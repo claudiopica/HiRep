@@ -11,53 +11,50 @@
 #include "memory.h"
 
 /* use power method to find max eigvalue */
-int max_H(spinor_operator H, geometry_descriptor *type, double *max)
-{
-  double norm, oldmax, dt;
-  spinor_field *s1, *s2, *s3;
-  int count;
+int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
+    double norm, oldmax, dt;
+    spinor_field *s1, *s2, *s3;
+    int count;
 
-  s1 = alloc_spinor_field_f(3, type);
-  /* #ifdef UPDATE_EO */
-  /*  s1=alloc_spinor_field_f(3,&glat_even); */
-  /* #else */
-  /*   s1=alloc_spinor_field_f(3,&glattice); */
-  /* #endif */
-  s2 = s1 + 1;
-  s3 = s2 + 1;
+    s1 = alloc_spinor_field_f(3, type);
+    /* #ifdef UPDATE_EO */
+    /*  s1=alloc_spinor_field_f(3,&glat_even); */
+    /* #else */
+    /*   s1=alloc_spinor_field_f(3,&glattice); */
+    /* #endif */
+    s2 = s1 + 1;
+    s3 = s2 + 1;
 
-  /* random spinor */
-  gaussian_spinor_field(s1);
-  norm = sqrt(spinor_field_sqnorm_f(s1));
-  spinor_field_mul_f(s1, 1. / norm, s1);
-  norm = 1.;
-
-  dt = 1.;
-
-  H(s3, s1);
-  count = 1;
-
-  do
-  {
-
-    spinor_field_mul_f(s1, dt, s3);
-
+    /* random spinor */
+    gaussian_spinor_field(s1);
     norm = sqrt(spinor_field_sqnorm_f(s1));
     spinor_field_mul_f(s1, 1. / norm, s1);
+    norm = 1.;
 
-    oldmax = *max;
+    dt = 1.;
+
     H(s3, s1);
-    ++count;
-    *max = spinor_field_prod_re_f(s1, s3);
+    count = 1;
 
-    /* printf("Iter %d: %4.5e\n",count,fabs(oldnorm-norm)); */
-  } while (fabs((*max - oldmax) / (*max)) > 1.e-3);
+    do {
+        spinor_field_mul_f(s1, dt, s3);
 
-  *max *= 1.1; /* do not know exact bound */
+        norm = sqrt(spinor_field_sqnorm_f(s1));
+        spinor_field_mul_f(s1, 1. / norm, s1);
 
-  lprintf("MaxH", 10, "Max_eig = %1.8e [MVM = %d]\n", *max, count);
+        oldmax = *max;
+        H(s3, s1);
+        ++count;
+        *max = spinor_field_prod_re_f(s1, s3);
 
-  free_spinor_field_f(s1);
+        /* printf("Iter %d: %4.5e\n",count,fabs(oldnorm-norm)); */
+    } while (fabs((*max - oldmax) / (*max)) > 1.e-3);
 
-  return count;
+    *max *= 1.1; /* do not know exact bound */
+
+    lprintf("MaxH", 10, "Max_eig = %1.8e [MVM = %d]\n", *max, count);
+
+    free_spinor_field_f(s1);
+
+    return count;
 }

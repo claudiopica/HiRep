@@ -23,21 +23,19 @@ char *const LOGTAG = "GEOMETRY DEFINE";
 // Basic functions to index points in a 4D box
 ///////////////////////////////////////////////////////////////////
 
-static inline int lexi(int b0, int b1, int b2, int b3, int x0, int x1, int x2, int x3)
-{
+static inline int lexi(int b0, int b1, int b2, int b3, int x0, int x1, int x2, int x3) {
     return x0 + x1 * b0 + x2 * b1 * b0 + x3 * b2 * b1 * b0;
 }
 
 //find a suitale block size for the lenght L
 //input b: requested block size
-static int set_block_size(int L, int b)
-{
+static int set_block_size(int L, int b) {
 #ifndef NDEBUG
     error(!(b > 0), 1, "GEOMETRY: " __FILE__, "Incorrect inner blocking dimensions used");
 #endif
     //keep decreasing b to find a good value
     while (b > 1) {
-        if (L % b == 0) return b;
+        if (L % b == 0) { return b; }
         b--;
     }
     return 1;
@@ -47,8 +45,7 @@ static int set_block_size(int L, int b)
 // X[0-3] = total size of the box
 // x[0-3] = coordinate of site in the box
 // return an index from 0 to (X0*X1*X2*X3)/2-1
-static int index_blocked(int b0, int b1, int b2, int b3, int X0, int X1, int X2, int X3, int x0, int x1, int x2, int x3)
-{
+static int index_blocked(int b0, int b1, int b2, int b3, int X0, int X1, int X2, int X3, int x0, int x1, int x2, int x3) {
     int xb0, xb1, xb2, xb3; //coordinates inside the block
     int xn0, xn1, xn2, xn3; //coordinates of the block
 
@@ -374,8 +371,7 @@ static box_t *makeBorderBox(char mask) {
 /// TODO: change this: make sendbuf_alloc take the full size of the sendbuffer, not the size per site
 
 /// Compute memory size for total=inner + buffers, and buffers only
-static void geometryMemSize(box_t *G, int *total, int *buffers)
-{
+static void geometryMemSize(box_t *G, int *total, int *buffers) {
     *total = roundUp(boxEvenVolume(G), THREADSIZE) + roundUp(boxOddVolume(G), THREADSIZE);
     *buffers = 0;
     box_t *L = G->next; //first border buffer. L3 are first, then L2
@@ -391,8 +387,7 @@ static void geometryMemSize(box_t *G, int *total, int *buffers)
 // ipt size is always T_EXT*X_EXT*Y_EXT*Z_EXT
 // iup, idn, imask and icoords arrays are indexed by the global name
 // their length depends on the size of the boxes
-static void index_alloc()
-{
+static void index_alloc() {
     // memory for ipt
     const int ext_volume = T_EXT * X_EXT * Y_EXT * Z_EXT;
     ipt = malloc(ext_volume * sizeof(*ipt));
@@ -417,8 +412,7 @@ static void index_alloc()
     sb_icoord = icoord + main_mem_volume;
 }
 
-static void index_free()
-{
+static void index_free() {
     if (ipt) { free(ipt); }
     ipt = NULL;
 
@@ -435,8 +429,7 @@ static void index_free()
 }
 
 // fill out ipt, iup, idn, imask
-static void enumerate_lattice()
-{
+static void enumerate_lattice() {
     // const int size[4] = { T, X, Y, Z };
     // const int borders[4] = { T_BORDER, X_BORDER, Y_BORDER, Z_BORDER };
     // const int ext_size[4] = { T_EXT, X_EXT, Y_EXT, Z_EXT };
@@ -527,7 +520,7 @@ static void enumerate_lattice()
     index_alloc();
     atexit(&index_free);
 
-    const int INVALID_POINT = -1; 
+    const int INVALID_POINT = -1;
     //NB: memset only works with 0 and -1 (assuming 2's complement numbers)
     memset(ipt, INVALID_POINT, T_EXT * X_EXT * Y_EXT * Z_EXT * sizeof(*ipt));
 
@@ -546,9 +539,10 @@ static void enumerate_lattice()
                         const int parity = (x0 + x1 + x2 + x3 + sign) % 2;
                         const int ix = idx + (parity ? b->base_index_odd : b->base_index);
 #ifndef NDEBUG
-                        if (idx < 0 || !(idx < (boxVolume(b) / 2)))
+                        if (idx < 0 || !(idx < (boxVolume(b) / 2))) {
                             lprintf(LOGTAG, 1, "ERROR in ipt: Volume/2=%d idx=%d  @ (%d, %d, %d, %d)\n", boxVolume(b) / 2, idx,
                                     x0 + b->l[0], x1 + b->l[1], x2 + b->l[2], x3 + b->l[3]);
+                        }
 #endif
                         ipt_ext(x0 + b->l[0], x1 + b->l[1], x2 + b->l[2], x3 + b->l[3]) = ix;
 
@@ -588,7 +582,7 @@ static void enumerate_lattice()
             for (int x2_ext = 0; x2_ext < Y_EXT; x2_ext++) {
                 for (int x3_ext = 0; x3_ext < Z_EXT; x3_ext++) {
                     const int ix = ipt_ext(x0_ext, x1_ext, x2_ext, x3_ext);
-                    if (ix == INVALID_POINT) continue;
+                    if (ix == INVALID_POINT) { continue; }
 
                     char xmask = 0;
                     int iy = 0;
@@ -637,16 +631,24 @@ static void enumerate_lattice()
             _OMP_PRAGMA(_omp_parallel)
             _OMP_PRAGMA(_omp_for)
             for (int ix = base_index; ix < last_index; ++ix) {
-                for (int dir = 0; dir < 4; ++dir) { iup_tmp[(&(iup(ix, dir)) - iup)] = iup(ix, dir); }
-                for (int dir = 0; dir < 4; ++dir) { idn_tmp[(&(idn(ix, dir)) - idn)] = idn(ix, dir); }
+                for (int dir = 0; dir < 4; ++dir) {
+                    iup_tmp[(&(iup(ix, dir)) - iup)] = iup(ix, dir);
+                }
+                for (int dir = 0; dir < 4; ++dir) {
+                    idn_tmp[(&(idn(ix, dir)) - idn)] = idn(ix, dir);
+                }
                 imask_tmp[ix] = imask[ix];
                 icoord_tmp[ix] = icoord[ix];
             }
             //these are unused points at the end of the piece
             //we don't use an openmp loop here
             for (int ix = last_index; ix < roundUp(last_index, THREADSIZE); ++ix) {
-                for (int dir = 0; dir < 4; ++dir) { iup_tmp[(&(iup(ix, dir)) - iup)] = iup(ix, dir); }
-                for (int dir = 0; dir < 4; ++dir) { idn_tmp[(&(idn(ix, dir)) - idn)] = idn(ix, dir); }
+                for (int dir = 0; dir < 4; ++dir) {
+                    iup_tmp[(&(iup(ix, dir)) - iup)] = iup(ix, dir);
+                }
+                for (int dir = 0; dir < 4; ++dir) {
+                    idn_tmp[(&(idn(ix, dir)) - idn)] = idn(ix, dir);
+                }
                 imask_tmp[ix] = imask[ix];
                 icoord_tmp[ix] = icoord[ix];
             }
@@ -662,10 +664,14 @@ static void enumerate_lattice()
 
                 _OMP_PRAGMA(_omp_parallel)
                 _OMP_PRAGMA(_omp_for)
-                for (int ix = base_index; ix < last_index; ++ix) { sb_icoord_tmp[ix] = sb_icoord[ix]; }
+                for (int ix = base_index; ix < last_index; ++ix) {
+                    sb_icoord_tmp[ix] = sb_icoord[ix];
+                }
                 //these are unused points at the end of the piece
                 //we don't use an openmp loop here
-                for (int ix = last_index; ix < roundUp(last_index, THREADSIZE); ++ix) { sb_icoord_tmp[ix] = sb_icoord[ix]; }
+                for (int ix = last_index; ix < roundUp(last_index, THREADSIZE); ++ix) {
+                    sb_icoord_tmp[ix] = sb_icoord[ix];
+                }
                 SB->icoord = sb_icoord_tmp; //point to the new array
             }
         }
@@ -702,8 +708,7 @@ static void enumerate_lattice()
 // glattice, glat_even and glat_odd
 ///////////////////////////////////////////////////////////////////
 
-static void gd_free_mem(geometry_descriptor *gd)
-{
+static void gd_free_mem(geometry_descriptor *gd) {
     if (gd->rbuf_len) {
         free(gd->rbuf_len);
         gd->rbuf_len = NULL;
@@ -723,8 +728,7 @@ static void gd_free_mem(geometry_descriptor *gd)
 // if N>0 this allocates memory for the send/rec index buffers and
 // master pieces indices. The number of master pieces is NBuf+NInner
 // otherwise sets them to NULL
-static void gd_alloc_mem(geometry_descriptor *gd, int NBuf, int NInner)
-{
+static void gd_alloc_mem(geometry_descriptor *gd, int NBuf, int NInner) {
     int *buf = NULL;
     if (NBuf > 0) {
         buf = (int *)malloc((6 * NBuf) * sizeof(int));
@@ -752,8 +756,7 @@ static void gd_alloc_mem(geometry_descriptor *gd, int NBuf, int NInner)
 
 // in this geometry we don't need to copy pieces of geometry
 // this functions sets the number of copies to zero e NULLs the arrays for copies
-static void gd_set_copy(geometry_descriptor *gd)
-{
+static void gd_set_copy(geometry_descriptor *gd) {
     gd->ncopies_gauge = 0;
     gd->ncopies_spinor = 0;
     gd->copy_from = NULL;
@@ -762,15 +765,13 @@ static void gd_set_copy(geometry_descriptor *gd)
     gd->copy_shift = 0;
 }
 
-static void gd_free()
-{
+static void gd_free() {
     gd_free_mem(&glattice);
     gd_free_mem(&glat_even);
     gd_free_mem(&glat_odd);
 }
 
-static void gd_init()
-{
+static void gd_init() {
     //number of parallel directions
     const int NPAR = (NP_T > 1 ? 1 : 0) + (NP_X > 1 ? 1 : 0) + (NP_Y > 1 ? 1 : 0) + (NP_Z > 1 ? 1 : 0);
     // Dimension 3 borders. These are for both gauge fields and spinors
@@ -842,8 +843,7 @@ static void gd_init()
 
 //sets: rbuf_len, sbuf_len, rbuf_from_proc, rbuf_start, sbuf_to_proc, sbuf_start,
 // master_start, master_end
-void gd_set_boxIndices()
-{
+void gd_set_boxIndices() {
     int ib = 0; //index of buffer in geometry descriptor
     box_t *L = geometryBoxes->next; // point to first border buffer. L3 are first, then L2
     while (L) {
@@ -942,37 +942,35 @@ static SB_t send_buffers[_MAX_SENDBUF] = { 0 };
 typedef int sb_handle;
 
 #ifndef NDEBUG
-static int isValidHandle(sb_handle h)
-{
+static int isValidHandle(sb_handle h) {
     return (h >= 0) && (h < _MAX_SENDBUF);
 }
 #endif
 
 #include "gpu.h"
 
-static void sendbuf_free()
-{
+static void sendbuf_free() {
     for (int i = 0; i < _MAX_SENDBUF; i++) {
         void *buf = send_buffers[i].buf;
-        if (buf) afree(buf); //this was allocated with amalloc
+        if (buf) {
+            afree(buf); //this was allocated with amalloc
+        }
 #ifdef WITH_GPU
         void *gpubuf = send_buffers[i].gpubuf;
-        if (gpubuf) cudaFree(buf);
+        if (gpubuf) { cudaFree(buf); }
 #endif
         const SB_t empty_sb = { 0 };
         send_buffers[i] = empty_sb;
     }
 }
 
-static void sendbuf_init()
-{
+static void sendbuf_init() {
     atexit(&sendbuf_free);
 }
 
-static SB_t *getSB(sb_handle h)
-{
+static SB_t *getSB(sb_handle h) {
 #ifndef NDEBUG
-    if (!isValidHandle(h)) error(1, 1, __func__, "Attempt to access invalid sendbuf handle");
+    if (!isValidHandle(h)) { error(1, 1, __func__, "Attempt to access invalid sendbuf handle"); }
 #endif
     return &send_buffers[h];
 }
@@ -980,8 +978,7 @@ static SB_t *getSB(sb_handle h)
 //find send buf of given size
 //if not already existing returns first free slot
 //if no free slots left, exit with error
-static sb_handle findSB(size_t bytes_per_site)
-{
+static sb_handle findSB(size_t bytes_per_site) {
     for (int i = 0; i < _MAX_SENDBUF; i++) {
         if ((send_buffers[i].buf == NULL) || (send_buffers[i].bytes_per_site == bytes_per_site)) {
             //this is the first empty slot
@@ -994,13 +991,12 @@ static sb_handle findSB(size_t bytes_per_site)
 }
 
 //allocate a new sendbuffer on the glattice geometry
-static sb_handle allocSB(size_t bytes_per_site)
-{
+static sb_handle allocSB(size_t bytes_per_site) {
     //find slot for send buffer
     sb_handle sb_h = findSB(bytes_per_site);
     SB_t *new_sb = getSB(sb_h);
     //if this is an already filled slot, just return it
-    if (new_sb->buf) return sb_h;
+    if (new_sb->buf) { return sb_h; }
 
     //otherwise allocate memory
     //gsize_gauge is the local volume + rsend buffers.
@@ -1027,26 +1023,23 @@ static sb_handle allocSB(size_t bytes_per_site)
 // function to allocate a sendbuffer
 // returns memory buffer
 // TODO: do we need EVEN/ODD here?
-void *sendbuf_alloc(size_t bytes_per_site)
-{
+void *sendbuf_alloc(size_t bytes_per_site) {
     const sb_handle sb_h = allocSB(bytes_per_site);
     return getSB(sb_h)->buf;
 }
 
 #ifdef WITH_GPU
-void *sendbuf_alloc_gpu(size_t bytes_per_site)
-{
+void *sendbuf_alloc_gpu(size_t bytes_per_site) {
     const sb_handle sb_h = allocSB(bytes_per_site);
     return getSB(sb_h)->gpubuf;
 }
 #endif
 
 //this prints out the state of the send buffer list
-void sendbuf_report()
-{
+void sendbuf_report() {
     for (int i = 0; i < _MAX_SENDBUF; i++) {
         SB_t *const sb = getSB(i);
-        if (sb->buf == NULL) break;
+        if (sb->buf == NULL) { break; }
         lprintf(LOGTAG, 1, "%d size=%zu\n", i, sb->bytes_per_site);
     }
 }
@@ -1059,14 +1052,13 @@ void sendbuf_report()
 // src : source geometry box.
 // bytes_per_site : size in bytes of the local object to copy. Could be 4 gauge fields or a (half)spinor
 // sendbuf : memory destination to be send over MPI to a matching recv buffer in the extended lattice (dst)
-static void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, void *lattice, void *sendbuf)
-{
+static void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, void *lattice, void *sendbuf) {
 #ifndef NDEBUG
     lprintf("SYNC", 1, "VOLUME/PARITY: SRC=%d[even=%d]/%d\n", boxVolume(src), boxEvenVolume(src), boxParity(src));
 #endif
     if (gd_t & EVEN) { //EVEN part
         const int vol = boxEvenVolume(src);
-        
+
         _OMP_PARALLEL_FOR
         for (int dix = src->base_index; dix < (src->base_index + vol); dix++) {
             coord4 c = src->icoord[dix];
@@ -1090,18 +1082,19 @@ static void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, v
     }
 }
 
-void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like, void *latticebuf, void *sb_ptr)
-{
+void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like, void *latticebuf, void *sb_ptr) {
     enum gd_type gd_t = GLOBAL;
     //TODO: the type should really be in the descriptor itself
     // we shouldn't compare pointers...
-    if (gd == &glat_even) gd_t = EVEN;
-    if (gd == &glat_odd) gd_t = ODD;
+    if (gd == &glat_even) { gd_t = EVEN; }
+    if (gd == &glat_odd) { gd_t = ODD; }
 
     latticebuf = ((char *)latticebuf) - (bytes_per_site * gd->master_shift); //shift buffer by master_shift
     char *const sendbuf_base = (char *)sb_ptr;
     int n_buffers = is_spinor_like ? gd->nbuffers_spinor : gd->nbuffers_gauge;
-    if (gd_t == GLOBAL) n_buffers /= 2; //we fill even and odd buffers at the same time
+    if (gd_t == GLOBAL) {
+        n_buffers /= 2; //we fill even and odd buffers at the same time
+    }
 #ifndef NDEBUG
     lprintf(LOGTAG, 50, "Geometry size: %d \n", is_spinor_like ? gd->gsize_spinor : gd->gsize_gauge);
     lprintf(LOGTAG, 50, "SPINOR_LIKE: %d  NBUFFERS: %d\n", is_spinor_like, n_buffers);
@@ -1140,8 +1133,7 @@ void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like,
 // ipt, iup, idn: look up tables to move around the lattice
 // imask: bitfield to encode some properties of the point
 // glattice, glat_even, glat_odd: geometry descriptors
-void define_geometry()
-{
+void define_geometry() {
     lprintf(LOGTAG, 1, "Define Lattice Geometry...\n");
     enumerate_lattice();
     gd_init();
@@ -1169,15 +1161,15 @@ static int isSiteParityCorrect(int idx, int parity, box_t *B) {
 }
 #endif
 
-static void resetArray(char *array, int len)
-{
-    for (int i = 0; i < len; ++i) array[i] = 0;
+static void resetArray(char *array, int len) {
+    for (int i = 0; i < len; ++i) {
+        array[i] = 0;
+    }
 }
 
 static char *LOGTESTTAG = "GEOMETRY TEST";
 
-static int checkArray(char *array, int local_len)
-{
+static int checkArray(char *array, int local_len) {
     int errors = 0;
     for (int i = 0; i < local_len; ++i) {
         if (i < local_len && array[i] != 1) {
@@ -1189,8 +1181,7 @@ static int checkArray(char *array, int local_len)
 }
 
 //check if a point is inside the local lattice
-static int isLocal(int x0_ext, int x1_ext, int x2_ext, int x3_ext)
-{
+static int isLocal(int x0_ext, int x1_ext, int x2_ext, int x3_ext) {
     x0_ext = safe_mod(x0_ext, T_EXT);
     x1_ext = safe_mod(x1_ext, X_EXT);
     x2_ext = safe_mod(x2_ext, Y_EXT);
@@ -1203,8 +1194,7 @@ static int isLocal(int x0_ext, int x1_ext, int x2_ext, int x3_ext)
 //we test that moving int he direction active in the mask
 //we end up inside the LOCAL lattice (no halos allowed)
 //NB: the starting point can be in the halo
-static int checkMask(char mask, int x0_ext, int x1_ext, int x2_ext, int x3_ext)
-{
+static int checkMask(char mask, int x0_ext, int x1_ext, int x2_ext, int x3_ext) {
     int errors = 0;
     if ((mask & T_UP_MASK) && !isLocal(x0_ext + 1, x1_ext, x2_ext, x3_ext)) {
         errors++;
@@ -1242,8 +1232,7 @@ static int checkMask(char mask, int x0_ext, int x1_ext, int x2_ext, int x3_ext)
     return errors;
 }
 
-static int checkBoxNumbers(int boxnumber)
-{
+static int checkBoxNumbers(int boxnumber) {
     //number of parallel directions
     const int NPAR = (NP_T > 1 ? 1 : 0) + (NP_X > 1 ? 1 : 0) + (NP_Y > 1 ? 1 : 0) + (NP_Z > 1 ? 1 : 0);
     // Dimension 3 borders. These are for both gauge fields and spinors
@@ -1268,8 +1257,7 @@ static int checkBoxNumbers(int boxnumber)
     return errors;
 }
 
-int test_define_geometry()
-{
+int test_define_geometry() {
     const int ext_vol = T_EXT * X_EXT * Y_EXT * Z_EXT;
     char *idxcheck = malloc(ext_vol * sizeof(*idxcheck)); //this should be at least the size of the max volume of a box
     const int max_ix = glattice.gsize_gauge;

@@ -43,417 +43,344 @@
 
 #define MAX_SWEEP 100
 
-static void sort1(int n, double d[], double v[])
-{
-	int i, j, k;
-	double p;
+static void sort1(int n, double d[], double v[]) {
+    int i, j, k;
+    double p;
 
-	for (i = 0; i < n - 1; i++)
-	{
-		k = i;
-		p = d[i];
+    for (i = 0; i < n - 1; i++) {
+        k = i;
+        p = d[i];
 
-		for (j = i + 1; j < n; j++)
-		{
-			if (d[j] < p)
-			{
-				k = j;
-				p = d[j];
-			}
-		}
+        for (j = i + 1; j < n; j++) {
+            if (d[j] < p) {
+                k = j;
+                p = d[j];
+            }
+        }
 
-		if (k != i)
-		{
-			d[k] = d[i];
-			d[i] = p;
+        if (k != i) {
+            d[k] = d[i];
+            d[i] = p;
 
-			for (j = 0; j < n; j++)
-			{
-				p = v[n * j + i];
-				v[n * j + i] = v[n * j + k];
-				v[n * j + k] = p;
-			}
-		}
-	}
+            for (j = 0; j < n; j++) {
+                p = v[n * j + i];
+                v[n * j + i] = v[n * j + k];
+                v[n * j + k] = p;
+            }
+        }
+    }
 }
 
-static void sort2(int n, double d[], hr_complex v[])
-{
-	int i, j, k;
-	double p;
-	hr_complex q;
+static void sort2(int n, double d[], hr_complex v[]) {
+    int i, j, k;
+    double p;
+    hr_complex q;
 
-	for (i = 0; i < n - 1; i++)
-	{
-		k = i;
-		p = d[i];
+    for (i = 0; i < n - 1; i++) {
+        k = i;
+        p = d[i];
 
-		for (j = i + 1; j < n; j++)
-		{
-			if (d[j] < p)
-			{
-				k = j;
-				p = d[j];
-			}
-		}
+        for (j = i + 1; j < n; j++) {
+            if (d[j] < p) {
+                k = j;
+                p = d[j];
+            }
+        }
 
-		if (k != i)
-		{
-			d[k] = d[i];
-			d[i] = p;
+        if (k != i) {
+            d[k] = d[i];
+            d[i] = p;
 
-			for (j = 0; j < n; j++)
-			{
-				q = v[n * j + i];
-				v[n * j + i] = v[n * j + k];
-				v[n * j + k] = q;
-			}
-		}
-	}
+            for (j = 0; j < n; j++) {
+                q = v[n * j + i];
+                v[n * j + i] = v[n * j + k];
+                v[n * j + k] = q;
+            }
+        }
+    }
 }
 
-void jacobi1(int n, double a[], double d[], double v[])
-{
-	int k, l, j, sweep;
-	double tol, abs_sum, thresh_factor, sd_factor, thresh;
-	double r1, r2, r3, r4;
-	double t, e, s, c, tau;
-	double xn, xd0, xdh, xd1;
+void jacobi1(int n, double a[], double d[], double v[]) {
+    int k, l, j, sweep;
+    double tol, abs_sum, thresh_factor, sd_factor, thresh;
+    double r1, r2, r3, r4;
+    double t, e, s, c, tau;
+    double xn, xd0, xdh, xd1;
 
-	xd0 = 0.0f;
-	xdh = 0.5f;
-	xd1 = 1.0f;
-	xn = (double)n;
-	sd_factor = 100.0f;
-	thresh_factor = 0.2f / (xn * xn);
+    xd0 = 0.0f;
+    xdh = 0.5f;
+    xd1 = 1.0f;
+    xn = (double)n;
+    sd_factor = 100.0f;
+    thresh_factor = 0.2f / (xn * xn);
 
-	tol = xd0;
-	abs_sum = xd0;
+    tol = xd0;
+    abs_sum = xd0;
 
-	for (k = 0; k < n; k++)
-	{
-		v[n * k + k] = xd1;
-		d[k] = a[n * k + k];
-		tol += fabs(d[k]);
+    for (k = 0; k < n; k++) {
+        v[n * k + k] = xd1;
+        d[k] = a[n * k + k];
+        tol += fabs(d[k]);
 
-		for (l = k + 1; l < n; l++)
-		{
-			v[n * k + l] = xd0;
-			v[n * l + k] = xd0;
+        for (l = k + 1; l < n; l++) {
+            v[n * k + l] = xd0;
+            v[n * l + k] = xd0;
 
-			error(a[n * k + l] != a[n * l + k], 1,
-				  "jacobi1 [jacobi.c]", "Matrix is not symmetric");
+            error(a[n * k + l] != a[n * l + k], 1, "jacobi1 [jacobi.c]", "Matrix is not symmetric");
 
-			abs_sum += fabs(a[n * k + l]);
-		}
-	}
+            abs_sum += fabs(a[n * k + l]);
+        }
+    }
 
-	tol += 2.0f * abs_sum;
-	tol *= DBL_EPSILON;
+    tol += 2.0f * abs_sum;
+    tol *= DBL_EPSILON;
 
-	for (sweep = 0; (abs_sum > tol) && (sweep < MAX_SWEEP); sweep++)
-	{
-		thresh = xd0;
-		if (sweep <= 2)
-			thresh = thresh_factor * abs_sum;
+    for (sweep = 0; (abs_sum > tol) && (sweep < MAX_SWEEP); sweep++) {
+        thresh = xd0;
+        if (sweep <= 2) { thresh = thresh_factor * abs_sum; }
 
-		for (k = 0; k < n - 1; k++)
-		{
-			for (l = k + 1; l < n; l++)
-			{
-				r1 = sd_factor * (fabs(a[n * k + l]));
-				r2 = fabs(d[k]);
-				r3 = fabs(d[l]);
+        for (k = 0; k < n - 1; k++) {
+            for (l = k + 1; l < n; l++) {
+                r1 = sd_factor * (fabs(a[n * k + l]));
+                r2 = fabs(d[k]);
+                r3 = fabs(d[l]);
 
-				if ((sweep > 3) && (r1 <= (r2 * DBL_EPSILON)) && (r1 <= (r3 * DBL_EPSILON)))
-					a[n * k + l] = xd0;
+                if ((sweep > 3) && (r1 <= (r2 * DBL_EPSILON)) && (r1 <= (r3 * DBL_EPSILON))) { a[n * k + l] = xd0; }
 
-				r1 = fabs(a[n * k + l]);
-				if (r1 <= thresh)
-					continue;
+                r1 = fabs(a[n * k + l]);
+                if (r1 <= thresh) { continue; }
 
-				r2 = d[l] - d[k];
-				r3 = fabs(r2);
+                r2 = d[l] - d[k];
+                r3 = fabs(r2);
 
-				if ((sd_factor * r1) < (r3 * DBL_EPSILON))
-				{
-					t = r1 / r2;
-				}
-				else
-				{
-					r4 = xdh * r2 / r1;
-					if (r4 < xd0)
-					{
-						t = xd1 / (r4 - (sqrt(xd1 + r4 * r4)));
-					}
-					else
-					{
-						t = xd1 / (r4 + (sqrt(xd1 + r4 * r4)));
-					}
-				}
+                if ((sd_factor * r1) < (r3 * DBL_EPSILON)) {
+                    t = r1 / r2;
+                } else {
+                    r4 = xdh * r2 / r1;
+                    if (r4 < xd0) {
+                        t = xd1 / (r4 - (sqrt(xd1 + r4 * r4)));
+                    } else {
+                        t = xd1 / (r4 + (sqrt(xd1 + r4 * r4)));
+                    }
+                }
 
-				e = xd1;
-				if (a[n * k + l] < xd0)
-					e = -xd1;
-				a[n * k + l] = xd0;
+                e = xd1;
+                if (a[n * k + l] < xd0) { e = -xd1; }
+                a[n * k + l] = xd0;
 
-				c = xd1 / (sqrt(xd1 + t * t));
-				s = t * c;
-				tau = s / (xd1 + c);
+                c = xd1 / (sqrt(xd1 + t * t));
+                s = t * c;
+                tau = s / (xd1 + c);
 
-				r2 = t * r1;
-				d[k] -= r2;
-				d[l] += r2;
+                r2 = t * r1;
+                d[k] -= r2;
+                d[l] += r2;
 
-				for (j = 0; j < n; j++)
-				{
-					if (j < k)
-					{
-						r1 = a[n * j + k];
-						r2 = a[n * j + l];
-						a[n * j + k] = -s * (tau * r1 + e * r2) + r1;
-						a[n * j + l] = s * (-tau * r2 + e * r1) + r2;
-					}
-					else if ((j > k) && (j < l))
-					{
-						r1 = a[n * k + j];
-						r2 = a[n * j + l];
-						a[n * k + j] = -s * (tau * r1 + e * r2) + r1;
-						a[n * j + l] = s * (-tau * r2 + e * r1) + r2;
-					}
-					else if (j > l)
-					{
-						r1 = a[n * k + j];
-						r2 = a[n * l + j];
-						a[n * k + j] = -s * (tau * r1 + e * r2) + r1;
-						a[n * l + j] = s * (-tau * r2 + e * r1) + r2;
-					}
+                for (j = 0; j < n; j++) {
+                    if (j < k) {
+                        r1 = a[n * j + k];
+                        r2 = a[n * j + l];
+                        a[n * j + k] = -s * (tau * r1 + e * r2) + r1;
+                        a[n * j + l] = s * (-tau * r2 + e * r1) + r2;
+                    } else if ((j > k) && (j < l)) {
+                        r1 = a[n * k + j];
+                        r2 = a[n * j + l];
+                        a[n * k + j] = -s * (tau * r1 + e * r2) + r1;
+                        a[n * j + l] = s * (-tau * r2 + e * r1) + r2;
+                    } else if (j > l) {
+                        r1 = a[n * k + j];
+                        r2 = a[n * l + j];
+                        a[n * k + j] = -s * (tau * r1 + e * r2) + r1;
+                        a[n * l + j] = s * (-tau * r2 + e * r1) + r2;
+                    }
 
-					r1 = v[n * j + k];
-					r2 = v[n * j + l];
-					v[n * j + k] = -s * (tau * r1 + e * r2) + r1;
-					v[n * j + l] = s * (-tau * r2 + e * r1) + r2;
-				}
-			}
-		}
+                    r1 = v[n * j + k];
+                    r2 = v[n * j + l];
+                    v[n * j + k] = -s * (tau * r1 + e * r2) + r1;
+                    v[n * j + l] = s * (-tau * r2 + e * r1) + r2;
+                }
+            }
+        }
 
-		abs_sum = xd0;
+        abs_sum = xd0;
 
-		for (k = 0; k < n - 1; k++)
-		{
-			for (l = k + 1; l < n; l++)
-			{
-				abs_sum += fabs(a[n * k + l]);
-			}
-		}
-	}
+        for (k = 0; k < n - 1; k++) {
+            for (l = k + 1; l < n; l++) {
+                abs_sum += fabs(a[n * k + l]);
+            }
+        }
+    }
 
-	error(sweep >= MAX_SWEEP, 1, "jacobi1 [jacobi.c]",
-		  "Maximum number of sweeps exceeded");
+    error(sweep >= MAX_SWEEP, 1, "jacobi1 [jacobi.c]", "Maximum number of sweeps exceeded");
 
-	for (k = 0; k < n - 1; k++)
-	{
-		for (l = k + 1; l < n; l++)
-		{
-			a[n * k + l] = a[n * l + k];
-		}
-	}
+    for (k = 0; k < n - 1; k++) {
+        for (l = k + 1; l < n; l++) {
+            a[n * k + l] = a[n * l + k];
+        }
+    }
 
-	sort1(n, d, v);
+    sort1(n, d, v);
 }
 
-void jacobi2(int n, hr_complex a[], double d[], hr_complex v[])
-{
-	int k, l, j, sweep;
-	double tol, abs_sum, thresh_factor, sd_factor, thresh;
-	double r1, r2, r3, r4;
-	double t, s, c, tau;
-	double xn, xd0, xdh, xd1;
-	hr_complex z1, z2;
-	hr_complex e;
-	hr_complex zd0, zd1;
+void jacobi2(int n, hr_complex a[], double d[], hr_complex v[]) {
+    int k, l, j, sweep;
+    double tol, abs_sum, thresh_factor, sd_factor, thresh;
+    double r1, r2, r3, r4;
+    double t, s, c, tau;
+    double xn, xd0, xdh, xd1;
+    hr_complex z1, z2;
+    hr_complex e;
+    hr_complex zd0, zd1;
 
-	xd0 = 0.0f;
-	xdh = 0.5f;
-	xd1 = 1.0f;
-	xn = (double)n;
-	sd_factor = 100.0f;
-	thresh_factor = 0.2f / (xn * xn);
+    xd0 = 0.0f;
+    xdh = 0.5f;
+    xd1 = 1.0f;
+    xn = (double)n;
+    sd_factor = 100.0f;
+    thresh_factor = 0.2f / (xn * xn);
 
-	zd0 = xd0 + I * xd0;
-	zd1 = xd1 + I * xd0;
+    zd0 = xd0 + I * xd0;
+    zd1 = xd1 + I * xd0;
 
-	tol = xd0;
-	abs_sum = xd0;
+    tol = xd0;
+    abs_sum = xd0;
 
-	for (k = 0; k < n; k++)
-	{
-		v[n * k + k] = zd1;
-		d[k] = creal(a[n * k + k]);
-		tol += fabs(d[k]);
+    for (k = 0; k < n; k++) {
+        v[n * k + k] = zd1;
+        d[k] = creal(a[n * k + k]);
+        tol += fabs(d[k]);
 
-		for (l = k + 1; l < n; l++)
-		{
-			v[n * k + l] = zd0;
-			v[n * l + k] = zd0;
+        for (l = k + 1; l < n; l++) {
+            v[n * k + l] = zd0;
+            v[n * l + k] = zd0;
 
-			a[n * k + l] = conj(a[n * l + k]);
-			
-			abs_sum += (fabs(creal(a[n * k + l]) + fabs(cimag(a[n * k + l]))));
-		}
-	}
+            a[n * k + l] = conj(a[n * l + k]);
 
-	tol += 2.0f * abs_sum;
-	tol *= DBL_EPSILON;
+            abs_sum += (fabs(creal(a[n * k + l]) + fabs(cimag(a[n * k + l]))));
+        }
+    }
 
-	for (sweep = 0; (abs_sum > tol) && (sweep < MAX_SWEEP); sweep++)
-	{
-		thresh = xd0;
-		if (sweep <= 2)
-			thresh = thresh_factor * abs_sum;
+    tol += 2.0f * abs_sum;
+    tol *= DBL_EPSILON;
 
-		for (k = 0; k < n - 1; k++)
-		{
-			for (l = k + 1; l < n; l++)
-			{
-				r1 = sd_factor *
-					 (fabs(creal(a[n * k + l])) + fabs(cimag(a[n * k + l])));
-				r2 = fabs(d[k]);
-				r3 = fabs(d[l]);
+    for (sweep = 0; (abs_sum > tol) && (sweep < MAX_SWEEP); sweep++) {
+        thresh = xd0;
+        if (sweep <= 2) { thresh = thresh_factor * abs_sum; }
 
-				if ((sweep > 3) && (r1 <= (r2 * DBL_EPSILON)) && (r1 <= (r3 * DBL_EPSILON)))
-					a[n * k + l] = zd0;
+        for (k = 0; k < n - 1; k++) {
+            for (l = k + 1; l < n; l++) {
+                r1 = sd_factor * (fabs(creal(a[n * k + l])) + fabs(cimag(a[n * k + l])));
+                r2 = fabs(d[k]);
+                r3 = fabs(d[l]);
 
-				r2 = fabs(creal(a[n * k + l]));
-				r3 = fabs(cimag(a[n * k + l]));
+                if ((sweep > 3) && (r1 <= (r2 * DBL_EPSILON)) && (r1 <= (r3 * DBL_EPSILON))) { a[n * k + l] = zd0; }
 
-				if (r2 > r3)
-				{
-					r3 /= r2;
-					r1 = r2 * (sqrt(xd1 + r3 * r3));
-				}
-				else if (r2 < r3)
-				{
-					r2 /= r3;
-					r1 = r3 * (sqrt(xd1 + r2 * r2));
-				}
-				else
-				{
-					r1 = r2 * (sqrt(xd1 + xd1));
-				}
+                r2 = fabs(creal(a[n * k + l]));
+                r3 = fabs(cimag(a[n * k + l]));
 
-				if (r1 <= thresh)
-					continue;
+                if (r2 > r3) {
+                    r3 /= r2;
+                    r1 = r2 * (sqrt(xd1 + r3 * r3));
+                } else if (r2 < r3) {
+                    r2 /= r3;
+                    r1 = r3 * (sqrt(xd1 + r2 * r2));
+                } else {
+                    r1 = r2 * (sqrt(xd1 + xd1));
+                }
 
-				r2 = d[l] - d[k];
-				r3 = fabs(r2);
+                if (r1 <= thresh) { continue; }
 
-				if ((sd_factor * r1) < (r3 * DBL_EPSILON))
-				{
-					t = r1 / r2;
-				}
-				else
-				{
-					r4 = xdh * r2 / r1;
-					if (r4 < xd0)
-					{
-						t = xd1 / (r4 - (sqrt(xd1 + r4 * r4)));
-					}
-					else
-					{
-						t = xd1 / (r4 + (sqrt(xd1 + r4 * r4)));
-					}
-				}
+                r2 = d[l] - d[k];
+                r3 = fabs(r2);
 
-				e = a[n * k + l] / r1;
+                if ((sd_factor * r1) < (r3 * DBL_EPSILON)) {
+                    t = r1 / r2;
+                } else {
+                    r4 = xdh * r2 / r1;
+                    if (r4 < xd0) {
+                        t = xd1 / (r4 - (sqrt(xd1 + r4 * r4)));
+                    } else {
+                        t = xd1 / (r4 + (sqrt(xd1 + r4 * r4)));
+                    }
+                }
 
-				a[n * k + l] = zd0;
+                e = a[n * k + l] / r1;
 
-				c = xd1 / (sqrt(xd1 + t * t));
-				s = t * c;
-				tau = s / (xd1 + c);
+                a[n * k + l] = zd0;
 
-				r2 = t * r1;
-				d[k] -= r2;
-				d[l] += r2;
+                c = xd1 / (sqrt(xd1 + t * t));
+                s = t * c;
+                tau = s / (xd1 + c);
 
-				for (j = 0; j < n; j++)
-				{
-					if (j < k)
-					{
-						z1 = a[n * j + k];
-						z2 = a[n * j + l];
-						a[n * j + k] = -s * (tau * z1 + conj(e) * z2) + z1;
-						/* a[n*j+k].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re; */
-						/* a[n*j+k].im=-s*( tau*z1.im-e.im*z2.re+e.re*z2.im)+z1.im; */
+                r2 = t * r1;
+                d[k] -= r2;
+                d[l] += r2;
 
-						a[n * j + l] = s * (-tau * z2 + e * z1) + z2;
-						/* a[n*j+l].re= s*(-tau*z2.re+e.re*z1.re-e.im*z1.im)+z2.re; */
-						/* a[n*j+l].im= s*(-tau*z2.im+e.im*z1.re+e.re*z1.im)+z2.im; */
-					}
-					else if ((j > k) && (j < l))
-					{
-						z1 = a[n * k + j];
-						z2 = a[n * j + l];
-						a[n * k + j] = -s * (tau * z1 + e * conj(z2)) + z1;
-						/* a[n*k+j].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re; */
-						/* a[n*k+j].im=-s*( tau*z1.im+e.im*z2.re-e.re*z2.im)+z1.im; */
+                for (j = 0; j < n; j++) {
+                    if (j < k) {
+                        z1 = a[n * j + k];
+                        z2 = a[n * j + l];
+                        a[n * j + k] = -s * (tau * z1 + conj(e) * z2) + z1;
+                        /* a[n*j+k].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re; */
+                        /* a[n*j+k].im=-s*( tau*z1.im-e.im*z2.re+e.re*z2.im)+z1.im; */
 
-						a[n * j + l] = s * (-tau * z2 + e * conj(z1)) + z2;
-						/* a[n*j+l].re= s*(-tau*z2.re+e.re*z1.re+e.im*z1.im)+z2.re; */
-						/* a[n*j+l].im= s*(-tau*z2.im+e.im*z1.re-e.re*z1.im)+z2.im; */
-					}
-					else if (j > l)
-					{
-						z1 = a[n * k + j];
-						z2 = a[n * l + j];
-						a[n * k + j] = -s * (tau * z1 + e * z2) + z1;
-						/* a[n*k+j].re=-s*( tau*z1.re+e.re*z2.re-e.im*z2.im)+z1.re; */
-						/* a[n*k+j].im=-s*( tau*z1.im+e.im*z2.re+e.re*z2.im)+z1.im; */
+                        a[n * j + l] = s * (-tau * z2 + e * z1) + z2;
+                        /* a[n*j+l].re= s*(-tau*z2.re+e.re*z1.re-e.im*z1.im)+z2.re; */
+                        /* a[n*j+l].im= s*(-tau*z2.im+e.im*z1.re+e.re*z1.im)+z2.im; */
+                    } else if ((j > k) && (j < l)) {
+                        z1 = a[n * k + j];
+                        z2 = a[n * j + l];
+                        a[n * k + j] = -s * (tau * z1 + e * conj(z2)) + z1;
+                        /* a[n*k+j].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re; */
+                        /* a[n*k+j].im=-s*( tau*z1.im+e.im*z2.re-e.re*z2.im)+z1.im; */
 
-						a[n * l + j] = s * (-tau * z2 + conj(e) * z1) + z2;
-						/* a[n*l+j].re= s*(-tau*z2.re+e.re*z1.re+e.im*z1.im)+z2.re; */
-						/* a[n*l+j].im= s*(-tau*z2.im-e.im*z1.re+e.re*z1.im)+z2.im; */
-					}
+                        a[n * j + l] = s * (-tau * z2 + e * conj(z1)) + z2;
+                        /* a[n*j+l].re= s*(-tau*z2.re+e.re*z1.re+e.im*z1.im)+z2.re; */
+                        /* a[n*j+l].im= s*(-tau*z2.im+e.im*z1.re-e.re*z1.im)+z2.im; */
+                    } else if (j > l) {
+                        z1 = a[n * k + j];
+                        z2 = a[n * l + j];
+                        a[n * k + j] = -s * (tau * z1 + e * z2) + z1;
+                        /* a[n*k+j].re=-s*( tau*z1.re+e.re*z2.re-e.im*z2.im)+z1.re; */
+                        /* a[n*k+j].im=-s*( tau*z1.im+e.im*z2.re+e.re*z2.im)+z1.im; */
 
-					z1 = v[n * j + k];
-					z2 = v[n * j + l];
+                        a[n * l + j] = s * (-tau * z2 + conj(e) * z1) + z2;
+                        /* a[n*l+j].re= s*(-tau*z2.re+e.re*z1.re+e.im*z1.im)+z2.re; */
+                        /* a[n*l+j].im= s*(-tau*z2.im-e.im*z1.re+e.re*z1.im)+z2.im; */
+                    }
 
-					v[n * j + k] = -s * (tau * z1 + conj(e) * z2) + z1;
-					/* v[n*j+k].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re; */
-					/* v[n*j+k].im=-s*( tau*z1.im-e.im*z2.re+e.re*z2.im)+z1.im; */
+                    z1 = v[n * j + k];
+                    z2 = v[n * j + l];
 
-					v[n * j + l] = s * (-tau * z2 + e * z1) + z2;
-					/* v[n*j+l].re= s*(-tau*z2.re+e.re*z1.re-e.im*z1.im)+z2.re; */
-					/* v[n*j+l].im= s*(-tau*z2.im+e.im*z1.re+e.re*z1.im)+z2.im; */
-				}
-			}
-		}
+                    v[n * j + k] = -s * (tau * z1 + conj(e) * z2) + z1;
+                    /* v[n*j+k].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re; */
+                    /* v[n*j+k].im=-s*( tau*z1.im-e.im*z2.re+e.re*z2.im)+z1.im; */
 
-		abs_sum = xd0;
+                    v[n * j + l] = s * (-tau * z2 + e * z1) + z2;
+                    /* v[n*j+l].re= s*(-tau*z2.re+e.re*z1.re-e.im*z1.im)+z2.re; */
+                    /* v[n*j+l].im= s*(-tau*z2.im+e.im*z1.re+e.re*z1.im)+z2.im; */
+                }
+            }
+        }
 
-		for (k = 0; k < n - 1; k++)
-		{
-			for (l = k + 1; l < n; l++)
-			{
-				abs_sum +=
-					(fabs(creal(a[n * k + l])) + fabs(cimag(a[n * k + l])));
-			}
-		}
-	}
+        abs_sum = xd0;
 
-	error(sweep >= MAX_SWEEP, 1, "jacobi2 [jacobi.c]",
-		  "Maximum number of sweeps exceeded");
+        for (k = 0; k < n - 1; k++) {
+            for (l = k + 1; l < n; l++) {
+                abs_sum += (fabs(creal(a[n * k + l])) + fabs(cimag(a[n * k + l])));
+            }
+        }
+    }
 
-	for (k = 0; k < n - 1; k++)
-	{
-		for (l = k + 1; l < n; l++)
-		{
-			a[n * k + l] = conj(a[n * l + k]);
-			/* a[n*k+l].re=a[n*l+k].re; */
-			/* a[n*k+l].im=-a[n*l+k].im; */
-		}
-	}
+    error(sweep >= MAX_SWEEP, 1, "jacobi2 [jacobi.c]", "Maximum number of sweeps exceeded");
 
-	sort2(n, d, v);
+    for (k = 0; k < n - 1; k++) {
+        for (l = k + 1; l < n; l++) {
+            a[n * k + l] = conj(a[n * l + k]);
+            /* a[n*k+l].re=a[n*l+k].re; */
+            /* a[n*k+l].im=-a[n*l+k].im; */
+        }
+    }
+
+    sort2(n, d, v);
 }

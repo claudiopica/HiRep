@@ -21,9 +21,8 @@
 #include "gpu.h"
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
-
 
 typedef struct cudaDeviceProp cudaDeviceProp;
 
@@ -97,9 +96,9 @@ void print_supported_features(cudaDeviceProp);
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
 void print_hardware_info(cudaDeviceProp, input_gpu);
-    
+
 #ifdef __cplusplus
-    }
+}
 #endif
 #endif
 #endif

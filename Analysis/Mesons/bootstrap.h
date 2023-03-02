@@ -3,5 +3,4 @@
 
 void b_sample(int len, int elen, int *bs);
 
-
 #endif //BOOTSTRAP_H

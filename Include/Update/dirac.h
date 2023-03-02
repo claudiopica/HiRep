@@ -19,7 +19,7 @@
 #include "geometry.h"
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 #ifdef __cplusplus
@@ -28,7 +28,7 @@
 #endif
 
 #define _SPINOR_FIELD_TYPE spinor_field
-#define _SUFFIX 
+#define _SUFFIX
 #include "TMPL/dirac.h.tmpl"
 
 #define _SPINOR_FIELD_TYPE spinor_field_flt
@@ -39,16 +39,13 @@
 void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in);
 void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in);
 
-typedef enum {
-  DIRECT,
-  DAGGER
-} tw_D_type;
+typedef enum { DIRECT, DAGGER } tw_D_type;
 
-void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in,tw_D_type tw_type);
-void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in,tw_D_type tw_type);
+void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in, tw_D_type tw_type);
+void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, tw_D_type tw_type);
 void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *in);
 
-#if (NG==3) && defined(REPR_FUNDAMENTAL)
+#if (NG == 3) && defined(REPR_FUNDAMENTAL)
 void Dphi_fused_(spinor_field *out, spinor_field *in); //TODO: should we remove this?
 #endif
 
@@ -93,11 +90,11 @@ void Dphieopre_4f_sq(double m0, spinor_field *out, spinor_field *in, double shif
 
 void Dphi_eopre_4f_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 // void Dphi_eopre_4f_dagger_flt(double m0, spinor_field_flt *out, spinor_field_flt *in); //TODO: this is not defined
-// void Dphieopre_4f_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in); //TODO: this is not defined 
+// void Dphieopre_4f_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in); //TODO: this is not defined
 // void Dphieopre_4f_DDdagger(double m0, spinor_field *out, spinor_field *in, double shift); //TODO: this is defined but it was not in the header
 
 /* Dirac operators used in update */
-void set_ff_dirac_mass(double mass);  // this is the mass used in the following operators
+void set_ff_dirac_mass(double mass); // this is the mass used in the following operators
 void set_ff_dirac_shift(double mass); // The shift added to four fermion Hasenbush-Dirac operators (Dff, Dff_dagger and Df_sq)
 
 void Dff(spinor_field *out, spinor_field *in);
@@ -109,6 +106,6 @@ void Dff_sq(spinor_field *out, spinor_field *in);
 // void Dphi_4f_sq(double m0, spinor_field *out, spinor_field *in); //TODO: this is defined but it was not in the header
 
 #ifdef __cplusplus
-    }
+}
 #endif
 #endif

@@ -4,7 +4,7 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 //sources.c
@@ -31,6 +31,6 @@ void add_momentum(spinor_field *out, spinor_field *in, int px, int py, int pz);
 void zero_even_or_odd_site_spinorfield(spinor_field *source, int nspinor, int eo);
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //SOURCES_H

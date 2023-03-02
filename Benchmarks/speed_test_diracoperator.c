@@ -8,8 +8,7 @@
 
 #include "libhr.h"
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     double res1, res2;
     spinor_field *s0, *s1;
     int flopsite, bytesite;
@@ -31,8 +30,7 @@ int main(int argc, char *argv[])
     gaussian_spinor_field(s0);
     gaussian_spinor_field(s1);
 
-    _OMP_PRAGMA(_omp_parallel num_threads(1))
-    {
+    _OMP_PRAGMA(_omp_parallel num_threads(1)) {
         res1 = spinor_field_sqnorm_f(s0);
         res2 = spinor_field_sqnorm_f(s1);
     }
@@ -66,8 +64,7 @@ int main(int argc, char *argv[])
 
     timer_set(&clock);
 #ifdef WITH_FUSE_MASTER_FOR
-    _OMP_PRAGMA(_omp_parallel)
-    {
+    _OMP_PRAGMA(_omp_parallel) {
         for (int i = 0; i < n_warmup; ++i) {
             Dphi_fused_(s1, s0);
         }
@@ -89,8 +86,7 @@ int main(int argc, char *argv[])
     do {
         elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
 #ifdef WITH_FUSE_MASTER_FOR
-        _OMP_PRAGMA(_omp_parallel)
-        {
+        _OMP_PRAGMA(_omp_parallel) {
             for (int i = 0; i < n_reps_trial; ++i) {
                 Dphi_fused_(s1, s0);
             }

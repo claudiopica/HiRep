@@ -1,7 +1,7 @@
 #ifndef SPATIAL_TRANSFORMATIONS_H
 #define SPATIAL_TRANSFORMATIONS_H
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /* Spatial Trasformations*/
@@ -12,11 +12,7 @@ extern int *glbT_to_active_slices;
 extern int n_active_slices;
 
 /* Spatial blocking */
-typedef enum
-{
-  NEW_SBLK = 1,
-  CONT_SBLK = 0
-} eval_spat_block;
+typedef enum { NEW_SBLK = 1, CONT_SBLK = 0 } eval_spat_block;
 
 void initialize_spatial_active_slices(int *tlist);
 void free_spatial_active_slices();
@@ -28,6 +24,6 @@ void assign_spatial_rotated_wrkspace(int *map, int idx_wrkspace);
 int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in);
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //SPATIAL_TRANSFORMATIONS_H

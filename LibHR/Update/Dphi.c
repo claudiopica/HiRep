@@ -37,8 +37,7 @@ static spinor_field *otmp = NULL;
 static spinor_field *otmp2 = NULL;
 static spinor_field *etmp2 = NULL;
 
-static void free_mem()
-{
+static void free_mem() {
     if (gtmp != NULL) {
         free_spinor_field_f(gtmp);
         gtmp = NULL;
@@ -62,8 +61,7 @@ static void free_mem()
     init_dirac = 1;
 }
 
-static void init_Dirac()
-{
+static void init_Dirac() {
     if (init_dirac) {
         gtmp = alloc_spinor_field_f(1, &glattice);
         etmp = alloc_spinor_field_f(1, &glat_even);
@@ -73,8 +71,7 @@ static void init_Dirac()
         init_dirac = 0;
     }
 }
-static void init_Dirac_tm()
-{
+static void init_Dirac_tm() {
     if (init_dirac_tm) {
         otmp2 = alloc_spinor_field_f(1, &glat_odd);
         atexit(&free_mem);
@@ -90,8 +87,7 @@ static void init_Dirac_tm()
  */
 static unsigned long int MVMcounter = 0;
 
-unsigned long int getMVM_cpu()
-{
+unsigned long int getMVM_cpu() {
     unsigned long int res = MVMcounter >> 1; /* divide by two */
     MVMcounter = 0; /* reset counter */
 
@@ -350,8 +346,7 @@ unsigned long int getMVM_cpu()
  * or on spinors with definite parity
  */
 #ifdef WITH_NEW_GEOMETRY
-void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
-{
+void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in) {
 #ifdef CHECK_SPINOR_MATCHING
     error((in == NULL) || (out == NULL), 1, "Dphi_cpu_ [Dphi.c]", "Attempt to access unallocated memory space");
     error(in == out, 1, "Dphi_cpu_ [Dphi.c]", "Input and output fields must be different");
@@ -436,8 +431,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
     }
 }
 
-void Dphi_cpu_new_(spinor_field *restrict out, spinor_field *restrict in)
-{
+void Dphi_cpu_new_(spinor_field *restrict out, spinor_field *restrict in) {
 #ifdef CHECK_SPINOR_MATCHING
     error((in == NULL) || (out == NULL), 1, "Dphi_cpu_ [Dphi.c]", "Attempt to access unallocated memory space");
     error(in == out, 1, "Dphi_cpu_ [Dphi.c]", "Input and output fields must be different");
@@ -601,8 +595,7 @@ void Dphi_cpu_new_(spinor_field *restrict out, spinor_field *restrict in)
 }
 
 #else
-void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
-{
+void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in) {
 #ifdef CHECK_SPINOR_MATCHING
     error((in == NULL) || (out == NULL), 1, "Dphi_cpu_ [Dphi.c]", "Attempt to access unallocated memory space");
     error(in == out, 1, "Dphi_cpu_ [Dphi.c]", "Input and output fields must be different");
@@ -611,7 +604,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 #endif
 
     ++MVMcounter; /* count matrix calls */
-    if (out->type == &glattice) ++MVMcounter;
+    if (out->type == &glattice) { ++MVMcounter; }
 
     /************************ loop over all lattice sites *************************/
     /* start communication of input spinor field */
@@ -767,8 +760,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 }
 
 #if (NG == 3) && defined(REPR_FUNDAMENTAL)
-void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in)
-{
+void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in) {
 #ifdef CHECK_SPINOR_MATCHING
     error((in == NULL) || (out == NULL), 1, "Dphi_fused_ [Dphi.c]", "Attempt to access unallocated memory space");
     error(in == out, 1, "Dphi_fused_ [Dphi.c]", "Input and output fields must be different");
@@ -777,12 +769,11 @@ void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in)
 #endif
 
     ++MVMcounter; /* count matrix calls */
-    if (out->type == &glattice) ++MVMcounter;
+    if (out->type == &glattice) { ++MVMcounter; }
     //
     /************************ loop over all lattice sites *************************/
     /* start communication of input spinor field */
-    _OMP_PRAGMA(master)
-    {
+    _OMP_PRAGMA(master) {
         start_sendrecv_spinor_field_f(in);
     }
 
@@ -931,8 +922,7 @@ void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in)
     } /* FUSE FOR */
 #ifdef WITH_MPI
 
-    _OMP_PRAGMA(master)
-    {
+    _OMP_PRAGMA(master) {
         complete_sendrecv_spinor_field_f(in);
     }
     _OMP_BARRIER
@@ -1076,8 +1066,7 @@ void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in)
 /*
  * this function takes 2 spinors defined on the whole lattice
  */
-void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
-{
+void Dphi_cpu(double m0, spinor_field *out, spinor_field *in) {
     double rho;
 #ifdef BC_T_SF_ROTATED
     int ix, iy, iz, index;
@@ -1107,8 +1096,8 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
     SFrho = 3. * _update_par.SF_ds + _update_par.SF_zf - 4.;
 
     if (COORD[0] == 0) {
-        for (ix = 0; ix < X; ++ix)
-            for (iy = 0; iy < Y; ++iy)
+        for (ix = 0; ix < X; ++ix) {
+            for (iy = 0; iy < Y; ++iy) {
                 for (iz = 0; iz < Z; ++iz) {
                     index = ipt(1, ix, iy, iz);
                     r = _FIELD_AT(out, index);
@@ -1123,10 +1112,12 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
                         _spinor_i_sub_assign_f(*r, tmp);
                     }
                 }
+            }
+        }
     }
     if (COORD[0] == NP_T - 1) {
-        for (ix = 0; ix < X; ++ix)
-            for (iy = 0; iy < Y; ++iy)
+        for (ix = 0; ix < X; ++ix) {
+            for (iy = 0; iy < Y; ++iy) {
                 for (iz = 0; iz < Z; ++iz) {
                     index = ipt(T - 1, ix, iy, iz);
                     r = _FIELD_AT(out, index);
@@ -1141,14 +1132,15 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
                         _spinor_i_sub_assign_f(*r, tmp);
                     }
                 }
+            }
+        }
     }
 #endif /* BC_T_SF_ROTATED */
 
     apply_BCs_on_spinor_field(out);
 }
 
-void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
-{
+void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in) {
     double rho;
 #ifdef BC_T_SF_ROTATED
     int ix, iy, iz, index;
@@ -1175,8 +1167,8 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
     SFrho = 3. * _update_par.SF_ds + _update_par.SF_zf - 4.;
 
     if (COORD[0] == 0) {
-        for (ix = 0; ix < X; ++ix)
-            for (iy = 0; iy < Y; ++iy)
+        for (ix = 0; ix < X; ++ix) {
+            for (iy = 0; iy < Y; ++iy) {
                 for (iz = 0; iz < Z; ++iz) {
                     index = ipt(1, ix, iy, iz);
                     r = _FIELD_AT(out, index);
@@ -1191,10 +1183,12 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
                         _spinor_i_sub_assign_f(*r, tmp);
                     }
                 }
+            }
+        }
     }
     if (COORD[0] == NP_T - 1) {
-        for (ix = 0; ix < X; ++ix)
-            for (iy = 0; iy < Y; ++iy)
+        for (ix = 0; ix < X; ++ix) {
+            for (iy = 0; iy < Y; ++iy) {
                 for (iz = 0; iz < Z; ++iz) {
                     index = ipt(T - 1, ix, iy, iz);
                     r = _FIELD_AT(out, index);
@@ -1209,6 +1203,8 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
                         _spinor_i_sub_assign_f(*r, tmp);
                     }
                 }
+            }
+        }
     }
 #endif /* BC_T_SF_ROTATED */
 
@@ -1222,8 +1218,7 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
  * Dphi in = (4+m0)^2*in - D_EO D_OE in
  *
  */
-void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
-{
+void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in) {
     double rho;
 
     error((in == NULL) || (out == NULL), 1, "Dphi_eopre_cpu [Dphi.c]", "Attempt to access unallocated memory space");
@@ -1257,8 +1252,7 @@ void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
  * Dphi in = (4+m0)^2*in - D_OE D_EO in
  *
  */
-void Dphi_oepre_cpu(double m0, spinor_field *out, spinor_field *in)
-{
+void Dphi_oepre_cpu(double m0, spinor_field *out, spinor_field *in) {
     double rho;
 
     error((in == NULL) || (out == NULL), 1, "Dphi_oepre_cpu [Dphi.c]", "Attempt to access unallocated memory space");
@@ -1289,8 +1283,7 @@ void Dphi_oepre_cpu(double m0, spinor_field *out, spinor_field *in)
     apply_BCs_on_spinor_field(out);
 }
 
-void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
-{
+void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in) {
     double rho;
 
     error((in == NULL) || (out == NULL), 1, "g5Dphi_eopre_cpu [Dphi.c]", "Attempt to access unallocated memory space");
@@ -1323,8 +1316,7 @@ void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
 }
 
 /* g5Dphi_eopre ^2 */
-void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in)
-{
+void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in) {
     /* alloc memory for temporary spinor field */
     if (init_dirac) { init_Dirac(); }
 
@@ -1333,8 +1325,7 @@ void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in)
 }
 
 /* g5Dhi ^2 */
-void g5Dphi_sq_cpu(double m0, spinor_field *out, spinor_field *in)
-{
+void g5Dphi_sq_cpu(double m0, spinor_field *out, spinor_field *in) {
     /* alloc memory for temporary spinor field */
     if (init_dirac) { init_Dirac(); }
 
@@ -1352,8 +1343,7 @@ void g5Dphi_sq_cpu(double m0, spinor_field *out, spinor_field *in)
 
 // Twisted mass operator for even odd preconditioned case
 /* g5 (M^+-_ee-M_eo {M_oo}^{-1} M_oe*/
-void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in)
-{
+void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in) {
     double norm = (4 + m0) * (4 + m0) + mu * mu;
     double rho = (4 + m0) / norm;
     hr_complex imu;
@@ -1389,8 +1379,7 @@ void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in)
     apply_BCs_on_spinor_field(out);
 }
 
-void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in)
-{
+void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in) {
     /* alloc memory for temporary spinor field */
     if (init_dirac) { init_Dirac(); }
 
@@ -1413,8 +1402,7 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in)
  * Cphi_diag_inv = D_oo^-1 or D_ee^-1            *
  *************************************************/
 
-static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign)
-{
+static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
     // Correct mass term
     mass = (4. + mass);
     // Loop over local sites
@@ -1463,8 +1451,7 @@ static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assig
     }
 }
 
-static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int assign)
-{
+static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
     int N = 2 * NF;
     mass = (4. + mass);
 
@@ -1522,30 +1509,26 @@ static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int a
     }
 }
 // BC for clover term in open/schrödinger functional.
-void Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     apply_BCs_on_spinor_field(sptr);
     Dphi_cpu_(dptr, sptr);
     Cphi_(mass, dptr, sptr, 1);
     apply_BCs_on_spinor_field(dptr);
 }
 
-void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi(mass, dptr, sptr);
     spinor_field_g5_assign_f_cpu(dptr);
 }
 
-void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
     if (init_dirac) { init_Dirac(); }
 
     g5Cphi(mass, gtmp, sptr);
     g5Cphi(mass, dptr, gtmp);
 }
 
-void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     if (init_dirac) { init_Dirac(); }
 
     apply_BCs_on_spinor_field(sptr);
@@ -1558,30 +1541,26 @@ void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
     apply_BCs_on_spinor_field(dptr);
 }
 
-void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi_eopre(mass, dptr, sptr);
     spinor_field_g5_assign_f_cpu(dptr);
 }
 
-void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
     if (init_dirac) { init_Dirac(); }
 
     g5Cphi_eopre(mass, etmp, sptr);
     g5Cphi_eopre(mass, dptr, etmp);
 }
 
-void Cphi_diag(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void Cphi_diag(double mass, spinor_field *dptr, spinor_field *sptr) {
     // Here (dptr == sptr) is allowed
     apply_BCs_on_spinor_field(sptr);
     Cphi_(mass, dptr, sptr, 0);
     apply_BCs_on_spinor_field(dptr);
 }
 
-void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr) {
     // Here (dptr == sptr) is allowed
     apply_BCs_on_spinor_field(sptr);
     Cphi_inv_(mass, dptr, sptr, 0);
@@ -1602,8 +1581,7 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
 
 // Inverse: 0, then normal operator; 1, then inverse operator;
 // Assume hermiticity!!
-static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse)
-{
+static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse) {
     evaluate_sw_order(&mass);
 
     // Correct mass term
@@ -1697,30 +1675,26 @@ static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assig
     }
 }
 
-void Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     apply_BCs_on_spinor_field(sptr);
     Dphi_cpu_(dptr, sptr);
     Cphi_(mass, dptr, sptr, 1, 0);
     apply_BCs_on_spinor_field(dptr);
 }
 
-void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi(mass, dptr, sptr);
     spinor_field_g5_assign_f_cpu(dptr);
 }
 
-void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
     if (init_dirac) { init_Dirac(); }
 
     g5Cphi(mass, gtmp, sptr);
     g5Cphi(mass, dptr, gtmp);
 }
 
-void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     if (init_dirac) { init_Dirac(); }
 
     apply_BCs_on_spinor_field(sptr);
@@ -1733,30 +1707,26 @@ void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
     apply_BCs_on_spinor_field(dptr);
 }
 
-void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi_eopre(mass, dptr, sptr);
     spinor_field_g5_assign_f_cpu(dptr);
 }
 
-void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
     if (init_dirac) { init_Dirac(); }
 
     g5Cphi_eopre(mass, etmp, sptr);
     g5Cphi_eopre(mass, dptr, etmp);
 }
 
-void Cphi_diag(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void Cphi_diag(double mass, spinor_field *dptr, spinor_field *sptr) {
     // Here (dptr == sptr) is allowed
     apply_BCs_on_spinor_field(sptr);
     Cphi_(mass, dptr, sptr, 0, 0);
     apply_BCs_on_spinor_field(dptr);
 }
 
-void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
-{
+void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr) {
     // Here (dptr == sptr) is allowed
 
     apply_BCs_on_spinor_field(sptr);
@@ -1768,8 +1738,7 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
 
 /*Dirac operator with twisted mass*/
 
-void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in, tw_D_type tw_type)
-{
+void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in, tw_D_type tw_type) {
     hr_complex z;
     double norm;
     spinor_field *aux = NULL;
@@ -1795,10 +1764,11 @@ void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in,
 
     norm = 1. / ((4. + mass) * (4. + mass) + twmass * twmass);
 
-    if (tw_type == DIRECT)
+    if (tw_type == DIRECT) {
         z = -I * twmass;
-    else
+    } else {
         z = I * twmass;
+    }
 
     // in= 1/((4+m)^2+mu^2)*((4+m) in +- i mu g5 in)
 
@@ -1812,8 +1782,7 @@ void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in,
     gtmp->ptr = gtmp_ptr;
 }
 
-void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, tw_D_type tw_type)
-{
+void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, tw_D_type tw_type) {
     double rho;
 
 #ifdef CHECK_SPINOR_MATCHING
@@ -1869,8 +1838,7 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
     apply_BCs_on_spinor_field(out);
 }
 
-void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *in)
-{
+void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *in) {
     /* alloc memory for temporary spinor field */
     if (init_dirac_tm) { init_Dirac_tm(); }
 

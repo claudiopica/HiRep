@@ -10,5 +10,3 @@
 #include "Statistics/jacknife.h"
 
 #endif
-
- 

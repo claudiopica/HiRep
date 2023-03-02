@@ -34,8 +34,7 @@
 static int init_gamma = 0;
 hr_complex my_gamma[4][4][4];
 
-int compute_gamma(int g[4], int ic)
-{
+int compute_gamma(int g[4], int ic) {
     int p[4], c[4], shift[4];
     double dbl;
     hr_complex locmy_gamma[4][4][4];
@@ -45,9 +44,13 @@ int compute_gamma(int g[4], int ic)
     in = alloc_spinor_field_f(1, &glattice);
     out = alloc_spinor_field_f(1, &glattice);
 
-    for (int mu = 0; mu < 4; mu++)
-        for (int beta = 0; beta < 4; beta++)
-            for (int alpha = 0; alpha < 4; alpha++) { locmy_gamma[mu][alpha][beta] = 0.; }
+    for (int mu = 0; mu < 4; mu++) {
+        for (int beta = 0; beta < 4; beta++) {
+            for (int alpha = 0; alpha < 4; alpha++) {
+                locmy_gamma[mu][alpha][beta] = 0.;
+            }
+        }
+    }
 
     p[0] = g[0] / T;
     p[1] = g[1] / X;
@@ -63,7 +66,9 @@ int compute_gamma(int g[4], int ic)
 #else
         _MASTER_FOR(&glattice, ix) {
 #endif
-            for (int nu = 0; nu < 4; nu++) { _suNg_zero(*_4FIELD_AT(u_gauge, ix, nu)); }
+            for (int nu = 0; nu < 4; nu++) {
+                _suNg_zero(*_4FIELD_AT(u_gauge, ix, nu));
+            }
         }
         if (COORD[0] == p[0] && COORD[1] == p[1] && COORD[2] == p[2] && COORD[3] == p[3]) {
             c[0] = g[0] % T;
@@ -78,8 +83,7 @@ int compute_gamma(int g[4], int ic)
         represent_gauge_field();
 
         dbl = 0.;
-        _MASTER_FOR_SUM(&glattice, ix, dbl)
-        {
+        _MASTER_FOR_SUM(&glattice, ix, dbl) {
             for (int nu = 0; nu < 4; nu++) {
                 double tmp;
                 _suNf_sqnorm(tmp, *_4FIELD_AT(u_gauge_f, ix, nu));
@@ -87,7 +91,7 @@ int compute_gamma(int g[4], int ic)
             }
         }
         global_sum(&dbl, 1);
-        if (fabs(dbl - NF) > 1.e-14) lprintf("ERROR", 0, "u_gauge_f sqnorm=%f\n", dbl);
+        if (fabs(dbl - NF) > 1.e-14) { lprintf("ERROR", 0, "u_gauge_f sqnorm=%f\n", dbl); }
 
         for (int beta = 0; beta < 4; beta++) {
             spinor_field_zero_f_cpu(in);
@@ -101,7 +105,7 @@ int compute_gamma(int g[4], int ic)
             }
 
             dbl = spinor_field_sqnorm_f_cpu(in);
-            if (fabs(dbl - GLB_T * GLB_X * GLB_Y * GLB_Z) > 1.e-14) lprintf("ERROR", 0, "source sqnorm=%f\n", dbl);
+            if (fabs(dbl - GLB_T * GLB_X * GLB_Y * GLB_Z) > 1.e-14) { lprintf("ERROR", 0, "source sqnorm=%f\n", dbl); }
 
 #ifdef WITH_GPU
             copy_to_gpu_spinor_field_f(in);
@@ -115,11 +119,11 @@ int compute_gamma(int g[4], int ic)
 #endif
 
             dbl = spinor_field_sqnorm_f_cpu(out);
-            if (fabs(dbl) < 1.e-14) lprintf("ERROR", 0, "vanishing out sqnorm\n");
+            if (fabs(dbl) < 1.e-14) { lprintf("ERROR", 0, "vanishing out sqnorm\n"); }
 
-            for (c[0] = 0; c[0] < T; c[0]++)
-                for (c[1] = 0; c[1] < X; c[1]++)
-                    for (c[2] = 0; c[2] < Y; c[2]++)
+            for (c[0] = 0; c[0] < T; c[0]++) {
+                for (c[1] = 0; c[1] < X; c[1]++) {
+                    for (c[2] = 0; c[2] < Y; c[2]++) {
                         for (c[3] = 0; c[3] < Z; c[3]++) {
                             int ix = ipt(c[0], c[1], c[2], c[3]);
                             if (c[0] + zerocoord[0] == g[0] && c[1] + zerocoord[1] == g[1] && c[2] + zerocoord[2] == g[2] &&
@@ -136,12 +140,16 @@ int compute_gamma(int g[4], int ic)
                                 }
                             } else {
                                 _spinor_prod_re_f(dbl, *_FIELD_AT(out, ix), *_FIELD_AT(out, ix));
-                                if (dbl != 0.)
+                                if (dbl != 0.) {
                                     lprintf("ERROR", 0,
                                             "Non-zero spinor! g=(%d,%d,%d,%d) ic=%d mu=%d beta=%d ix=%d sqnorm=%e\n", g[0],
                                             g[1], g[2], g[3], ic, mu, beta, ix, dbl);
+                                }
                             }
                         }
+                    }
+                }
+            }
         }
     }
 
@@ -172,11 +180,12 @@ int compute_gamma(int g[4], int ic)
     } else {
         for (int mu = 0; mu < 4; mu++) {
             dbl = 0.;
-            for (int beta = 0; beta < 4; beta++)
+            for (int beta = 0; beta < 4; beta++) {
                 for (int alpha = 0; alpha < 4; alpha++) {
                     dbl += (locmy_gamma[mu][alpha][beta] - my_gamma[mu][alpha][beta]) *
                            conj(locmy_gamma[mu][alpha][beta] - my_gamma[mu][alpha][beta]);
                 }
+            }
             if (fabs(dbl) > 1.e-14) {
                 return_value = 1;
                 lprintf("ERROR", 0, "Wrong gamma matrix! g=(%d,%d,%d,%d) ic=%d mu=%d err2=%e\n", g[0], g[1], g[2], g[3], ic, mu,
@@ -201,8 +210,7 @@ int compute_gamma(int g[4], int ic)
 
 /* FUNZIONA SOLO CON PBC */
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     int return_value = 0;
     /* setup process id and communications */
     logger_map("DEBUG", "debug");
@@ -221,15 +229,19 @@ int main(int argc, char *argv[])
 
     int g[4], ic;
 
-    for (ic = 0; ic < NF; ic++)
-        for (g[0] = 0; g[0] < GLB_T; g[0]++)
-            for (g[1] = 0; g[1] < GLB_X; g[1]++)
-                for (g[2] = 0; g[2] < GLB_Y; g[2]++)
+    for (ic = 0; ic < NF; ic++) {
+        for (g[0] = 0; g[0] < GLB_T; g[0]++) {
+            for (g[1] = 0; g[1] < GLB_X; g[1]++) {
+                for (g[2] = 0; g[2] < GLB_Y; g[2]++) {
                     for (g[3] = 0; g[3] < GLB_Z; g[3]++) {
                         lprintf("MAIN", 0, ".");
 
                         return_value += compute_gamma(g, ic);
                     }
+                }
+            }
+        }
+    }
 
     finalize_process();
     return return_value;

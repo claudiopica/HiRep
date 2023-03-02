@@ -45,80 +45,70 @@
 #include <limits.h>
 #include <float.h>
 
-static void local_error(int no)
-{
-    switch (no)
-    {
+static void local_error(int no) {
+    switch (no) {
     case 1:
-        error(1,1,"RANDOM","Error in rlxs_init\nBad choice of luxury level (should be 1 or 2)\n");
+        error(1, 1, "RANDOM", "Error in rlxs_init\nBad choice of luxury level (should be 1 or 2)\n");
         break;
     case 2:
-        error(1,1,"RANDOM","Error in rlxs_init\nBad choice of seed (should be between 1 and 2^31-1)\n");
+        error(1, 1, "RANDOM", "Error in rlxs_init\nBad choice of seed (should be between 1 and 2^31-1)\n");
         break;
     case 3:
-        error(1,1,"RANDOM","Error in rlxs_get\nUndefined state (ranlxd is not initialized\n");
+        error(1, 1, "RANDOM", "Error in rlxs_get\nUndefined state (ranlxd is not initialized\n");
         break;
     case 5:
-        error(1,1,"RANDOM","Error in rlxs_reset\nUnexpected input data\n");
+        error(1, 1, "RANDOM", "Error in rlxs_reset\nUnexpected input data\n");
         break;
     case 6:
-        error(1,1,"RANDOM","Unitialized random seed\n");
+        error(1, 1, "RANDOM", "Unitialized random seed\n");
         break;
     }
 }
 
 #if (defined SSE)
 
-typedef struct
-{
+typedef struct {
     float c1, c2, c3, c4;
 } vec_t __attribute__((aligned(16)));
 
-typedef struct
-{
+typedef struct {
     vec_t c1, c2;
 } dble_vec_t __attribute__((aligned(16)));
 
 static int init = 0, pr, prm, ir, jr, is, is_old, next[96];
 static vec_t one, one_bit, carry;
 
-static union
-{
+static union {
     dble_vec_t vec[12];
     float num[96];
 } x __attribute__((aligned(16)));
 
-#define STEP(pi, pj)                                       \
-    __asm__ __volatile__("movaps %4, %%xmm4 \n\t"          \
-                         "movaps %%xmm2, %%xmm3 \n\t"      \
-                         "subps %2, %%xmm4 \n\t"           \
-                         "movaps %%xmm1, %%xmm5 \n\t"      \
-                         "cmpps $0x6, %%xmm4, %%xmm2 \n\t" \
-                         "andps %%xmm2, %%xmm5 \n\t"       \
-                         "subps %%xmm3, %%xmm4 \n\t"       \
-                         "andps %%xmm0, %%xmm2 \n\t"       \
-                         "addps %%xmm4, %%xmm5 \n\t"       \
-                         "movaps %%xmm5, %0 \n\t"          \
-                         "movaps %5, %%xmm6 \n\t"          \
-                         "movaps %%xmm2, %%xmm3 \n\t"      \
-                         "subps %3, %%xmm6 \n\t"           \
-                         "movaps %%xmm1, %%xmm7 \n\t"      \
-                         "cmpps $0x6, %%xmm6, %%xmm2 \n\t" \
-                         "andps %%xmm2, %%xmm7 \n\t"       \
-                         "subps %%xmm3, %%xmm6 \n\t"       \
-                         "andps %%xmm0, %%xmm2 \n\t"       \
-                         "addps %%xmm6, %%xmm7 \n\t"       \
-                         "movaps %%xmm7, %1"               \
-                         : "=m"((*pi).c1),                 \
-                           "=m"((*pi).c2)                  \
-                         : "m"((*pi).c1),                  \
-                           "m"((*pi).c2),                  \
-                           "m"((*pj).c1),                  \
-                           "m"((*pj).c2)                   \
+#define STEP(pi, pj)                                                                  \
+    __asm__ __volatile__("movaps %4, %%xmm4 \n\t"                                     \
+                         "movaps %%xmm2, %%xmm3 \n\t"                                 \
+                         "subps %2, %%xmm4 \n\t"                                      \
+                         "movaps %%xmm1, %%xmm5 \n\t"                                 \
+                         "cmpps $0x6, %%xmm4, %%xmm2 \n\t"                            \
+                         "andps %%xmm2, %%xmm5 \n\t"                                  \
+                         "subps %%xmm3, %%xmm4 \n\t"                                  \
+                         "andps %%xmm0, %%xmm2 \n\t"                                  \
+                         "addps %%xmm4, %%xmm5 \n\t"                                  \
+                         "movaps %%xmm5, %0 \n\t"                                     \
+                         "movaps %5, %%xmm6 \n\t"                                     \
+                         "movaps %%xmm2, %%xmm3 \n\t"                                 \
+                         "subps %3, %%xmm6 \n\t"                                      \
+                         "movaps %%xmm1, %%xmm7 \n\t"                                 \
+                         "cmpps $0x6, %%xmm6, %%xmm2 \n\t"                            \
+                         "andps %%xmm2, %%xmm7 \n\t"                                  \
+                         "subps %%xmm3, %%xmm6 \n\t"                                  \
+                         "andps %%xmm0, %%xmm2 \n\t"                                  \
+                         "addps %%xmm6, %%xmm7 \n\t"                                  \
+                         "movaps %%xmm7, %1"                                          \
+                         : "=m"((*pi).c1), "=m"((*pi).c2)                             \
+                         : "m"((*pi).c1), "m"((*pi).c2), "m"((*pj).c1), "m"((*pj).c2) \
                          : "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7")
 
-static void update(void)
-{
+static void update(void) {
     int k, kmax;
     dble_vec_t *pmin, *pmax, *pi, *pj;
 
@@ -132,37 +122,28 @@ static void update(void)
                          "movaps %1, %%xmm1 \n\t"
                          "movaps %2, %%xmm2"
                          :
-                         : "m"(one_bit),
-                           "m"(one),
-                           "m"(carry)
+                         : "m"(one_bit), "m"(one), "m"(carry)
                          : "xmm0", "xmm1", "xmm2");
 
-    for (k = 0; k < kmax; k++)
-    {
+    for (k = 0; k < kmax; k++) {
         STEP(pi, pj);
         pi += 1;
         pj += 1;
-        if (pi == pmax)
-            pi = pmin;
-        if (pj == pmax)
-            pj = pmin;
+        if (pi == pmax) { pi = pmin; }
+        if (pj == pmax) { pj = pmin; }
     }
 
-    __asm__ __volatile__("movaps %%xmm2, %0"
-                         : "=m"(carry));
+    __asm__ __volatile__("movaps %%xmm2, %0" : "=m"(carry));
 
     ir += prm;
     jr += prm;
-    if (ir >= 12)
-        ir -= 12;
-    if (jr >= 12)
-        jr -= 12;
+    if (ir >= 12) { ir -= 12; }
+    if (jr >= 12) { jr -= 12; }
     is = 8 * ir;
     is_old = is;
 }
 
-static void define_constants(void)
-{
+static void define_constants(void) {
     int k;
     float b;
 
@@ -177,49 +158,45 @@ static void define_constants(void)
     one_bit.c3 = b;
     one_bit.c4 = b;
 
-    for (k = 0; k < 96; k++)
+    for (k = 0; k < 96; k++) {
         next[k] = (k + 1) % 96;
+    }
 }
 
-void rlxs_init(int level, int seed)
-{
+void rlxs_init(int level, int seed) {
     int i, k, l;
     int ibit, jbit, xbit[31];
     int ix, iy;
 
     define_constants();
 
-    if (level == 0)
+    if (level == 0) {
         pr = 109;
-    else if (level == 1)
+    } else if (level == 1) {
         pr = 202;
-    else if (level == 2)
+    } else if (level == 2) {
         pr = 397;
-    else
+    } else {
         local_error(1);
+    }
 
     i = seed + MPI_PID;
 
-    for (k = 0; k < 31; k++)
-    {
+    for (k = 0; k < 31; k++) {
         xbit[k] = i % 2;
         i /= 2;
     }
 
-    if ((seed <= 0) || (i != 0))
-        local_error(2);
+    if ((seed <= 0) || (i != 0)) { local_error(2); }
 
     ibit = 0;
     jbit = 18;
 
-    for (i = 0; i < 4; i++)
-    {
-        for (k = 0; k < 24; k++)
-        {
+    for (i = 0; i < 4; i++) {
+        for (k = 0; k < 24; k++) {
             ix = 0;
 
-            for (l = 0; l < 24; l++)
-            {
+            for (l = 0; l < 24; l++) {
                 iy = xbit[ibit];
                 ix = 2 * ix + iy;
 
@@ -228,8 +205,7 @@ void rlxs_init(int level, int seed)
                 jbit = (jbit + 1) % 31;
             }
 
-            if ((k % 4) == i)
-                ix = 16777215 - ix;
+            if ((k % 4) == i) { ix = 16777215 - ix; }
 
             x.num[4 * k + i] = (float)(ldexp((double)(ix), -24));
         }
@@ -248,39 +224,33 @@ void rlxs_init(int level, int seed)
     init = 1;
 }
 
-void ranlxs(float r[], int n)
-{
+void ranlxs(float r[], int n) {
     int k;
 
-    if (init == 0)
-        local_error(6);
-    for (k = 0; k < n; k++)
-    {
+    if (init == 0) { local_error(6); }
+    for (k = 0; k < n; k++) {
         is = next[is];
-        if (is == is_old)
-            update();
+        if (is == is_old) { update(); }
         r[k] = x.num[is];
     }
 }
 
-int rlxs_size(void)
-{
+int rlxs_size(void) {
     return (105);
 }
 
-void rlxs_get(int state[])
-{
+void rlxs_get(int state[]) {
     int k;
     float base;
 
-    if (init == 0)
-        local_error(3);
+    if (init == 0) { local_error(3); }
 
     base = (float)(ldexp(1.0, 24));
     state[0] = rlxs_size();
 
-    for (k = 0; k < 96; k++)
+    for (k = 0; k < 96; k++) {
         state[k + 1] = (int)(base * x.num[k]);
+    }
 
     state[97] = (int)(base * carry.c1);
     state[98] = (int)(base * carry.c2);
@@ -293,28 +263,23 @@ void rlxs_get(int state[])
     state[104] = is;
 }
 
-void rlxs_reset(int state[])
-{
+void rlxs_reset(int state[]) {
     int k;
 
     define_constants();
 
-    if (state[0] != rlxs_size())
-        local_error(5);
+    if (state[0] != rlxs_size()) { local_error(5); }
 
-    for (k = 0; k < 96; k++)
-    {
-        if ((state[k + 1] < 0) || (state[k + 1] >= 167777216))
-            local_error(5);
+    for (k = 0; k < 96; k++) {
+        if ((state[k + 1] < 0) || (state[k + 1] >= 167777216)) { local_error(5); }
 
         x.num[k] = (float)(ldexp((double)(state[k + 1]), -24));
     }
 
-    if (((state[97] != 0) && (state[97] != 1)) ||
-        ((state[98] != 0) && (state[98] != 1)) ||
-        ((state[99] != 0) && (state[99] != 1)) ||
-        ((state[100] != 0) && (state[100] != 1)))
+    if (((state[97] != 0) && (state[97] != 1)) || ((state[98] != 0) && (state[98] != 1)) ||
+        ((state[99] != 0) && (state[99] != 1)) || ((state[100] != 0) && (state[100] != 1))) {
         local_error(5);
+    }
 
     carry.c1 = (float)(ldexp((double)(state[97]), -24));
     carry.c2 = (float)(ldexp((double)(state[98]), -24));
@@ -329,10 +294,10 @@ void rlxs_reset(int state[])
     prm = pr % 12;
     init = 1;
 
-    if (((pr != 109) && (pr != 202) && (pr != 397)) ||
-        (ir < 0) || (ir > 11) || (jr < 0) || (jr > 11) || (jr != ((ir + 7) % 12)) ||
-        (is < 0) || (is > 95))
+    if (((pr != 109) && (pr != 202) && (pr != 397)) || (ir < 0) || (ir > 11) || (jr < 0) || (jr > 11) ||
+        (jr != ((ir + 7) % 12)) || (is < 0) || (is > 95)) {
         local_error(5);
+    }
 }
 
 #else
@@ -341,18 +306,15 @@ void rlxs_reset(int state[])
 
 #define BASE 0x1000000
 #define MASK 0xffffff
-typedef struct
-{
+typedef struct {
     int c1, c2, c3, c4;
 } vec_t;
 
-typedef struct
-{
+typedef struct {
     vec_t c1, c2;
 } dble_vec_t;
 
-typedef union
-{
+typedef union {
     dble_vec_t vec[12];
     int num[96];
 } x_struct;
@@ -396,8 +358,7 @@ static x_struct *x;
     d += BASE;                                      \
     (*pi).c2.c4 = d & MASK
 
-static void update(void)
-{
+static void update(void) {
     int k, kmax, d;
     dble_vec_t *pmin, *pmax, *pi, *pj;
 
@@ -409,49 +370,39 @@ static void update(void)
     pi = &(x[tid].vec[ir[tid]]);
     pj = &(x[tid].vec[jr[tid]]);
 
-    for (k = 0; k < kmax; k++)
-    {
+    for (k = 0; k < kmax; k++) {
         STEP(pi, pj, tid);
 
         pi += 1;
         pj += 1;
-        if (pi == pmax)
-            pi = pmin;
-        if (pj == pmax)
-            pj = pmin;
+        if (pi == pmax) { pi = pmin; }
+        if (pj == pmax) { pj = pmin; }
     }
 
     ir[tid] += prm[tid];
     jr[tid] += prm[tid];
-    if (ir[tid] >= 12)
-        ir[tid] -= 12;
-    if (jr[tid] >= 12)
-        jr[tid] -= 12;
+    if (ir[tid] >= 12) { ir[tid] -= 12; }
+    if (jr[tid] >= 12) { jr[tid] -= 12; }
     is[tid] = 8 * ir[tid];
     is_old[tid] = is[tid];
 }
 
-static void define_constants(void)
-{
+static void define_constants(void) {
     int k;
     int tid = omp_get_thread_num();
 
     one_bit[tid] = (float)(ldexp(1.0, -24));
 
-    for (k = 0; k < 96; k++)
-    {
+    for (k = 0; k < 96; k++) {
         next[k + tid * 96] = (k + 1) % 96;
     }
 }
 
-void rlxs_init(int level, int seed)
-{
-    _OMP_PRAGMA(_omp_parallel)
-    {
+void rlxs_init(int level, int seed) {
+    _OMP_PRAGMA(_omp_parallel) {
         int tid = omp_get_thread_num();
         int nt = omp_get_num_threads();
-        _OMP_PRAGMA(single)
-        {
+        _OMP_PRAGMA(single) {
             init = malloc(nt * sizeof(int) * 103);
             pr = init + nt;
             prm = pr + nt;
@@ -470,42 +421,37 @@ void rlxs_init(int level, int seed)
         int ibit, jbit, xbit[31];
         int ix, iy;
 
-        if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24))
-            local_error(0);
+        if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24)) { local_error(0); }
 
         define_constants();
 
-        if (level == 0)
+        if (level == 0) {
             pr[tid] = 109;
-        else if (level == 1)
+        } else if (level == 1) {
             pr[tid] = 202;
-        else if (level == 2)
+        } else if (level == 2) {
             pr[tid] = 397;
-        else
+        } else {
             local_error(1);
+        }
 
         i = seed + tid + nt * MPI_PID;
 
-        for (k = 0; k < 31; k++)
-        {
+        for (k = 0; k < 31; k++) {
             xbit[k] = i % 2;
             i /= 2;
         }
 
-        if ((seed <= 0) || (i != 0))
-            local_error(2);
+        if ((seed <= 0) || (i != 0)) { local_error(2); }
 
         ibit = 0;
         jbit = 18;
 
-        for (i = 0; i < 4; i++)
-        {
-            for (k = 0; k < 24; k++)
-            {
+        for (i = 0; i < 4; i++) {
+            for (k = 0; k < 24; k++) {
                 ix = 0;
 
-                for (l = 0; l < 24; l++)
-                {
+                for (l = 0; l < 24; l++) {
                     iy = xbit[ibit];
                     ix = 2 * ix + iy;
 
@@ -514,8 +460,7 @@ void rlxs_init(int level, int seed)
                     jbit = (jbit + 1) % 31;
                 }
 
-                if ((k % 4) == i)
-                    ix = 16777215 - ix;
+                if ((k % 4) == i) { ix = 16777215 - ix; }
 
                 x[tid].num[4 * k + i] = ix;
             }
@@ -534,40 +479,34 @@ void rlxs_init(int level, int seed)
         init[tid] = 1;
     }
 }
-void ranlxs(float r[], int n)
-{
+void ranlxs(float r[], int n) {
     int k;
     int tid = omp_get_thread_num();
 
-    if (init == NULL)
-        local_error(6);
+    if (init == NULL) { local_error(6); }
 
-    for (k = 0; k < n; k++)
-    {
+    for (k = 0; k < n; k++) {
         is[tid] = next[is[tid] + tid * 96];
-        if (is[tid] == is_old[tid])
-            update();
+        if (is[tid] == is_old[tid]) { update(); }
         r[k] = one_bit[tid] * (float)(x[tid].num[is[tid]]);
     }
 }
 
-int rlxs_size(void)
-{
+int rlxs_size(void) {
     return (105);
 }
 
-void rlxs_get(int state[])
-{
+void rlxs_get(int state[]) {
     int k;
     int tid = omp_get_thread_num();
 
-    if (init[tid] == 0)
-        local_error(3);
+    if (init[tid] == 0) { local_error(3); }
 
     state[0] = rlxs_size();
 
-    for (k = 0; k < 96; k++)
+    for (k = 0; k < 96; k++) {
         state[k + 1] = x[tid].num[k];
+    }
 
     state[97] = carry[tid].c1;
     state[98] = carry[tid].c2;
@@ -580,32 +519,26 @@ void rlxs_get(int state[])
     state[104] = is[tid];
 }
 
-void rlxs_reset(int state[])
-{
+void rlxs_reset(int state[]) {
     int k;
     int tid = omp_get_thread_num();
 
-    if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24))
-        local_error(4);
+    if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24)) { local_error(4); }
 
     define_constants();
 
-    if (state[0] != rlxs_size())
-        local_error(5);
+    if (state[0] != rlxs_size()) { local_error(5); }
 
-    for (k = 0; k < 96; k++)
-    {
-        if ((state[k + 1] < 0) || (state[k + 1] >= 167777216))
-            local_error(5);
+    for (k = 0; k < 96; k++) {
+        if ((state[k + 1] < 0) || (state[k + 1] >= 167777216)) { local_error(5); }
 
         x[tid].num[k] = state[k + 1];
     }
 
-    if (((state[97] != 0) && (state[97] != 1)) ||
-        ((state[98] != 0) && (state[98] != 1)) ||
-        ((state[99] != 0) && (state[99] != 1)) ||
-        ((state[100] != 0) && (state[100] != 1)))
+    if (((state[97] != 0) && (state[97] != 1)) || ((state[98] != 0) && (state[98] != 1)) ||
+        ((state[99] != 0) && (state[99] != 1)) || ((state[100] != 0) && (state[100] != 1))) {
         local_error(5);
+    }
 
     carry[tid].c1 = state[97];
     carry[tid].c2 = state[98];
@@ -620,23 +553,21 @@ void rlxs_reset(int state[])
     prm[tid] = pr[tid] % 12;
     init[tid] = 1;
 
-    if (((pr[tid] != 109) && (pr[tid] != 202) && (pr[tid] != 397)) ||
-        (ir[tid] < 0) || (ir[tid] > 11) || (jr[tid] < 0) || (jr[tid] > 11) || (jr[tid] != ((ir[tid] + 7) % 12)) ||
-        (is[tid] < 0) || (is[tid] > 95))
+    if (((pr[tid] != 109) && (pr[tid] != 202) && (pr[tid] != 397)) || (ir[tid] < 0) || (ir[tid] > 11) || (jr[tid] < 0) ||
+        (jr[tid] > 11) || (jr[tid] != ((ir[tid] + 7) % 12)) || (is[tid] < 0) || (is[tid] > 95)) {
         local_error(5);
+    }
 }
 #else
 
 #define BASE 0x1000000
 #define MASK 0xffffff
 
-typedef struct
-{
+typedef struct {
     int c1, c2, c3, c4;
 } vec_t;
 
-typedef struct
-{
+typedef struct {
     vec_t c1, c2;
 } dble_vec_t;
 
@@ -644,8 +575,7 @@ static int init = 0, pr, prm, ir, jr, is, is_old, next[96];
 static float one_bit;
 static vec_t carry;
 
-static union
-{
+static union {
     dble_vec_t vec[12];
     int num[96];
 } x;
@@ -684,8 +614,7 @@ static union
     d += BASE;                                \
     (*pi).c2.c4 = d & MASK
 
-static void update(void)
-{
+static void update(void) {
     int k, kmax, d;
     dble_vec_t *pmin, *pmax, *pi, *pj;
 
@@ -695,79 +624,68 @@ static void update(void)
     pi = &x.vec[ir];
     pj = &x.vec[jr];
 
-    for (k = 0; k < kmax; k++)
-    {
+    for (k = 0; k < kmax; k++) {
         STEP(pi, pj);
         pi += 1;
         pj += 1;
-        if (pi == pmax)
-            pi = pmin;
-        if (pj == pmax)
-            pj = pmin;
+        if (pi == pmax) { pi = pmin; }
+        if (pj == pmax) { pj = pmin; }
     }
 
     ir += prm;
     jr += prm;
-    if (ir >= 12)
-        ir -= 12;
-    if (jr >= 12)
-        jr -= 12;
+    if (ir >= 12) { ir -= 12; }
+    if (jr >= 12) { jr -= 12; }
     is = 8 * ir;
     is_old = is;
 }
 
-static void define_constants(void)
-{
+static void define_constants(void) {
     int k;
 
     one_bit = (float)(ldexp(1.0, -24));
 
-    for (k = 0; k < 96; k++)
+    for (k = 0; k < 96; k++) {
         next[k] = (k + 1) % 96;
+    }
 }
 
-void rlxs_init(int level, int seed)
-{
+void rlxs_init(int level, int seed) {
     int i, k, l;
     int ibit, jbit, xbit[31];
     int ix, iy;
 
-    if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24))
-        local_error(0);
+    if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24)) { local_error(0); }
 
     define_constants();
 
-    if (level == 0)
+    if (level == 0) {
         pr = 109;
-    else if (level == 1)
+    } else if (level == 1) {
         pr = 202;
-    else if (level == 2)
+    } else if (level == 2) {
         pr = 397;
-    else
+    } else {
         local_error(1);
+    }
 
     i = seed + MPI_PID;
 
-    for (k = 0; k < 31; k++)
-    {
+    for (k = 0; k < 31; k++) {
         xbit[k] = i % 2;
         i /= 2;
     }
 
-    if ((seed <= 0) || (i != 0))
-        local_error(2);
+    if ((seed <= 0) || (i != 0)) { local_error(2); }
 
     ibit = 0;
     jbit = 18;
 
-    for (i = 0; i < 4; i++)
-    {
-        for (k = 0; k < 24; k++)
-        {
+    for (i = 0; i < 4; i++) {
+        for (k = 0; k < 24; k++) {
             ix = 0;
 
-            for (l = 0; l < 24; l++)
-            {
+            for (l = 0; l < 24; l++) {
                 iy = xbit[ibit];
                 ix = 2 * ix + iy;
 
@@ -776,8 +694,7 @@ void rlxs_init(int level, int seed)
                 jbit = (jbit + 1) % 31;
             }
 
-            if ((k % 4) == i)
-                ix = 16777215 - ix;
+            if ((k % 4) == i) { ix = 16777215 - ix; }
 
             x.num[4 * k + i] = ix;
         }
@@ -796,38 +713,32 @@ void rlxs_init(int level, int seed)
     init = 1;
 }
 
-void ranlxs(float r[], int n)
-{
+void ranlxs(float r[], int n) {
     int k;
 
-    if (init == 0)
-        local_error(6);
+    if (init == 0) { local_error(6); }
 
-    for (k = 0; k < n; k++)
-    {
+    for (k = 0; k < n; k++) {
         is = next[is];
-        if (is == is_old)
-            update();
+        if (is == is_old) { update(); }
         r[k] = one_bit * (float)(x.num[is]);
     }
 }
 
-int rlxs_size(void)
-{
+int rlxs_size(void) {
     return (105);
 }
 
-void rlxs_get(int state[])
-{
+void rlxs_get(int state[]) {
     int k;
 
-    if (init == 0)
-        local_error(3);
+    if (init == 0) { local_error(3); }
 
     state[0] = rlxs_size();
 
-    for (k = 0; k < 96; k++)
+    for (k = 0; k < 96; k++) {
         state[k + 1] = x.num[k];
+    }
 
     state[97] = carry.c1;
     state[98] = carry.c2;
@@ -840,31 +751,25 @@ void rlxs_get(int state[])
     state[104] = is;
 }
 
-void rlxs_reset(int state[])
-{
+void rlxs_reset(int state[]) {
     int k;
 
-    if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24))
-        local_error(4);
+    if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24)) { local_error(4); }
 
     define_constants();
 
-    if (state[0] != rlxs_size())
-        local_error(5);
+    if (state[0] != rlxs_size()) { local_error(5); }
 
-    for (k = 0; k < 96; k++)
-    {
-        if ((state[k + 1] < 0) || (state[k + 1] >= 167777216))
-            local_error(5);
+    for (k = 0; k < 96; k++) {
+        if ((state[k + 1] < 0) || (state[k + 1] >= 167777216)) { local_error(5); }
 
         x.num[k] = state[k + 1];
     }
 
-    if (((state[97] != 0) && (state[97] != 1)) ||
-        ((state[98] != 0) && (state[98] != 1)) ||
-        ((state[99] != 0) && (state[99] != 1)) ||
-        ((state[100] != 0) && (state[100] != 1)))
+    if (((state[97] != 0) && (state[97] != 1)) || ((state[98] != 0) && (state[98] != 1)) ||
+        ((state[99] != 0) && (state[99] != 1)) || ((state[100] != 0) && (state[100] != 1))) {
         local_error(5);
+    }
 
     carry.c1 = state[97];
     carry.c2 = state[98];
@@ -879,10 +784,10 @@ void rlxs_reset(int state[])
     prm = pr % 12;
     init = 1;
 
-    if (((pr != 109) && (pr != 202) && (pr != 397)) ||
-        (ir < 0) || (ir > 11) || (jr < 0) || (jr > 11) || (jr != ((ir + 7) % 12)) ||
-        (is < 0) || (is > 95))
+    if (((pr != 109) && (pr != 202) && (pr != 397)) || (ir < 0) || (ir > 11) || (jr < 0) || (jr > 11) ||
+        (jr != ((ir + 7) % 12)) || (is < 0) || (is > 95)) {
         local_error(5);
+    }
 }
 #endif
 #endif

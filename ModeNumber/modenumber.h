@@ -6,4 +6,3 @@ void free_modenumber();
 double ModeNumber(double M2);
 
 #endif
-

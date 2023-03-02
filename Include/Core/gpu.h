@@ -15,26 +15,22 @@
 #include "IO/input_par.h"
 
 #ifdef __cplusplus
-  extern "C" {
+extern "C" {
 #endif
 
-typedef struct 
-{
-  unsigned int gpuID;
-  input_record_t read[2]; /* for the reading function */
+typedef struct {
+    unsigned int gpuID;
+    input_record_t read[2]; /* for the reading function */
 } input_gpu;
 
-#define init_input_gpu(varname) \
-  { \
-    .read={\
-      {"gpuID", "gpuID = %d", INT_T, &(varname)},\
-      {NULL, NULL, INT_T, NULL}\
-    }\
-  }
+#define init_input_gpu(varname)                                                               \
+    {                                                                                         \
+        .read = { { "gpuID", "gpuID = %d", INT_T, &(varname) }, { NULL, NULL, INT_T, NULL } } \
+    }
 
 #ifdef __cplusplus
-  }
+}
 #endif
 
-#endif 
+#endif
 #endif

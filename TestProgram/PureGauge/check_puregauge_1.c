@@ -6,64 +6,60 @@
 
 #include "libhr.h"
 
-int main(int argc,char *argv[])
-{
-  int return_value=0;
-  suNg A,B,C,E;
-  suNf a,b,c,e,tmp;
-  int level,seed;
-  double tau;
+int main(int argc, char *argv[]) {
+    int return_value = 0;
+    suNg A, B, C, E;
+    suNf a, b, c, e, tmp;
+    int level, seed;
+    double tau;
 
-  printf("Gauge group: SU(%d)\n",NG);
-  printf("Fermion representation: dim = %d\n",NF);
-  printf("\n");
+    printf("Gauge group: SU(%d)\n", NG);
+    printf("Fermion representation: dim = %d\n", NF);
+    printf("\n");
 
-  level=1;
-  seed=123;
-  rlxd_init(level,seed);
-  printf("ranlux: level = %d, seed = %d\n\n",level,seed);
-  fflush(stdout);
+    level = 1;
+    seed = 123;
+    rlxd_init(level, seed);
+    printf("ranlux: level = %d, seed = %d\n\n", level, seed);
+    fflush(stdout);
 
-  _suNg_unit(E);
-  _suNf_unit(e);
+    _suNg_unit(E);
+    _suNf_unit(e);
 
-   _group_represent2(&tmp,&E);
-   _suNf_sub_assign(e,tmp);
+    _group_represent2(&tmp, &E);
+    _suNf_sub_assign(e, tmp);
 
-   _suNf_sqnorm(tau,e);
-   printf("checking that _group_represent works on E: %.3f\n",tau);
-   printf("(should be 0.00)\n");
-   if (tau > 1e-30){
-     printf("Test failed ?\n");
-     return_value +=1;
-   }
+    _suNf_sqnorm(tau, e);
+    printf("checking that _group_represent works on E: %.3f\n", tau);
+    printf("(should be 0.00)\n");
+    if (tau > 1e-30) {
+        printf("Test failed ?\n");
+        return_value += 1;
+    }
 
-   printf("Generating random matrices A and B... ");
-   fflush(stdout);
-   random_suNg(&A);
-   random_suNg(&B);
-   printf("done.\n");
+    printf("Generating random matrices A and B... ");
+    fflush(stdout);
+    random_suNg(&A);
+    random_suNg(&B);
+    printf("done.\n");
 
-   _suNg_times_suNg(C,A,B);
+    _suNg_times_suNg(C, A, B);
 
-   _group_represent2(&a,&A);
-   _group_represent2(&b,&B);
+    _group_represent2(&a, &A);
+    _group_represent2(&b, &B);
 
-   _suNf_times_suNf(c,a,b);
-   _group_represent2(&tmp,&C);
+    _suNf_times_suNf(c, a, b);
+    _group_represent2(&tmp, &C);
 
-   _suNf_sub_assign(c,tmp);
+    _suNf_sub_assign(c, tmp);
 
-   _suNf_sqnorm(tau,c);
-   printf("checking that _group_represent is a homo: %.3f\n",tau);
-   printf("(should be 0.00)\n");
-   if (tau > 1e-30){
-     printf("Test failed ?\n");
-     return_value +=1;
-   }
+    _suNf_sqnorm(tau, c);
+    printf("checking that _group_represent is a homo: %.3f\n", tau);
+    printf("(should be 0.00)\n");
+    if (tau > 1e-30) {
+        printf("Test failed ?\n");
+        return_value += 1;
+    }
 
-   
-
-   return return_value;
-
- }
+    return return_value;
+}

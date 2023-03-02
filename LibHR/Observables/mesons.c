@@ -7,27 +7,37 @@
 #include "libhr_core.h"
 #include "inverters.h"
 
-#define _INDEX_(i,s) ( (s)*NF+(i) )
+#define _INDEX_(i, s) ((s)*NF + (i))
 
-#define _spinor_c_(r,i) (*((suNf_vector*)(&r)+(i)))
+#define _spinor_c_(r, i) (*((suNf_vector *)(&r) + (i)))
 
-#define _spinor_perm_prod_re(k,r,s) \
-  { double _ptmp;\
-		_vector_prod_re_f(_ptmp,_spinor_c_(r,_C0_),(s).c[0]); (k)=(_S0_)*_ptmp; \
-		_vector_prod_re_f(_ptmp,_spinor_c_(r,_C1_),(s).c[1]); (k)+=(_S1_)*_ptmp; \
-		_vector_prod_re_f(_ptmp,_spinor_c_(r,_C2_),(s).c[2]); (k)+=(_S2_)*_ptmp; \
-		_vector_prod_re_f(_ptmp,_spinor_c_(r,_C3_),(s).c[3]); (k)+=(_S3_)*_ptmp; \
-	} while(0)
+#define _spinor_perm_prod_re(k, r, s)                            \
+    {                                                            \
+        double _ptmp;                                            \
+        _vector_prod_re_f(_ptmp, _spinor_c_(r, _C0_), (s).c[0]); \
+        (k) = (_S0_)*_ptmp;                                      \
+        _vector_prod_re_f(_ptmp, _spinor_c_(r, _C1_), (s).c[1]); \
+        (k) += (_S1_)*_ptmp;                                     \
+        _vector_prod_re_f(_ptmp, _spinor_c_(r, _C2_), (s).c[2]); \
+        (k) += (_S2_)*_ptmp;                                     \
+        _vector_prod_re_f(_ptmp, _spinor_c_(r, _C3_), (s).c[3]); \
+        (k) += (_S3_)*_ptmp;                                     \
+    }                                                            \
+    while (0)
 
-#define _spinor_perm_prod_im(k,r,s) \
-  { double _ptmp;\
-		_vector_prod_im_f(_ptmp,_spinor_c_(r,_C0_),(s).c[0]); (k)=(_S0_)*_ptmp; \
-		_vector_prod_im_f(_ptmp,_spinor_c_(r,_C1_),(s).c[1]); (k)+=(_S1_)*_ptmp; \
-		_vector_prod_im_f(_ptmp,_spinor_c_(r,_C2_),(s).c[2]); (k)+=(_S2_)*_ptmp; \
-		_vector_prod_im_f(_ptmp,_spinor_c_(r,_C3_),(s).c[3]); (k)+=(_S3_)*_ptmp; \
-	} while(0)
-
-
+#define _spinor_perm_prod_im(k, r, s)                            \
+    {                                                            \
+        double _ptmp;                                            \
+        _vector_prod_im_f(_ptmp, _spinor_c_(r, _C0_), (s).c[0]); \
+        (k) = (_S0_)*_ptmp;                                      \
+        _vector_prod_im_f(_ptmp, _spinor_c_(r, _C1_), (s).c[1]); \
+        (k) += (_S1_)*_ptmp;                                     \
+        _vector_prod_im_f(_ptmp, _spinor_c_(r, _C2_), (s).c[2]); \
+        (k) += (_S2_)*_ptmp;                                     \
+        _vector_prod_im_f(_ptmp, _spinor_c_(r, _C3_), (s).c[3]); \
+        (k) += (_S3_)*_ptmp;                                     \
+    }                                                            \
+    while (0)
 
 /***************************************************************************\
 
@@ -41,39 +51,41 @@ out[t] = 1/L^3 \sum_x \sum_{a,b,i}
 
 \***************************************************************************/
 
-#define MESON_DEFINITION(name) \
-void name##_correlator(double *out, int t0, spinor_field *qp) { \
-  int t,x,y,z, i; \
-  suNf_spinor *s1; \
-  suNf_spinor *s2; \
-  for (t=0; t<GLB_T; t++) out[t] = 0.; \
-  for (t=0; t<T; t++) { \
-    double _tmp,hc=0.; \
-    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { \
-      for (i=0; i<NF; ++i) { \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,0)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_C0_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_re(_tmp,*s1,*s2); \
-        hc += (_S0_)*_tmp; \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,1)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_C1_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_re(_tmp,*s1,*s2); \
-        hc += (_S1_)*_tmp; \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,2)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_C2_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_re(_tmp,*s1,*s2); \
-        hc += (_S2_)*_tmp; \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,3)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_C3_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_re(_tmp,*s1,*s2); \
-        hc += (_S3_)*_tmp; \
-      } \
-    } \
-    out[(zerocoord[0]+t+GLB_T-t0)%GLB_T] = (_SIGN_)*hc/GLB_VOL3; \
-  } \
-  global_sum(out,GLB_T); \
-}
-
+#define MESON_DEFINITION(name)                                                      \
+    void name##_correlator(double *out, int t0, spinor_field *qp) {                 \
+        int t, x, y, z, i;                                                          \
+        suNf_spinor *s1;                                                            \
+        suNf_spinor *s2;                                                            \
+        for (t = 0; t < GLB_T; t++)                                                 \
+            out[t] = 0.;                                                            \
+        for (t = 0; t < T; t++) {                                                   \
+            double _tmp, hc = 0.;                                                   \
+            for (x = 0; x < X; x++)                                                 \
+                for (y = 0; y < Y; y++)                                             \
+                    for (z = 0; z < Z; z++) {                                       \
+                        for (i = 0; i < NF; ++i) {                                  \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 0)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C0_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
+                            hc += (_S0_)*_tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 1)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C1_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
+                            hc += (_S1_)*_tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 2)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C2_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
+                            hc += (_S2_)*_tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 3)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C3_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
+                            hc += (_S3_)*_tmp;                                      \
+                        }                                                           \
+                    }                                                               \
+            out[(zerocoord[0] + t + GLB_T - t0) % GLB_T] = (_SIGN_)*hc / GLB_VOL3;  \
+        }                                                                           \
+        global_sum(out, GLB_T);                                                     \
+    }
 
 /***************************************************************************\
 
@@ -89,39 +101,41 @@ out[t] = Re{
 
 \***************************************************************************/
 
-#define MESON_DEFINITION_TWO_RE(name) \
-void name##_re_correlator(double *out, int t0, spinor_field *qp) { \
-  int t,x,y,z, i; \
-  suNf_spinor *s1; \
-  suNf_spinor *s2; \
-  for (t=0; t<GLB_T; t++) out[t] = 0.; \
-  for (t=0; t<T; t++) { \
-    double _tmp,hc=0.; \
-    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { \
-      for (i=0; i<NF; ++i) { \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,0)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_D0_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_re(_tmp,*s1,*s2); \
-        hc += (_T0_)*_tmp; \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,1)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_D1_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_re(_tmp,*s1,*s2); \
-        hc += (_T1_)*_tmp; \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,2)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_D2_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_re(_tmp,*s1,*s2); \
-        hc += (_T2_)*_tmp; \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,3)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_D3_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_re(_tmp,*s1,*s2); \
-        hc += (_T3_)*_tmp; \
-      } \
-    } \
-    out[(zerocoord[0]+t+GLB_T-t0)%GLB_T] = -(_SIGN_)*hc/GLB_VOL3; \
-  } \
-  global_sum(out,GLB_T); \
-}
-
+#define MESON_DEFINITION_TWO_RE(name)                                               \
+    void name##_re_correlator(double *out, int t0, spinor_field *qp) {              \
+        int t, x, y, z, i;                                                          \
+        suNf_spinor *s1;                                                            \
+        suNf_spinor *s2;                                                            \
+        for (t = 0; t < GLB_T; t++)                                                 \
+            out[t] = 0.;                                                            \
+        for (t = 0; t < T; t++) {                                                   \
+            double _tmp, hc = 0.;                                                   \
+            for (x = 0; x < X; x++)                                                 \
+                for (y = 0; y < Y; y++)                                             \
+                    for (z = 0; z < Z; z++) {                                       \
+                        for (i = 0; i < NF; ++i) {                                  \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 0)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D0_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
+                            hc += (_T0_)*_tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 1)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D1_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
+                            hc += (_T1_)*_tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 2)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D2_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
+                            hc += (_T2_)*_tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 3)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D3_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
+                            hc += (_T3_)*_tmp;                                      \
+                        }                                                           \
+                    }                                                               \
+            out[(zerocoord[0] + t + GLB_T - t0) % GLB_T] = -(_SIGN_)*hc / GLB_VOL3; \
+        }                                                                           \
+        global_sum(out, GLB_T);                                                     \
+    }
 
 /***************************************************************************\
 
@@ -137,39 +151,41 @@ out[t] = Im{
 
 \***************************************************************************/
 
-#define MESON_DEFINITION_TWO_IM(name) \
-void name##_im_correlator(double *out, int t0, spinor_field *qp) { \
-  int t,x,y,z, i; \
-  suNf_spinor *s1; \
-  suNf_spinor *s2; \
-  for (t=0; t<GLB_T; t++) out[t] = 0.; \
-  for (t=0; t<T; t++) { \
-    double _tmp,hc=0.; \
-    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { \
-      for (i=0; i<NF; ++i) { \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,0)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_D0_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_im(_tmp,*s1,*s2); \
-        hc += (_T0_)*_tmp; \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,1)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_D1_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_im(_tmp,*s1,*s2); \
-        hc += (_T1_)*_tmp; \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,2)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_D2_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_im(_tmp,*s1,*s2); \
-        hc += (_T2_)*_tmp; \
-        s1 = _FIELD_AT(&qp[_INDEX_(i,3)],ipt(t,x,y,z)); \
-        s2 = _FIELD_AT(&qp[_INDEX_(i,_D3_)],ipt(t,x,y,z)); \
-				_spinor_perm_prod_im(_tmp,*s1,*s2); \
-        hc += (_T3_)*_tmp; \
-      } \
-    } \
-    out[(zerocoord[0]+t+GLB_T-t0)%GLB_T] = -(_SIGN_)*hc/GLB_VOL3; \
-  } \
-  global_sum(out,GLB_T); \
-}
-
+#define MESON_DEFINITION_TWO_IM(name)                                               \
+    void name##_im_correlator(double *out, int t0, spinor_field *qp) {              \
+        int t, x, y, z, i;                                                          \
+        suNf_spinor *s1;                                                            \
+        suNf_spinor *s2;                                                            \
+        for (t = 0; t < GLB_T; t++)                                                 \
+            out[t] = 0.;                                                            \
+        for (t = 0; t < T; t++) {                                                   \
+            double _tmp, hc = 0.;                                                   \
+            for (x = 0; x < X; x++)                                                 \
+                for (y = 0; y < Y; y++)                                             \
+                    for (z = 0; z < Z; z++) {                                       \
+                        for (i = 0; i < NF; ++i) {                                  \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 0)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D0_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_im(_tmp, *s1, *s2);                   \
+                            hc += (_T0_)*_tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 1)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D1_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_im(_tmp, *s1, *s2);                   \
+                            hc += (_T1_)*_tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 2)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D2_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_im(_tmp, *s1, *s2);                   \
+                            hc += (_T2_)*_tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 3)], ipt(t, x, y, z));    \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D3_)], ipt(t, x, y, z)); \
+                            _spinor_perm_prod_im(_tmp, *s1, *s2);                   \
+                            hc += (_T3_)*_tmp;                                      \
+                        }                                                           \
+                    }                                                               \
+            out[(zerocoord[0] + t + GLB_T - t0) % GLB_T] = -(_SIGN_)*hc / GLB_VOL3; \
+        }                                                                           \
+        global_sum(out, GLB_T);                                                     \
+    }
 
 /***************************************************************************\
 
@@ -179,32 +195,31 @@ g0 Gamma^\dag g0 = sign Gamma
 
 \***************************************************************************/
 
-#define SINGLE_TRACE_DEBUG(name) \
-void name##_debug(hr_complex Gamma[4][4], int* sign) { \
-  int i,j; \
-  for(i=0;i<4;i++) \
-  for(j=0;j<4;j++) { \
-    _complex_0(Gamma[i][j]);   \
-  } \
-  if(_REAL_ == 1) { \
-    *sign = - _SIGN_; \
-    Gamma[0][_C0_] = _S0_; \
-    Gamma[1][_C1_] = _S1_; \
-    Gamma[2][_C2_] = _S2_; \
-    Gamma[3][_C3_] = _S3_; \
-  } else { \
-    *sign = _SIGN_; \
-    Gamma[0][_C0_] = I*_S0_; \
-    Gamma[1][_C1_] = I*_S1_; \
-    Gamma[2][_C2_] = I*_S2_; \
-    Gamma[3][_C3_] = I*_S3_; \
-  } \
-  for(i=0;i<4;i++) { \
-    Gamma[2][i] = -Gamma[2][i]; \
-    Gamma[3][i] = -Gamma[3][i]; \
-   } \
-}
-
+#define SINGLE_TRACE_DEBUG(name)                           \
+    void name##_debug(hr_complex Gamma[4][4], int *sign) { \
+        int i, j;                                          \
+        for (i = 0; i < 4; i++)                            \
+            for (j = 0; j < 4; j++) {                      \
+                _complex_0(Gamma[i][j]);                   \
+            }                                              \
+        if (_REAL_ == 1) {                                 \
+            *sign = -_SIGN_;                               \
+            Gamma[0][_C0_] = _S0_;                         \
+            Gamma[1][_C1_] = _S1_;                         \
+            Gamma[2][_C2_] = _S2_;                         \
+            Gamma[3][_C3_] = _S3_;                         \
+        } else {                                           \
+            *sign = _SIGN_;                                \
+            Gamma[0][_C0_] = I * _S0_;                     \
+            Gamma[1][_C1_] = I * _S1_;                     \
+            Gamma[2][_C2_] = I * _S2_;                     \
+            Gamma[3][_C3_] = I * _S3_;                     \
+        }                                                  \
+        for (i = 0; i < 4; i++) {                          \
+            Gamma[2][i] = -Gamma[2][i];                    \
+            Gamma[3][i] = -Gamma[3][i];                    \
+        }                                                  \
+    }
 
 /***************************************************************************\
 
@@ -212,14 +227,11 @@ out = Re tr (g5 Gamma smat)
 
 \***************************************************************************/
 
-#define GAMMA_TRACE_RE_DEFINITION(name) \
-void name##_trace_H(hr_complex* out, hr_complex* smat) { \
-           *out = _S0_*smat[SPIN_2D_INDEX(_C0_,0)] \
-                + _S1_*smat[SPIN_2D_INDEX(_C1_,1)] \
-                + _S2_*smat[SPIN_2D_INDEX(_C2_,2)] \
-                + _S3_*smat[SPIN_2D_INDEX(_C3_,3)]; \
-}
-
+#define GAMMA_TRACE_RE_DEFINITION(name)                                                    \
+    void name##_trace_H(hr_complex *out, hr_complex *smat) {                               \
+        *out = _S0_ * smat[SPIN_2D_INDEX(_C0_, 0)] + _S1_ * smat[SPIN_2D_INDEX(_C1_, 1)] + \
+               _S2_ * smat[SPIN_2D_INDEX(_C2_, 2)] + _S3_ * smat[SPIN_2D_INDEX(_C3_, 3)];  \
+    }
 
 /***************************************************************************\
 
@@ -227,14 +239,11 @@ out = Im tr (g5 Gamma smat)
 
 \***************************************************************************/
 
-#define GAMMA_TRACE_IM_DEFINITION(name) \
-void name##_trace_H(hr_complex* out, hr_complex* smat) { \
-        *out    = _S0_*I*smat[SPIN_2D_INDEX(_C0_,0)] \
-                + _S1_*I*smat[SPIN_2D_INDEX(_C1_,1)] \
-                + _S2_*I*smat[SPIN_2D_INDEX(_C2_,2)] \
-                + _S3_*I*smat[SPIN_2D_INDEX(_C3_,3)]; \
-}
-
+#define GAMMA_TRACE_IM_DEFINITION(name)                                                            \
+    void name##_trace_H(hr_complex *out, hr_complex *smat) {                                       \
+        *out = _S0_ * I * smat[SPIN_2D_INDEX(_C0_, 0)] + _S1_ * I * smat[SPIN_2D_INDEX(_C1_, 1)] + \
+               _S2_ * I * smat[SPIN_2D_INDEX(_C2_, 2)] + _S3_ * I * smat[SPIN_2D_INDEX(_C3_, 3)];  \
+    }
 
 /***************************************************************************\
 
@@ -242,17 +251,16 @@ out = g5 Gamma^\dag in
 
 \***************************************************************************/
 
-#define GAMMA_G5GAMMADAG_RE_DEFINITION(name) \
-void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
-  int a; \
-  for(a=0; a<NF; a++) { \
-    out->c[0].c[a] = _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a]; \
-    out->c[1].c[a] = _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a]; \
-    out->c[2].c[a] = _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a]; \
-    out->c[3].c[a] = _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a]; \
-  } \
-}
-
+#define GAMMA_G5GAMMADAG_RE_DEFINITION(name)                                      \
+    void name##_eval_g5GammaDag_times_spinor(suNf_spinor *out, suNf_spinor *in) { \
+        int a;                                                                    \
+        for (a = 0; a < NF; a++) {                                                \
+            out->c[0].c[a] = _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a];                \
+            out->c[1].c[a] = _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a];                \
+            out->c[2].c[a] = _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a];                \
+            out->c[3].c[a] = _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a];                \
+        }                                                                         \
+    }
 
 /***************************************************************************\
 
@@ -260,19 +268,16 @@ out = i g5 Gamma^\dag in
 
 \***************************************************************************/
 
-#define GAMMA_G5GAMMADAG_IM_DEFINITION(name) \
-void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
-  int a; \
-  for(a=0; a<NF; a++) { \
-    out->c[0].c[a] = -_SIGN_DAG_ * _S0_ * I * in->c[_C0_].c[a]; \
-    out->c[1].c[a] = -_SIGN_DAG_ * _S1_ * I * in->c[_C1_].c[a]; \
-    out->c[2].c[a] = -_SIGN_DAG_ * _S2_ * I * in->c[_C2_].c[a]; \
-    out->c[3].c[a] = -_SIGN_DAG_ * _S3_ * I * in->c[_C3_].c[a]; \
-  } \
-}
-
-
-
+#define GAMMA_G5GAMMADAG_IM_DEFINITION(name)                                      \
+    void name##_eval_g5GammaDag_times_spinor(suNf_spinor *out, suNf_spinor *in) { \
+        int a;                                                                    \
+        for (a = 0; a < NF; a++) {                                                \
+            out->c[0].c[a] = -_SIGN_DAG_ * _S0_ * I * in->c[_C0_].c[a];           \
+            out->c[1].c[a] = -_SIGN_DAG_ * _S1_ * I * in->c[_C1_].c[a];           \
+            out->c[2].c[a] = -_SIGN_DAG_ * _S2_ * I * in->c[_C2_].c[a];           \
+            out->c[3].c[a] = -_SIGN_DAG_ * _S3_ * I * in->c[_C3_].c[a];           \
+        }                                                                         \
+    }
 
 /***************************************************************************\
 
@@ -293,7 +298,6 @@ If Gamma has imaginary elements then:
   Gamma^\dag = _SIGN_DAG_ \Gamma
 
 \***************************************************************************/
-
 
 #define NAME id
 
@@ -330,7 +334,6 @@ GAMMA_G5GAMMADAG_RE_DEFINITION(id)
 #undef _SIGN_DAG_
 #undef _REAL_
 
-
 #define NAME g0
 
 #define _C0_ 2
@@ -365,8 +368,6 @@ GAMMA_G5GAMMADAG_RE_DEFINITION(g0)
 #undef _SIGN_
 #undef _SIGN_DAG_
 #undef _REAL_
-
-
 
 #define NAME g5
 
@@ -403,8 +404,6 @@ GAMMA_G5GAMMADAG_RE_DEFINITION(g5)
 #undef _SIGN_DAG_
 #undef _REAL_
 
-
-
 #define NAME g0g5
 
 #define _C0_ 2
@@ -439,8 +438,6 @@ GAMMA_G5GAMMADAG_RE_DEFINITION(g0g5)
 #undef _SIGN_
 #undef _SIGN_DAG_
 #undef _REAL_
-
-
 
 #define NAME g1
 
@@ -477,8 +474,6 @@ GAMMA_G5GAMMADAG_IM_DEFINITION(g1)
 #undef _SIGN_DAG_
 #undef _REAL_
 
-
-
 #define NAME g2
 
 #define _C0_ 3
@@ -513,8 +508,6 @@ GAMMA_G5GAMMADAG_RE_DEFINITION(g2)
 #undef _SIGN_
 #undef _SIGN_DAG_
 #undef _REAL_
-
-
 
 #define NAME g3
 
@@ -551,8 +544,6 @@ GAMMA_G5GAMMADAG_IM_DEFINITION(g3)
 #undef _SIGN_DAG_
 #undef _REAL_
 
-
-
 #define NAME g0g1
 
 #define _C0_ 1
@@ -587,8 +578,6 @@ GAMMA_G5GAMMADAG_IM_DEFINITION(g0g1)
 #undef _SIGN_
 #undef _SIGN_DAG_
 #undef _REAL_
-
-
 
 #define NAME g0g2
 
@@ -625,8 +614,6 @@ GAMMA_G5GAMMADAG_RE_DEFINITION(g0g2)
 #undef _SIGN_DAG_
 #undef _REAL_
 
-
-
 #define NAME g0g3
 
 #define _C0_ 0
@@ -661,8 +648,6 @@ GAMMA_G5GAMMADAG_IM_DEFINITION(g0g3)
 #undef _SIGN_
 #undef _SIGN_DAG_
 #undef _REAL_
-
-
 
 #define NAME g5g1
 
@@ -699,8 +684,6 @@ GAMMA_G5GAMMADAG_IM_DEFINITION(g5g1)
 #undef _SIGN_DAG_
 #undef _REAL_
 
-
-
 #define NAME g5g2
 
 #define _C0_ 3
@@ -735,8 +718,6 @@ GAMMA_G5GAMMADAG_RE_DEFINITION(g5g2)
 #undef _SIGN_
 #undef _SIGN_DAG_
 #undef _REAL_
-
-
 
 #define NAME g5g3
 
@@ -773,8 +754,6 @@ GAMMA_G5GAMMADAG_IM_DEFINITION(g5g3)
 #undef _SIGN_DAG_
 #undef _REAL_
 
-
-
 #define NAME g0g5g1
 
 #define _C0_ 1
@@ -809,8 +788,6 @@ GAMMA_G5GAMMADAG_IM_DEFINITION(g0g5g1)
 #undef _SIGN_
 #undef _SIGN_DAG_
 #undef _REAL_
-
-
 
 #define NAME g0g5g2
 
@@ -847,8 +824,6 @@ GAMMA_G5GAMMADAG_RE_DEFINITION(g0g5g2)
 #undef _SIGN_DAG_
 #undef _REAL_
 
-
-
 #define NAME g0g5g3
 
 #define _C0_ 0
@@ -883,8 +858,6 @@ GAMMA_G5GAMMADAG_IM_DEFINITION(g0g5g3)
 #undef _SIGN_
 #undef _SIGN_DAG_
 #undef _REAL_
-
-
 
 #define NAME g5_g0g5_re_correlator
 
@@ -931,8 +904,6 @@ MESON_DEFINITION_TWO_RE(g5_g0g5)
 #undef _T3_
 #undef _SIGN_
 
-
-
 #define NAME g5_g0g5_im_correlator
 
 #define _C0_ 0
@@ -977,4 +948,3 @@ MESON_DEFINITION_TWO_IM(g5_g0g5)
 #undef _T2_
 #undef _T3_
 #undef _SIGN_
-

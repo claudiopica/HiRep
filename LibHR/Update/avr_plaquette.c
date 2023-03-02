@@ -19,8 +19,7 @@
 #include "geometry.h"
 #include "inverters.h"
 
-double plaq(int ix, int mu, int nu)
-{
+double plaq(int ix, int mu, int nu) {
     int iy, iz;
     double p;
     suNg *v1, *v2, *v3, *v4, w1, w2, w3;
@@ -40,15 +39,14 @@ double plaq(int ix, int mu, int nu)
     _suNg_trace_re(p, w3);
 
 #ifdef PLAQ_WEIGHTS
-    if (plaq_weight == NULL) return p;
+    if (plaq_weight == NULL) { return p; }
     return plaq_weight[ix * 16 + mu * 4 + nu] * p;
 #else
     return p;
 #endif
 }
 
-void cplaq(hr_complex *ret, int ix, int mu, int nu)
-{
+void cplaq(hr_complex *ret, int ix, int mu, int nu) {
     int iy, iz;
     suNg *v1, *v2, *v3, *v4, w1, w2, w3;
     double tmpre = 0.;
@@ -78,12 +76,10 @@ void cplaq(hr_complex *ret, int ix, int mu, int nu)
 #endif
 }
 
-double avr_plaquette()
-{
+double avr_plaquette() {
     static double pa = 0.;
 
-    _OMP_PRAGMA(single)
-    {
+    _OMP_PRAGMA(single) {
         pa = 0.;
     }
 
@@ -94,8 +90,7 @@ double avr_plaquette()
             complete_sendrecv_gfield(u_gauge);
             _OMP_PRAGMA(barrier)
         }
-        _SITE_FOR_SUM(&glattice, ixp, ix, pa)
-        {
+        _SITE_FOR_SUM(&glattice, ixp, ix, pa) {
             pa += plaq(ix, 1, 0);
             pa += plaq(ix, 2, 0);
             pa += plaq(ix, 2, 1);
@@ -118,16 +113,17 @@ double avr_plaquette()
     return pa;
 }
 
-void avr_plaquette_time(double *plaqt, double *plaqs)
-{
+void avr_plaquette_time(double *plaqt, double *plaqs) {
     int ix;
     int tc;
-    for (int nt = 0; nt < GLB_T; nt++) plaqt[nt] = plaqs[nt] = 0.0;
+    for (int nt = 0; nt < GLB_T; nt++) {
+        plaqt[nt] = plaqs[nt] = 0.0;
+    }
 
     for (int nt = 0; nt < T; nt++) {
         tc = (zerocoord[0] + nt + GLB_T) % GLB_T;
-        for (int nx = 0; nx < X; nx++)
-            for (int ny = 0; ny < Y; ny++)
+        for (int nx = 0; nx < X; nx++) {
+            for (int ny = 0; ny < Y; ny++) {
                 for (int nz = 0; nz < Z; nz++) {
                     ix = ipt(nt, nx, ny, nz);
                     plaqt[tc] += plaq(ix, 1, 0);
@@ -137,6 +133,8 @@ void avr_plaquette_time(double *plaqt, double *plaqs)
                     plaqs[tc] += plaq(ix, 3, 1);
                     plaqs[tc] += plaq(ix, 3, 2);
                 }
+            }
+        }
         plaqt[tc] /= 3.0 * NG * GLB_VOL3;
         plaqs[tc] /= 3.0 * NG * GLB_VOL3;
     }
@@ -147,8 +145,7 @@ void avr_plaquette_time(double *plaqt, double *plaqs)
     }
 }
 
-void full_plaquette()
-{
+void full_plaquette() {
     static hr_complex pa[6];
     static hr_complex r0;
     static hr_complex r1;
@@ -157,8 +154,7 @@ void full_plaquette()
     static hr_complex r4;
     static hr_complex r5;
 
-    _OMP_PRAGMA(single)
-    {
+    _OMP_PRAGMA(single) {
         r0 = 0.;
         r1 = 0.;
         r2 = 0.;
@@ -175,8 +171,7 @@ void full_plaquette()
             _OMP_PRAGMA(barrier)
         }
 
-        _SITE_FOR_SUM(&glattice, ixp, ix, r0, r1, r2, r3, r4, r5)
-        {
+        _SITE_FOR_SUM(&glattice, ixp, ix, r0, r1, r2, r3, r4, r5) {
             hr_complex tmp;
 
             cplaq(&tmp, ix, 1, 0);
@@ -217,8 +212,7 @@ void full_plaquette()
         }
     }
 
-    _OMP_PRAGMA(single)
-    {
+    _OMP_PRAGMA(single) {
         pa[0] = r0;
         pa[1] = r1;
         pa[2] = r2;
@@ -271,8 +265,7 @@ void full_plaquette()
   }
 }*/
 
-double local_plaq(int ix)
-{
+double local_plaq(int ix) {
     double pa;
 
     pa = plaq(ix, 1, 0);
@@ -285,8 +278,7 @@ double local_plaq(int ix)
     return pa;
 }
 
-void full_momenta(suNg_av_field *momenta)
-{
+void full_momenta(suNg_av_field *momenta) {
     scalar_field *la = alloc_sfield(1, &glattice);
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(&glattice, i) {
@@ -305,20 +297,17 @@ void full_momenta(suNg_av_field *momenta)
         *_FIELD_AT(la, i) = a;
     }
     static double mom;
-    _OMP_PRAGMA(single)
-    {
+    _OMP_PRAGMA(single) {
         mom = 0.;
-    }   
-    _MASTER_FOR_SUM(la->type, i, mom)
-    {
+    }
+    _MASTER_FOR_SUM(la->type, i, mom) {
         mom += *_FIELD_AT(la, i);
     }
     lprintf("MOMENTA", 0, "%1.8g\n", mom);
     free_sfield(la);
 }
 
-void cplaq_wrk(hr_complex *ret, int ix, int mu, int nu)
-{
+void cplaq_wrk(hr_complex *ret, int ix, int mu, int nu) {
     int iy, iz;
     suNg *v1, *v2, *v3, *v4, w1, w2, w3;
 #ifdef GAUGE_SON
@@ -348,14 +337,12 @@ void cplaq_wrk(hr_complex *ret, int ix, int mu, int nu)
 #endif
 }
 
-hr_complex avr_plaquette_wrk()
-{
+hr_complex avr_plaquette_wrk() {
     static hr_complex pa, tmp;
     suNg_field *_u = u_gauge_wrk();
     start_sendrecv_gfield(_u);
 
-    _OMP_PRAGMA(single)
-    {
+    _OMP_PRAGMA(single) {
         pa = tmp = 0.;
     }
 
@@ -366,8 +353,7 @@ hr_complex avr_plaquette_wrk()
             complete_sendrecv_gfield(_u);
             _OMP_PRAGMA(barrier)
         }
-        _SITE_FOR_SUM(&glattice, ixp, ix, pa)
-        {
+        _SITE_FOR_SUM(&glattice, ixp, ix, pa) {
             cplaq_wrk(&tmp, ix, 1, 0);
             pa += tmp;
             cplaq_wrk(&tmp, ix, 2, 0);

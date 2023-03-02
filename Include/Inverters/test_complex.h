@@ -7,7 +7,7 @@
 #define TEST_COMPLEX_H
 
 #ifdef __cplusplus
-  extern "C" {
+extern "C" {
 #endif
 
 int test_gpu_complex();
@@ -33,6 +33,6 @@ int test_I_add();
 int test_I_prod();
 
 #ifdef __cplusplus
-  }
+}
 #endif
 #endif

@@ -15,7 +15,7 @@
 #include "gpu.h"
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -24,7 +24,7 @@
  * @param file          File where the last error was raised
  * @param line          Line where the last error was raised
  */
-void __cudaCheckError( const char *file, int line );
+void __cudaCheckError(const char *file, int line);
 
 /**
  * @brief Check CUDA call and log error message on failure 
@@ -33,12 +33,13 @@ void __cudaCheckError( const char *file, int line );
  *
  * @param err           Function call that should be checked
  */
-#define CudaSafeCall( err )     __cudaSafeCall( err, __FILE__, __LINE__ )
+#define CudaSafeCall(err) __cudaSafeCall(err, __FILE__, __LINE__)
 
 /**
  * @brief Check last error after CUDA calls
  */
-#define CudaCheckError()        __cudaCheckError( (const char*)__FILE__, (int)__LINE__ ) /*Apparently these casts are necessary. Why? (SAM)*/ 
+#define CudaCheckError() \
+    __cudaCheckError((const char *)__FILE__, (int)__LINE__) /*Apparently these casts are necessary. Why? (SAM)*/
 
 /**
  * @brief Check CUDA call and log error message on failure
@@ -47,7 +48,7 @@ void __cudaCheckError( const char *file, int line );
  * @param file          File where the exception was raised
  * @param line          Line where the exception was raised
  */
-void __cudaSafeCall( cudaError_t err, const char *file, const int line );
+void __cudaSafeCall(cudaError_t err, const char *file, const int line);
 
 /**
  * @brief Check CUDA call and log error message on failure.
@@ -56,9 +57,8 @@ void __cudaSafeCall( cudaError_t err, const char *file, const int line );
  */
 #define CHECK_CUDA(call) CudaSafeCall(call)
 
-
 #ifdef __cplusplus
-    }
+}
 #endif
 #endif
 #endif

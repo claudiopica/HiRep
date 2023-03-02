@@ -118,4 +118,3 @@
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_device_transfer.c.tmpl"
 #include "TMPL/field_alloc.c.tmpl"
-

@@ -4,7 +4,7 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 //single_double_utils.c
@@ -15,6 +15,6 @@ void assign_s2sd(spinor_field *out, spinor_field_flt *in);
 void assign_sd2s(spinor_field_flt *out, spinor_field *in);
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //SINGLE_DOUBLE_UTILS_H

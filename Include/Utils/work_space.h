@@ -4,7 +4,7 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 //work_space.c
@@ -22,6 +22,6 @@ void release_wrk_space(int id_release);
 void free_wrk_space();
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //WORK_SPACE_H

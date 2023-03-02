@@ -41,8 +41,7 @@
 static short int truncated;
 
 static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spinor_operator M, spinor_field *in,
-                             spinor_field *out_trunc, spinor_field *out)
-{
+                             spinor_field *out_trunc, spinor_field *out) {
     spinor_field **q1, **q2;
     spinor_field *p1, *p2, *Mp;
     spinor_field *sptmp, *memall;
@@ -61,7 +60,9 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
     /* par->n deve essere almeno 1! */
     assert(par->n > 0);
 #ifndef CHECK_SPINOR_MATCHING
-    for (i = 0; i < par->n; ++i) _TWO_SPINORS_MATCHING(in, &out[i]);
+    for (i = 0; i < par->n; ++i) {
+        _TWO_SPINORS_MATCHING(in, &out[i]);
+    }
 #endif
 
     /*
@@ -121,7 +122,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
         r[i] = rho;
         c2[i] = c1[i] = 1.;
         s1[i] = s2[i] = 0.;
-        if (par->n != 1) spinor_field_zero_f(&out[i]); /* if no multishift we start with the trial solution */
+        if (par->n != 1) { spinor_field_zero_f(&out[i]); /* if no multishift we start with the trial solution */ }
         spinor_field_zero_f(q1[i]);
         spinor_field_zero_f(q2[i]);
         flags[i] = 1;
@@ -261,22 +262,20 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
     free(flags);
 
     /* return number of cg iter */
-    if (par->n == 1) ++cgiter;
+    if (par->n == 1) { ++cgiter; }
     return cgiter;
 }
 
 static double sh;
 static spinor_operator g5Herm;
-static void Herm(spinor_field *out, spinor_field *in)
-{
+static void Herm(spinor_field *out, spinor_field *in) {
     g5Herm(out, in);
     if (sh != 0.) { spinor_field_mul_add_assign_f(out, -sh, in); }
     spinor_field_g5_f(out, out);
 }
 
 int g5QMR_mshift_trunc(mshift_par *par, int trunc_iter, spinor_operator M, spinor_field *in, spinor_field *out_trunc,
-                       spinor_field *out)
-{
+                       spinor_field *out) {
     int cgiter;
     int n;
     mshift_par orig;

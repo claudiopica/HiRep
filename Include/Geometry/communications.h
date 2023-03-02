@@ -20,7 +20,7 @@
 #include "Utils/generics.h"
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 void probe_mpi(void);
@@ -98,4 +98,4 @@ void probe_mpi(void);
 #ifdef __cplusplus
 }
 #endif
-#endif 
+#endif

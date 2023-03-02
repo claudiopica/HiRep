@@ -5,19 +5,18 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 // boundary_conditions.c
-typedef struct
-{
-  double gauge_boundary_improvement_cs;
-  double gauge_boundary_improvement_ct;
-  double chiSF_boundary_improvement_ds;
-  double fermion_twisting_theta[4];
-  int SF_BCs;
-  suNg gauge_boundary_up;
-  suNg gauge_boundary_dn;
+typedef struct {
+    double gauge_boundary_improvement_cs;
+    double gauge_boundary_improvement_ct;
+    double chiSF_boundary_improvement_ds;
+    double fermion_twisting_theta[4];
+    int SF_BCs;
+    suNg gauge_boundary_up;
+    suNg gauge_boundary_dn;
 } BCs_pars_t;
 
 void init_BCs(BCs_pars_t *pars);
@@ -34,8 +33,7 @@ void apply_BCs_on_clover_term(suNfc_field *);
 void SF_classical_solution();
 #endif
 
-
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //BOUNDARY_CONDITIONS_H

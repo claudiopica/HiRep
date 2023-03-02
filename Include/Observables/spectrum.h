@@ -12,11 +12,10 @@
 *******************************************************************************/
 
 // Header file for:
-// - meson_measurements.c 
-// - baryon_measurements.c 
-// - meson_measurements_ff.c 
-// - mesons.c 
-
+// - meson_measurements.c
+// - baryon_measurements.c
+// - meson_measurements_ff.c
+// - mesons.c
 
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
@@ -25,38 +24,56 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 //used in mesons.c and trunc_hairpin.c
 #define SPIN_2D_INDEX(i, j) ((i)*4 + (j))
 
-//meson_measurements.c 
-void measure_spectrum_semwall(int nm, double* m, int nhits,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_discon_semwall(int nm, double* m, int nhits,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_discon_gfwall(int nm, double* m, int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_discon_volume(int nm, double* m, int conf_num, double precision, int dil, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_gfwall(int nm, double* m, int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_pt(int tau, int nm, double* m, int n_mom,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_semwall_ext(int nm, double* m, int nhits,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_pt_ext(int tau, int nm, double* m, int n_mom,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_semwall_fixedbc(int dt, int nm, double* m, int nhits,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double* m, int n_mom,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_gfwall_fixedbc(int dt, int nm, double* m, int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_formfactor_pt(int ti, int tf, int nm, double* m, int n_mom, int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double* m, int n_mom, int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_diquark_semwall_background(int nm, double* m, int nhits,int conf_num, double precision,double Q, int n, storage_switch swc, data_storage_array **ret);
-void measure_conserved_formfactor_fixed(int ti, int tf, int dt, int nm, double* m, int n_mom, int conf_num, double precision, storage_switch swc, data_storage_array **ret); //TODO: not defined in lib
+//meson_measurements.c
+void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
+                              data_storage_array **ret);
+void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
+                                     data_storage_array **ret);
+void measure_spectrum_discon_gfwall(int nm, double *m, int conf_num, double precision, storage_switch swc,
+                                    data_storage_array **ret);
+void measure_spectrum_discon_volume(int nm, double *m, int conf_num, double precision, int dil, storage_switch swc,
+                                    data_storage_array **ret);
+void measure_spectrum_gfwall(int nm, double *m, int conf_num, double precision, storage_switch swc, data_storage_array **ret);
+void measure_spectrum_pt(int tau, int nm, double *m, int n_mom, int conf_num, double precision, storage_switch swc,
+                         data_storage_array **ret);
+void measure_spectrum_semwall_ext(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
+                                  data_storage_array **ret);
+void measure_spectrum_pt_ext(int tau, int nm, double *m, int n_mom, int conf_num, double precision, storage_switch swc,
+                             data_storage_array **ret);
+void measure_spectrum_semwall_fixedbc(int dt, int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
+                                      data_storage_array **ret);
+void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double *m, int n_mom, int conf_num, double precision,
+                                 storage_switch swc, data_storage_array **ret);
+void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, double precision, storage_switch swc,
+                                     data_storage_array **ret);
+void measure_formfactor_pt(int ti, int tf, int nm, double *m, int n_mom, int conf_num, double precision, storage_switch swc,
+                           data_storage_array **ret);
+void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_mom, int conf_num, double precision,
+                              storage_switch swc, data_storage_array **ret);
+void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_num, double precision, double Q, int n,
+                                        storage_switch swc, data_storage_array **ret);
+void measure_conserved_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_mom, int conf_num, double precision,
+                                        storage_switch swc, data_storage_array **ret); //TODO: not defined in lib
 
-//baryon_measurements.c 
-void measure_baryons(double* m,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
+//baryon_measurements.c
+void measure_baryons(double *m, int conf_num, double precision, storage_switch swc, data_storage_array **ret);
 
 /* For measuring spectrum with a four fermion interaction */
 //meson_measurements_ff.c
-void measure_spectrum_ff_semwall(int nm, double* m, int nhits,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree_hopping, int nhits_hopping,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_ff_pt(int tau, int nm, double* m, int n_mom,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
-void measure_spectrum_semwall_ff_ext(int nm, double* m, int nhits,int conf_num, double precision, storage_switch swc, data_storage_array **ret);
+void measure_spectrum_ff_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
+                                 data_storage_array **ret);
+void measure_spectrum_discon_ff_semwall(int nm, double *m, int nhits, int degree_hopping, int nhits_hopping, int conf_num,
+                                        double precision, storage_switch swc, data_storage_array **ret);
+void measure_spectrum_ff_pt(int tau, int nm, double *m, int n_mom, int conf_num, double precision, storage_switch swc,
+                            data_storage_array **ret);
+void measure_spectrum_semwall_ff_ext(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
+                                     data_storage_array **ret);
 
 //mesons.c
 void id_correlator(double *out, int t0, spinor_field *qp);
@@ -130,6 +147,6 @@ void g0g5g2_eval_g5GammaDag_times_spinor(suNf_spinor *out, suNf_spinor *in);
 void g0g5g3_eval_g5GammaDag_times_spinor(suNf_spinor *out, suNf_spinor *in);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 #endif

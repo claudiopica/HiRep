@@ -22,66 +22,66 @@
 #define _KERNEL(_name, _args) __global__ _FUNC(void, _name, _FIELD_NAME, _args)
 #define _DECLARE(_type, _name, _args) _FUNC(_type, _name, _FIELD_NAME, _args)
 
-_DECLARE(kernel_field_input*, init_kernel_input_, (void* sendbuf, _FIELD_TYPE *in, box_t* box, gd_type gd_t)) {
-  kernel_field_input* input = (kernel_field_input*)malloc(sizeof(kernel_field_input));
-  input->field_in = (void*)in->gpu_ptr;
-  input->field_out = sendbuf;
-  input->base_in[0] = geometryBoxes->base_index;
-  input->base_in[1] = geometryBoxes->base_index_odd;
-  input->base_out[0] = box->base_index;
-  input->base_out[1] = box->base_index_odd;
-  input->vol_in[0] = boxEvenVolume(geometryBoxes);
-  input->vol_in[1] = boxOddVolume(geometryBoxes);
-  input->vol_out[0] = boxEvenVolume(box);
-  input->vol_out[1] = boxOddVolume(box);
-  input->master_shift_in = in->type->master_shift;
-  input->master_shift_out = 0;
-  input->iup_gpu = iup_gpu;
-  input->idn_gpu = idn_gpu;
-  input->imask_gpu = imask_gpu;
-  input->gd_in = gd_t;
+_DECLARE(kernel_field_input *, init_kernel_input_, (void *sendbuf, _FIELD_TYPE *in, box_t *box, gd_type gd_t)) {
+    kernel_field_input *input = (kernel_field_input *)malloc(sizeof(kernel_field_input));
+    input->field_in = (void *)in->gpu_ptr;
+    input->field_out = sendbuf;
+    input->base_in[0] = geometryBoxes->base_index;
+    input->base_in[1] = geometryBoxes->base_index_odd;
+    input->base_out[0] = box->base_index;
+    input->base_out[1] = box->base_index_odd;
+    input->vol_in[0] = boxEvenVolume(geometryBoxes);
+    input->vol_in[1] = boxOddVolume(geometryBoxes);
+    input->vol_out[0] = boxEvenVolume(box);
+    input->vol_out[1] = boxOddVolume(box);
+    input->master_shift_in = in->type->master_shift;
+    input->master_shift_out = 0;
+    input->iup_gpu = iup_gpu;
+    input->idn_gpu = idn_gpu;
+    input->imask_gpu = imask_gpu;
+    input->gd_in = gd_t;
 
-  kernel_field_input* input_d;
-  cudaMalloc((void**)&input_d, sizeof(kernel_field_input));
-  cudaMemcpy(input_d, input, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
-  return input_d;
+    kernel_field_input *input_d;
+    cudaMalloc((void **)&input_d, sizeof(kernel_field_input));
+    cudaMemcpy(input_d, input, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
+    return input_d;
 }
 
-_KERNEL(box_to_buffer_kernel_,(kernel_field_input* input, coord4* icoord, int* ipt_gpu)) {
-    _SITE_TYPE *in = (_SITE_TYPE*)input->field_in;
-    _SITE_TYPE *out = (_SITE_TYPE*)input->field_out;
+_KERNEL(box_to_buffer_kernel_, (kernel_field_input * input, coord4 *icoord, int *ipt_gpu)) {
+    _SITE_TYPE *in = (_SITE_TYPE *)input->field_in;
+    _SITE_TYPE *out = (_SITE_TYPE *)input->field_out;
 
     _KERNEL_PIECE_FOR(piece) {
         _IF_IN_BOX_OUT(input, piece) {
-            int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x + input->base_out[piece-1];
+            int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x + input->base_out[piece - 1];
             coord4 c = icoord[ix];
             int iy = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]);
             _SITE_TYPE site;
             for (int comp = 0; comp < _FIELD_DIM; ++comp) {
-                read_gpu<_REAL>(0, &site, in, iy-input->master_shift_in, comp, _FIELD_DIM);
+                read_gpu<_REAL>(0, &site, in, iy - input->master_shift_in, comp, _FIELD_DIM);
                 write_gpu<_REAL>(0, &site, out, ix, comp, _FIELD_DIM);
             }
         }
     }
 }
 
-_DECLARE(void, sync_box_to_buffer_gpu_,(geometry_descriptor *gd, box_t *src, _FIELD_TYPE* in, void *sendbuf)) {
+_DECLARE(void, sync_box_to_buffer_gpu_, (geometry_descriptor * gd, box_t *src, _FIELD_TYPE *in, void *sendbuf)) {
     /* TODO: we do not want to compare pointers */
     enum gd_type gd_t = GLOBAL;
-    if (gd == &glat_even) gd_t = EVEN;
-    if (gd == &glat_odd) gd_t = ODD;
+    if (gd == &glat_even) { gd_t = EVEN; }
+    if (gd == &glat_odd) { gd_t = ODD; }
 
     /* icoord array gives coordinates of inner lattice given a sendbuffer index */
     coord4 *c = src->icoord;
     coord4 *d_c;
     int full_vol = boxVolume(src);
-    cudaMalloc((void**)&d_c, glattice.nbuffers_gauge*full_vol*sizeof(coord4));
-    cudaMemcpy(d_c, c, glattice.nbuffers_gauge*full_vol*sizeof(coord4), cudaMemcpyHostToDevice);
+    cudaMalloc((void **)&d_c, glattice.nbuffers_gauge * full_vol * sizeof(coord4));
+    cudaMemcpy(d_c, c, glattice.nbuffers_gauge * full_vol * sizeof(coord4), cudaMemcpyHostToDevice);
 
-    kernel_field_input* input = _F_NAME(init_kernel_input_,_FIELD_NAME)(sendbuf, in, src, gd_t);
+    kernel_field_input *input = _F_NAME(init_kernel_input_, _FIELD_NAME)(sendbuf, in, src, gd_t);
     const int max_vol = fmax(boxEvenVolume(src), boxOddVolume(src));
-    const int grid = (max_vol - 1)/BLOCK_SIZE + 1; 
-    _F_NAME(box_to_buffer_kernel_,_FIELD_NAME)<<<grid, BLOCK_SIZE>>>(input, d_c, ipt_gpu);
+    const int grid = (max_vol - 1) / BLOCK_SIZE + 1;
+    _F_NAME(box_to_buffer_kernel_, _FIELD_NAME)<<<grid, BLOCK_SIZE> > >(input, d_c, ipt_gpu);
 }
 
 #undef _DECLARE

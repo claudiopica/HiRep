@@ -6,28 +6,23 @@
 
 #include "libhr.h"
 
-static hr_complex spat_avr_0pp_wrk()
-{
+static hr_complex spat_avr_0pp_wrk() {
     static hr_complex pa, tmp;
     suNg_field *_u = u_gauge_wrk();
     start_sendrecv_gfield(_u);
 
-    _OMP_PRAGMA(single)
-    {
+    _OMP_PRAGMA(single) {
         pa = tmp = 0.;
     }
 
-    _PIECE_FOR(&glattice, ixp)
-    {
-        if (ixp == glattice.inner_master_pieces)
-        {
+    _PIECE_FOR(&glattice, ixp) {
+        if (ixp == glattice.inner_master_pieces) {
             _OMP_PRAGMA(master)
             /* wait for gauge field to be transfered */
             complete_sendrecv_gfield(_u);
             _OMP_PRAGMA(barrier)
         }
-        _SITE_FOR_SUM(&glattice, ixp, ix, pa)
-        {
+        _SITE_FOR_SUM(&glattice, ixp, ix, pa) {
             cplaq_wrk(&tmp, ix, 1, 2);
             pa += tmp;
             cplaq_wrk(&tmp, ix, 2, 1);
@@ -54,9 +49,7 @@ static hr_complex spat_avr_0pp_wrk()
     return pa;
 }
 
-int main(int argc, char *argv[])
-{
-
+int main(int argc, char *argv[]) {
     int return_value = 0;
     int idx_wrk;
     hr_complex plaq[2], test;
@@ -78,20 +71,19 @@ int main(int argc, char *argv[])
     plaq[0] = spat_avr_0pp_wrk();
 
     lprintf("MAIN", 0, "Requesting, one workspace gauge field\n");
-    idx_wrk=reserve_wrk_space();
+    idx_wrk = reserve_wrk_space();
     lprintf("MAIN", 0, "done.\n\n");
 
     space_rotations = direct_spatial_rotations();
 
-    lprintf("MAIN", 0, "Resetting and initializing (rotating) workspace gauge field once for each of the 48 cubic rotations\n\n");
-    for (j = 0; j < 48; j++)
-    {
-        lprintf("MAIN", 0, "Rotation %d  %d->%d   %d->%d   %d->%d   %d->%d\n", j, 0, space_rotations[j][0], 1, space_rotations[j][1], 2, space_rotations[j][2], 3, space_rotations[j][3]);
+    lprintf("MAIN", 0,
+            "Resetting and initializing (rotating) workspace gauge field once for each of the 48 cubic rotations\n\n");
+    for (j = 0; j < 48; j++) {
+        lprintf("MAIN", 0, "Rotation %d  %d->%d   %d->%d   %d->%d   %d->%d\n", j, 0, space_rotations[j][0], 1,
+                space_rotations[j][1], 2, space_rotations[j][2], 3, space_rotations[j][3]);
 
-        _MASTER_FOR(&glattice, i)
-        {
-            for (mu = 0; mu < 4; mu++)
-            {
+        _MASTER_FOR(&glattice, i) {
+            for (mu = 0; mu < 4; mu++) {
                 _suNg_zero(*pu_gauge_wrk(i, mu));
             }
         }
@@ -99,10 +91,8 @@ int main(int argc, char *argv[])
 
         lprintf("MAIN", 0, "Checking if the workspace field is assigned to a SU(N) element on all the links\n");
         test = 0;
-        _MASTER_FOR(&glattice, i)
-        {
-            for (mu = 0; mu < 4; mu++)
-            {
+        _MASTER_FOR(&glattice, i) {
+            for (mu = 0; mu < 4; mu++) {
                 det_Cmplx_Ng(&res, pu_gauge_wrk(i, mu));
                 test += (res - 1.0) / (4 * GLB_VOLUME);
             }
@@ -111,8 +101,7 @@ int main(int argc, char *argv[])
         dop = sqrt(_complex_prod_re(test, test));
         lprintf("MAIN", 0, "Maximal normalized difference = %.4e \n", dop);
         lprintf("MAIN", 0, "(should be smaller 1*10^(-15) or so)\n");
-        if (dop > 10.e-14)
-            return_value++;
+        if (dop > 10.e-14) { return_value++; }
 
         plaq[1] = spat_avr_0pp_wrk();
 
@@ -122,8 +111,7 @@ int main(int argc, char *argv[])
 
         lprintf("MAIN", 0, "Maximal normalized difference = %.4e \n", dop);
         lprintf("MAIN", 0, "(should be smaller 1*10^(-15) or so)\n");
-        if (dop > 10.e-14)
-            return_value++;
+        if (dop > 10.e-14) { return_value++; }
         lprintf("MAIN", 0, "done.\n\n");
     }
 

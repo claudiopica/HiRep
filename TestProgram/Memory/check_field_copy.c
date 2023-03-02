@@ -20,16 +20,15 @@ int test_bijectivity_gtransf();
 int test_bijectivity_clover_ldl();
 int test_bijectivity_clover_term();
 int test_bijectivity_clover_force();
-int test_bijectivity_spinor_field_f(geometry_descriptor*);
-int test_bijectivity_sfield(geometry_descriptor*);
+int test_bijectivity_spinor_field_f(geometry_descriptor *);
+int test_bijectivity_sfield(geometry_descriptor *);
 
 // Single precision
 int test_bijectivity_gfield_flt();
 int test_bijectivity_gfield_f_flt();
-int test_bijectivity_spinor_field_f_flt(geometry_descriptor*);
+int test_bijectivity_spinor_field_f_flt(geometry_descriptor *);
 
-int main(int argc, char *argv[]) 
-{
+int main(int argc, char *argv[]) {
     // Init
     int return_val = 0;
 
@@ -41,7 +40,7 @@ int main(int argc, char *argv[])
     // Test block
 
     lprintf("INFO", 0, "\n\n Testing Full Lattice \n\n");
-     /* Double precision */
+    /* Double precision */
     return_val += test_bijectivity_gfield();
     return_val += test_bijectivity_gfield_f();
     return_val += test_bijectivity_suNg_scalar_field();
@@ -53,7 +52,7 @@ int main(int argc, char *argv[])
     return_val += test_bijectivity_spinor_field_f(&glattice);
     return_val += test_bijectivity_sfield(&glattice);
 
-     /* Single precision */
+    /* Single precision */
     return_val += test_bijectivity_gfield_flt();
     return_val += test_bijectivity_gfield_f_flt();
     return_val += test_bijectivity_spinor_field_f_flt(&glattice);
@@ -73,8 +72,7 @@ int main(int argc, char *argv[])
     return return_val;
 }
 
-int test_bijectivity_gfield() 
-{
+int test_bijectivity_gfield() {
     lprintf("INFO", 0, " ====== TEST GAUGE FIELD ======= ");
     int return_val = 0;
     suNg_field *in, *in_copy;
@@ -102,8 +100,7 @@ int test_bijectivity_gfield()
     return return_val;
 }
 
-int test_bijectivity_gfield_f() 
-{
+int test_bijectivity_gfield_f() {
     lprintf("INFO", 0, " ====== TEST GAUGE FIELD ======= ");
     int return_val = 0;
     suNf_field *in, *in_copy;
@@ -132,8 +129,7 @@ int test_bijectivity_gfield_f()
     return return_val;
 }
 
-int test_bijectivity_spinor_field_f(geometry_descriptor *gd) 
-{
+int test_bijectivity_spinor_field_f(geometry_descriptor *gd) {
     lprintf("INFO", 0, " ====== TEST SPINOR FIELD ======= ");
     int return_val = 0;
     spinor_field *in, *in_copy;
@@ -144,7 +140,8 @@ int test_bijectivity_spinor_field_f(geometry_descriptor *gd)
 
     spinor_field_copy_f_cpu(in_copy, in);
     lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
-    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", spinor_field_sqnorm_f_cpu(in_copy));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n",
+            spinor_field_sqnorm_f_cpu(in_copy));
 
     copy_to_gpu_spinor_field_f(in);
     fill_buffers_with_zeroes_spinor_field_f(in);
@@ -164,8 +161,7 @@ int test_bijectivity_spinor_field_f(geometry_descriptor *gd)
     return return_val;
 }
 
-int test_bijectivity_spinor_field_f_flt(geometry_descriptor *gd) 
-{
+int test_bijectivity_spinor_field_f_flt(geometry_descriptor *gd) {
     lprintf("INFO", 0, " ====== TEST SPINOR FIELD SINGLE PRECISION ======= ");
     int return_val = 0;
     spinor_field_flt *in, *in_copy;
@@ -176,7 +172,8 @@ int test_bijectivity_spinor_field_f_flt(geometry_descriptor *gd)
 
     spinor_field_copy_f_flt_cpu(in_copy, in);
     lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(in));
-    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", spinor_field_sqnorm_f_flt_cpu(in_copy));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n",
+            spinor_field_sqnorm_f_flt_cpu(in_copy));
 
     copy_to_gpu_spinor_field_f_flt(in);
     spinor_field_zero_f_flt_cpu(in);
@@ -194,8 +191,7 @@ int test_bijectivity_spinor_field_f_flt(geometry_descriptor *gd)
     return return_val;
 }
 
-int test_bijectivity_sfield(geometry_descriptor *gd) 
-{
+int test_bijectivity_sfield(geometry_descriptor *gd) {
     lprintf("INFO", 0, " ====== TEST SCALAR FIELD ======= ");
     int return_val = 0;
     scalar_field *in, *in_copy;
@@ -222,8 +218,7 @@ int test_bijectivity_sfield(geometry_descriptor *gd)
     return return_val;
 }
 
-int test_bijectivity_gfield_flt() 
-{
+int test_bijectivity_gfield_flt() {
     lprintf("INFO", 0, " ====== TEST GAUGE FIELD SINGLE PRECISION ======= ");
     int return_val = 0;
     suNg_field_flt *in, *in_copy;
@@ -251,8 +246,7 @@ int test_bijectivity_gfield_flt()
     return return_val;
 }
 
-int test_bijectivity_gfield_f_flt() 
-{
+int test_bijectivity_gfield_f_flt() {
     lprintf("INFO", 0, " ====== TEST GAUGE FIELD REPRESENTED SINGLE PRECISION ======= ");
     int return_val = 0;
     suNf_field_flt *in, *in_copy;
@@ -280,8 +274,7 @@ int test_bijectivity_gfield_f_flt()
     return return_val;
 }
 
-int test_bijectivity_suNg_scalar_field() 
-{
+int test_bijectivity_suNg_scalar_field() {
     lprintf("INFO", 0, " ====== TEST SU(NG) SCALAR FIELD ======= ");
     int return_val = 0;
     suNg_scalar_field *in, *in_copy;
@@ -292,7 +285,8 @@ int test_bijectivity_suNg_scalar_field()
 
     copy_suNg_scalar_field_cpu(in_copy, in);
     lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_suNg_scalar_field_cpu(in));
-    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_suNg_scalar_field_cpu(in_copy));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n",
+            sqnorm_suNg_scalar_field_cpu(in_copy));
 
     copy_to_gpu_suNg_scalar_field(in);
     zero_suNg_scalar_field_cpu(in);
@@ -309,8 +303,7 @@ int test_bijectivity_suNg_scalar_field()
     return return_val;
 }
 
-int test_bijectivity_avfield() 
-{
+int test_bijectivity_avfield() {
     lprintf("INFO", 0, " ====== TEST ALGEBRA VECTOR FIELD ======= ");
     int return_val = 0;
     suNg_av_field *in, *in_copy;
@@ -338,8 +331,7 @@ int test_bijectivity_avfield()
     return return_val;
 }
 
-int test_bijectivity_gtransf() 
-{
+int test_bijectivity_gtransf() {
     lprintf("INFO", 0, " ====== TEST GAUGE TRANSFORMATION ======= ");
     int return_val = 0;
     suNg_field *in, *in_copy;
@@ -367,8 +359,7 @@ int test_bijectivity_gtransf()
     return return_val;
 }
 
-int test_bijectivity_clover_term() 
-{
+int test_bijectivity_clover_term() {
     lprintf("INFO", 0, " ====== TEST CLOVER TERM ======= ");
     int return_val = 0;
     suNfc_field *in, *in_copy;
@@ -396,8 +387,7 @@ int test_bijectivity_clover_term()
     return return_val;
 }
 
-int test_bijectivity_clover_force() 
-{
+int test_bijectivity_clover_force() {
     lprintf("INFO", 0, " ====== TEST CLOVER FORCE ======= ");
     int return_val = 0;
     suNf_field *in, *in_copy;
@@ -425,8 +415,7 @@ int test_bijectivity_clover_force()
     return return_val;
 }
 
-int test_bijectivity_clover_ldl() 
-{
+int test_bijectivity_clover_ldl() {
     lprintf("INFO", 0, " ====== TEST CLOVER LDL ======= ");
     int return_val = 0;
     ldl_field *in, *in_copy;
@@ -434,7 +423,7 @@ int test_bijectivity_clover_ldl()
     in_copy = alloc_clover_ldl(&glattice);
 
     random_clover_ldl_cpu(in);
-    
+
     copy_clover_ldl_cpu(in_copy, in);
     lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_clover_ldl_cpu(in));
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_clover_ldl_cpu(in_copy));
@@ -453,10 +442,3 @@ int test_bijectivity_clover_ldl()
     free_clover_ldl(in_copy);
     return return_val;
 }
-
-
-
-
-
-
-

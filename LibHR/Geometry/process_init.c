@@ -38,16 +38,13 @@ static char input_filename[256] = "input_file";
 static char output_filename[256] = "out";
 static char error_filename[256] = "err";
 
-char *get_input_filename()
-{
+char *get_input_filename() {
     return input_filename;
 }
-char *get_output_filename()
-{
+char *get_output_filename() {
     return output_filename;
 }
-char *get_error_filename()
-{
+char *get_error_filename() {
     return error_filename;
 }
 
@@ -56,8 +53,7 @@ static void setup_random();
 
 static int setup_level = 0;
 
-static void read_cmdline(int argc, char **argv)
-{
+static void read_cmdline(int argc, char **argv) {
     int option, ai = 0;
 
     while ((option = getopt(argc, argv, "i:o:mh")) != -1) { // get option from the getopt() method
@@ -78,15 +74,15 @@ static void read_cmdline(int argc, char **argv)
             exit(0);
         }
     }
-    if (ai != 1) lprintf("PROCESS INIT", 1, "Using default input file [%s]\n", input_filename);
+    if (ai != 1) { lprintf("PROCESS INIT", 1, "Using default input file [%s]\n", input_filename); }
 }
 
-void setup_gauge_fields()
-{
+void setup_gauge_fields() {
     if (setup_level != 1) {
         error(0, 1, "SETUP_GAUGE_FIELDS", "setup_process has not yet been called\n");
-    } else
+    } else {
         setup_level = 2;
+    }
 
     u_gauge = alloc_gfield(&glattice);
 
@@ -113,13 +109,13 @@ void setup_gauge_fields()
     reset_wrk_pointers();
 }
 
-int setup_process(int *argc, char ***argv)
-{
+int setup_process(int *argc, char ***argv) {
     if (setup_level != 0) {
         printf("Error: the setup_process should be the first initialization function call\n");
         exit(1);
-    } else
+    } else {
         setup_level = 1;
+    }
 
     register_sighandlers();
 
@@ -183,9 +179,7 @@ int setup_process(int *argc, char ***argv)
 #pragma omp parallel
     {
 #pragma omp master
-        {
-            lprintf("OMP", 0, "Number of Threads requested = %i\n", omp_get_num_threads());
-        }
+        { lprintf("OMP", 0, "Number of Threads requested = %i\n", omp_get_num_threads()); }
     }
 #endif
 
@@ -221,8 +215,7 @@ int setup_process(int *argc, char ***argv)
     return 0;
 }
 
-static void setup_random()
-{
+static void setup_random() {
     read_input(rlx_var.read, get_input_filename());
 
     if (strcmp(rlx_var.rlxd_start, "continue") == 0 && rlx_var.rlxd_state[0] != '\0') {
@@ -243,8 +236,7 @@ static void setup_random()
 /* this function is intended to clean up before process ending
  *
  */
-void finalize_process()
-{
+void finalize_process() {
     free_ghmc();
 
     free_BCs();
@@ -256,9 +248,9 @@ void finalize_process()
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
     free_gfield_f(u_gauge_f);
 #endif
-    if (u_scalar != NULL) free_suNg_scalar_field(u_scalar);
+    if (u_scalar != NULL) { free_suNg_scalar_field(u_scalar); }
 
-    if (u_gauge_f_flt != NULL) free_gfield_f_flt(u_gauge_f_flt);
+    if (u_gauge_f_flt != NULL) { free_gfield_f_flt(u_gauge_f_flt); }
 
     // #ifndef WITH_NEW_GEOMETRY
     //   free_geometry_mpi_eo();
@@ -269,7 +261,7 @@ void finalize_process()
     /* MPI variables */
     int init;
     MPI_Initialized(&init);
-    if (init) MPI_Finalize();
+    if (init) { MPI_Finalize(); }
 #endif
 }
 
@@ -281,8 +273,7 @@ void finalize_process()
  *
  * AFFECTS THE GLOBAL VARIABLES: GLB_COMM, RID, PID, WORLD_SIZE
  */
-static int setup_replicas()
-{
+static int setup_replicas() {
 #ifdef WITH_MPI
     if (N_REP > 1) {
         int mpiret;

@@ -21,10 +21,10 @@
 #error Missing _REAL in strided_reads_gpu.h
 #endif
 
-_GPU_FUNC(void, read_, _FIELD_NAME, (_SITE_TYPE *s, _FIELD_TYPE *in, int ix, int comp));
-_GPU_FUNC(void, write_, _FIELD_NAME, (_SITE_TYPE *s, _FIELD_TYPE *in, int ix, int comp));
-_GPU_FUNC(void, read_strided_, _FIELD_NAME, (_SITE_TYPE *s, _SITE_TYPE *in, int ix, int comp));
-_GPU_FUNC(void, write_strided_, _FIELD_NAME, (_SITE_TYPE *s, _SITE_TYPE *in, int ix, int comp));
+_GPU_FUNC(void, read_, _FIELD_NAME, (_SITE_TYPE * s, _FIELD_TYPE *in, int ix, int comp));
+_GPU_FUNC(void, write_, _FIELD_NAME, (_SITE_TYPE * s, _FIELD_TYPE *in, int ix, int comp));
+_GPU_FUNC(void, read_strided_, _FIELD_NAME, (_SITE_TYPE * s, _SITE_TYPE *in, int ix, int comp));
+_GPU_FUNC(void, write_strided_, _FIELD_NAME, (_SITE_TYPE * s, _SITE_TYPE *in, int ix, int comp));
 
 #undef _FIELD_NAME
 #undef _FIELD_TYPE

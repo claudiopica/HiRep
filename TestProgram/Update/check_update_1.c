@@ -20,59 +20,52 @@ hmc_flow flow = init_hmc_flow(flow);
 ### this might have to be changed  if update_ghmc is modified.
 */
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+    int return_value = 0;
+    double orig_plaq, new_plaq, diff;
+    logger_map("DEBUG", "debug");
 
-  int return_value = 0;
-  double orig_plaq, new_plaq, diff;
-  logger_map("DEBUG", "debug");
+    setup_process(&argc, &argv);
+    setup_gauge_fields();
 
-  setup_process(&argc, &argv);
-  setup_gauge_fields();
+    //  return 1;
 
-  //  return 1;
+    /* Init Monte Carlo */
+    init_mc_ghmc(&flow, get_input_filename());
 
-  /* Init Monte Carlo */
-  init_mc_ghmc(&flow, get_input_filename());
+    lprintf("MAIN", 0, "MVM during (R)HMC initialzation: %ld\n", getMVM());
+    lprintf("MAIN", 0, "Initial plaquette: %1.8e\n", avr_plaquette());
 
-  lprintf("MAIN", 0, "MVM during (R)HMC initialzation: %ld\n", getMVM());
-  lprintf("MAIN", 0, "Initial plaquette: %1.8e\n", avr_plaquette());
-
-  /*Vincent */
-  lprintf("REVERSIBILITY TEST", 0, "Plaquette before update: %1.8e\n", avr_plaquette());
-  orig_plaq = avr_plaquette();
-  int rr = update_ghmc();
-  /*Vincent */
-  if (rr < 0)
-  {
-    lprintf("REVERSIBILITY TEST", 0, "Error in updating the gauge field!!\n");
-    return 1;
-  }
-
-  if (rr == 1)
-  {
-
-    lprintf("REVERSIBILITY TEST", 0, "Plaquette after update: %1.8e\n", avr_plaquette());
-
-    rr = reverse_update_ghmc();
     /*Vincent */
-    if (rr < 0)
-    {
-      lprintf("REVERSIBILITY TEST", 0, "Error in updating the gauge field!!\n");
-      return 1;
+    lprintf("REVERSIBILITY TEST", 0, "Plaquette before update: %1.8e\n", avr_plaquette());
+    orig_plaq = avr_plaquette();
+    int rr = update_ghmc();
+    /*Vincent */
+    if (rr < 0) {
+        lprintf("REVERSIBILITY TEST", 0, "Error in updating the gauge field!!\n");
+        return 1;
     }
 
-    lprintf("REVERSIBILITY TEST", 0, "Plaquette after reverse update: %1.8e\n", avr_plaquette());
-    new_plaq = avr_plaquette();
+    if (rr == 1) {
+        lprintf("REVERSIBILITY TEST", 0, "Plaquette after update: %1.8e\n", avr_plaquette());
 
-    diff = fabs(new_plaq - orig_plaq);
-    lprintf("REVERSIBILITY TEST", 0, "diff: %1.8e\n Should be 10^-12 or so\n", diff);
-    if (diff > 1e-10)
-      return_value++;
-  }
-  else
-    lprintf("REVERSIBILITY TEST", 0, "Skipped the comparison as the configuration was not accepted\n");
+        rr = reverse_update_ghmc();
+        /*Vincent */
+        if (rr < 0) {
+            lprintf("REVERSIBILITY TEST", 0, "Error in updating the gauge field!!\n");
+            return 1;
+        }
 
-  finalize_process();
-  return return_value;
+        lprintf("REVERSIBILITY TEST", 0, "Plaquette after reverse update: %1.8e\n", avr_plaquette());
+        new_plaq = avr_plaquette();
+
+        diff = fabs(new_plaq - orig_plaq);
+        lprintf("REVERSIBILITY TEST", 0, "diff: %1.8e\n Should be 10^-12 or so\n", diff);
+        if (diff > 1e-10) { return_value++; }
+    } else {
+        lprintf("REVERSIBILITY TEST", 0, "Skipped the comparison as the configuration was not accepted\n");
+    }
+
+    finalize_process();
+    return return_value;
 }

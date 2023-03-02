@@ -12,7 +12,7 @@
 
 #ifdef _PATELLA_STYLE_
 
-#define _MINDEX_ "[" << a.row*a.size+a.col << "]"
+#define _MINDEX_ "[" << a.row * a.size + a.col << "]"
 #define _VINDEX_ "[" << a.row << "]"
 #define _INDENT_ "\t"
 #define _ENDL_ ";\n"
@@ -24,8 +24,12 @@
 
 #ifdef _PICA_STYLE_
 
-#define _MINDEX_ ".c" << "[" << a.row*a.size+a.col << "]"
-#define _VINDEX_ ".c" << "[" << a.row << "]"
+#define _MINDEX_ \
+    ".c"         \
+        << "[" << a.row * a.size + a.col << "]"
+#define _VINDEX_ \
+    ".c"         \
+        << "[" << a.row << "]"
 #define _INDENT_ "\t"
 #define _ENDL_ "; \\\n"
 #define _LASTENDL_ ";\n"

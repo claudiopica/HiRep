@@ -5,7 +5,7 @@
 #ifndef RANLUX_H
 #define RANLUX_H
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /*******************************************************************************
@@ -43,6 +43,6 @@ void rlxs_get(int state[]);
 void rlxs_reset(int state[]);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 #endif /* RANLUX_H */

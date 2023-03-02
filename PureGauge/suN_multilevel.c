@@ -15,8 +15,7 @@
 
 pg_flow_ml flow = init_pg_flow_ml(flow);
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     int i;
 
     setup_process(&argc, &argv);
@@ -33,10 +32,11 @@ int main(int argc, char *argv[])
     for (i = 0; i < flow.therm; ++i) {
         update(&(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor);
         if (flow.therm > 20) {
-            if (i % (flow.therm / 5) == 0)
+            if (i % (flow.therm / 5) == 0) {
                 lprintf("MAIN", 0, "%d", ((i * 100) / flow.therm));
-            else if (i % (flow.therm / 20) == 0)
+            } else if (i % (flow.therm / 20) == 0) {
                 lprintf("MAIN", 0, ".");
+            }
         }
     }
     if (i) {
@@ -48,7 +48,9 @@ int main(int argc, char *argv[])
     for (i = flow.start; i < flow.end; ++i) {
         if (i != 1) {
             double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
-            for (int j = 0; j < flow.nskip; ++j) update(&(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor);
+            for (int j = 0; j < flow.nskip; ++j) {
+                update(&(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor);
+            }
             elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
             lprintf("MAIN", 0, "Skipped %d Trajectories: [%lf sec]\n", flow.nskip, elapsed_sec);
         }
@@ -57,7 +59,7 @@ int main(int argc, char *argv[])
         lprintf("MAIN", 0, "ML Measure #%d...\n", i);
 
         double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
-        
+
         update_hb_multilevel_gb_measure(0, &(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor, flow.pg_v->ml_niteration,
                                         flow.pg_v->ml_nskip, flow.pg_v->nblkstart, flow.pg_v->nblkend, &(flow.pg_v->APEsmear),
                                         &(flow.pg_v->corrs));
@@ -68,7 +70,7 @@ int main(int argc, char *argv[])
 
         if (strcmp(flow.wf->make, "true") == 0) {
             static suNg_field *Vwf = NULL;
-            if (Vwf == NULL) Vwf = alloc_gfield(&glattice);
+            if (Vwf == NULL) { Vwf = alloc_gfield(&glattice); }
             elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
             suNg_field_copy(Vwf, u_gauge);
             WF_update_and_measure(RK3_ADAPTIVE, Vwf, &(flow.wf->tmax), &(flow.wf->eps), &(flow.wf->delta), flow.wf->nmeas,

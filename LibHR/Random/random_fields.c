@@ -16,8 +16,7 @@
 #include "memory.h"
 #include "geometry.h"
 
-void random_u(suNg_field *gf)
-{
+void random_u(suNg_field *gf) {
     error(gf == NULL, 1, "random_u [random_fields.c]", "Attempt to access unallocated memory space");
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(gf->type, ix) {
@@ -40,8 +39,7 @@ void random_u(suNg_field *gf)
     start_sendrecv_gfield(gf);
 }
 
-void random_u_f(suNf_field *gf)
-{
+void random_u_f(suNf_field *gf) {
     error(gf == NULL, 1, "random_u_f [random_fields.c]", "Attempt to access unallocated memory space");
 
 #ifdef WITH_FUSE_MASTER_FOR
@@ -64,8 +62,7 @@ void random_u_f(suNf_field *gf)
     start_sendrecv_gfield_f(gf);
 }
 
-void unit_u(suNg_field *gf)
-{
+void unit_u(suNg_field *gf) {
     suNg unity;
 
     error(gf == NULL, 1, "unit_u [random_fields.c]", "Attempt to access unallocated memory space");
@@ -93,8 +90,7 @@ void unit_u(suNg_field *gf)
     start_sendrecv_gfield(gf);
 }
 
-void random_s(suNg_scalar_field *sf)
-{
+void random_s(suNg_scalar_field *sf) {
     error(sf == NULL, 1, "random_s [random_fields.c]", "Attempt to access unallocated memory space");
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(sf->type, ix) {
@@ -114,8 +110,7 @@ void random_s(suNg_scalar_field *sf)
     complete_sendrecv_suNg_scalar_field(sf);
 }
 
-void zero_s(suNg_scalar_field *sf)
-{
+void zero_s(suNg_scalar_field *sf) {
     error(sf == NULL, 1, "zero_s [random_fields.c]", "Attempt to access unallocated memory space");
 
     suNg_vector zero_vector;

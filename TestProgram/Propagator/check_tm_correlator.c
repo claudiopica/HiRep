@@ -24,18 +24,20 @@
 /// \cond
 #define BASENAME(filename) (strrchr((filename), '/') ? strrchr((filename), '/') + 1 : filename)
 
-#define corr_ind(px, py, pz, n_mom, tc, nm, cm) ((px) * (n_mom) * (n_mom)*GLB_T * (nm) + (py) * (n_mom)*GLB_T * (nm) + (pz)*GLB_T * (nm) + ((cm)*GLB_T) + (tc))
+#define corr_ind(px, py, pz, n_mom, tc, nm, cm) \
+    ((px) * (n_mom) * (n_mom)*GLB_T * (nm) + (py) * (n_mom)*GLB_T * (nm) + (pz)*GLB_T * (nm) + ((cm)*GLB_T) + (tc))
 /// \endcond
 
 /// \cond
-#define INDEX(px, py, pz, n_mom, tc) ((px + n_mom) * (2 * n_mom + 1) * (2 * n_mom + 1) * (GLB_T) + (py + n_mom) * (2 * n_mom + 1) * (GLB_T) + (pz + n_mom) * (GLB_T) + (tc))
+#define INDEX(px, py, pz, n_mom, tc)                                                                         \
+    ((px + n_mom) * (2 * n_mom + 1) * (2 * n_mom + 1) * (GLB_T) + (py + n_mom) * (2 * n_mom + 1) * (GLB_T) + \
+     (pz + n_mom) * (GLB_T) + (tc))
 /// \endcond
 
 /**
  * @brief Structure containing data from the input file relevant to scattering.
  */
-typedef struct input_cor
-{
+typedef struct input_cor {
     char mstring[256];
     char mustring[256];
     double precision;
@@ -45,14 +47,14 @@ typedef struct input_cor
 
 } input_cor;
 
-#define init_input_cor(varname)                                                             \
-    {                                                                                       \
-        .read = {                                                                           \
-            {"Fermion mass", "prop:mass = %s", STRING_T, (varname).mstring},                \
-            {"twisted mass", "prop:mu = %s", STRING_T, (varname).mustring},                 \
-            {"inverter precision", "prop:precision = %lf", DOUBLE_T, &(varname).precision}, \
-            {NULL, NULL, INT_T, NULL}                                                       \
-        }                                                                                   \
+#define init_input_cor(varname)                                                               \
+    {                                                                                         \
+        .read = {                                                                             \
+            { "Fermion mass", "prop:mass = %s", STRING_T, (varname).mstring },                \
+            { "twisted mass", "prop:mu = %s", STRING_T, (varname).mustring },                 \
+            { "inverter precision", "prop:precision = %lf", DOUBLE_T, &(varname).precision }, \
+            { NULL, NULL, INT_T, NULL }                                                       \
+        }                                                                                     \
     }
 
 char input_filename[256] = "input_file";
@@ -60,25 +62,20 @@ char input_filename[256] = "input_file";
 input_cor cor_var = init_input_cor(cor_var);
 
 /* Random timeslice not previously chosen */
-static int random_tau()
-{
+static int random_tau() {
     static int *slices = NULL;
-    if (slices == NULL)
-        slices = (int *)malloc(GLB_T * sizeof(int));
+    if (slices == NULL) { slices = (int *)malloc(GLB_T * sizeof(int)); }
     static int counter = 0;
     int itmp, tau, i;
     double ran;
 
-    if (counter == 0)
-    {
-        for (i = 0; i < GLB_T; ++i)
-        {
+    if (counter == 0) {
+        for (i = 0; i < GLB_T; ++i) {
             slices[i] = i;
         }
         counter = GLB_T;
     }
-    do
-    {
+    do {
         ranlxd(&ran, 1);
         itmp = (int)(ran * counter);
     } while (itmp == counter);
@@ -90,21 +87,17 @@ static int random_tau()
     return tau;
 }
 
-typedef struct fourvector
-{
+typedef struct fourvector {
     double v[4];
 } fourvec;
 
-static void do_global_sum(meson_observable *mo, double norm)
-{
+static void do_global_sum(meson_observable *mo, double norm) {
     meson_observable *motmp = mo;
     int i;
-    while (motmp != NULL)
-    {
+    while (motmp != NULL) {
         global_sum(motmp->corr_re, motmp->corr_size);
         global_sum(motmp->corr_im, motmp->corr_size);
-        for (i = 0; i < motmp->corr_size; i++)
-        {
+        for (i = 0; i < motmp->corr_size; i++) {
             motmp->corr_re[i] *= norm;
             motmp->corr_im[i] *= norm;
         }
@@ -114,10 +107,8 @@ static void do_global_sum(meson_observable *mo, double norm)
 /**
  * @brief Adds two four-vectors together replacing the first one with the sum, v1 += v2
  */
-static void iadd(fourvec *v1, fourvec *v2)
-{
-    for (int i = 0; i < 4; ++i)
-    {
+static void iadd(fourvec *v1, fourvec *v2) {
+    for (int i = 0; i < 4; ++i) {
         v1->v[i] += v2->v[i];
     }
 }
@@ -125,10 +116,8 @@ static void iadd(fourvec *v1, fourvec *v2)
 /**
  * @brief Multiply four-vector by a real number
  */
-static void imul(fourvec *v1, double a)
-{
-    for (int i = 0; i < 4; ++i)
-    {
+static void imul(fourvec *v1, double a) {
+    for (int i = 0; i < 4; ++i) {
         v1->v[i] *= a;
     }
 }
@@ -136,13 +125,11 @@ static void imul(fourvec *v1, double a)
 /**
  * @brief Returns sum over phat^2 + m (part of the propagator)
  */
-double f1(fourvec p, double m)
-{
+double f1(fourvec p, double m) {
     double tmp = 0.0;
     int i;
 
-    for (i = 0; i < 4; ++i)
-    {
+    for (i = 0; i < 4; ++i) {
         tmp += sin(p.v[i] / 2) * sin(p.v[i] / 2);
     }
     return m + 2 * tmp;
@@ -151,12 +138,10 @@ double f1(fourvec p, double m)
 /**
  * @brief Part of the propagator
  */
-static double f2(fourvec v1, fourvec v2)
-{
+static double f2(fourvec v1, fourvec v2) {
     int i;
     double result = 0.0;
-    for (i = 0; i < 4; ++i)
-    {
+    for (i = 0; i < 4; ++i) {
         result += sin(v1.v[i]) * sin(v2.v[i]);
     }
     return result;
@@ -170,82 +155,82 @@ static double f2(fourvec v1, fourvec v2)
  * @param LT time extent of the box
  * @param t time slice
  */
-hr_complex tw_twopoint(fourvec p, double m, double mu, int L, int LT, int t)
-{
+hr_complex tw_twopoint(fourvec p, double m, double mu, int L, int LT, int t) {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
     hr_complex res;
     res = 0.;
     double tmp;
 
-    for (q1 = 0; q1 < L; ++q1)
-        for (q2 = 0; q2 < L; ++q2)
-            for (q3 = 0; q3 < L; ++q3)
-                for (q41 = 0; q41 < LT; ++q41)
-                    for (q42 = 0; q42 < LT; ++q42)
-                    {
+    for (q1 = 0; q1 < L; ++q1) {
+        for (q2 = 0; q2 < L; ++q2) {
+            for (q3 = 0; q3 < L; ++q3) {
+                for (q41 = 0; q41 < LT; ++q41) {
+                    for (q42 = 0; q42 < LT; ++q42) {
 #ifdef BC_T_PERIODIC
-                        mom1 = (fourvec){{q1, q2, q3, ((double)q41) * L / LT}};
+                        mom1 = (fourvec){ { q1, q2, q3, ((double)q41) * L / LT } };
                         iadd(&mom1, &p);
                         imul(&mom1, 2.0 * PI / L);
 #elif BC_T_ANTIPERIODIC
-                        mom1 = (fourvec){{q1 * 2.0 * PI / L, q2 * 2.0 * PI / L, q3 * 2.0 * PI / L, ((double)(2 * q41 + 1)) * PI / LT}};
+                        mom1 = (fourvec){ { q1 * 2.0 * PI / L, q2 * 2.0 * PI / L, q3 * 2.0 * PI / L,
+                                            ((double)(2 * q41 + 1)) * PI / LT } };
 #endif
 
 #ifdef BC_T_PERIODIC
-                        mom2 = (fourvec){{q1, q2, q3, ((double)q42) * L / LT}};
+                        mom2 = (fourvec){ { q1, q2, q3, ((double)q42) * L / LT } };
                         imul(&mom2, 2.0 * PI / L);
 #elif BC_T_ANTIPERIODIC
-                        mom2 = (fourvec){{q1 * 2.0 * PI / L, q2 * 2.0 * PI / L, q3 * 2.0 * PI / L, ((double)(2 * q42 + 1)) * PI / LT}};
+                        mom2 = (fourvec){ { q1 * 2.0 * PI / L, q2 * 2.0 * PI / L, q3 * 2.0 * PI / L,
+                                            ((double)(2 * q42 + 1)) * PI / LT } };
 #endif
 
-                        tmp = (f1(mom1, m) * f1(mom2, m) + mu * mu + f2(mom1, mom2)) / ((SQR(f1(mom1, m)) + mu * mu + f2(mom1, mom1)) * (SQR(f1(mom2, m)) + mu * mu + f2(mom2, mom2)));
+                        tmp = (f1(mom1, m) * f1(mom2, m) + mu * mu + f2(mom1, mom2)) /
+                              ((SQR(f1(mom1, m)) + mu * mu + f2(mom1, mom1)) * (SQR(f1(mom2, m)) + mu * mu + f2(mom2, mom2)));
 
                         res += tmp * cexp(I * (2.0 * PI / LT) * t * (q42 - q41));
                     }
+                }
+            }
+        }
+    }
 
     res = 4 * res / L / L / L / LT / LT;
     return res;
 }
 
-static int compare_corr(hr_complex *corr_ex, hr_complex *corr_num, int tstart, char *name, double tol)
-{
+static int compare_corr(hr_complex *corr_ex, hr_complex *corr_num, int tstart, char *name, double tol) {
     int retval = 0;
-    for (int t = tstart; t < GLB_T; t++)
-    {
-        if (cabs(corr_ex[t] - corr_num[t]) / cabs(corr_ex[t]) > tol)
-        {
-            lprintf("TEST", 0, "Mismatch %s, t=%d, relative diff: %e, numeric = %e + I*(%e), analytic = %e + I*(%e) \n", name, t, cabs(corr_ex[t] - corr_num[t]) / cabs(corr_ex[t]), creal(corr_num[t]), cimag(corr_num[t]), creal(corr_ex[t]), cimag(corr_ex[t]));
+    for (int t = tstart; t < GLB_T; t++) {
+        if (cabs(corr_ex[t] - corr_num[t]) / cabs(corr_ex[t]) > tol) {
+            lprintf("TEST", 0, "Mismatch %s, t=%d, relative diff: %e, numeric = %e + I*(%e), analytic = %e + I*(%e) \n", name,
+                    t, cabs(corr_ex[t] - corr_num[t]) / cabs(corr_ex[t]), creal(corr_num[t]), cimag(corr_num[t]),
+                    creal(corr_ex[t]), cimag(corr_ex[t]));
             retval += 1;
-        }
-        else
-        {
-            lprintf("TEST", 0, "Match %s, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e) \n", name, t, creal(corr_num[t]), cimag(corr_num[t]), creal(corr_ex[t]), cimag(corr_ex[t]));
+        } else {
+            lprintf("TEST", 0, "Match %s, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e) \n", name, t, creal(corr_num[t]),
+                    cimag(corr_num[t]), creal(corr_ex[t]), cimag(corr_ex[t]));
         }
     }
     return retval;
 }
 
-static int compare_prop(spinor_field *prop1, spinor_field *prop2, double tol)
-{
+static int compare_prop(spinor_field *prop1, spinor_field *prop2, double tol) {
     int retval = 0;
     suNf_spinor *p1, *p2;
 
-    for (int l = 0; l < 4; l++)
-    {
-        _MASTER_FOR(prop2->type, ix)
-        {
+    for (int l = 0; l < 4; l++) {
+        _MASTER_FOR(prop2->type, ix) {
             p1 = _FIELD_AT(prop1 + l, ix);
             p2 = _FIELD_AT(prop2 + l, ix);
-            for (int j = 0; j < 4; j++)
-                for (int k = 0; k < NF; k++)
-
-                    if (cabs(p1->c[j].c[k] - p2->c[j].c[k]) > tol)
-                    {
+            for (int j = 0; j < 4; j++) {
+                for (int k = 0; k < NF; k++) {
+                    if (cabs(p1->c[j].c[k] - p2->c[j].c[k]) > tol) {
                         lprintf("ERROR", 0, "%0.8e %0.8e %0.8e %0.8e\n ", creal(p1->c[j].c[k]), cimag(p1->c[j].c[k]),
                                 creal(p2->c[j].c[k]), cimag(p2->c[j].c[k]));
                         retval++;
                     }
+                }
+            }
         }
     }
 
@@ -254,10 +239,9 @@ static int compare_prop(spinor_field *prop1, spinor_field *prop2, double tol)
     return retval;
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     int return_value = 0;
-    fourvec zero_p = (fourvec){{0, 0, 0, 0}};
+    fourvec zero_p = (fourvec){ { 0, 0, 0, 0 } };
     double mu, m;
     int ts;
 
@@ -296,8 +280,7 @@ int main(int argc, char *argv[])
     hr_complex Piseq[GLB_T];
     hr_complex Pith[GLB_T];
 
-    for (int t = 0; t < GLB_T; t++)
-    {
+    for (int t = 0; t < GLB_T; t++) {
         Piseq[t] = 0.0;
         Pith[t] = tw_twopoint(zero_p, m, mu, GLB_X, GLB_T, t);
     }
@@ -307,8 +290,9 @@ int main(int argc, char *argv[])
 
     reset_mo(&mo);
 
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < 4; j++) {
         spinor_field_zero_f(prop + j);
+    }
 
     ts = 0 * random_tau();
 
@@ -325,10 +309,11 @@ int main(int argc, char *argv[])
     return_value = compare_prop(propmu0, prop, 1.e-14);
 
     lprintf("MAIN", 0, "\nComparing propagators at mu=0\n ");
-    if (return_value != 0)
+    if (return_value != 0) {
         lprintf("MAIN", 0, "Check failed\n ");
-    else
+    } else {
         lprintf("MAIN", 0, "Check passed\n ");
+    }
 
     calc_propagator_tw(&m, mu, prop, source, 4);
 
@@ -337,8 +322,9 @@ int main(int argc, char *argv[])
     do_global_sum(&mo, 1.0);
 
     // now copy the content to a placeholder.
-    for (int t = 0; t < GLB_T; t++)
+    for (int t = 0; t < GLB_T; t++) {
         Piseq[t] = (mo.corr_re[corr_ind(0, 0, 0, 0, t, 1, 0)] + I * mo.corr_im[corr_ind(0, 0, 0, 0, t, 1, 0)]);
+    }
 
     return_value += compare_corr(Pith, Piseq, 0, "Pi", 1.e-8);
 

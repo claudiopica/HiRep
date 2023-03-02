@@ -491,8 +491,9 @@ sub print_c_cpp_properties {
     my $optfile = "$rootdir/.vscode/c_cpp_properties.json";
     my $compilerpath = `echo 'command -v ${$options{'CC'}}[0]' | sh`;
     chomp($compilerpath);
+    my $compilerversion = `${$options{'CC'}}[0] --version`;
     my $compilermode = "gcc-x64";
-    if ( $compilerpath =~ /clang/ ) { $compilermode = "clang-x64"; }
+    if ( $compilerversion =~ /clang/ ) { $compilermode = "clang-x64"; }
     
     #make sure path exists
     make_path("$rootdir/.vscode/");

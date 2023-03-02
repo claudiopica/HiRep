@@ -10,138 +10,132 @@
 #include "Inverters/linear_algebra.h"
 
 static spinor_field *tmp_pf = NULL;
-static rational_app r_APP = {0};  /* used for computing HB and MT for RHMC monomials */
+static rational_app r_APP = { 0 }; /* used for computing HB and MT for RHMC monomials */
 static int mon_init = 1;
 
-static int gcd(int a, int b)
-{
-	while (b!=0){ int t=b; b=a%t; a=t; }
-	return a;
+static int gcd(int a, int b) {
+    while (b != 0) {
+        int t = b;
+        b = a % t;
+        a = t;
+    }
+    return a;
 }
 
-static void reduce_fraction(int *a, int *b)
-{
-	int f=gcd(abs(*a),abs(*b));
-	if (*b!=0 && f!=1){ *a/=f; *b/=f; }
+static void reduce_fraction(int *a, int *b) {
+    int f = gcd(abs(*a), abs(*b));
+    if (*b != 0 && f != 1) {
+        *a /= f;
+        *b /= f;
+    }
 }
 
-static void rhmc_gaussian_pf(monomial const *m)
-{
-	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
-	gaussian_spinor_field(par->pf);
+static void rhmc_gaussian_pf(monomial const *m) {
+    mon_rhmc_par *par = (mon_rhmc_par *)(m->data.par);
+    gaussian_spinor_field(par->pf);
 
-	// find min/max and best rational approximation
-	double minev, maxev;
-	set_dirac_mass(par->mass);
-	find_spec_H2(&maxev, &minev);
-	r_app_set(&(par->ratio), minev, maxev);
+    // find min/max and best rational approximation
+    double minev, maxev;
+    set_dirac_mass(par->mass);
+    find_spec_H2(&maxev, &minev);
+    r_app_set(&(par->ratio), minev, maxev);
 }
 
-static void rhmc_correct_pf(monomial const *m)
-{
-	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
+static void rhmc_correct_pf(monomial const *m) {
+    mon_rhmc_par *par = (mon_rhmc_par *)(m->data.par);
 
-	/* r_APP = x^{-n/(2*d)} */
-	/* use n=-n and d=2*d respect to the r_app used for the MD */
-	r_APP.rel_error = m->data.MT_prec;
-	r_APP.n = -par->ratio.n;
-	r_APP.d = 2*par->ratio.d;
-	reduce_fraction(&r_APP.n, &r_APP.d);
-	r_app_set(&r_APP, par->ratio.min, par->ratio.max);
+    /* r_APP = x^{-n/(2*d)} */
+    /* use n=-n and d=2*d respect to the r_app used for the MD */
+    r_APP.rel_error = m->data.MT_prec;
+    r_APP.n = -par->ratio.n;
+    r_APP.d = 2 * par->ratio.d;
+    reduce_fraction(&r_APP.n, &r_APP.d);
+    r_app_set(&r_APP, par->ratio.min, par->ratio.max);
 
-	set_dirac_mass(par->mass);
-	rational_func(&r_APP, &H2, par->pf, par->pf);
+    set_dirac_mass(par->mass);
+    rational_func(&r_APP, &H2, par->pf, par->pf);
 }
 
-static void rhmc_correct_la_pf(monomial const *m)
-{
-	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
+static void rhmc_correct_la_pf(monomial const *m) {
+    mon_rhmc_par *par = (mon_rhmc_par *)(m->data.par);
 
-   /* r_APP = x^{n/(2*d)} */
-	/* use n=n and d=2*d respect to the r_app used for the MD */
-	r_APP.rel_error = m->data.MT_prec;
-	r_APP.n = par->ratio.n;
-	r_APP.d = 2*par->ratio.d;
-	reduce_fraction(&r_APP.n, &r_APP.d);
-	r_app_set(&r_APP, par->ratio.min, par->ratio.max);
+    /* r_APP = x^{n/(2*d)} */
+    /* use n=n and d=2*d respect to the r_app used for the MD */
+    r_APP.rel_error = m->data.MT_prec;
+    r_APP.n = par->ratio.n;
+    r_APP.d = 2 * par->ratio.d;
+    reduce_fraction(&r_APP.n, &r_APP.d);
+    r_app_set(&r_APP, par->ratio.min, par->ratio.max);
 
-	set_dirac_mass(par->mass);
-	rational_func(&r_APP, &H2, par->pf, par->pf);
+    set_dirac_mass(par->mass);
+    rational_func(&r_APP, &H2, par->pf, par->pf);
 }
 
-static const spinor_field* rhmc_pseudofermion(monomial const *m)
-{
-	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
-	return par->pf;
+static const spinor_field *rhmc_pseudofermion(monomial const *m) {
+    mon_rhmc_par *par = (mon_rhmc_par *)(m->data.par);
+    return par->pf;
 }
 
-static void rhmc_add_local_action(monomial const *m, scalar_field *loc_action)
-{
-	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
-	pf_local_action(loc_action, par->pf);
+static void rhmc_add_local_action(monomial const *m, scalar_field *loc_action) {
+    mon_rhmc_par *par = (mon_rhmc_par *)(m->data.par);
+    pf_local_action(loc_action, par->pf);
 
 #ifdef WITH_CLOVER_EO
-	double nf = (-2.0*par->ratio.n)/par->ratio.d;
-	clover_la_logdet(nf, par->mass, loc_action);
+    double nf = (-2.0 * par->ratio.n) / par->ratio.d;
+    clover_la_logdet(nf, par->mass, loc_action);
 #endif
 }
 
-static void rhmc_free(monomial *m)
-{
-	mon_rhmc_par *par = (mon_rhmc_par*)m->data.par;
+static void rhmc_free(monomial *m) {
+    mon_rhmc_par *par = (mon_rhmc_par *)m->data.par;
 
-	if (par->pf != NULL)
-	{
-		free_spinor_field_f(par->pf);
-	}
+    if (par->pf != NULL) { free_spinor_field_f(par->pf); }
 
-	r_app_free(&par->ratio);
-	free(par);
-	free(m);
+    r_app_free(&par->ratio);
+    free(par);
+    free(m);
 }
 
-monomial* rhmc_create(monomial_data const *data)
-{
-	monomial *m = malloc(sizeof(*m));
-	mon_rhmc_par *par = (mon_rhmc_par*)data->par;
+monomial *rhmc_create(monomial_data const *data) {
+    monomial *m = malloc(sizeof(*m));
+    mon_rhmc_par *par = (mon_rhmc_par *)data->par;
 
-	// Copy data structure
-	m->data = *data;
+    // Copy data structure
+    m->data = *data;
 
-	// Allocate memory for mon_rhmc_par
-	if(mon_init)
-	{
-		tmp_pf = alloc_spinor_field_f(1, &glat_default);
-		r_APP.order = 16;
-		r_app_alloc(&r_APP);
-		mon_init = 0;
-	}
-	par->pf = alloc_spinor_field_f(1, &glat_default);
+    // Allocate memory for mon_rhmc_par
+    if (mon_init) {
+        tmp_pf = alloc_spinor_field_f(1, &glat_default);
+        r_APP.order = 16;
+        r_app_alloc(&r_APP);
+        mon_init = 0;
+    }
+    par->pf = alloc_spinor_field_f(1, &glat_default);
 
-	// Setup force parameters
-	par->fpar.id = data->id;
-	par->fpar.n_pf = 1;
-	par->fpar.pf = par->pf;
-	par->fpar.inv_err2 = data->force_prec;
-	par->fpar.mass = par->mass;
-	par->ratio.rel_error = data->MD_prec;
-	par->fpar.ratio = &par->ratio;
-	par->fpar.momenta = &suN_momenta;
-	par->ratio.order = 16;
-	r_app_alloc(&par->ratio);
+    // Setup force parameters
+    par->fpar.id = data->id;
+    par->fpar.n_pf = 1;
+    par->fpar.pf = par->pf;
+    par->fpar.inv_err2 = data->force_prec;
+    par->fpar.mass = par->mass;
+    par->ratio.rel_error = data->MD_prec;
+    par->fpar.ratio = &par->ratio;
+    par->fpar.momenta = &suN_momenta;
+    par->ratio.order = 16;
+    r_app_alloc(&par->ratio);
 
-	// Setup pointers to update functions
-	m->free = &rhmc_free;
-	m->update_force = &force_rhmc;
-	m->force_par = &par->fpar;
-	m->update_field = 0;
-	m->field_par = 0;
+    // Setup pointers to update functions
+    m->free = &rhmc_free;
+    m->update_force = &force_rhmc;
+    m->force_par = &par->fpar;
+    m->update_field = 0;
+    m->field_par = 0;
 
-	m->pseudofermion = &rhmc_pseudofermion;
-	m->gaussian_pf = &rhmc_gaussian_pf;
-	m->correct_pf = &rhmc_correct_pf;
-	m->correct_la_pf = &rhmc_correct_la_pf;
-	m->add_local_action = &rhmc_add_local_action;
+    m->pseudofermion = &rhmc_pseudofermion;
+    m->gaussian_pf = &rhmc_gaussian_pf;
+    m->correct_pf = &rhmc_correct_pf;
+    m->correct_la_pf = &rhmc_correct_la_pf;
+    m->add_local_action = &rhmc_add_local_action;
 
-	return m;
+    return m;
 }

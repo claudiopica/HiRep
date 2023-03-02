@@ -22,8 +22,7 @@ int test_gfield_flt_allocation();
 int test_gfield_f_flt_allocation();
 int test_spinor_field_flt_allocation();
 
-int main(int argc, char *argv[]) 
-{
+int main(int argc, char *argv[]) {
     // Init
     int return_val = 0;
 
@@ -39,7 +38,7 @@ int main(int argc, char *argv[])
     return_val += test_avfield_allocation();
     return_val += test_clover_term_allocation();
     return_val += test_clover_force_allocation();
-    return_val += test_sfield_allocation(); 
+    return_val += test_sfield_allocation();
 
     // Single precision test block
     return_val += test_gfield_flt_allocation();
@@ -51,8 +50,7 @@ int main(int argc, char *argv[])
     return return_val;
 }
 
-int test_gfield_allocation() 
-{
+int test_gfield_allocation() {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD ======= \n");
     int return_val = 0;
     suNg_field *f = alloc_gfield(&glattice);
@@ -63,8 +61,7 @@ int test_gfield_allocation()
     return return_val;
 }
 
-int test_gfield_f_allocation() 
-{
+int test_gfield_f_allocation() {
     lprintf("INFO", 0, " ======= TEST REPRESENTED GAUGE FIELD ======= \n");
     int return_val = 0;
     suNf_field *f = alloc_gfield_f(&glattice);
@@ -75,8 +72,7 @@ int test_gfield_f_allocation()
     return return_val;
 }
 
-int test_gfield_flt_allocation() 
-{
+int test_gfield_flt_allocation() {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
     suNg_field_flt *f = alloc_gfield_flt(&glattice);
@@ -87,8 +83,7 @@ int test_gfield_flt_allocation()
     return return_val;
 }
 
-int test_gfield_f_flt_allocation() 
-{
+int test_gfield_f_flt_allocation() {
     lprintf("INFO", 0, " ======= TEST REPRESENTED GAUGE FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
     suNf_field_flt *f = alloc_gfield_f_flt(&glattice);
@@ -99,8 +94,7 @@ int test_gfield_f_flt_allocation()
     return return_val;
 }
 
-int test_avfield_allocation() 
-{
+int test_avfield_allocation() {
     lprintf("INFO", 0, " ======= TEST SU(N) ALGEBRA VECTOR FIELD ======= \n");
     int return_val = 0;
     suNg_av_field *f = alloc_avfield(&glattice);
@@ -111,8 +105,7 @@ int test_avfield_allocation()
     return return_val;
 }
 
-int test_gtransf_allocation() 
-{
+int test_gtransf_allocation() {
     lprintf("INFO", 0, " ======= GAUGE TRANSFORMATION ======= \n");
     int return_val = 0;
     suNg_field *f = alloc_gtransf(&glattice);
@@ -123,8 +116,7 @@ int test_gtransf_allocation()
     return return_val;
 }
 
-int test_clover_term_allocation() 
-{
+int test_clover_term_allocation() {
     lprintf("INFO", 0, " ======= CLOVER TERM ======= \n");
     int return_val = 0;
     suNfc_field *f = alloc_clover_term(&glattice);
@@ -135,8 +127,7 @@ int test_clover_term_allocation()
     return return_val;
 }
 
-int test_clover_force_allocation()
-{
+int test_clover_force_allocation() {
     lprintf("INFO", 0, " ======= CLOVER FORCE ======= \n");
     int return_val = 0;
     suNf_field *f = alloc_clover_force(&glattice);
@@ -147,8 +138,7 @@ int test_clover_force_allocation()
     return return_val;
 }
 
-int test_spinor_field_allocation() 
-{
+int test_spinor_field_allocation() {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
     int return_val = 0;
     spinor_field *f = alloc_spinor_field_f(1, &glattice);
@@ -159,8 +149,7 @@ int test_spinor_field_allocation()
     return return_val;
 }
 
-int test_spinor_field_flt_allocation() 
-{
+int test_spinor_field_flt_allocation() {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
     spinor_field_flt *f = alloc_spinor_field_f_flt(1, &glattice);
@@ -171,8 +160,7 @@ int test_spinor_field_flt_allocation()
     return return_val;
 }
 
-int test_sfield_allocation() 
-{
+int test_sfield_allocation() {
     lprintf("INFO", 0, " ======= TEST SFIELD ======= \n");
     int return_val = 0;
     scalar_field *f = alloc_sfield(1, &glattice);
@@ -182,7 +170,3 @@ int test_sfield_allocation()
     free_sfield(f);
     return return_val;
 }
-
-
-
-

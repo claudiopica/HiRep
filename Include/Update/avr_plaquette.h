@@ -9,7 +9,7 @@
 #include "hr_complex.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 //avr_plaquette.h
@@ -32,6 +32,6 @@ hr_complex avr_plaquette_wrk(void);
 // double local_rect_1x2(int ix);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 #endif

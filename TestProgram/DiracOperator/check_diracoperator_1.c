@@ -9,13 +9,11 @@
 static double hmass = 0.1;
 static suNg_field *g;
 
-static void loc_D(spinor_field *out, spinor_field *in)
-{
+static void loc_D(spinor_field *out, spinor_field *in) {
     Dphi(hmass, out, in);
 }
 
-static void random_g(void)
-{
+static void random_g(void) {
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(&glattice, ix) {
         _FUSE_IDX(&glattice, ix);
@@ -29,8 +27,7 @@ static void random_g(void)
 #endif
 }
 
-static void transform_u(void)
-{
+static void transform_u(void) {
 #ifdef WITH_GPU
     copy_from_gpu_gfield(u_gauge);
     copy_from_gpu_gtransf(g);
@@ -64,8 +61,7 @@ static void transform_u(void)
     smear_gauge_field();
 }
 
-static void transform_s(spinor_field *out, spinor_field *in)
-{
+static void transform_s(spinor_field *out, spinor_field *in) {
 #ifdef WITH_GPU
     copy_from_gpu_spinor_field_f(in);
 #endif
@@ -92,8 +88,7 @@ static void transform_s(spinor_field *out, spinor_field *in)
 #endif
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     int return_value = 1;
     double sig, tau;
     spinor_field *s0, *s1, *s2, *s3;
@@ -148,7 +143,7 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", sqrt(sig));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
 
-    if (sqrt(sig) < 10.e-14) return_value = 0;
+    if (sqrt(sig) < 10.e-14) { return_value = 0; }
 
     free_spinor_field_f(s0);
 

@@ -12,8 +12,8 @@
 #ifndef GEOMETRY_DESCRIPTOR_H
 #define GEOMETRY_DESCRIPTOR_H
 #ifdef __cplusplus
-  extern "C" {
-#endif 
+extern "C" {
+#endif
 
 /**
  * @struct geometry_descriptor
@@ -102,30 +102,29 @@
  *
  */
 typedef struct geometry_descriptor {
-  int inner_master_pieces; 
-  int local_master_pieces; 
-  int total_spinor_master_pieces;
-  int total_gauge_master_pieces;
-  int *master_start, *master_end; 
-  int master_shift;
-  int ncopies_spinor;
-  int ncopies_gauge;
-  int *copy_from, *copy_to, *copy_len;
-  int copy_shift;
-  int nbuffers_spinor;
-  int nbuffers_gauge;
-  int *rbuf_len, *sbuf_len;
-  int *rbuf_from_proc, *rbuf_start;
-  int *sbuf_to_proc, *sbuf_start;
-  int gsize_spinor;
-  int gsize_gauge;
-  int *fuse_mask;
-  int fuse_gauge_size;
-  int fuse_inner_counter;
+    int inner_master_pieces;
+    int local_master_pieces;
+    int total_spinor_master_pieces;
+    int total_gauge_master_pieces;
+    int *master_start, *master_end;
+    int master_shift;
+    int ncopies_spinor;
+    int ncopies_gauge;
+    int *copy_from, *copy_to, *copy_len;
+    int copy_shift;
+    int nbuffers_spinor;
+    int nbuffers_gauge;
+    int *rbuf_len, *sbuf_len;
+    int *rbuf_from_proc, *rbuf_start;
+    int *sbuf_to_proc, *sbuf_start;
+    int gsize_spinor;
+    int gsize_gauge;
+    int *fuse_mask;
+    int fuse_gauge_size;
+    int fuse_inner_counter;
 } geometry_descriptor;
 
-
 #ifdef __cplusplus
-  }
+}
 #endif
 #endif

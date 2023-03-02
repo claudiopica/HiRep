@@ -11,7 +11,7 @@
 // TODO: put gpu as last suffix
 // TODO: fill buffers needs gpu suffix
 // TODO: MPI error management
-    
+
 #define random_double ranlxd
 #define random_float ranlxs
 

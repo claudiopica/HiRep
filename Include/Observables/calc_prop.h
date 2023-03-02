@@ -4,7 +4,7 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 //calc_prop.h
@@ -19,6 +19,6 @@ void calc_deflated_propagator(spinor_field *psi, spinor_field *eta, int ndilute,
 void copy_evec(int n, spinor_field *psi1, double *eval);
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //CALC_PROP_H

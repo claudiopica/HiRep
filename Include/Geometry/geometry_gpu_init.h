@@ -19,7 +19,7 @@
 #include "gpu.h"
 
 #ifdef __cplusplus
-   extern "C" {
+extern "C" {
 #endif
 
 //init_gpu.c
@@ -40,9 +40,7 @@ void init_gpu(input_gpu gpu_var);
 void init_neighbors_gpu(void);
 
 #ifdef __cplusplus
-   }
+}
 #endif
 #endif
 #endif
-
-

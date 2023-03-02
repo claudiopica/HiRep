@@ -4,16 +4,12 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 //local_action.c
 /* local action */
-typedef enum
-{
-  NEW = 1,
-  DELTA = 2
-} local_action_type;
+typedef enum { NEW = 1, DELTA = 2 } local_action_type;
 
 /*
  * compute the local action at every site for the HMC
@@ -23,6 +19,6 @@ void local_hmc_action(local_action_type type, scalar_field *loc_action, suNg_av_
 void pf_local_action(scalar_field *loc_action, spinor_field *pf);
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //LOCAL_ACTION_H

@@ -4,7 +4,7 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /* HYP smearing */
@@ -15,6 +15,6 @@ void HYP_span_parameters(double mtp[6859]);
 int HYP_best_parameters(double mtp[6859], double w[3]);
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //HYP_SMEARING_H

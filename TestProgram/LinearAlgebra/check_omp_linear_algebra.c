@@ -7,26 +7,25 @@
 
 #include "libhr.h"
 
-static double spinors_max_difference(spinor_field *r0, spinor_field *r1)
-{
+static double spinors_max_difference(spinor_field *r0, spinor_field *r1) {
     double red = 0.;
     _MASTER_FOR(&glattice, ix) {
         suNf_spinor *v1 = _FIELD_AT(r0, ix);
         suNf_spinor *v2 = _FIELD_AT(r1, ix);
-        for (int j = 0; j < 4; j++)
+        for (int j = 0; j < 4; j++) {
             for (int n = 0; n < NF; n++) {
                 if (_complex_prod_re(v1->c[j].c[n] - v2->c[j].c[n], v1->c[j].c[n] - v2->c[j].c[n]) > red) {
                     red = _complex_prod_re(v1->c[j].c[n] - v2->c[j].c[n], v1->c[j].c[n] - v2->c[j].c[n]);
                 }
             }
+        }
     }
     global_max(&red, 1);
     bcast(&red, 1);
 
     return red;
 }
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     /* setup process id and communications */
     int retval = 0;
     logger_map("DEBUG", "debug");
@@ -66,7 +65,7 @@ int main(int argc, char *argv[])
     red = spinors_max_difference(s3, s2);
     lprintf("MAIN", 0, "Max point difference for spinor_field_add_assign_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             red);
-    if (red > 1.e-14) retval++;
+    if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -78,7 +77,7 @@ int main(int argc, char *argv[])
     spinor_field_sub_f(s3, s0, s1);
     red = spinors_max_difference(s3, s2);
     lprintf("MAIN", 0, "Max point difference for spinor_field_sub_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
-    if (red > 1.e-14) retval++;
+    if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -90,7 +89,7 @@ int main(int argc, char *argv[])
     spinor_field_mul_f(s3, rnd[0], s0);
     red = spinors_max_difference(s3, s2);
     lprintf("MAIN", 0, "Max point difference for spinor_field_mul_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
-    if (red > 1.e-14) retval++;
+    if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -105,7 +104,7 @@ int main(int argc, char *argv[])
     red = spinors_max_difference(s3, s2);
     lprintf("MAIN", 0, "Max point difference for spinor_field_mul_add_assign_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             red);
-    if (red > 1.e-14) retval++;
+    if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -120,7 +119,7 @@ int main(int argc, char *argv[])
     red = spinors_max_difference(s3, s2);
     lprintf("MAIN", 0,
             "Max point difference for spinor_field_mulc_add_assign_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
-    if (red > 1.e-14) retval++;
+    if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -132,7 +131,7 @@ int main(int argc, char *argv[])
     spinor_field_g5_f(s2, s0);
     red = spinors_max_difference(s3, s2);
     lprintf("MAIN", 0, "Max point difference for spinor_field_g5_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
-    if (red > 1.e-14) retval++;
+    if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -144,7 +143,7 @@ int main(int argc, char *argv[])
     spinor_field_lc_f(s3, rnd[0], s0, rnd[1], s1);
     red = spinors_max_difference(s3, s2);
     lprintf("MAIN", 0, "Max point difference for spinor_field_lc_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
-    if (red > 1.e-14) retval++;
+    if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -157,7 +156,7 @@ int main(int argc, char *argv[])
     bcast(res, 2);
     lprintf("MAIN", 0, "Max difference for spinor_field_prod_re_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             fabs(res[1] - res[0]) / fabs(res[1]));
-    if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) retval++;
+    if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -170,7 +169,7 @@ int main(int argc, char *argv[])
     bcast(res, 2);
     lprintf("MAIN", 0, "Max difference for spinor_field_prod_im_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             fabs(res[1] - res[0]) / fabs(res[1]));
-    if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) retval++;
+    if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -183,7 +182,7 @@ int main(int argc, char *argv[])
     bcast(res, 2);
     lprintf("MAIN", 0, "Max difference for spinor_field_prod_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             cabs(cres[1] - cres[0]) / cabs(cres[1]));
-    if (cabs(cres[1] - cres[0]) / cabs(cres[1]) > 1.e-14) retval++;
+    if (cabs(cres[1] - cres[0]) / cabs(cres[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -196,7 +195,7 @@ int main(int argc, char *argv[])
     bcast(res, 2);
     lprintf("MAIN", 0, "Max difference for spinor_field_sqnorm_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             fabs(res[1] - res[0]) / fabs(res[1]));
-    if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) retval++;
+    if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -209,7 +208,7 @@ int main(int argc, char *argv[])
     bcast(res, 2);
     lprintf("MAIN", 0, "Max difference for spinor_field_g5_prod_re_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             fabs(res[1] - res[0]) / fabs(res[1]));
-    if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) retval++;
+    if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
@@ -222,7 +221,7 @@ int main(int argc, char *argv[])
     bcast(res, 2);
     lprintf("MAIN", 0, "Max difference for spinor_field_g5_prod_im_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             fabs(res[1] - res[0]) / fabs(res[1]));
-    if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) retval++;
+    if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif

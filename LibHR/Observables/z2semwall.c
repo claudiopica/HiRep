@@ -56,8 +56,7 @@ static const int _g5_g0g5_re = NCHANNELS - 1;
 /*}*/
 
 #ifdef POINT_TO_ALL
-static void create_point_source_even(spinor_field *source, int beta, int b)
-{
+static void create_point_source_even(spinor_field *source, int beta, int b) {
     spinor_field_zero_f(source);
     if (COORD[0] == 0 && COORD[1] == 0 && COORD[2] == 0 && COORD[3] == 0) {
         int ix = ipt(0, 0, 0, 0);
@@ -65,18 +64,21 @@ static void create_point_source_even(spinor_field *source, int beta, int b)
     }
 }
 #else
-static void create_diluted_source_even(spinor_field *source, int tau, int beta)
-{
+static void create_diluted_source_even(spinor_field *source, int tau, int beta) {
     int c[4];
     spinor_field_zero_f(source);
     if (COORD[0] == tau / T) {
         c[0] = tau % T;
-        for (c[1] = 0; c[1] < X; c[1]++)
-            for (c[2] = 0; c[2] < Y; c[2]++)
-                for (c[3] = 0; c[3] < Z; c[3]++)
-                    if (((tau + zerocoord[1] + c[1] + zerocoord[2] + c[2] + zerocoord[3] + c[3]) & 1) == 0)
+        for (c[1] = 0; c[1] < X; c[1]++) {
+            for (c[2] = 0; c[2] < Y; c[2]++) {
+                for (c[3] = 0; c[3] < Z; c[3]++) {
+                    if (((tau + zerocoord[1] + c[1] + zerocoord[2] + c[2] + zerocoord[3] + c[3]) & 1) == 0) {
                         ranz2((double *)(&(_FIELD_AT(source, ipt(c[0], c[1], c[2], c[3])))->c[beta]),
                               sizeof(suNf_vector) / sizeof(double));
+                    }
+                }
+            }
+        }
     }
 
 #ifndef NDEBUG
@@ -91,8 +93,7 @@ static double hmass;
 #endif
 static double hmass_pre;
 
-static void D_pre(spinor_field *out, spinor_field *in)
-{
+static void D_pre(spinor_field *out, spinor_field *in) {
     Dphi_eopre(hmass_pre, out, in);
 }
 
@@ -111,8 +112,7 @@ static spinor_field *resd;
 static spinor_field *eta;
 static spinor_field *psi0;
 static spinor_field *psi;
-static void z2semwall_qprop_init(int nm, double *m, double acc)
-{
+static void z2semwall_qprop_init(int nm, double *m, double acc) {
     int i, cgiter = 0;
     double norm;
 
@@ -154,7 +154,9 @@ static void z2semwall_qprop_init(int nm, double *m, double acc)
     }
 
     /* invert noise */
-    for (i = 0; i < QMR_par.n; ++i) spinor_field_zero_f(&QMR_resdn[i]);
+    for (i = 0; i < QMR_par.n; ++i) {
+        spinor_field_zero_f(&QMR_resdn[i]);
+    }
     cgiter += g5QMR_mshift(&QMR_par, &D_pre, QMR_noise, QMR_resdn);
 
 #ifndef NDEBUG
@@ -174,8 +176,7 @@ static void z2semwall_qprop_init(int nm, double *m, double acc)
     init = 1;
 }
 
-void z2semwall_qprop_free()
-{
+void z2semwall_qprop_free() {
     error(init == 0, 1, "z2semwall.c", "z2semwall method not initialized!");
 
 #ifndef NDEBUG
@@ -204,8 +205,7 @@ psi = D^{-1} g5 Gamma^+ eta
 
 \***************************************************************************/
 
-static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), spinor_field *psi_out, spinor_field *eta_in)
-{
+static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), spinor_field *psi_out, spinor_field *eta_in) {
     spinor_field qprop_mask;
     int i, cgiter = 0;
 
@@ -241,7 +241,9 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), 
     spinor_field_add_assign_f(eta2, QMR_noise);
 
     /* invert source */
-    for (i = 0; i < QMR_par.n; ++i) { spinor_field_zero_f(&resd[i]); }
+    for (i = 0; i < QMR_par.n; ++i) {
+        spinor_field_zero_f(&resd[i]);
+    }
     cgiter += g5QMR_mshift(&QMR_par, &D_pre, eta2, resd);
 
     for (i = 0; i < QMR_par.n; ++i) {
@@ -282,7 +284,7 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), 
         qprop_mask.ptr = psi_out[i].ptr + glat_odd.master_shift;
         Dphi_(&qprop_mask, &resd[i]);
         spinor_field_minus_f(&qprop_mask, &qprop_mask);
-        if (i & 1) ++cgiter; /* count only half of calls. works because the number of sources is even */
+        if (i & 1) { ++cgiter; /* count only half of calls. works because the number of sources is even */ }
 
 #ifndef NDEBUG
         /* this is a test of the solution */
@@ -353,8 +355,7 @@ endif * POINT_TO_ALL *
 
 \***************************************************************************/
 
-void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc)
-{
+void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
     suNf_spinor sp;
     int ix, i, k, n;
     int beta, tau;
@@ -369,8 +370,11 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc)
 
     z2semwall_qprop_init(nm, m, acc);
 
-    for (i = 0; i < nm * GLB_T; i++)
-        for (k = 0; k < NCHANNELS; k++) corr[k][i] = 0.;
+    for (i = 0; i < nm * GLB_T; i++) {
+        for (k = 0; k < NCHANNELS; k++) {
+            corr[k][i] = 0.;
+        }
+    }
 
 #ifdef POINT_TO_ALL
     nhits = NF;
@@ -396,17 +400,22 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc)
             z2semwall_qprop_QMR_eo(&g5_eval_g5GammaDag_times_spinor, &psi0[beta * nm], &eta[beta]);
         }
 
-        for (beta = 0; beta < 4; beta++)
-            for (i = 0; i < nm; i++)
-                for (t = 0; t < T; t++)
-                    for (x = 0; x < X; x++)
-                        for (y = 0; y < Y; y++)
+        for (beta = 0; beta < 4; beta++) {
+            for (i = 0; i < nm; i++) {
+                for (t = 0; t < T; t++) {
+                    for (x = 0; x < X; x++) {
+                        for (y = 0; y < Y; y++) {
                             for (z = 0; z < Z; z++) {
                                 ix = ipt(t, x, y, z);
                                 _spinor_prod_re_f(tmp, *_FIELD_AT(&psi0[beta * nm + i], ix),
                                                   *_FIELD_AT(&psi0[beta * nm + i], ix));
                                 corr[_g5][(zerocoord[0] + t + GLB_T - tau) % GLB_T + i * GLB_T] += tmp;
                             }
+                        }
+                    }
+                }
+            }
+        }
 
 #define COMPUTE_CORR(name)                                                                                 \
     for (beta = 0; beta < 4; beta++) {                                                                     \
@@ -490,8 +499,8 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc)
         for (beta = 0; beta < 4; beta++) {
             for (i = 0; i < nm; i++) {
                 for (t = 0; t < T; t++) {
-                    for (x = 0; x < X; x++)
-                        for (y = 0; y < Y; y++)
+                    for (x = 0; x < X; x++) {
+                        for (y = 0; y < Y; y++) {
                             for (z = 0; z < Z; z++) {
                                 ix = ipt(t, x, y, z);
                                 _spinor_zero_f(sp);
@@ -499,6 +508,8 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc)
                                 _spinor_prod_re_f(tmp, *_FIELD_AT(&psi0[beta * nm + i], ix), sp);
                                 corr[_g5_g0g5_re][(zerocoord[0] + t + GLB_T - tau) % GLB_T + i * GLB_T] += tmp;
                             }
+                        }
+                    }
                 }
             }
         }
@@ -515,15 +526,19 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc)
 #endif
     }
 
-#define PRINT_CORR(name)                                                                         \
-    for (i = 0; i < nm; i++) {                                                                   \
-        lprintf("MAIN", 0, "conf #%d mass=%2.6f TRIPLET " #name "= ", conf, mass[i]);            \
-        for (t = 0; t < GLB_T; ++t) { lprintf("MAIN", 0, "%e ", corr[_##name][t + i * GLB_T]); } \
-        lprintf("MAIN", 0, "\n");                                                                \
-        fflush(stdout);                                                                          \
+#define PRINT_CORR(name)                                                              \
+    for (i = 0; i < nm; i++) {                                                        \
+        lprintf("MAIN", 0, "conf #%d mass=%2.6f TRIPLET " #name "= ", conf, mass[i]); \
+        for (t = 0; t < GLB_T; ++t) {                                                 \
+            lprintf("MAIN", 0, "%e ", corr[_##name][t + i * GLB_T]);                  \
+        }                                                                             \
+        lprintf("MAIN", 0, "\n");                                                     \
+        fflush(stdout);                                                               \
     }
 
-    for (i = 0; i < nm * GLB_T; i++) corr[_g5][i] *= -1.;
+    for (i = 0; i < nm * GLB_T; i++) {
+        corr[_g5][i] *= -1.;
+    }
     PRINT_CORR(g5);
 
 #ifdef ID_CHANNEL
@@ -535,22 +550,30 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc)
 #endif
 
 #ifdef G1_CHANNEL
-    for (i = 0; i < nm * GLB_T; i++) corr[_g1][i] *= -1.;
+    for (i = 0; i < nm * GLB_T; i++) {
+        corr[_g1][i] *= -1.;
+    }
     PRINT_CORR(g1);
 #endif
 
 #ifdef G2_CHANNEL
-    for (i = 0; i < nm * GLB_T; i++) corr[_g2][i] *= -1.;
+    for (i = 0; i < nm * GLB_T; i++) {
+        corr[_g2][i] *= -1.;
+    }
     PRINT_CORR(g2);
 #endif
 
 #ifdef G3_CHANNEL
-    for (i = 0; i < nm * GLB_T; i++) corr[_g3][i] *= -1.;
+    for (i = 0; i < nm * GLB_T; i++) {
+        corr[_g3][i] *= -1.;
+    }
     PRINT_CORR(g3);
 #endif
 
 #ifdef G0G5_CHANNEL
-    for (i = 0; i < nm * GLB_T; i++) corr[_g0g5][i] *= -1.;
+    for (i = 0; i < nm * GLB_T; i++) {
+        corr[_g0g5][i] *= -1.;
+    }
     PRINT_CORR(g0g5);
 #endif
 
@@ -567,17 +590,23 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc)
 #endif
 
 #ifdef G0G1_CHANNEL
-    for (i = 0; i < nm * GLB_T; i++) corr[_g0g1][i] *= -1.;
+    for (i = 0; i < nm * GLB_T; i++) {
+        corr[_g0g1][i] *= -1.;
+    }
     PRINT_CORR(g0g1);
 #endif
 
 #ifdef G0G2_CHANNEL
-    for (i = 0; i < nm * GLB_T; i++) corr[_g0g2][i] *= -1.;
+    for (i = 0; i < nm * GLB_T; i++) {
+        corr[_g0g2][i] *= -1.;
+    }
     PRINT_CORR(g0g2);
 #endif
 
 #ifdef G0G3_CHANNEL
-    for (i = 0; i < nm * GLB_T; i++) corr[_g0g3][i] *= -1.;
+    for (i = 0; i < nm * GLB_T; i++) {
+        corr[_g0g3][i] *= -1.;
+    }
     PRINT_CORR(g0g3);
 #endif
 

@@ -34,8 +34,7 @@ static spinor_field_flt *gtmp = NULL;
 static spinor_field_flt *etmp = NULL;
 static spinor_field_flt *otmp = NULL;
 
-static void free_mem()
-{
+static void free_mem() {
     if (gtmp != NULL) {
         free_spinor_field_f_flt(gtmp);
         gtmp = NULL;
@@ -51,8 +50,7 @@ static void free_mem()
     init = 1;
 }
 
-static void init_Dirac()
-{
+static void init_Dirac() {
     if (init) {
         gtmp = alloc_spinor_field_f_flt(1, &glattice);
         etmp = alloc_spinor_field_f_flt(1, &glat_even);
@@ -69,8 +67,7 @@ static void init_Dirac()
  */
 static unsigned long int MVMcounter = 0;
 
-unsigned long int getMVM_flt_cpu()
-{
+unsigned long int getMVM_flt_cpu() {
     unsigned long int res = MVMcounter >> 1; /* divide by two */
     MVMcounter = 0; /* reset counter */
 
@@ -214,8 +211,7 @@ static hr_complex_flt eitheta_flt[4];
  * in the range [VOLUME/2,VOLUME[
  */
 #ifdef WITH_NEW_GEOMETRY
-void Dphi_flt_cpu_(spinor_field_flt *restrict out, spinor_field_flt *restrict in)
-{
+void Dphi_flt_cpu_(spinor_field_flt *restrict out, spinor_field_flt *restrict in) {
 #ifdef CHECK_SPINOR_MATCHING
     error((in == NULL) || (out == NULL), 1, "Dphi_cpu_ [Dphi.c]", "Attempt to access unallocated memory space");
     error(in == out, 1, "Dphi_cpu_ [Dphi.c]", "Input and output fields must be different");
@@ -233,10 +229,10 @@ void Dphi_flt_cpu_(spinor_field_flt *restrict out, spinor_field_flt *restrict in
 #endif
 
     ++MVMcounter; /* count matrix calls */
-    if (out->type == &glattice) ++MVMcounter;
+    if (out->type == &glattice) { ++MVMcounter; }
 
-        /************************ loop over all lattice sites *************************/
-        /* start communication of input spinor field */
+    /************************ loop over all lattice sites *************************/
+    /* start communication of input spinor field */
 #ifdef WITH_MPI
     start_sendrecv_spinor_field_f_flt(in);
 #endif
@@ -433,8 +429,7 @@ void Dphi_flt_cpu_(spinor_field_flt *restrict out, spinor_field_flt *restrict in
     }
 }
 #else
-void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in)
-{
+void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in) {
     error((in == NULL) || (out == NULL), 1, "Dphi_flt_ [Dphi_flt.c]", "Attempt to access unallocated memory space");
 
     error(in == out, 1, "Dphi_flt_ [Dphi_flt.c]", "Input and output fields must be different");
@@ -454,7 +449,7 @@ void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in)
 #endif
 
     ++MVMcounter; /* count matrix call */
-    if (out->type == &glattice) ++MVMcounter;
+    if (out->type == &glattice) { ++MVMcounter; }
 
     /************************ loop over all lattice sites *************************/
     /* start communication of input spinor field */
@@ -634,8 +629,7 @@ void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in)
  * this function takes 2 spinors defined on the whole lattice
  * of size VOLUME
  */
-void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
-{
+void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
     float rho;
 #ifdef BC_T_SF_ROTATED
     int ix, iy, iz, index;
@@ -662,8 +656,8 @@ void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
     SFrho = (float)(3. * _update_par.SF_ds + _update_par.SF_zf - 4.);
 
     if (COORD[0] == 0) {
-        for (ix = 0; ix < X; ++ix)
-            for (iy = 0; iy < Y; ++iy)
+        for (ix = 0; ix < X; ++ix) {
+            for (iy = 0; iy < Y; ++iy) {
                 for (iz = 0; iz < Z; ++iz) {
                     index = ipt(1, ix, iy, iz);
                     r = _FIELD_AT(out, index);
@@ -678,10 +672,12 @@ void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
                         _spinor_i_sub_assign_f(*r, tmp);
                     }
                 }
+            }
+        }
     }
     if (COORD[0] == NP_T - 1) {
-        for (ix = 0; ix < X; ++ix)
-            for (iy = 0; iy < Y; ++iy)
+        for (ix = 0; ix < X; ++ix) {
+            for (iy = 0; iy < Y; ++iy) {
                 for (iz = 0; iz < Z; ++iz) {
                     index = ipt(T - 1, ix, iy, iz);
                     r = _FIELD_AT(out, index);
@@ -696,14 +692,15 @@ void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
                         _spinor_i_sub_assign_f(*r, tmp);
                     }
                 }
+            }
+        }
     }
 #endif
 
     apply_BCs_on_spinor_field_flt(out);
 }
 
-void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
-{
+void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
     float rho;
 
     error((in == NULL) || (out == NULL), 1, "g5Dphi_flt [Dphi_flt.c]", "Attempt to access unallocated memory space");
@@ -730,8 +727,7 @@ void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
  * Dphi in = (4+m0)^2*in - D_EO D_OE in
  *
  */
-void Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
-{
+void Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
     float rho;
 
     error((in == NULL) || (out == NULL), 1, "Dphi_eopre_flt [Dphi_flt.c]", "Attempt to access unallocated memory space");
@@ -767,8 +763,7 @@ void Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
  * Dphi in = (4+m0)^2*in - D_OE D_EO in
  *
  */
-void Dphi_oepre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
-{
+void Dphi_oepre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
     float rho;
 
     error((in == NULL) || (out == NULL), 1, "Dphi_oepre_flt [Dphi_flt.c]", "Attempt to access unallocated memory space");
@@ -799,8 +794,7 @@ void Dphi_oepre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
     apply_BCs_on_spinor_field_flt(out);
 }
 
-void g5Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
-{
+void g5Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
     float rho;
 
     error((in == NULL) || (out == NULL), 1, "g5Dphi_eopre_flt [Dphi_flt.c]", "Attempt to access unallocated memory space");
@@ -833,8 +827,7 @@ void g5Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in
 }
 
 /* g5Dphi_eopre ^2 */
-void g5Dphi_eopre_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
-{
+void g5Dphi_eopre_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
     /* alloc memory for temporary spinor field */
     if (init) {
         init_Dirac();
@@ -846,8 +839,7 @@ void g5Dphi_eopre_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt 
 }
 
 /* g5Dhi ^2 */
-void g5Dphi_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
-{
+void g5Dphi_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
     /* alloc memory for temporary spinor field */
     if (init) {
         init_Dirac();

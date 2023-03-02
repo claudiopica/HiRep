@@ -9,7 +9,6 @@
 #include "observables.h"
 #include "libhr_core.h"
 
-
 /*
  * Bottom E_8 component
  *
@@ -19,51 +18,50 @@
  *
  */
 
-static double E_8(int ix, int k)
-{
-  double p;
-  suNg *v1, *v2, *v3, *v4, w1, w2, w3, w4, ilambda8;
-  int iy, iz;
+static double E_8(int ix, int k) {
+    double p;
+    suNg *v1, *v2, *v3, *v4, w1, w2, w3, w4, ilambda8;
+    int iy, iz;
 
 #if NG == 4
-  _suNg_zero(ilambda8);
-  ilambda8.c[0] = I * 0.5;
-  ilambda8.c[5] = I * 0.5;
-  ilambda8.c[10] = -I * 0.5;
-  ilambda8.c[15] = -I * 0.5;
+    _suNg_zero(ilambda8);
+    ilambda8.c[0] = I * 0.5;
+    ilambda8.c[5] = I * 0.5;
+    ilambda8.c[10] = -I * 0.5;
+    ilambda8.c[15] = -I * 0.5;
 #elif NG == 3
-  _suNg_zero(ilambda8);
-  ilambda8.c[0] = I;
-  ilambda8.c[4] = -I * 0.5;
-  ilambda8.c[8] = -I * 0.5;
+    _suNg_zero(ilambda8);
+    ilambda8.c[0] = I;
+    ilambda8.c[4] = -I * 0.5;
+    ilambda8.c[8] = -I * 0.5;
 #elif NG == 2
-  _suNg_zero(ilambda8);
+    _suNg_zero(ilambda8);
 #ifdef WITH_QUATERNIONS
-  ilambda8.c[3] = 1.0;
+    ilambda8.c[3] = 1.0;
 #else
-  ilambda8.c[0] = I;
-  ilambda8.c[3] = -I;
+    ilambda8.c[0] = I;
+    ilambda8.c[3] = -I;
 #endif
 #else
-  error(0, 1, "E_8 " __FILE__, "No explicit generator for observable for given NG");
+    error(0, 1, "E_8 " __FILE__, "No explicit generator for observable for given NG");
 #endif
 
-  iy = iup(ix, k);
-  iz = iup(ix, 0);
+    iy = iup(ix, k);
+    iz = iup(ix, 0);
 
-  v1 = pu_gauge(ix, k);
-  v2 = pu_gauge(iy, 0);
-  v3 = pu_gauge(iz, k);
-  v4 = pu_gauge(ix, 0);
+    v1 = pu_gauge(ix, k);
+    v2 = pu_gauge(iy, 0);
+    v3 = pu_gauge(iz, k);
+    v4 = pu_gauge(ix, 0);
 
-  _suNg_times_suNg(w1, (*v1), (*v2));
-  _suNg_times_suNg(w2, (*v4), (*v3));
-  _suNg_times_suNg_dagger(w3, w1, w2);
-  _suNg_times_suNg(w4, ilambda8, w3);
+    _suNg_times_suNg(w1, (*v1), (*v2));
+    _suNg_times_suNg(w2, (*v4), (*v3));
+    _suNg_times_suNg_dagger(w3, w1, w2);
+    _suNg_times_suNg(w4, ilambda8, w3);
 
-  _suNg_trace_re(p, w4);
+    _suNg_trace_re(p, w4);
 
-  return p;
+    return p;
 }
 
 /*
@@ -75,50 +73,49 @@ static double E_8(int ix, int k)
 
  */
 
-static double E_8_top(int ix, int k)
-{
-  double p;
-  suNg *v1, *v2, *v3, *v4, w1, w2, w3, w4, ilambda8;
-  int iy, iz;
+static double E_8_top(int ix, int k) {
+    double p;
+    suNg *v1, *v2, *v3, *v4, w1, w2, w3, w4, ilambda8;
+    int iy, iz;
 #if NG == 4
-  _suNg_zero(ilambda8);
-  ilambda8.c[0] = I * 0.5;
-  ilambda8.c[5] = I * 0.5;
-  ilambda8.c[10] = -I * 0.5;
-  ilambda8.c[15] = -I * 0.5;
+    _suNg_zero(ilambda8);
+    ilambda8.c[0] = I * 0.5;
+    ilambda8.c[5] = I * 0.5;
+    ilambda8.c[10] = -I * 0.5;
+    ilambda8.c[15] = -I * 0.5;
 #elif NG == 3
-  _suNg_zero(ilambda8);
-  ilambda8.c[0] = I;
-  ilambda8.c[4] = -I * 0.5;
-  ilambda8.c[8] = -I * 0.5;
+    _suNg_zero(ilambda8);
+    ilambda8.c[0] = I;
+    ilambda8.c[4] = -I * 0.5;
+    ilambda8.c[8] = -I * 0.5;
 #elif NG == 2
-  _suNg_zero(ilambda8);
+    _suNg_zero(ilambda8);
 #ifdef WITH_QUATERNIONS
-  ilambda8.c[3] = 1.0;
+    ilambda8.c[3] = 1.0;
 #else
-  _suNg_zero(ilambda8);
-  ilambda8.c[0] = I;
-  ilambda8.c[3] = -I;
+    _suNg_zero(ilambda8);
+    ilambda8.c[0] = I;
+    ilambda8.c[3] = -I;
 #endif
 #else
-  error(0, 1, "E_8_top " __FILE__, "No explicit generator for observable for given NG");
+    error(0, 1, "E_8_top " __FILE__, "No explicit generator for observable for given NG");
 #endif
-  iy = iup(ix, k);
-  iz = iup(ix, 0);
+    iy = iup(ix, k);
+    iz = iup(ix, 0);
 
-  v1 = pu_gauge(ix, k);
-  v2 = pu_gauge(iy, 0);
-  v3 = pu_gauge(iz, k);
-  v4 = pu_gauge(ix, 0);
+    v1 = pu_gauge(ix, k);
+    v2 = pu_gauge(iy, 0);
+    v3 = pu_gauge(iz, k);
+    v4 = pu_gauge(ix, 0);
 
-  _suNg_times_suNg(w1, (*v1), (*v2));
-  _suNg_times_suNg(w2, ilambda8, (*v3));
-  _suNg_times_suNg_dagger(w3, w2, w1);
-  _suNg_times_suNg(w4, (*v4), w3);
+    _suNg_times_suNg(w1, (*v1), (*v2));
+    _suNg_times_suNg(w2, ilambda8, (*v3));
+    _suNg_times_suNg_dagger(w3, w2, w1);
+    _suNg_times_suNg(w4, (*v4), w3);
 
-  _suNg_trace_re(p, w4);
+    _suNg_trace_re(p, w4);
 
-  return -p;
+    return -p;
 }
 
 /*
@@ -136,37 +133,36 @@ static double E_8_top(int ix, int k)
 
  */
 
-double SF_action(double beta)
-{
-  double pa = 0.;
-  int ix, iy, iz, index;
-  complete_sendrecv_gfield(u_gauge);
-  if (COORD[0] == 0)
-  {
-    for (ix = 0; ix < X; ++ix)
-      for (iy = 0; iy < Y; ++iy)
-        for (iz = 0; iz < Z; ++iz)
-        {
-          index = ipt(1, ix, iy, iz);
-          pa += (double)(E_8(index, 1));
-          pa += (double)(E_8(index, 2));
-          pa += (double)(E_8(index, 3));
+double SF_action(double beta) {
+    double pa = 0.;
+    int ix, iy, iz, index;
+    complete_sendrecv_gfield(u_gauge);
+    if (COORD[0] == 0) {
+        for (ix = 0; ix < X; ++ix) {
+            for (iy = 0; iy < Y; ++iy) {
+                for (iz = 0; iz < Z; ++iz) {
+                    index = ipt(1, ix, iy, iz);
+                    pa += (double)(E_8(index, 1));
+                    pa += (double)(E_8(index, 2));
+                    pa += (double)(E_8(index, 3));
+                }
+            }
         }
-  }
-  if (COORD[0] == NP_T - 1)
-  {
-    for (ix = 0; ix < X; ++ix)
-      for (iy = 0; iy < Y; ++iy)
-        for (iz = 0; iz < Z; ++iz)
-        {
-          index = ipt(T - 2, ix, iy, iz);
-          pa += (double)(E_8_top(index, 1));
-          pa += (double)(E_8_top(index, 2));
-          pa += (double)(E_8_top(index, 3));
+    }
+    if (COORD[0] == NP_T - 1) {
+        for (ix = 0; ix < X; ++ix) {
+            for (iy = 0; iy < Y; ++iy) {
+                for (iz = 0; iz < Z; ++iz) {
+                    index = ipt(T - 2, ix, iy, iz);
+                    pa += (double)(E_8_top(index, 1));
+                    pa += (double)(E_8_top(index, 2));
+                    pa += (double)(E_8_top(index, 3));
+                }
+            }
         }
-  }
-  global_sum(&pa, 1);
-  return pa * (double)(beta / (NG * GLB_X));
+    }
+    global_sum(&pa, 1);
+    return pa * (double)(beta / (NG * GLB_X));
 }
 
 #endif

@@ -9,7 +9,7 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 #if (defined(WITH_CLOVER) && defined(UPDATE_EO))
@@ -19,12 +19,12 @@
 double get_csw();
 void compute_ldl_decomp(double);
 void compute_clover_term();
-void clover_la_logdet(double, double, scalar_field*);
+void clover_la_logdet(double, double, scalar_field *);
 void compute_force_logdet(double, double);
 void clover_init(double);
 void set_csw(double *);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 #endif

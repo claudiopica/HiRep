@@ -14,7 +14,7 @@
 #include "input_par.h"
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 /* ***********************************************
@@ -44,7 +44,6 @@
  * (default = program stdout)
  *
  * ***********************************************/
-
 
 /* map the ID name to the file with name filename 
  * filename can start with ">>" in which case the file
@@ -121,6 +120,6 @@ void logger_disable();
 int lprintf(const char *name, int level, const char *format, ...);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 #endif

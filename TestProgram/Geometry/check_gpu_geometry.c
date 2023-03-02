@@ -28,8 +28,7 @@ int test_write_read_gauge_field_flt();
 int test_write_read_gauge_field_f_flt();
 int test_write_read_spinor_field_f_flt();
 
-int main(int argc, char *argv[]) 
-{
+int main(int argc, char *argv[]) {
     // Init
     int return_val = 0;
 
@@ -47,10 +46,10 @@ int main(int argc, char *argv[])
     return_val += test_write_read_clover_ldl();
     return_val += test_write_read_clover_term();
     return_val += test_write_read_clover_force();
-    
+
     return_val += test_write_read_spinor_field_f();
     return_val += test_write_read_sfield();
-    
+
     //Single Precision Tests
     return_val += test_write_read_gauge_field_flt();
     return_val += test_write_read_gauge_field_f_flt();
@@ -61,8 +60,7 @@ int main(int argc, char *argv[])
     return return_val;
 }
 
-int test_write_read_gauge_field()
-{
+int test_write_read_gauge_field() {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD ======= ");
     int return_val = 0;
     suNg_field *in, *gpu_format, *out;
@@ -71,10 +69,10 @@ int test_write_read_gauge_field()
     out = alloc_gfield(&glattice);
     gpu_format = alloc_gfield(&glattice);
 
-    random_u(in); 
+    random_u(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_gfield_cpu(in));
 
-    suNg *in_mat, *out_mat;   
+    suNg *in_mat, *out_mat;
     _MASTER_FOR(in->type, ix) {
         for (int comp = 0; comp < 4; comp++) {
             in_mat = _4FIELD_AT(in, ix, comp);
@@ -96,8 +94,7 @@ int test_write_read_gauge_field()
     return return_val;
 }
 
-int test_write_read_gauge_field_flt()
-{
+int test_write_read_gauge_field_flt() {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD SINGLE PRECISION ======= ");
     int return_val = 0;
     suNg_field_flt *in, *gpu_format, *out;
@@ -109,7 +106,7 @@ int test_write_read_gauge_field_flt()
     random_gfield_flt_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_gfield_flt_cpu(in));
 
-    suNg_flt *in_mat, *out_mat;  
+    suNg_flt *in_mat, *out_mat;
     _MASTER_FOR(in->type, ix) {
         for (int comp = 0; comp < 4; ++comp) {
             in_mat = _4FIELD_AT(in, ix, comp);
@@ -131,8 +128,7 @@ int test_write_read_gauge_field_flt()
     return return_val;
 }
 
-int test_write_read_gauge_field_f()
-{
+int test_write_read_gauge_field_f() {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD FUNDAMENTAL REP ======= ");
     int return_val = 0;
     suNf_field *in, *gpu_format, *out;
@@ -167,8 +163,7 @@ int test_write_read_gauge_field_f()
     return return_val;
 }
 
-int test_write_read_gauge_field_f_flt()
-{
+int test_write_read_gauge_field_f_flt() {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD FUNDAMENTAL REP ======= ");
     int return_val = 0;
     suNf_field_flt *in, *gpu_format, *out;
@@ -203,8 +198,7 @@ int test_write_read_gauge_field_f_flt()
     return return_val;
 }
 
-int test_write_read_spinor_field_f() 
-{
+int test_write_read_spinor_field_f() {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= ");
     int return_val = 0;
     spinor_field *in, *gpu_format, *out;
@@ -235,9 +229,8 @@ int test_write_read_spinor_field_f()
     free_spinor_field_f(out);
     return return_val;
 }
-   
-int test_write_read_spinor_field_f_flt() 
-{
+
+int test_write_read_spinor_field_f_flt() {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
     spinor_field_flt *in, *gpu_format, *out;
@@ -269,8 +262,7 @@ int test_write_read_spinor_field_f_flt()
     return return_val;
 }
 
-int test_write_read_sfield() 
-{
+int test_write_read_sfield() {
     lprintf("INFO", 0, " ======= TEST SCALAR FIELD ======= ");
     int return_val = 0;
     scalar_field *in, *gpu_format, *out;
@@ -303,8 +295,7 @@ int test_write_read_sfield()
     return return_val;
 }
 
-int test_write_read_suNg_scalar_field() 
-{
+int test_write_read_suNg_scalar_field() {
     lprintf("INFO", 0, " ======= TEST SU(NG) SCALAR FIELD ======= ");
     int return_val = 0;
     suNg_scalar_field *in, *gpu_format, *out;
@@ -337,8 +328,7 @@ int test_write_read_suNg_scalar_field()
     return return_val;
 }
 
-int test_write_read_avfield() 
-{
+int test_write_read_avfield() {
     lprintf("INFO", 0, " ======= TEST AVFIELD ======= ");
     int return_val = 0;
     suNg_av_field *in, *gpu_format, *out;
@@ -373,8 +363,7 @@ int test_write_read_avfield()
     return return_val;
 }
 
-int test_write_read_gtransf() 
-{
+int test_write_read_gtransf() {
     lprintf("INFO", 0, " ======= TEST GTRANSF ======= ");
     int return_val = 0;
     suNg_field *in, *gpu_format, *out;
@@ -407,8 +396,7 @@ int test_write_read_gtransf()
     return return_val;
 }
 
-int test_write_read_clover_term() 
-{
+int test_write_read_clover_term() {
     lprintf("INFO", 0, " ======= TEST CLOVER TERM ======= ");
     int return_val = 0;
     suNfc_field *in, *gpu_format, *out;
@@ -443,8 +431,7 @@ int test_write_read_clover_term()
     return return_val;
 }
 
-int test_write_read_clover_force() 
-{
+int test_write_read_clover_force() {
     lprintf("INFO", 0, " ======= TEST CLOVER FORCE ======= ");
     int return_val = 0;
     suNf_field *in, *gpu_format, *out;
@@ -479,8 +466,7 @@ int test_write_read_clover_force()
     return return_val;
 }
 
-int test_write_read_clover_ldl() 
-{
+int test_write_read_clover_ldl() {
     lprintf("INFO", 0, " ======= TEST LDL FIELD ======= ");
     int return_val = 0;
     ldl_field *in, *gpu_format, *out;
@@ -512,4 +498,3 @@ int test_write_read_clover_ldl()
     free_clover_ldl(gpu_format);
     return return_val;
 }
-

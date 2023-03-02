@@ -15,7 +15,7 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-    extern "C" {
+extern "C" {
 #endif
 
 void read_gauge_field_mpieo_BE(char filename[]);
@@ -42,10 +42,10 @@ void write_gauge_field_hirep_pbc_to_obc(char filename[]);
 void write_gauge_field_hirep_pbc_to_sf(char filename[]);
 
 /* void write_spinor_field_eo_lexi(char filename[],spinor_field *sp); */
-void write_spinor_field(char filename[],spinor_field *sp);
-void read_spinor_field(char filename[],spinor_field *sp);
+void write_spinor_field(char filename[], spinor_field *sp);
+void read_spinor_field(char filename[], spinor_field *sp);
 
 #ifdef __cplusplus
-    }
+}
 #endif
 #endif

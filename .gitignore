@@ -25,11 +25,11 @@ Disconnected/*
 ModeNumber/*
 Scattering/*
 RenormalizationFactors/*
-Converter/*
+Converter/*/*
 WilsonFlow/*
 Fortran/*
 Reweight/*
-Analysis/*
+Analysis/*/*
 StaticPotential/*
 TestProgram/*/*
 

@@ -1,10 +1,10 @@
 /*
 * NOCOMPILE = !WITH_GPU
-*/ 
+*/
 
 #include "libhr.h"
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
     int test1;
     int gpu_test1;
     int test2;

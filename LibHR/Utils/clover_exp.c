@@ -20,36 +20,35 @@ static int NNexp;
 static double *inverse_fact;
 static int init_exp = 0;
 
-
-static double factorial(int N)
-{
+static double factorial(int N) {
     int i;
     double fact = 1.;
-    for (i = 1; i <= N; ++i) { fact *= i; }
+    for (i = 1; i <= N; ++i) {
+        fact *= i;
+    }
     return fact;
 }
 
-int get_NNexp()
-{
+int get_NNexp() {
     return NNexp;
 }
 
-void init_clover_exp()
-{
+void init_clover_exp() {
     if (init_exp == 0) {
         int i;
 
         inverse_fact = malloc(sizeof(double) * MAX_EXP_ORDER);
 
         inverse_fact[0] = 1.;
-        for (i = 1; i < MAX_EXP_ORDER; i++) { inverse_fact[i] = 1. / factorial(i); }
+        for (i = 1; i < MAX_EXP_ORDER; i++) {
+            inverse_fact[i] = 1. / factorial(i);
+        }
 
         init_exp = 1;
     }
 }
 
-void evaluate_sw_order(double *mass)
-{
+void evaluate_sw_order(double *mass) {
     static double m0 = 0.0;
     static double csw0 = 0.0;
     if (m0 != *mass || csw0 != get_csw()) {
@@ -79,8 +78,7 @@ void evaluate_sw_order(double *mass)
     }
 }
 //C = B*A when C hermitian!
-void _su2Nfc_times_su2Nfc_herm(suNfc *C, suNfc *B, suNfc *A)
-{
+void _su2Nfc_times_su2Nfc_herm(suNfc *C, suNfc *B, suNfc *A) {
     // new zero component
     _suNfc_times_suNfc(C[0], B[0], A[0]);
     _suNfc_times_suNfc_assign(C[0], B[1], A[2]);
@@ -97,8 +95,7 @@ void _su2Nfc_times_su2Nfc_herm(suNfc *C, suNfc *B, suNfc *A)
 }
 
 //C = B*A
-void _su2Nfc_times_su2Nfc(suNfc *C, suNfc *B, suNfc *A)
-{
+void _su2Nfc_times_su2Nfc(suNfc *C, suNfc *B, suNfc *A) {
     // new zero component
     _suNfc_times_suNfc(C[0], B[0], A[0]);
     _suNfc_times_suNfc_assign(C[0], B[1], A[2]);
@@ -117,8 +114,7 @@ void _su2Nfc_times_su2Nfc(suNfc *C, suNfc *B, suNfc *A)
 }
 
 // C += A*B
-void _su2Nfc_times_su2Nfc_assign(suNfc *C, suNfc *B, suNfc *A)
-{
+void _su2Nfc_times_su2Nfc_assign(suNfc *C, suNfc *B, suNfc *A) {
     // new zero component
     _suNfc_times_suNfc_assign(C[0], B[0], A[0]);
     _suNfc_times_suNfc_assign(C[0], B[1], A[2]);
@@ -137,8 +133,7 @@ void _su2Nfc_times_su2Nfc_assign(suNfc *C, suNfc *B, suNfc *A)
 }
 
 //C += B*A when C hermitian!
-void _su2Nfc_times_su2Nfc_assign_herm(suNfc *C, suNfc *B, suNfc *A)
-{
+void _su2Nfc_times_su2Nfc_assign_herm(suNfc *C, suNfc *B, suNfc *A) {
     // new zero component
     _suNfc_times_suNfc_assign(C[0], B[0], A[0]);
     _suNfc_times_suNfc_assign(C[0], B[1], A[2]);
@@ -155,8 +150,7 @@ void _su2Nfc_times_su2Nfc_assign_herm(suNfc *C, suNfc *B, suNfc *A)
 }
 
 //trace of B*A
-void _su2Nfc_times_su2Nfc_trace(hr_complex *trace, suNfc *B, suNfc *A)
-{
+void _su2Nfc_times_su2Nfc_trace(hr_complex *trace, suNfc *B, suNfc *A) {
     suNfc aux;
 
     _suNfc_times_suNfc(aux, B[0], A[0]);
@@ -168,8 +162,7 @@ void _su2Nfc_times_su2Nfc_trace(hr_complex *trace, suNfc *B, suNfc *A)
 }
 
 //trace of the square of a 2NF hermitian matrix
-void _su2Nfc_times_su2Nfc_trace_herm_sq(hr_complex *trace, suNfc *B)
-{
+void _su2Nfc_times_su2Nfc_trace_herm_sq(hr_complex *trace, suNfc *B) {
     suNfc aux;
     double auxtrace;
 
@@ -183,16 +176,14 @@ void _su2Nfc_times_su2Nfc_trace_herm_sq(hr_complex *trace, suNfc *B)
     *trace = *trace + 2 * auxtrace;
 }
 
-void _su2Nfc_unit(suNfc *A)
-{
+void _su2Nfc_unit(suNfc *A) {
     _suNfc_unit(A[0]);
     _suNfc_unit(A[3]);
     _suNfc_zero(A[1]);
     _suNfc_zero(A[2]);
 }
 
-void _su2Nfc_trace(hr_complex *p, suNfc *A)
-{
+void _su2Nfc_trace(hr_complex *p, suNfc *A) {
     hr_complex aux = 0.;
     _suNfc_trace(aux, A[0]);
     _suNfc_trace(*p, A[3]);
@@ -201,8 +192,7 @@ void _su2Nfc_trace(hr_complex *p, suNfc *A)
 
 #if (NF == 3)
 
-static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus)
-{
+static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus) {
     suNfc A0[3], A2[4], A3[4], tmp1[4], tmp2[3];
 
     int i = 0, j = 0;
@@ -237,7 +227,9 @@ static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus)
     p[2] += +p[4] * p[4] / 2;
 
     double q[2 * NF];
-    for (i = 0; i < 2 * NF; i++) q[i] = 0.;
+    for (i = 0; i < 2 * NF; i++) {
+        q[i] = 0.;
+    }
 
     double qlast;
     q[0] = inverse_fact[NN];
@@ -245,7 +237,9 @@ static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus)
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[2 * NF - 1];
         q[2 * NF - 1] = q[2 * NF - 2];
-        for (j = 2 * NF - 2; j > 0; j--) q[j] = q[j - 1] - creal(p[j]) * qlast;
+        for (j = 2 * NF - 2; j > 0; j--) {
+            q[j] = q[j - 1] - creal(p[j]) * qlast;
+        }
         q[0] = inverse_fact[i] - creal(p[0]) * qlast;
     }
 
@@ -283,8 +277,7 @@ static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus)
 
 #if (NF == 2)
 
-static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus)
-{
+static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus) {
     suNfc A0[3], A2[4], tmp1[4];
 
     int i = 0, j = 0;
@@ -303,13 +296,17 @@ static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus)
     p[2] = -p[2] / 2;
 
     double q[2 * NF];
-    for (i = 0; i < 2 * NF; i++) q[i] = 0.;
+    for (i = 0; i < 2 * NF; i++) {
+        q[i] = 0.;
+    }
     double qlast;
     q[0] = inverse_fact[NN];
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[2 * NF - 1];
         q[2 * NF - 1] = q[2 * NF - 2];
-        for (j = 2 * NF - 2; j > 0; j--) q[j] = q[j - 1] - creal(p[j]) * qlast;
+        for (j = 2 * NF - 2; j > 0; j--) {
+            q[j] = q[j - 1] - creal(p[j]) * qlast;
+        }
         q[0] = inverse_fact[i] - creal(p[0]) * qlast;
     }
 
@@ -331,8 +328,7 @@ static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus)
 
 #endif
 
-void clover_exp_taylor(suNfc *Xin, suNfc *u)
-{
+void clover_exp_taylor(suNfc *Xin, suNfc *u) {
     suNfc Xk[4], tmp[4];
     _su2Nfc_unit(u);
     _su2Nfc_unit(Xk);
@@ -357,12 +353,11 @@ void clover_exp_taylor(suNfc *Xin, suNfc *u)
             error += erroraux;
         }
 
-        if (sqrt(error) < 1e-28) break;
+        if (sqrt(error) < 1e-28) { break; }
     }
 }
 
-inline void clover_exp(suNfc *Aplus, suNfc *expAplus)
-{
+inline void clover_exp(suNfc *Aplus, suNfc *expAplus) {
 #if (NF == 2)
     clover_exp_NF2(Aplus, expAplus);
 #elif (NF == 3)
@@ -374,8 +369,7 @@ inline void clover_exp(suNfc *Aplus, suNfc *expAplus)
 
 #if (NF == 3)
 
-static void doublehornerNF3(double *C, suNfc *A)
-{
+static void doublehornerNF3(double *C, suNfc *A) {
     suNfc A2[4], A3[4];
     hr_complex p[2 * NF - 1];
 
@@ -407,26 +401,36 @@ static void doublehornerNF3(double *C, suNfc *A)
 
     for (j = 0; j <= NNexp; j++) {
         q[0] = inverse_fact[NNexp + 2];
-        for (k = 1; k < 2 * NF; k++) q[k] = 0.;
+        for (k = 1; k < 2 * NF; k++) {
+            q[k] = 0.;
+        }
 
         for (i = NNexp - j; i > -1; i--) {
             qlast = q[2 * NF - 1];
             q[2 * NF - 1] = q[2 * NF - 2];
-            for (k = 2 * NF - 2; k > 0; k--) q[k] = q[k - 1] - creal(p[k]) * qlast;
+            for (k = 2 * NF - 2; k > 0; k--) {
+                q[k] = q[k - 1] - creal(p[k]) * qlast;
+            }
             q[0] = -creal(p[0]) * qlast + inverse_fact[i + j + 1];
         }
 
-        for (i = 0; i < 2 * NF; i++) { q2[j][i] = q[i]; }
+        for (i = 0; i < 2 * NF; i++) {
+            q2[j][i] = q[i];
+        }
     }
 
     for (i = 0; i < 2 * NF; i++) {
         q[0] = q2[NNexp][i];
-        for (k = 1; k < 2 * NF; k++) q[k] = 0.;
+        for (k = 1; k < 2 * NF; k++) {
+            q[k] = 0.;
+        }
 
         for (j = NNexp - 1; j > -1; j--) {
             qlast = q[2 * NF - 1];
             q[2 * NF - 1] = q[2 * NF - 2];
-            for (k = 2 * NF - 2; k > 0; k--) q[k] = q[k - 1] - creal(p[k]) * qlast;
+            for (k = 2 * NF - 2; k > 0; k--) {
+                q[k] = q[k - 1] - creal(p[k]) * qlast;
+            }
             q[0] = -p[0] * qlast + q2[j][i];
         }
 
@@ -441,8 +445,7 @@ static void doublehornerNF3(double *C, suNfc *A)
 
 #if (NF == 2)
 
-static void doublehornerNF2(double *C, suNfc *A)
-{
+static void doublehornerNF2(double *C, suNfc *A) {
     suNfc A2[4];
     hr_complex p[2 * NF - 1];
     _su2Nfc_times_su2Nfc_herm(A2, A, A);
@@ -462,26 +465,36 @@ static void doublehornerNF2(double *C, suNfc *A)
 
     for (j = 0; j <= NNexp; j++) {
         q[0] = inverse_fact[NNexp + 2];
-        for (k = 1; k < 2 * NF; k++) q[k] = 0.;
+        for (k = 1; k < 2 * NF; k++) {
+            q[k] = 0.;
+        }
 
         for (i = NNexp - j; i > -1; i--) {
             qlast = q[2 * NF - 1];
             q[2 * NF - 1] = q[2 * NF - 2];
-            for (k = 2 * NF - 2; k > 0; k--) q[k] = q[k - 1] - creal(p[k]) * qlast;
+            for (k = 2 * NF - 2; k > 0; k--) {
+                q[k] = q[k - 1] - creal(p[k]) * qlast;
+            }
             q[0] = -creal(p[0]) * qlast + inverse_fact[i + j + 1];
         }
 
-        for (i = 0; i < 2 * NF; i++) { q2[j][i] = q[i]; }
+        for (i = 0; i < 2 * NF; i++) {
+            q2[j][i] = q[i];
+        }
     }
 
     for (i = 0; i < 2 * NF; i++) {
         q[0] = q2[NNexp][i];
-        for (k = 1; k < 2 * NF; k++) q[k] = 0.;
+        for (k = 1; k < 2 * NF; k++) {
+            q[k] = 0.;
+        }
 
         for (j = NNexp - 1; j > -1; j--) {
             qlast = q[2 * NF - 1];
             q[2 * NF - 1] = q[2 * NF - 2];
-            for (k = 2 * NF - 2; k > 0; k--) q[k] = q[k - 1] - creal(p[k]) * qlast;
+            for (k = 2 * NF - 2; k > 0; k--) {
+                q[k] = q[k - 1] - creal(p[k]) * qlast;
+            }
             q[0] = -p[0] * qlast + q2[j][i];
         }
 
@@ -493,8 +506,7 @@ static void doublehornerNF2(double *C, suNfc *A)
 }
 #endif
 
-inline void doublehorner(double *C, suNfc *A)
-{
+inline void doublehorner(double *C, suNfc *A) {
 #if (NF == 3)
     doublehornerNF3(C, A);
 #elif (NF == 2)
@@ -504,11 +516,10 @@ inline void doublehorner(double *C, suNfc *A)
 #endif
 }
 
-void factorialCoef(double *C)
-{
+void factorialCoef(double *C) {
     int i, j;
 
-    for (j = 0; j < NNexp; j++)
+    for (j = 0; j < NNexp; j++) {
         for (i = 0; i < NNexp; i++) {
             if (i + j <= NNexp) {
                 C[(NNexp)*i + j] = inverse_fact[i + j + 1];
@@ -516,6 +527,7 @@ void factorialCoef(double *C)
                 C[(NNexp)*i + j] = 0.;
             }
         }
+    }
 }
 
 #endif

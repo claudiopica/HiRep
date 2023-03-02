@@ -23,14 +23,14 @@
 #include "core_utils.h"
 #include "gpu.h"
 
-GLB_VAR(__device__ __constant__ int,T_EXT_GPU);
-GLB_VAR(__device__ __constant__ int,X_EXT_GPU);
-GLB_VAR(__device__ __constant__ int,Y_EXT_GPU);
-GLB_VAR(__device__ __constant__ int,Z_EXT_GPU);
+GLB_VAR(__device__ __constant__ int, T_EXT_GPU);
+GLB_VAR(__device__ __constant__ int, X_EXT_GPU);
+GLB_VAR(__device__ __constant__ int, Y_EXT_GPU);
+GLB_VAR(__device__ __constant__ int, Z_EXT_GPU);
 
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
 #include "hr_complex.h"
-GLB_VAR(__device__ __constant__ hr_complex,eitheta_gpu[4]);
+GLB_VAR(__device__ __constant__ hr_complex, eitheta_gpu[4]);
 #endif
 
 #endif

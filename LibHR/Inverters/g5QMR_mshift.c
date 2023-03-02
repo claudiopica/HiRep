@@ -38,16 +38,13 @@
         }                                       \
     }
 
-static double spinor_field_g5_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_flt *s2)
-{
+static double spinor_field_g5_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_flt *s2) {
     static double res;
-    _OMP_PRAGMA(single)
-    {
+    _OMP_PRAGMA(single) {
         res = 0.;
     }
 
-    _TWO_SPINORS_FOR_SUM(s1, s2, res)
-    {
+    _TWO_SPINORS_FOR_SUM(s1, s2, res) {
         float prod;
         _spinor_g5_prod_re_f(prod, *_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
         res += (double)prod;
@@ -58,16 +55,13 @@ static double spinor_field_g5_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_f
     return res;
 }
 
-static double spinor_field_sqnorm_f_f2d(spinor_field_flt *s1)
-{
+static double spinor_field_sqnorm_f_f2d(spinor_field_flt *s1) {
     static double res;
-    _OMP_PRAGMA(single)
-    {
+    _OMP_PRAGMA(single) {
         res = 0.;
     }
 
-    _ONE_SPINOR_FOR_SUM(s1, res)
-    {
+    _ONE_SPINOR_FOR_SUM(s1, res) {
         float prod;
         _spinor_prod_re_f(prod, *_SPINOR_PTR(s1), *_SPINOR_PTR(s1));
         res += (double)prod;
@@ -83,8 +77,7 @@ static double spinor_field_sqnorm_f_f2d(spinor_field_flt *s1)
 * out[i] = (M-(par->shift[i]))^-1 in
 * returns the number of cg iterations done.
 */
-static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out)
-{
+static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out) {
     spinor_field **q1, **q2;
     spinor_field *p1, *p2, *Mp;
     spinor_field *sptmp, *memall;
@@ -147,7 +140,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
         r[i] = rho;
         c2[i] = c1[i] = 1.;
         s1[i] = s2[i] = 0.;
-        if (par->n != 1) spinor_field_zero_f(&out[i]); /* if no multishift we start with the trial solution */
+        if (par->n != 1) { spinor_field_zero_f(&out[i]); /* if no multishift we start with the trial solution */ }
         spinor_field_zero_f(q1[i]);
         spinor_field_zero_f(q2[i]);
         flags[i] = 1;
@@ -276,13 +269,12 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
     free(flags);
 
     /* return number of cg iter */
-    if (par->n == 1) ++cgiter;
+    if (par->n == 1) { ++cgiter; }
     return cgiter;
 }
 
 static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operator_flt M, spinor_field_flt *in,
-                          spinor_field_flt *out)
-{
+                          spinor_field_flt *out) {
     spinor_field_flt *q1, *q2;
     spinor_field_flt *p1, *p2, *Mp;
     spinor_field_flt *sptmp, *memall;
@@ -466,8 +458,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
 
 static double sh;
 static spinor_operator g5Herm;
-static void Herm(spinor_field *out, spinor_field *in)
-{
+static void Herm(spinor_field *out, spinor_field *in) {
     g5Herm(out, in);
     if (sh != 0.) { spinor_field_mul_add_assign_f(out, -sh, in); }
     spinor_field_g5_f(out, out);
@@ -475,15 +466,13 @@ static void Herm(spinor_field *out, spinor_field *in)
 
 static double sh_flt;
 static spinor_operator_flt g5Herm_flt;
-static void Herm_flt(spinor_field_flt *out, spinor_field_flt *in)
-{
+static void Herm_flt(spinor_field_flt *out, spinor_field_flt *in) {
     g5Herm_flt(out, in);
     if (sh_flt != 0.) { spinor_field_mul_add_assign_f_flt(out, ((float)(-sh_flt)), in); }
     spinor_field_g5_f_flt(out, out);
 }
 
-int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out)
-{
+int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out) {
     int cgiter;
     int n;
     mshift_par orig;
@@ -545,8 +534,7 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fi
     return cgiter;
 }
 
-int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M_flt, spinor_field *in, spinor_field *out)
-{
+int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M_flt, spinor_field *in, spinor_field *out) {
     int cgiter = 0, cgiter_flt = 0, cgiter_minres = 0, k;
     short valid;
     spinor_field_flt *in_flt, *out_flt, *res_flt;
@@ -599,7 +587,9 @@ int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M
 #else
         _MASTER_FOR(out->type, ix) {
 #endif
-            for (k = 0; k < 8 * NF; k++) { ((double *)_FIELD_AT(out, ix))[k] += (double)((float *)_FIELD_AT(out_flt, ix))[k]; }
+            for (k = 0; k < 8 * NF; k++) {
+                ((double *)_FIELD_AT(out, ix))[k] += (double)((float *)_FIELD_AT(out_flt, ix))[k];
+            }
         }
 
         M(res, out);

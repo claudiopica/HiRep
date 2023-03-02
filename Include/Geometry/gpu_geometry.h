@@ -14,42 +14,43 @@
 #include "new_geometry.h"
 #include "Utils/generics.h"
 
-#define _GPU_FIELD_BLK(s,i) (((s)->gpu_ptr) + ((s)->type->master_start[(i)] - (s)->type->master_shift))
-#define _GPU_4FIELD_BLK(s,i) (((s)->gpu_ptr) + 4*((s)->type->master_start[(i)]))
-#define _GPU_DFIELD_BLK(s,i,size) (((s)->gpu_ptr) + size*((s)->type->master_start[(i)] - (s)->type->master_shift))
+#define _GPU_FIELD_BLK(s, i) (((s)->gpu_ptr) + ((s)->type->master_start[(i)] - (s)->type->master_shift))
+#define _GPU_4FIELD_BLK(s, i) (((s)->gpu_ptr) + 4 * ((s)->type->master_start[(i)]))
+#define _GPU_DFIELD_BLK(s, i, size) (((s)->gpu_ptr) + size * ((s)->type->master_start[(i)] - (s)->type->master_shift))
 
-#define _BUF_GPU_FIELD_BLK(s,i) (((s)->gpu_ptr) + ((s)->type->rbuf_start[(i)] - (s)->type->master_shift))
-#define _BUF_GPU_4FIELD_BLK(s,i) (((s)->gpu_ptr) + 4*((s)->type->rbuf_start[(i)] - (s)->type->master_shift))
-#define _BUF_GPU_DFIELD_BLK(s,i,size) (((s)->gpu_ptr) + size*((s)->type->rbuf_start[(i)] - (s)->type->master_shift))
+#define _BUF_GPU_FIELD_BLK(s, i) (((s)->gpu_ptr) + ((s)->type->rbuf_start[(i)] - (s)->type->master_shift))
+#define _BUF_GPU_4FIELD_BLK(s, i) (((s)->gpu_ptr) + 4 * ((s)->type->rbuf_start[(i)] - (s)->type->master_shift))
+#define _BUF_GPU_DFIELD_BLK(s, i, size) (((s)->gpu_ptr) + size * ((s)->type->rbuf_start[(i)] - (s)->type->master_shift))
 
 // Kernel structure
-#define _KERNEL_PIECE_FOR(_piece) \
-      for (int _piece = EVEN; _piece <= ODD; _piece++)
+#define _KERNEL_PIECE_FOR(_piece) for (int _piece = EVEN; _piece <= ODD; _piece++)
 
 #define _IF_IN_BOX_IN(_input, _piece) \
-      if (_input->gd_in & piece) if (blockIdx.x * BLOCK_SIZE + threadIdx.x < _input->vol_in[piece-1])
+    if (_input->gd_in & piece)        \
+        if (blockIdx.x * BLOCK_SIZE + threadIdx.x < _input->vol_in[piece - 1])
 
 #define _IF_IN_BOX_OUT(_input, _piece) \
-      if (_input->gd_in & piece) if (blockIdx.x * BLOCK_SIZE + threadIdx.x < _input->vol_out[piece-1])
+    if (_input->gd_in & piece)         \
+        if (blockIdx.x * BLOCK_SIZE + threadIdx.x < _input->vol_out[piece - 1])
 
 typedef struct _kernel_field_input {
-    void* field_in;
+    void *field_in;
     int start_in_even;
     int start_in;
     int base_in[2];
     int stride_in;
     int vol_in[2];
     int master_shift_in;
-    void* field_out;
+    void *field_out;
     int stride_out;
     int base_out[2];
     int start_out;
     int vol_out[2];
     int master_shift_out;
-    void* gauge;
-    int* iup_gpu;
-    int* idn_gpu;
-    char* imask_gpu;
+    void *gauge;
+    int *iup_gpu;
+    int *idn_gpu;
+    char *imask_gpu;
     enum gd_type gd_in;
 } kernel_field_input;
 

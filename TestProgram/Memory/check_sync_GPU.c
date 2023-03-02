@@ -12,7 +12,7 @@
 #include "libhr.h"
 #include <string.h>
 
-int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor*);
+int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *);
 int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd);
 int test_sync_identical_to_cpu_sfield(geometry_descriptor *gd);
 int test_sync_identical_to_cpu_gfield();
@@ -26,8 +26,7 @@ int test_sync_identical_to_cpu_clover_ldl();
 int test_sync_identical_to_cpu_clover_term();
 int test_sync_identical_to_cpu_clover_force();
 
-int main(int argc, char *argv[]) 
-{
+int main(int argc, char *argv[]) {
     // Init
     int return_val = 0;
 
@@ -65,21 +64,20 @@ int main(int argc, char *argv[])
     return return_val;
 }
 
-#define round_up(val, modulo) ((val / modulo ) + 1) * modulo;
+#define round_up(val, modulo) ((val / modulo) + 1) * modulo;
 
-#define sendbuf_length(_len) \
-    _len = 0; \
-    box_t *L = geometryBoxes->next; \
-    int m = 0; \
-    while (L && m < glattice.nbuffers_spinor) { \
+#define sendbuf_length(_len)                                            \
+    _len = 0;                                                           \
+    box_t *L = geometryBoxes->next;                                     \
+    int m = 0;                                                          \
+    while (L && m < glattice.nbuffers_spinor) {                         \
         sendbuf_len += round_up(boxEvenVolume(L->sendBox), THREADSIZE); \
-        sendbuf_len += round_up(boxOddVolume(L->sendBox), THREADSIZE); \
-        L = L->next; m++; \
+        sendbuf_len += round_up(boxOddVolume(L->sendBox), THREADSIZE);  \
+        L = L->next;                                                    \
+        m++;                                                            \
     }
 
-
-int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd) 
-{
+int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd) {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
@@ -94,31 +92,27 @@ int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd)
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
-    suNf_spinor* sendbuf_cpu = (suNf_spinor*)malloc(sendbuf_len*sizeof(suNf_spinor));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNf_spinor));
+    suNf_spinor *sendbuf_cpu = (suNf_spinor *)malloc(sendbuf_len * sizeof(suNf_spinor));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len * sizeof(suNf_spinor));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_spinor_field_f_gpu(f);
-    suNf_spinor* sendbuf_gpu = (suNf_spinor*)malloc(sendbuf_len*sizeof(suNf_spinor));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNf_spinor), cudaMemcpyDeviceToHost);
+    suNf_spinor *sendbuf_gpu = (suNf_spinor *)malloc(sendbuf_len * sizeof(suNf_spinor));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len * sizeof(suNf_spinor), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNf_spinor *spinor_gpu = (suNf_spinor*)malloc(sizeof(suNf_spinor));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNf_spinor *spinor_gpu = (suNf_spinor *)malloc(sizeof(suNf_spinor));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             suNf_spinor *spinor_cpu = sendbuf_cpu + j + gd->sbuf_start[i];
             suNf_spinor *in_block = sendbuf_gpu + gd->sbuf_start[i];
             read_strided_spinor_field_f_gpu(spinor_gpu, in_block, j, 0);
 
-            for (int k = 0; k < 4; ++k) 
-            {
-                for (int comp = 0; comp < NF; ++comp) 
-                {
-                    diff += creal((*spinor_cpu).c[k].c[comp])-creal((*spinor_gpu).c[k].c[comp]);
-                    diff += cimag((*spinor_cpu).c[k].c[comp])-cimag((*spinor_gpu).c[k].c[comp]);
+            for (int k = 0; k < 4; ++k) {
+                for (int comp = 0; comp < NF; ++comp) {
+                    diff += creal((*spinor_cpu).c[k].c[comp]) - creal((*spinor_gpu).c[k].c[comp]);
+                    diff += cimag((*spinor_cpu).c[k].c[comp]) - cimag((*spinor_gpu).c[k].c[comp]);
                 }
             }
         }
@@ -129,8 +123,7 @@ int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd)
     return return_val;
 }
 
-int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd) 
-{
+int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd) {
     lprintf("INFO", 0, " ======= TEST SINGLE PRECISION SPINOR FIELD ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
@@ -146,31 +139,27 @@ int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd)
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
-    suNf_spinor_flt* sendbuf_cpu = (suNf_spinor_flt*)malloc(sendbuf_len*sizeof(suNf_spinor_flt));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNf_spinor_flt));
+    suNf_spinor_flt *sendbuf_cpu = (suNf_spinor_flt *)malloc(sendbuf_len * sizeof(suNf_spinor_flt));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len * sizeof(suNf_spinor_flt));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_spinor_field_f_flt_gpu(f);
-    suNf_spinor_flt* sendbuf_gpu = (suNf_spinor_flt*)malloc(sendbuf_len*sizeof(suNf_spinor_flt));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNf_spinor_flt), cudaMemcpyDeviceToHost);
+    suNf_spinor_flt *sendbuf_gpu = (suNf_spinor_flt *)malloc(sendbuf_len * sizeof(suNf_spinor_flt));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len * sizeof(suNf_spinor_flt), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNf_spinor_flt *spinor_gpu = (suNf_spinor_flt*)malloc(sizeof(suNf_spinor_flt));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNf_spinor_flt *spinor_gpu = (suNf_spinor_flt *)malloc(sizeof(suNf_spinor_flt));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             suNf_spinor_flt *spinor_cpu = sendbuf_cpu + j + gd->sbuf_start[i];
             suNf_spinor_flt *in_block = sendbuf_gpu + gd->sbuf_start[i];
             read_strided_spinor_field_f_flt_gpu(spinor_gpu, in_block, j, 0);
 
-            for (int k = 0; k < 4; ++k) 
-            {
-                for (int comp = 0; comp < NF; ++comp) 
-                {
-                    diff += creal((*spinor_cpu).c[k].c[comp])-creal((*spinor_gpu).c[k].c[comp]);
-                    diff += cimag((*spinor_cpu).c[k].c[comp])-cimag((*spinor_gpu).c[k].c[comp]);
+            for (int k = 0; k < 4; ++k) {
+                for (int comp = 0; comp < NF; ++comp) {
+                    diff += creal((*spinor_cpu).c[k].c[comp]) - creal((*spinor_gpu).c[k].c[comp]);
+                    diff += cimag((*spinor_cpu).c[k].c[comp]) - cimag((*spinor_gpu).c[k].c[comp]);
                 }
             }
         }
@@ -181,8 +170,7 @@ int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd)
     return return_val;
 }
 
-int test_sync_identical_to_cpu_sfield(geometry_descriptor *gd) 
-{
+int test_sync_identical_to_cpu_sfield(geometry_descriptor *gd) {
     lprintf("INFO", 0, " ======= TEST SFIELD ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
@@ -198,21 +186,19 @@ int test_sync_identical_to_cpu_sfield(geometry_descriptor *gd)
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
-    double* sendbuf_cpu = (double*)malloc(sendbuf_len*sizeof(double));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(double));
+    double *sendbuf_cpu = (double *)malloc(sendbuf_len * sizeof(double));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len * sizeof(double));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_sfield_gpu(f);
-    double* sendbuf_gpu = (double*)malloc(sendbuf_len*sizeof(double));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(double), cudaMemcpyDeviceToHost);
+    double *sendbuf_gpu = (double *)malloc(sendbuf_len * sizeof(double));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len * sizeof(double), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    double *spinor_gpu = (double*)malloc(sizeof(double));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    double *spinor_gpu = (double *)malloc(sizeof(double));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             double *spinor_cpu = sendbuf_cpu + j + gd->sbuf_start[i];
             double *in_block = sendbuf_gpu + gd->sbuf_start[i];
             read_strided_sfield_gpu(spinor_gpu, in_block, j, 0);
@@ -225,13 +211,12 @@ int test_sync_identical_to_cpu_sfield(geometry_descriptor *gd)
     return return_val;
 }
 
-int test_sync_identical_to_cpu_gfield() 
-{
+int test_sync_identical_to_cpu_gfield() {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
     // Setup fields on GPU
-    geometry_descriptor* gd = &glattice;
+    geometry_descriptor *gd = &glattice;
     int return_val = 0;
     suNg_field *f = alloc_gfield(gd);
     random_gfield_cpu(f);
@@ -242,22 +227,20 @@ int test_sync_identical_to_cpu_gfield()
     sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
-    sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
-    suNg* sendbuf_cpu = (suNg*)malloc(4*sendbuf_len*sizeof(suNg));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNg));
+    sync_field(f->type, 4 * sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
+    suNg *sendbuf_cpu = (suNg *)malloc(4 * sendbuf_len * sizeof(suNg));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4 * sendbuf_len * sizeof(suNg));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_gfield_gpu(f);
-    suNg* sendbuf_gpu = (suNg*)malloc(4*sendbuf_len*sizeof(suNg));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNg), cudaMemcpyDeviceToHost);
+    suNg *sendbuf_gpu = (suNg *)malloc(4 * sendbuf_len * sizeof(suNg));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4 * sendbuf_len * sizeof(suNg), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNg *mat_gpu = (suNg*)malloc(sizeof(suNg));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNg *mat_gpu = (suNg *)malloc(sizeof(suNg));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             for (int mu = 0; mu < 4; ++mu) {
                 int idx = gd->sbuf_start[i] + j;
                 int offset = gd->sbuf_start[i];
@@ -265,11 +248,11 @@ int test_sync_identical_to_cpu_gfield()
                 suNg *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
                 read_strided_gfield_gpu(mat_gpu, in_block, j, mu);
 
-                for (int comp = 0; comp < NG*NG; ++comp) {
-                    diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
-                    diff += cimag((*mat_cpu).c[comp])-cimag((*mat_gpu).c[comp]);
+                for (int comp = 0; comp < NG * NG; ++comp) {
+                    diff += creal((*mat_cpu).c[comp]) - creal((*mat_gpu).c[comp]);
+                    diff += cimag((*mat_cpu).c[comp]) - cimag((*mat_gpu).c[comp]);
                 }
-            }     
+            }
         }
     }
 
@@ -278,13 +261,12 @@ int test_sync_identical_to_cpu_gfield()
     return return_val;
 }
 
-int test_sync_identical_to_cpu_gfield_f() 
-{
+int test_sync_identical_to_cpu_gfield_f() {
     lprintf("INFO", 0, " ======= TEST REPRESENTED GAUGE FIELD ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
     // Setup fields on GPU
-    geometry_descriptor* gd = &glattice;
+    geometry_descriptor *gd = &glattice;
     int return_val = 0;
     suNf_field *f = alloc_gfield_f(gd);
     random_gfield_f_cpu(f);
@@ -295,22 +277,20 @@ int test_sync_identical_to_cpu_gfield_f()
     sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
-    sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
-    suNf* sendbuf_cpu = (suNf*)malloc(4*sendbuf_len*sizeof(suNf));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNf));
+    sync_field(f->type, 4 * sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
+    suNf *sendbuf_cpu = (suNf *)malloc(4 * sendbuf_len * sizeof(suNf));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4 * sendbuf_len * sizeof(suNf));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_gfield_f_gpu(f);
-    suNf* sendbuf_gpu = (suNf*)malloc(4*sendbuf_len*sizeof(suNf));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNf), cudaMemcpyDeviceToHost);
+    suNf *sendbuf_gpu = (suNf *)malloc(4 * sendbuf_len * sizeof(suNf));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4 * sendbuf_len * sizeof(suNf), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNf *mat_gpu = (suNf*)malloc(sizeof(suNf));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNf *mat_gpu = (suNf *)malloc(sizeof(suNf));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             for (int mu = 0; mu < 4; ++mu) {
                 int idx = gd->sbuf_start[i] + j;
                 int offset = gd->sbuf_start[i];
@@ -318,11 +298,11 @@ int test_sync_identical_to_cpu_gfield_f()
                 suNf *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
                 read_strided_gfield_f_gpu(mat_gpu, in_block, j, mu);
 
-                for (int comp = 0; comp < NF*NF; ++comp) {
-                    diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
-                    diff += cimag((*mat_cpu).c[comp])-cimag((*mat_gpu).c[comp]);
+                for (int comp = 0; comp < NF * NF; ++comp) {
+                    diff += creal((*mat_cpu).c[comp]) - creal((*mat_gpu).c[comp]);
+                    diff += cimag((*mat_cpu).c[comp]) - cimag((*mat_gpu).c[comp]);
                 }
-            }     
+            }
         }
     }
 
@@ -331,13 +311,12 @@ int test_sync_identical_to_cpu_gfield_f()
     return return_val;
 }
 
-int test_sync_identical_to_cpu_gfield_flt() 
-{
+int test_sync_identical_to_cpu_gfield_flt() {
     lprintf("INFO", 0, " ======= TEST SINGLE PRECISION GAUGE FIELD ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
     // Setup fields on GPU
-    geometry_descriptor* gd = &glattice;
+    geometry_descriptor *gd = &glattice;
     int return_val = 0;
     suNg_field_flt *f = alloc_gfield_flt(gd);
     random_gfield_flt_cpu(f);
@@ -348,22 +327,20 @@ int test_sync_identical_to_cpu_gfield_flt()
     sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
-    sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
-    suNg_flt* sendbuf_cpu = (suNg_flt*)malloc(4*sendbuf_len*sizeof(suNg_flt));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNg_flt));
+    sync_field(f->type, 4 * sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
+    suNg_flt *sendbuf_cpu = (suNg_flt *)malloc(4 * sendbuf_len * sizeof(suNg_flt));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4 * sendbuf_len * sizeof(suNg_flt));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_gfield_flt_gpu(f);
-    suNg_flt* sendbuf_gpu = (suNg_flt*)malloc(4*sendbuf_len*sizeof(suNg_flt));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNg_flt), cudaMemcpyDeviceToHost);
+    suNg_flt *sendbuf_gpu = (suNg_flt *)malloc(4 * sendbuf_len * sizeof(suNg_flt));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4 * sendbuf_len * sizeof(suNg_flt), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNg_flt *mat_gpu = (suNg_flt*)malloc(sizeof(suNg_flt));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNg_flt *mat_gpu = (suNg_flt *)malloc(sizeof(suNg_flt));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             for (int mu = 0; mu < 4; ++mu) {
                 int idx = gd->sbuf_start[i] + j;
                 int offset = gd->sbuf_start[i];
@@ -371,11 +348,11 @@ int test_sync_identical_to_cpu_gfield_flt()
                 suNg_flt *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
                 read_strided_gfield_flt_gpu(mat_gpu, in_block, j, mu);
 
-                for (int comp = 0; comp < NG*NG; ++comp) {
-                    diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
-                    diff += cimag((*mat_cpu).c[comp])-cimag((*mat_gpu).c[comp]);
+                for (int comp = 0; comp < NG * NG; ++comp) {
+                    diff += creal((*mat_cpu).c[comp]) - creal((*mat_gpu).c[comp]);
+                    diff += cimag((*mat_cpu).c[comp]) - cimag((*mat_gpu).c[comp]);
                 }
-            }     
+            }
         }
     }
 
@@ -384,13 +361,12 @@ int test_sync_identical_to_cpu_gfield_flt()
     return return_val;
 }
 
-int test_sync_identical_to_cpu_gfield_f_flt() 
-{
+int test_sync_identical_to_cpu_gfield_f_flt() {
     lprintf("INFO", 0, " ======= TEST REPRESENTED SINGLE PRECISION GAUGE FIELD ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
     // Setup fields on GPU
-    geometry_descriptor* gd = &glattice;
+    geometry_descriptor *gd = &glattice;
     int return_val = 0;
     suNf_field_flt *f = alloc_gfield_f_flt(gd);
     random_gfield_f_flt_cpu(f);
@@ -401,22 +377,20 @@ int test_sync_identical_to_cpu_gfield_f_flt()
     sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
-    sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
-    suNf_flt* sendbuf_cpu = (suNf_flt*)malloc(4*sendbuf_len*sizeof(suNf_flt));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNf_flt));
+    sync_field(f->type, 4 * sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
+    suNf_flt *sendbuf_cpu = (suNf_flt *)malloc(4 * sendbuf_len * sizeof(suNf_flt));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4 * sendbuf_len * sizeof(suNf_flt));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_gfield_f_flt_gpu(f);
-    suNf_flt* sendbuf_gpu = (suNf_flt*)malloc(4*sendbuf_len*sizeof(suNf_flt));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNf_flt), cudaMemcpyDeviceToHost);
+    suNf_flt *sendbuf_gpu = (suNf_flt *)malloc(4 * sendbuf_len * sizeof(suNf_flt));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4 * sendbuf_len * sizeof(suNf_flt), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNf_flt *mat_gpu = (suNf_flt*)malloc(sizeof(suNf_flt));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNf_flt *mat_gpu = (suNf_flt *)malloc(sizeof(suNf_flt));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             for (int mu = 0; mu < 4; ++mu) {
                 int idx = gd->sbuf_start[i] + j;
                 int offset = gd->sbuf_start[i];
@@ -424,11 +398,11 @@ int test_sync_identical_to_cpu_gfield_f_flt()
                 suNf_flt *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
                 read_strided_gfield_f_flt_gpu(mat_gpu, in_block, j, mu);
 
-                for (int comp = 0; comp < NF*NF; ++comp) {
-                    diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
-                    diff += cimag((*mat_cpu).c[comp])-cimag((*mat_gpu).c[comp]);
+                for (int comp = 0; comp < NF * NF; ++comp) {
+                    diff += creal((*mat_cpu).c[comp]) - creal((*mat_gpu).c[comp]);
+                    diff += cimag((*mat_cpu).c[comp]) - cimag((*mat_gpu).c[comp]);
                 }
-            }     
+            }
         }
     }
 
@@ -437,13 +411,12 @@ int test_sync_identical_to_cpu_gfield_f_flt()
     return return_val;
 }
 
-int test_sync_identical_to_cpu_suNg_scalar_field() 
-{
+int test_sync_identical_to_cpu_suNg_scalar_field() {
     lprintf("INFO", 0, " ======= TEST SU(NG) SCALAR FIELD ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
     // Setup fields on GPU
-    geometry_descriptor* gd = &glattice;
+    geometry_descriptor *gd = &glattice;
     int return_val = 0;
     suNg_scalar_field *f = alloc_suNg_scalar_field(gd);
     random_suNg_scalar_field_cpu(f);
@@ -455,21 +428,19 @@ int test_sync_identical_to_cpu_suNg_scalar_field()
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
-    suNg_vector* sendbuf_cpu = (suNg_vector*)malloc(sendbuf_len*sizeof(suNg_vector));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNg_vector));
+    suNg_vector *sendbuf_cpu = (suNg_vector *)malloc(sendbuf_len * sizeof(suNg_vector));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len * sizeof(suNg_vector));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_suNg_scalar_field_gpu(f);
-    suNg_vector* sendbuf_gpu = (suNg_vector*)malloc(sendbuf_len*sizeof(suNg_vector));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNg_vector), cudaMemcpyDeviceToHost);
+    suNg_vector *sendbuf_gpu = (suNg_vector *)malloc(sendbuf_len * sizeof(suNg_vector));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len * sizeof(suNg_vector), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNg_vector *mat_gpu = (suNg_vector*)malloc(sizeof(suNg_vector));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNg_vector *mat_gpu = (suNg_vector *)malloc(sizeof(suNg_vector));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             int idx = gd->sbuf_start[i] + j;
             int offset = gd->sbuf_start[i];
             suNg_vector *mat_cpu = _FIELD_AT_PTR(sendbuf_cpu, idx, 0);
@@ -477,9 +448,9 @@ int test_sync_identical_to_cpu_suNg_scalar_field()
             read_strided_suNg_scalar_field_gpu(mat_gpu, in_block, j, 0);
 
             for (int comp = 0; comp < NG; ++comp) {
-                diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
-                diff += cimag((*mat_cpu).c[comp])-cimag((*mat_gpu).c[comp]);
-            } 
+                diff += creal((*mat_cpu).c[comp]) - creal((*mat_gpu).c[comp]);
+                diff += cimag((*mat_cpu).c[comp]) - cimag((*mat_gpu).c[comp]);
+            }
         }
     }
 
@@ -488,13 +459,12 @@ int test_sync_identical_to_cpu_suNg_scalar_field()
     return return_val;
 }
 
-int test_sync_identical_to_cpu_avfield() 
-{
+int test_sync_identical_to_cpu_avfield() {
     lprintf("INFO", 0, " ======= TEST AVFIELD ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
     // Setup fields on GPU
-    geometry_descriptor* gd = &glattice;
+    geometry_descriptor *gd = &glattice;
     int return_val = 0;
     suNg_av_field *f = alloc_avfield(gd);
     random_avfield_cpu(f);
@@ -505,32 +475,30 @@ int test_sync_identical_to_cpu_avfield()
     sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
-    sync_field(f->type, 4*sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
-    suNg_algebra_vector* sendbuf_cpu = (suNg_algebra_vector*)malloc(4*sendbuf_len*sizeof(suNg_algebra_vector));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNg_algebra_vector));
+    sync_field(f->type, 4 * sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
+    suNg_algebra_vector *sendbuf_cpu = (suNg_algebra_vector *)malloc(4 * sendbuf_len * sizeof(suNg_algebra_vector));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4 * sendbuf_len * sizeof(suNg_algebra_vector));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_avfield_gpu(f);
-    suNg_algebra_vector* sendbuf_gpu = (suNg_algebra_vector*)malloc(4*sendbuf_len*sizeof(suNg_algebra_vector));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNg_algebra_vector), cudaMemcpyDeviceToHost);
+    suNg_algebra_vector *sendbuf_gpu = (suNg_algebra_vector *)malloc(4 * sendbuf_len * sizeof(suNg_algebra_vector));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4 * sendbuf_len * sizeof(suNg_algebra_vector), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNg_algebra_vector *mat_gpu = (suNg_algebra_vector*)malloc(sizeof(suNg_algebra_vector));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNg_algebra_vector *mat_gpu = (suNg_algebra_vector *)malloc(sizeof(suNg_algebra_vector));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             int idx = gd->sbuf_start[i] + j;
             int offset = gd->sbuf_start[i];
             suNg_algebra_vector *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, 0, 0);
             suNg_algebra_vector *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
             read_strided_avfield_gpu(mat_gpu, in_block, j, 0);
 
-            for (int comp = 0; comp < NG*NG-1; ++comp) {
-                diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
-                diff += cimag((*mat_cpu).c[comp])-cimag((*mat_gpu).c[comp]);
-            } 
+            for (int comp = 0; comp < NG * NG - 1; ++comp) {
+                diff += creal((*mat_cpu).c[comp]) - creal((*mat_gpu).c[comp]);
+                diff += cimag((*mat_cpu).c[comp]) - cimag((*mat_gpu).c[comp]);
+            }
         }
     }
 
@@ -539,13 +507,12 @@ int test_sync_identical_to_cpu_avfield()
     return return_val;
 }
 
-int test_sync_identical_to_cpu_gtransf() 
-{
+int test_sync_identical_to_cpu_gtransf() {
     lprintf("INFO", 0, " ======= TEST GTRANSF ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
     // Setup fields on GPU
-    geometry_descriptor* gd = &glattice;
+    geometry_descriptor *gd = &glattice;
     int return_val = 0;
     suNg_field *f = alloc_gtransf(gd);
     random_gtransf_cpu(f);
@@ -557,31 +524,29 @@ int test_sync_identical_to_cpu_gtransf()
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
-    suNg* sendbuf_cpu = (suNg*)malloc(sendbuf_len*sizeof(suNg));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNg));
+    suNg *sendbuf_cpu = (suNg *)malloc(sendbuf_len * sizeof(suNg));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len * sizeof(suNg));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_gtransf_gpu(f);
-    suNg* sendbuf_gpu = (suNg*)malloc(sendbuf_len*sizeof(suNg));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNg), cudaMemcpyDeviceToHost);
+    suNg *sendbuf_gpu = (suNg *)malloc(sendbuf_len * sizeof(suNg));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len * sizeof(suNg), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNg *mat_gpu = (suNg*)malloc(sizeof(suNg));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNg *mat_gpu = (suNg *)malloc(sizeof(suNg));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             int idx = gd->sbuf_start[i] + j;
             int offset = gd->sbuf_start[i];
             suNg *mat_cpu = _FIELD_AT_PTR(sendbuf_cpu, idx, 0);
             suNg *in_block = _FIELD_AT_PTR(sendbuf_gpu, offset, 0);
             read_strided_gtransf_gpu(mat_gpu, in_block, j, 0);
 
-            for (int comp = 0; comp < NG*NG; ++comp) {
-                diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
-                diff += cimag((*mat_cpu).c[comp])-cimag((*mat_gpu).c[comp]);
-            } 
+            for (int comp = 0; comp < NG * NG; ++comp) {
+                diff += creal((*mat_cpu).c[comp]) - creal((*mat_gpu).c[comp]);
+                diff += cimag((*mat_cpu).c[comp]) - cimag((*mat_gpu).c[comp]);
+            }
         }
     }
     return_val += check_diff_norm_zero(diff);
@@ -589,13 +554,12 @@ int test_sync_identical_to_cpu_gtransf()
     return return_val;
 }
 
-int test_sync_identical_to_cpu_clover_ldl() 
-{
+int test_sync_identical_to_cpu_clover_ldl() {
     lprintf("INFO", 0, " ======= TEST CLOVER LDL ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
     // Setup fields on GPU
-    geometry_descriptor* gd = &glattice;
+    geometry_descriptor *gd = &glattice;
     int return_val = 0;
     ldl_field *f = alloc_clover_ldl(gd);
     random_clover_ldl_cpu(f);
@@ -607,33 +571,31 @@ int test_sync_identical_to_cpu_clover_ldl()
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
-    ldl_t* sendbuf_cpu = (ldl_t*)malloc(sendbuf_len*sizeof(ldl_t));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(ldl_t));
+    ldl_t *sendbuf_cpu = (ldl_t *)malloc(sendbuf_len * sizeof(ldl_t));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len * sizeof(ldl_t));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_clover_ldl_gpu(f);
-    ldl_t* sendbuf_gpu = (ldl_t*)malloc(sendbuf_len*sizeof(ldl_t));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(ldl_t), cudaMemcpyDeviceToHost);
+    ldl_t *sendbuf_gpu = (ldl_t *)malloc(sendbuf_len * sizeof(ldl_t));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len * sizeof(ldl_t), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    ldl_t *mat_gpu = (ldl_t*)malloc(sizeof(ldl_t));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    ldl_t *mat_gpu = (ldl_t *)malloc(sizeof(ldl_t));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             int idx = gd->sbuf_start[i] + j;
             int offset = gd->sbuf_start[i];
             ldl_t *mat_cpu = _FIELD_AT_PTR(sendbuf_cpu, idx, 0);
             ldl_t *in_block = _FIELD_AT_PTR(sendbuf_gpu, offset, 0);
             read_strided_clover_ldl_gpu(mat_gpu, in_block, j, 0);
 
-            for (int comp = 0; comp < NF*(2*NF-1); ++comp) {
-                diff += creal((*mat_cpu).up[comp])-creal((*mat_gpu).up[comp]);
-                diff += cimag((*mat_cpu).up[comp])-cimag((*mat_gpu).up[comp]);
-                diff += creal((*mat_cpu).dn[comp])-creal((*mat_gpu).dn[comp]);
-                diff += cimag((*mat_cpu).dn[comp])-cimag((*mat_gpu).dn[comp]);
-            } 
+            for (int comp = 0; comp < NF * (2 * NF - 1); ++comp) {
+                diff += creal((*mat_cpu).up[comp]) - creal((*mat_gpu).up[comp]);
+                diff += cimag((*mat_cpu).up[comp]) - cimag((*mat_gpu).up[comp]);
+                diff += creal((*mat_cpu).dn[comp]) - creal((*mat_gpu).dn[comp]);
+                diff += cimag((*mat_cpu).dn[comp]) - cimag((*mat_gpu).dn[comp]);
+            }
         }
     }
     return_val += check_diff_norm_zero(diff);
@@ -641,13 +603,12 @@ int test_sync_identical_to_cpu_clover_ldl()
     return return_val;
 }
 
-int test_sync_identical_to_cpu_clover_term() 
-{
+int test_sync_identical_to_cpu_clover_term() {
     lprintf("INFO", 0, " ======= TEST CLOVER TERM ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
     // Setup fields on GPU
-    geometry_descriptor* gd = &glattice;
+    geometry_descriptor *gd = &glattice;
     int return_val = 0;
     suNfc_field *f = alloc_clover_term(gd);
     random_clover_term_cpu(f);
@@ -658,22 +619,20 @@ int test_sync_identical_to_cpu_clover_term()
     sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
-    sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
-    suNfc* sendbuf_cpu = (suNfc*)malloc(4*sendbuf_len*sizeof(suNfc));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNfc));
+    sync_field(f->type, 4 * sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
+    suNfc *sendbuf_cpu = (suNfc *)malloc(4 * sendbuf_len * sizeof(suNfc));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, 4 * sendbuf_len * sizeof(suNfc));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_clover_term_gpu(f);
-    suNfc* sendbuf_gpu = (suNfc*)malloc(4*sendbuf_len*sizeof(suNfc));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNfc), cudaMemcpyDeviceToHost);
+    suNfc *sendbuf_gpu = (suNfc *)malloc(4 * sendbuf_len * sizeof(suNfc));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4 * sendbuf_len * sizeof(suNfc), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNfc *mat_gpu = (suNfc*)malloc(sizeof(suNfc));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNfc *mat_gpu = (suNfc *)malloc(sizeof(suNfc));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             for (int mu = 0; mu < 4; ++mu) {
                 int idx = gd->sbuf_start[i] + j;
                 int offset = gd->sbuf_start[i];
@@ -681,11 +640,11 @@ int test_sync_identical_to_cpu_clover_term()
                 suNfc *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
                 read_strided_clover_term_gpu(mat_gpu, in_block, j, mu);
 
-                for (int comp = 0; comp < NG*NG; ++comp) {
-                    diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
-                    diff += cimag((*mat_cpu).c[comp])-cimag((*mat_gpu).c[comp]);
+                for (int comp = 0; comp < NG * NG; ++comp) {
+                    diff += creal((*mat_cpu).c[comp]) - creal((*mat_gpu).c[comp]);
+                    diff += cimag((*mat_cpu).c[comp]) - cimag((*mat_gpu).c[comp]);
                 }
-            }     
+            }
         }
     }
 
@@ -694,13 +653,12 @@ int test_sync_identical_to_cpu_clover_term()
     return return_val;
 }
 
-int test_sync_identical_to_cpu_clover_force() 
-{
+int test_sync_identical_to_cpu_clover_force() {
     lprintf("INFO", 0, " ======= TEST CLOVER FORCE ======= \n");
     lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
 
     // Setup fields on GPU
-    geometry_descriptor* gd = &glattice;
+    geometry_descriptor *gd = &glattice;
     int return_val = 0;
     suNf_field *f = alloc_clover_force(gd);
     random_clover_force_cpu(f);
@@ -711,22 +669,20 @@ int test_sync_identical_to_cpu_clover_force()
     sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
-    sync_field(f->type, 6*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
-    suNf* sendbuf_cpu = (suNf*)malloc(6*sendbuf_len*sizeof(suNf));
-    memcpy(sendbuf_cpu, f->sendbuf_ptr, 6*sendbuf_len*sizeof(suNf));
+    sync_field(f->type, 6 * sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
+    suNf *sendbuf_cpu = (suNf *)malloc(6 * sendbuf_len * sizeof(suNf));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, 6 * sendbuf_len * sizeof(suNf));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
     sync_clover_force_gpu(f);
-    suNf* sendbuf_gpu = (suNf*)malloc(6*sendbuf_len*sizeof(suNf));
-    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 6*sendbuf_len*sizeof(suNf), cudaMemcpyDeviceToHost);
+    suNf *sendbuf_gpu = (suNf *)malloc(6 * sendbuf_len * sizeof(suNf));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 6 * sendbuf_len * sizeof(suNf), cudaMemcpyDeviceToHost);
 
     // Iterate over the arrays and check
     double diff = 0.0;
-    suNf *mat_gpu = (suNf*)malloc(sizeof(suNf));
-    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
-    {
-        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
-        {
+    suNf *mat_gpu = (suNf *)malloc(sizeof(suNf));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
             for (int mu = 0; mu < 4; ++mu) {
                 int idx = gd->sbuf_start[i] + j;
                 int offset = gd->sbuf_start[i];
@@ -734,11 +690,11 @@ int test_sync_identical_to_cpu_clover_force()
                 suNf *in_block = _6FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
                 read_strided_clover_force_gpu(mat_gpu, in_block, j, mu);
 
-                for (int comp = 0; comp < NG*NG; ++comp) {
-                    diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
-                    diff += cimag((*mat_cpu).c[comp])-cimag((*mat_gpu).c[comp]);
+                for (int comp = 0; comp < NG * NG; ++comp) {
+                    diff += creal((*mat_cpu).c[comp]) - creal((*mat_gpu).c[comp]);
+                    diff += cimag((*mat_cpu).c[comp]) - cimag((*mat_gpu).c[comp]);
                 }
-            }     
+            }
         }
     }
 

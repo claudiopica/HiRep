@@ -12,22 +12,21 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 //rotated_corrs_gp.c
-typedef struct
-{
-  hr_complex ***g1_ij, ***g2_ij, ***g3_ij, ***g4_ij, *g1, *g2, *g3, *g4, **M;
+typedef struct {
+    hr_complex ***g1_ij, ***g2_ij, ***g3_ij, ***g4_ij, *g1, *g2, *g3, *g4, **M;
 
-  hr_complex *l11, *l12, *l13;
-  hr_complex *l21, *l22, *l23;
-  hr_complex *l31, *l32, *l33;
-  hr_complex *l41, *l42, *l43;
+    hr_complex *l11, *l12, *l13;
+    hr_complex *l21, *l22, *l23;
+    hr_complex *l31, *l32, *l33;
+    hr_complex *l41, *l42, *l43;
 
-  hr_complex ***l11_ij, ***l12_ij, ***l13_ij;
-  hr_complex ***l21_ij, ***l22_ij, ***l23_ij;
-  hr_complex ***l31_ij, ***l32_ij, ***l33_ij;
+    hr_complex ***l11_ij, ***l12_ij, ***l13_ij;
+    hr_complex ***l21_ij, ***l22_ij, ***l23_ij;
+    hr_complex ***l31_ij, ***l32_ij, ***l33_ij;
 } chisf_mem;
 
 chisf_mem *init_rotated_corr_mem(void);
@@ -70,10 +69,8 @@ void rotated_lXddm(chisf_mem *corr_mem, suNf_spinor *chi, spinor_field *prop_uu,
 void rotated_lXudm(chisf_mem *corr_mem, suNf_spinor *chi, spinor_field *prop_uu, spinor_field *prop_dd);
 void rotated_lXdum(chisf_mem *corr_mem, suNf_spinor *chi, spinor_field *prop_uu, spinor_field *prop_dd);
 
-
-
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //defined(BC_T_SF_ROTATED)
 #endif //ROTATED_CORRS_H

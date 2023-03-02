@@ -19,7 +19,7 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-   extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -126,7 +126,7 @@ hr_complex global_sum_gpu_complex(hr_complex *vector, int size);
 #endif
 
 #ifdef __cplusplus
-   }
+}
 #endif
 
-#endif 
+#endif

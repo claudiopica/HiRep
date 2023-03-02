@@ -8,12 +8,12 @@
 #include "suN_types.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 // suN_exp_group.c
 // SUN exp matrix
-extern void (*suNg_Exp)(suNg *u, suNg *Xin); //global function pointer to the correct implementation 
+extern void (*suNg_Exp)(suNg *u, suNg *Xin); //global function pointer to the correct implementation
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 void suNg_Exp_Taylor(suNg *u, suNg *Xin);
 
@@ -30,6 +30,6 @@ int project_to_suNg_real(suNg *out, suNg *in);
 #endif
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //SUN_MAT_UTILS_H

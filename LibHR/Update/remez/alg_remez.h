@@ -20,143 +20,134 @@
 #define JMAX 10000 //Maximum number of iterations of Newton's approximation
 #define SUM_MAX 10 // Maximum number of terms in exponential
 
-class AlgRemez
-{
- private:
-  char *cname;
+class AlgRemez {
+private:
+    char *cname;
 
-  // The approximation parameters
-  bigfloat *param, *roots, *poles;
-  bigfloat norm;
+    // The approximation parameters
+    bigfloat *param, *roots, *poles;
+    bigfloat norm;
 
-  // The numerator and denominator degree (n=d)
-  int n, d;
-  
-  // The bounds of the approximation
-  bigfloat apstrt, apwidt, apend;
+    // The numerator and denominator degree (n=d)
+    int n, d;
 
-  // the numerator and denominator of the power we are approximating
-  unsigned long power_num; 
-  unsigned long power_den;
+    // The bounds of the approximation
+    bigfloat apstrt, apwidt, apend;
 
-  // Flag to determine whether the arrays have been allocated
-  int alloc;
+    // the numerator and denominator of the power we are approximating
+    unsigned long power_num;
+    unsigned long power_den;
 
-  // Flag to determine whether the roots have been found
-  int foundRoots;
+    // Flag to determine whether the arrays have been allocated
+    int alloc;
 
-  // Variables used to calculate the approximation
-  int nd1, iter;
-  bigfloat *xx, *mm, *step;
-  bigfloat delta, spread, tolerance;
+    // Flag to determine whether the roots have been found
+    int foundRoots;
 
-  // The exponential summation coefficients
-  bigfloat *a;
-  int *a_power;
-  int a_length;
+    // Variables used to calculate the approximation
+    int nd1, iter;
+    bigfloat *xx, *mm, *step;
+    bigfloat delta, spread, tolerance;
 
-  // The number of equations we must solve at each iteration (n+d+1)
-  int neq;
+    // The exponential summation coefficients
+    bigfloat *a;
+    int *a_power;
+    int a_length;
 
-  // The precision of the GNU MP library
-  long prec;
+    // The number of equations we must solve at each iteration (n+d+1)
+    int neq;
 
-  // Initial values of maximal and minmal errors
-  void initialGuess();
+    // The precision of the GNU MP library
+    long prec;
 
-  // Solve the equations
-  void equations();
+    // Initial values of maximal and minmal errors
+    void initialGuess();
 
-  // Search for error maxima and minima
-  void search(bigfloat *step); 
+    // Solve the equations
+    void equations();
 
-  // Initialise step sizes
-  void stpini(bigfloat *step);
+    // Search for error maxima and minima
+    void search(bigfloat *step);
 
-  // Calculate the roots of the approximation
-  int root();
+    // Initialise step sizes
+    void stpini(bigfloat *step);
 
-  // Evaluate the polynomial
-  bigfloat polyEval(bigfloat x, bigfloat *poly, long size);
-  //complex_bf polyEval(complex_bf x, complex_bf *poly, long size);
+    // Calculate the roots of the approximation
+    int root();
 
-  // Evaluate the differential of the polynomial
-  bigfloat polyDiff(bigfloat x, bigfloat *poly, long size);
-  //complex_bf polyDiff(complex_bf x, complex_bf *poly, long size);
+    // Evaluate the polynomial
+    bigfloat polyEval(bigfloat x, bigfloat *poly, long size);
+    //complex_bf polyEval(complex_bf x, complex_bf *poly, long size);
 
-  // Newton's method to calculate roots
-  bigfloat rtnewt(bigfloat *poly, long i, bigfloat x1, bigfloat x2, bigfloat xacc);
-  //complex_bf rtnewt(complex_bf *poly, long i, bigfloat x1, bigfloat x2, bigfloat xacc);
+    // Evaluate the differential of the polynomial
+    bigfloat polyDiff(bigfloat x, bigfloat *poly, long size);
+    //complex_bf polyDiff(complex_bf x, complex_bf *poly, long size);
 
-  // Evaluate the partial fraction expansion of the rational function
-  // with res roots and poles poles.  Result is overwritten on input
-  // arrays.
-  void pfe(bigfloat *res, bigfloat* poles, bigfloat norm);
+    // Newton's method to calculate roots
+    bigfloat rtnewt(bigfloat *poly, long i, bigfloat x1, bigfloat x2, bigfloat xacc);
+    //complex_bf rtnewt(complex_bf *poly, long i, bigfloat x1, bigfloat x2, bigfloat xacc);
 
-  // Calculate function required for the approximation
-  bigfloat func(bigfloat x);
+    // Evaluate the partial fraction expansion of the rational function
+    // with res roots and poles poles.  Result is overwritten on input
+    // arrays.
+    void pfe(bigfloat *res, bigfloat *poles, bigfloat norm);
 
-  // Compute size and sign of the approximation error at x
-  bigfloat getErr(bigfloat x, int *sign);
+    // Calculate function required for the approximation
+    bigfloat func(bigfloat x);
 
-  // Solve the system AX=B
-  int simq(bigfloat *A, bigfloat *B, bigfloat *X, int n);
+    // Compute size and sign of the approximation error at x
+    bigfloat getErr(bigfloat x, int *sign);
 
-  // Free memory and reallocate as necessary
-  void allocate(int num_degree, int den_degree);
+    // Solve the system AX=B
+    int simq(bigfloat *A, bigfloat *B, bigfloat *X, int n);
 
-  // Evaluate the rational form P(x)/Q(x) using coefficients from the
-  // solution vector param
-  bigfloat approx(bigfloat x);
+    // Free memory and reallocate as necessary
+    void allocate(int num_degree, int den_degree);
 
- public:
-  
-  // Constructor
-  AlgRemez(double lower, double upper, long prec);
+    // Evaluate the rational form P(x)/Q(x) using coefficients from the
+    // solution vector param
+    bigfloat approx(bigfloat x);
 
-  // Destructor
-  virtual ~AlgRemez();
+public:
+    // Constructor
+    AlgRemez(double lower, double upper, long prec);
 
-  // Reset the bounds of the approximation
-  void setBounds(double lower, double upper);
+    // Destructor
+    virtual ~AlgRemez();
 
-  // Generate the rational approximation x^(pnum/pden)
-  double generateApprox(int num_degree, int den_degree, 
-			unsigned long power_num, unsigned long power_den, 
-			bigfloat *dmm, int a_len, double* a_param, int* a_pow);
-  double generateApprox(int num_degree, int den_degree, 
-			unsigned long power_num, unsigned long power_den, bigfloat *dmm=0);
-  double generateApprox(int degree, unsigned long power_num, 
-			unsigned long power_den, bigfloat *dmm=0);
+    // Reset the bounds of the approximation
+    void setBounds(double lower, double upper);
 
-	void getMM(bigfloat *dmm);
+    // Generate the rational approximation x^(pnum/pden)
+    double generateApprox(int num_degree, int den_degree, unsigned long power_num, unsigned long power_den, bigfloat *dmm,
+                          int a_len, double *a_param, int *a_pow);
+    double generateApprox(int num_degree, int den_degree, unsigned long power_num, unsigned long power_den, bigfloat *dmm = 0);
+    double generateApprox(int degree, unsigned long power_num, unsigned long power_den, bigfloat *dmm = 0);
 
-  // Return the partial fraction expansion of the approximation x^(pnum/pden)
-  int getPFE(double *Res, double *Pole, double *Norm);
+    void getMM(bigfloat *dmm);
 
-  // Return the partial fraction expansion of the approximation x^(-pnum/pden)
-  int getIPFE(double *Res, double *Pole, double *Norm);
+    // Return the partial fraction expansion of the approximation x^(pnum/pden)
+    int getPFE(double *Res, double *Pole, double *Norm);
 
-  // Return the poles and roots of the approximation x^(pnum/pden)
-  int getPR(double *Root, double *Pole, double *Norm);
+    // Return the partial fraction expansion of the approximation x^(-pnum/pden)
+    int getIPFE(double *Res, double *Pole, double *Norm);
 
-  // Evaluate the rational form P(x)/Q(x) using coefficients from the
-  // solution vector param
-  double evaluateApprox(double x);
+    // Return the poles and roots of the approximation x^(pnum/pden)
+    int getPR(double *Root, double *Pole, double *Norm);
 
-  // Evaluate the rational form Q(x)/P(x) using coefficients from the
-  // solution vector param
-  double evaluateInverseApprox(double x);
+    // Evaluate the rational form P(x)/Q(x) using coefficients from the
+    // solution vector param
+    double evaluateApprox(double x);
 
-  // Calculate function required for the approximation
-  double evaluateFunc(double x);
+    // Evaluate the rational form Q(x)/P(x) using coefficients from the
+    // solution vector param
+    double evaluateInverseApprox(double x);
 
-  // Calculate inverse function required for the approximation
-  double evaluateInverseFunc(double x);
+    // Calculate function required for the approximation
+    double evaluateFunc(double x);
 
+    // Calculate inverse function required for the approximation
+    double evaluateInverseFunc(double x);
 };
 
-#endif  // Include guard
-
-
-
+#endif // Include guard

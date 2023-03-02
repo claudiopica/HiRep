@@ -25,72 +25,64 @@ hmc_flow flow = init_hmc_flow(flow);
 ### this might have to be changed  if update_ghmc is modified.
 */
 
-void clover_field_copy(suNf_field *g1, suNf_field *g2)
-{
+void clover_field_copy(suNf_field *g1, suNf_field *g2) {
 #ifdef CHECK_SPINOR_MATCHING
-  _TWO_SPINORS_MATCHING(g1, g2);
+    _TWO_SPINORS_MATCHING(g1, g2);
 #endif
-  memcpy(g1->ptr, g2->ptr, 6 * g1->type->gsize_gauge * sizeof(*(g1->ptr)));
+    memcpy(g1->ptr, g2->ptr, 6 * g1->type->gsize_gauge * sizeof(*(g1->ptr)));
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
+    int return_value = 0;
+    logger_map("DEBUG", "debug");
 
-  int return_value = 0;
-  logger_map("DEBUG", "debug");
+    setup_process(&argc, &argv);
+    setup_gauge_fields();
 
-  setup_process(&argc, &argv);
-  setup_gauge_fields();
-
-  /* Init Monte Carlo */
-  init_mc_ghmc(&flow, get_input_filename());
+    /* Init Monte Carlo */
+    init_mc_ghmc(&flow, get_input_filename());
 
 #ifdef WITH_EXPCLOVER
-  // This is the check of the exponential clover term
+    // This is the check of the exponential clover term
 
-  spinor_field *Xl = alloc_spinor_field_f(1, &glattice);
-  spinor_field *Yl = alloc_spinor_field_f(1, &glattice);
+    spinor_field *Xl = alloc_spinor_field_f(1, &glattice);
+    spinor_field *Yl = alloc_spinor_field_f(1, &glattice);
 
-  create_z2_volume_source(Xl);
-  create_z2_volume_source(Yl);
+    create_z2_volume_source(Xl);
+    create_z2_volume_source(Yl);
 
-  fermion_force_begin();
-  force_clover_fermion_taylor(Xl, Yl, 1.0);
+    fermion_force_begin();
+    force_clover_fermion_taylor(Xl, Yl, 1.0);
 
-  suNf_field *cl_force2;
-  cl_force2 = alloc_clover_force(&glattice);
-  clover_field_copy(cl_force2, cl_force);
+    suNf_field *cl_force2;
+    cl_force2 = alloc_clover_force(&glattice);
+    clover_field_copy(cl_force2, cl_force);
 
-  fermion_force_begin();
-  force_clover_fermion(Xl, Yl, 1.0);
+    fermion_force_begin();
+    force_clover_fermion(Xl, Yl, 1.0);
 
-  hr_complex aux;
-  double norm = 0.;
+    hr_complex aux;
+    double norm = 0.;
 
-  _MASTER_FOR(&glattice, ix)
-  {
-    for (int mu = 0; mu < 6; mu++)
-    {
-      for (int i = 0; i < NF * NF; i++)
-      {
+    _MASTER_FOR(&glattice, ix) {
+        for (int mu = 0; mu < 6; mu++) {
+            for (int i = 0; i < NF * NF; i++) {
+                aux = (_6FIELD_AT(cl_force2, ix, mu))->c[i] - (_6FIELD_AT(cl_force, ix, mu))->c[i];
 
-        aux = (_6FIELD_AT(cl_force2, ix, mu))->c[i] - (_6FIELD_AT(cl_force, ix, mu))->c[i];
-
-        norm += (creal(aux) * creal(aux) + cimag(aux) * cimag(aux));
-      }
+                norm += (creal(aux) * creal(aux) + cimag(aux) * cimag(aux));
+            }
+        }
     }
-  }
 
-  lprintf("TEST CLOVER FORCE", 0, "Difference = %2.20e \n", sqrt(norm / GLB_T / GLB_X / GLB_X / GLB_X / 6 / NF / NF / 2));
+    lprintf("TEST CLOVER FORCE", 0, "Difference = %2.20e \n", sqrt(norm / GLB_T / GLB_X / GLB_X / GLB_X / 6 / NF / NF / 2));
 
-  if (sqrt(norm / (VOLUME*6.0* NF * NF)) > 1e-14)
-  {
-    lprintf("TEST CLOVER FORCE", 0, "FAILED!!! Precision is not enough.  \n");
-    return_value += 1;
-  }
+    if (sqrt(norm / (VOLUME * 6.0 * NF * NF)) > 1e-14) {
+        lprintf("TEST CLOVER FORCE", 0, "FAILED!!! Precision is not enough.  \n");
+        return_value += 1;
+    }
 
 #endif
 
-  finalize_process();
-  return return_value;
+    finalize_process();
+    return return_value;
 }

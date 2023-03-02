@@ -16,24 +16,18 @@
 #include "Geometry/geometry_descriptor.h"
 #include "suN_types.h"
 #ifdef WITH_MPI
-	#include "hr_mpi.h"
+#include "hr_mpi.h"
 #endif
 
 /* Communications */
-typedef enum comm_t {
-  CPU_COMM = 1<<0,
-  GPU_COMM = 1<<1
-} comm_t;
+typedef enum comm_t { CPU_COMM = 1 << 0, GPU_COMM = 1 << 1 } comm_t;
 #define ALL_COMMS (CPU_COMM | GPU_COMM)
 
 /* Memory */
-typedef enum mem_t {
-  CPU_MEM = 1<<0,
-  GPU_MEM = 1<<1
-} mem_t;
+typedef enum mem_t { CPU_MEM = 1 << 0, GPU_MEM = 1 << 1 } mem_t;
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 /**
@@ -45,9 +39,9 @@ typedef enum mem_t {
  */
 #define _GPU_FIELD_DATA(_type)
 #ifdef WITH_GPU
-	#undef _GPU_FIELD_DATA
-	#define _GPU_FIELD_DATA(_type) _type *gpu_ptr;
-#endif 
+#undef _GPU_FIELD_DATA
+#define _GPU_FIELD_DATA(_type) _type *gpu_ptr;
+#endif
 
 /**
  * @brief This macro corresponds to a field declaration line to be used
@@ -56,15 +50,15 @@ typedef enum mem_t {
  */
 #define _MPI_FIELD_DATA(_type)
 #ifdef WITH_MPI
-	#undef _MPI_FIELD_DATA
-	#define _MPI_FIELD_DATA(_type) \
-		MPI_Request *comm_req; \
-		_type *sendbuf_ptr; \
-		_type *sendbuf_gpu_ptr; \
-		_type *recvbuf_gpu_ptr;
+#undef _MPI_FIELD_DATA
+#define _MPI_FIELD_DATA(_type) \
+    MPI_Request *comm_req;     \
+    _type *sendbuf_ptr;        \
+    _type *sendbuf_gpu_ptr;    \
+    _type *recvbuf_gpu_ptr;
 
-		//
-#endif 
+//
+#endif
 
 /**
  * @brief This macro declares a field struct that contains all necessary 
@@ -73,17 +67,15 @@ typedef enum mem_t {
  * @param _name The name of the field type
  * @param _type The elementary type struct of data stored at each site/link.
  */
-#define _DECLARE_FIELD_STRUCT(_name,_type) \
-	typedef struct _name\
-	{ \
-		_type *ptr; \
-		geometry_descriptor *type; \
-		_MPI_FIELD_DATA(_type) \
-		_GPU_FIELD_DATA(_type) \
-		comm_t comm_type; \
-		mem_t alloc_t; \
-	} _name
-
+#define _DECLARE_FIELD_STRUCT(_name, _type) \
+    typedef struct _name {                  \
+        _type *ptr;                         \
+        geometry_descriptor *type;          \
+        _MPI_FIELD_DATA(_type)              \
+        _GPU_FIELD_DATA(_type)              \
+        comm_t comm_type;                   \
+        mem_t alloc_t;                      \
+    } _name
 
 /**
  * @struct suNg_field
@@ -259,6 +251,6 @@ _DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
 _DECLARE_FIELD_STRUCT(suNfc_field, suNfc);
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif

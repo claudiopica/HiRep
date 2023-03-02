@@ -6,24 +6,24 @@
 #ifndef MAT_UTILS_H
 #define MAT_UTILS_H
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
-//inv_Cmplx_Ng.c 
+//inv_Cmplx_Ng.c
 #ifndef GAUGE_SON
 void ludcmp(hr_complex *a, int *indx, double *d, int N);
 void lubksb(hr_complex *a, int *indx, hr_complex *b, int N);
 void inv_Cmplx_Ng(suNg *a);
 #endif
 
-//det_Cmplx_Ng.c 
+//det_Cmplx_Ng.c
 #ifndef GAUGE_SON
 void det_Cmplx_Ng(hr_complex *res, suNg *a);
 #else
 void det_Cmplx_Ng(double *res, suNg *a);
 #endif
 
-//diag_hmat.c 
+//diag_hmat.c
 #ifdef GAUGE_SON
 void tridiagonalize(suNg *hmat, double *diag, double *roffdiag);
 void tridiagonalize(suNg *hmat, double *diag, double *roffdiag);
@@ -37,8 +37,7 @@ void diag_hmat(suNg *hmat, double *diag);
 void diag_hmat(suNg *hmat, double *dag);
 #endif
 
-
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //MAT_UTILS_H

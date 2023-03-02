@@ -11,49 +11,51 @@ int fulltorcheck(int rotid, hr_complex *rotated, hr_complex *unrotated);
 
 static hr_complex **polyf;
 
-static void all_g_op(hr_complex *pa)
-{
+static void all_g_op(hr_complex *pa) {
     suNg_field *_u = u_gauge_wrk();
     start_sendrecv_gfield(_u);
     complete_sendrecv_gfield(_u);
 
     int i;
 
-    for (i = 0; i < total_n_glue_op; i++)
+    for (i = 0; i < total_n_glue_op; i++) {
         pa[i] = 0.;
+    }
 
-    for (i = 0; i < n_active_slices; i++)
+    for (i = 0; i < n_active_slices; i++) {
         eval_all_glueball_ops(active_slices_list[i], pa);
+    }
 
-    for (i = 0; i < total_n_glue_op; i++)
+    for (i = 0; i < total_n_glue_op; i++) {
         pa[i] /= n_active_slices * NP_T;
+    }
 
     global_sum((double *)(pa), 2 * total_n_glue_op);
 }
 
-static void all_t_op(hr_complex *pa)
-{
+static void all_t_op(hr_complex *pa) {
     suNg_field *_u = u_gauge_wrk();
     start_sendrecv_gfield(_u);
     complete_sendrecv_gfield(_u);
 
     int i;
 
-    for (i = 0; i < total_n_tor_op; i++)
+    for (i = 0; i < total_n_tor_op; i++) {
         pa[i] = 0.;
+    }
 
-    for (i = 0; i < n_active_slices; i++)
+    for (i = 0; i < n_active_slices; i++) {
         eval_all_torellon_ops(active_slices_list[i], pa, polyf);
+    }
 
-    for (i = 0; i < total_n_tor_op; i++)
+    for (i = 0; i < total_n_tor_op; i++) {
         pa[i] /= n_active_slices * NP_T;
+    }
 
     global_sum((double *)(pa), 2 * total_n_tor_op);
 }
 
-int main(int argc, char *argv[])
-{
-
+int main(int argc, char *argv[]) {
     int return_value = 0;
     int idx_wrk;
     hr_complex *op, *rop;
@@ -90,11 +92,12 @@ int main(int argc, char *argv[])
     space_rotations = direct_spatial_rotations();
     inverse_space_rotations = inverse_spatial_rotations();
 
-    lprintf("MAIN", 0, "Resetting and initializing (rotating) workspace gauge field once for each of the 48 cubic rotations\n\n");
+    lprintf("MAIN", 0,
+            "Resetting and initializing (rotating) workspace gauge field once for each of the 48 cubic rotations\n\n");
 
-    for (j = 0; j < 48; j++)
-    {
-        lprintf("MAIN", 0, "Rotation %d  %d->%d   %d->%d   %d->%d   %d->%d\n", j, 0, space_rotations[j][0], 1, space_rotations[j][1], 2, space_rotations[j][2], 3, space_rotations[j][3]);
+    for (j = 0; j < 48; j++) {
+        lprintf("MAIN", 0, "Rotation %d  %d->%d   %d->%d   %d->%d   %d->%d\n", j, 0, space_rotations[j][0], 1,
+                space_rotations[j][1], 2, space_rotations[j][2], 3, space_rotations[j][3]);
 
         assign_spatial_rotated_wrkspace(inverse_space_rotations[j], idx_wrk);
 
@@ -106,10 +109,9 @@ int main(int argc, char *argv[])
 
         global_sum_int(&ret, 1);
 
-        if (ret == 0)
+        if (ret == 0) {
             lprintf("MAIN", 0, "active - passive rotation  %d: Pass\n", j);
-        else
-        {
+        } else {
             lprintf("MAIN", 0, "active - passive rotation  %d: Fail\n", j);
             return_value += ret;
         }
@@ -125,11 +127,12 @@ int main(int argc, char *argv[])
     all_t_op(op);
     lprintf("MAIN", 0, "done.\n\n");
 
-    lprintf("MAIN", 0, "Resetting and initializing (rotating) workspace gauge field once for each of the 48 cubic rotations\n\n");
+    lprintf("MAIN", 0,
+            "Resetting and initializing (rotating) workspace gauge field once for each of the 48 cubic rotations\n\n");
 
-    for (j = 0; j < 48; j++)
-    {
-        lprintf("MAIN", 0, "Rotation %d  %d->%d   %d->%d   %d->%d   %d->%d\n", j, 0, space_rotations[j][0], 1, space_rotations[j][1], 2, space_rotations[j][2], 3, space_rotations[j][3]);
+    for (j = 0; j < 48; j++) {
+        lprintf("MAIN", 0, "Rotation %d  %d->%d   %d->%d   %d->%d   %d->%d\n", j, 0, space_rotations[j][0], 1,
+                space_rotations[j][1], 2, space_rotations[j][2], 3, space_rotations[j][3]);
 
         assign_spatial_rotated_wrkspace(inverse_space_rotations[j], idx_wrk);
 
@@ -141,10 +144,9 @@ int main(int argc, char *argv[])
 
         global_sum_int(&ret, 1);
 
-        if (ret == 0)
+        if (ret == 0) {
             lprintf("MAIN", 0, "active - passive rotation  %d: Pass\n", j);
-        else
-        {
+        } else {
             lprintf("MAIN", 0, "active - passive rotation  %d: Fail\n", j);
             return_value += ret;
         }

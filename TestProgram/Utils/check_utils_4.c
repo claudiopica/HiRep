@@ -8,10 +8,8 @@
 
 static suNg_field *g;
 
-static void random_g(void)
-{
-    _MASTER_FOR(&glattice, ix)
-    {
+static void random_g(void) {
+    _MASTER_FOR(&glattice, ix) {
         random_suNg(_FIELD_AT(g, ix));
     }
 
@@ -19,13 +17,10 @@ static void random_g(void)
     complete_sendrecv_gtransf(g);
 }
 
-static void transform_u(void)
-{
-    _MASTER_FOR(&glattice, ix)
-    {
+static void transform_u(void) {
+    _MASTER_FOR(&glattice, ix) {
         suNg v;
-        for (int mu = 0; mu < 4; mu++)
-        {
+        for (int mu = 0; mu < 4; mu++) {
             int iy = iup(ix, mu);
             suNg *u = pu_gauge(ix, mu);
             _suNg_times_suNg_dagger(v, *u, *_FIELD_AT(g, iy));
@@ -38,28 +33,23 @@ static void transform_u(void)
     // smear_gauge_field();
 }
 
-static hr_complex spat_avr_0pp_wrk()
-{
+static hr_complex spat_avr_0pp_wrk() {
     static hr_complex pa, tmp;
     suNg_field *_u = u_gauge_wrk();
     start_sendrecv_gfield(_u);
 
-    _OMP_PRAGMA(single)
-    {
+    _OMP_PRAGMA(single) {
         pa = tmp = 0.;
     }
 
-    _PIECE_FOR(&glattice, ixp)
-    {
-        if (ixp == glattice.inner_master_pieces)
-        {
+    _PIECE_FOR(&glattice, ixp) {
+        if (ixp == glattice.inner_master_pieces) {
             _OMP_PRAGMA(master)
             /* wait for gauge field to be transfered */
             complete_sendrecv_gfield(_u);
             _OMP_PRAGMA(barrier)
         }
-        _SITE_FOR_SUM(&glattice, ixp, ix, pa)
-        {
+        _SITE_FOR_SUM(&glattice, ixp, ix, pa) {
             cplaq_wrk(&tmp, ix, 1, 2);
             pa += tmp;
             cplaq_wrk(&tmp, ix, 2, 1);
@@ -86,13 +76,10 @@ static hr_complex spat_avr_0pp_wrk()
     return pa;
 }
 
-int main(int argc, char *argv[])
-{
-
+int main(int argc, char *argv[]) {
     int return_value = 0;
     hr_complex Zeropp[2];
     double dop;
-
 
     double smear_par = 0.8;
 
@@ -109,13 +96,13 @@ int main(int argc, char *argv[])
     start_sendrecv_gfield(u_gauge);
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n\n");
-  
+
     lprintf("MAIN", 0, "Requesting, one workspace... ");
     reserve_wrk_space();
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Smearing the gauge field of the workspace... ");
-    spatial_APE_smear_wrkspace(&smear_par,-1);
+    spatial_APE_smear_wrkspace(&smear_par, -1);
     lprintf("MAIN", 0, "done.\n\n");
 
     Zeropp[0] = spat_avr_0pp_wrk();
@@ -126,23 +113,20 @@ int main(int argc, char *argv[])
 
     lprintf("MAIN", 0, "done.\n\n");
 
-
     lprintf("MAIN", 0, "Smearing the gauge field of the workspace... ");
-    spatial_APE_smear_wrkspace(&smear_par,-1);
+    spatial_APE_smear_wrkspace(&smear_par, -1);
     lprintf("MAIN", 0, "done.\n\n");
 
     Zeropp[1] = spat_avr_0pp_wrk();
 
     Zeropp[0] -= Zeropp[1];
-    
 
     dop = sqrt(_complex_prod_re(Zeropp[0], Zeropp[0]));
 
     lprintf("MAIN", 0, "Checking gauge invariance of the spatial 0pp on smeared configurations.\n ");
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", dop);
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (dop > 10.e-14)
-        return_value++;
+    if (dop > 10.e-14) { return_value++; }
 
     finalize_process();
     return return_value;

@@ -10,7 +10,7 @@
 // They are parametrized over the input types for double/single precision
 // The template is in TMPL/linear_algebra.c.tmpl
 
-// double precision 
+// double precision
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _SPINOR_TYPE suNf_spinor
 #define _REAL double
@@ -18,7 +18,7 @@
 #define _SUFFIX _f
 #include "TMPL/linear_algebra.c.tmpl"
 
-// single precision 
+// single precision
 #define _SPINOR_FIELD_TYPE spinor_field_flt
 #define _SPINOR_TYPE suNf_spinor_flt
 #define _REAL float

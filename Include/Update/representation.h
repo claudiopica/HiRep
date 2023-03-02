@@ -10,15 +10,15 @@
 #include "suN_repr_func.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
-void _group_represent2(suNf* v, suNg *u);
-void _group_represent2_flt(suNf_flt* v, suNg_flt *u);
+void _group_represent2(suNf *v, suNg *u);
+void _group_represent2_flt(suNf_flt *v, suNg_flt *u);
 void represent_gauge_field();
 //void represent_gauge_field_measure(); //TODO: not defined in libhr
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif

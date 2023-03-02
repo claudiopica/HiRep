@@ -15,57 +15,45 @@ static input_WF WF_var = init_input_WF(WF_var);
 
 static input_poly poly_var = init_input_poly(poly_var);
 
-static void mk_gconf_name(char *name, pg_flow_ml *gf, int id)
-{
-    sprintf(name, "%s_%dx%dx%dx%dnc%db%.6fan%.6fn%d",
-            gf->run_name, GLB_T, GLB_X, GLB_Y, GLB_Z, NG,
-            gf->pg_v->beta, gf->pg_v->anisotropy, id);
+static void mk_gconf_name(char *name, pg_flow_ml *gf, int id) {
+    sprintf(name, "%s_%dx%dx%dx%dnc%db%.6fan%.6fn%d", gf->run_name, GLB_T, GLB_X, GLB_Y, GLB_Z, NG, gf->pg_v->beta,
+            gf->pg_v->anisotropy, id);
 }
 
-static char *add_dirname(char *dirname, char *filename)
-{
+static char *add_dirname(char *dirname, char *filename) {
     static char buf[256];
     strcpy(buf, dirname);
     return strcat(buf, filename);
 }
 
-static void slower(char *str)
-{
-    while (*str)
-    {
+static void slower(char *str) {
+    while (*str) {
         *str = (char)(tolower(*str));
         ++str;
     }
 }
 
-static int parse_gstart(pg_flow_ml *gf)
-{
-
+static int parse_gstart(pg_flow_ml *gf) {
     int t, x, y, z, ng;
     double beta;
     double anisotropy;
     int ret = 0;
     char buf[256];
 
-    ret = sscanf(gf->g_start, "%[^_]_%dx%dx%dx%dnc%db%lfan%lfn%d",
-                 buf, &t, &x, &y, &z, &ng, &beta, &anisotropy, &gf->start);
+    ret = sscanf(gf->g_start, "%[^_]_%dx%dx%dx%dnc%db%lfan%lfn%d", buf, &t, &x, &y, &z, &ng, &beta, &anisotropy, &gf->start);
 
-    if (ret == 9)
-    { /* we have a correct file name */
+    if (ret == 9) { /* we have a correct file name */
         /* increase gf->start: this will be the first conf id */
         gf->start++;
 
         /* do some check */
-        if (t != GLB_T || x != GLB_X || y != GLB_Y || z != GLB_Z)
-        {
+        if (t != GLB_T || x != GLB_X || y != GLB_Y || z != GLB_Z) {
             lprintf("WARNING", 0, "Size read from config name (%d,%d,%d,%d) is different from the lattice size!\n", t, x, y, z);
         }
-        if (ng != NG)
-        {
+        if (ng != NG) {
             lprintf("WARNING", 0, "Gauge group read from config name (NG=%d) is not the one used in this code!\n", ng);
         }
-        if (strcmp(buf, gf->run_name) != 0)
-        {
+        if (strcmp(buf, gf->run_name) != 0) {
             lprintf("WARNING", 0, "Run name [%s] doesn't match conf name [%s]!\n", gf->run_name, buf);
         }
 
@@ -80,14 +68,12 @@ static int parse_gstart(pg_flow_ml *gf)
     strcpy(buf, gf->g_start);
     slower(buf);
     ret = strcmp(buf, "unit");
-    if (ret == 0)
-    {
+    if (ret == 0) {
         lprintf("FLOW", 0, "Starting a new run from a unit conf!\n");
         return 1;
     }
     ret = strcmp(buf, "random");
-    if (ret == 0)
-    {
+    if (ret == 0) {
         lprintf("FLOW", 0, "Starting a new run from a random conf!\n");
         return 2;
     }
@@ -98,30 +84,22 @@ static int parse_gstart(pg_flow_ml *gf)
     return -1;
 }
 
-static int parse_lastconf(pg_flow_ml *gf)
-{
-
+static int parse_lastconf(pg_flow_ml *gf) {
     int ret = 0;
     int addtostart = 0;
 
-    if (gf->last_conf[0] == '+')
-    {
-        addtostart = 1;
-    }
-    if (addtostart)
-    {
+    if (gf->last_conf[0] == '+') { addtostart = 1; }
+    if (addtostart) {
         ret = sscanf(gf->last_conf, "+%d", &(gf->end));
-    }
-    else
-    {
+    } else {
         ret = sscanf(gf->last_conf, "%d", &(gf->end));
     }
-    if (ret == 1)
-    {
-        if (addtostart)
+    if (ret == 1) {
+        if (addtostart) {
             gf->end += gf->start;
-        else
+        } else {
             gf->end++;
+        }
         return 0;
     }
 
@@ -131,15 +109,13 @@ static int parse_lastconf(pg_flow_ml *gf)
     return -1;
 }
 
-static void parse_ml_corellator_def()
-{
+static void parse_ml_corellator_def() {
     char sep[2] = ",";
     char *token;
     /* get the first token */
     token = strtok(pg_var_ml.cml_niteration, sep);
     /* walk through other tokens */
-    for (int i = 0; i < pg_var_ml.ml_levels; i++)
-    {
+    for (int i = 0; i < pg_var_ml.ml_levels; i++) {
         error(token == NULL, 1, "init_mc_ml " __FILE__, "Missing one level of number of iterartions");
         pg_var_ml.ml_niteration[i] = atoi(token);
 
@@ -148,15 +124,15 @@ static void parse_ml_corellator_def()
 
     token = strtok(pg_var_ml.cml_nskip, sep);
     /* walk through other tokens */
-    for (int i = 0; i < pg_var_ml.ml_levels; i++)
-    {
+    for (int i = 0; i < pg_var_ml.ml_levels; i++) {
         error(token == NULL, 1, "init_mc_ml " __FILE__, "Missing one level of skip iterartions");
         pg_var_ml.ml_nskip[i] = atoi(token);
         token = strtok(NULL, sep);
     }
     lprintf("INIT ML", 0, "number of MultiLevels=%d\n", pg_var_ml.ml_levels);
-    for (int i = 0; i < pg_var_ml.ml_levels; i++)
+    for (int i = 0; i < pg_var_ml.ml_levels; i++) {
         lprintf("INIT ML", 0, "lev %d nup=%d nskip=%d\n", i, pg_var_ml.ml_niteration[i], pg_var_ml.ml_nskip[i]);
+    }
 
     strncpy(sep, ",", 2);
     char sep2[2] = "|";
@@ -172,12 +148,9 @@ static void parse_ml_corellator_def()
     strncpy(tmp, pg_var_ml.cml_corrs, 2048);
     token = strtok_r(tmp, sep, &saveptr1);
 
-    do
-    {
-
+    do {
         token2 = strtok_r(token, sep2, &saveptr2);
-        do
-        {
+        do {
             j++;
             token2 = strtok_r(NULL, sep2, &saveptr2);
         } while (token2 != NULL);
@@ -198,14 +171,13 @@ static void parse_ml_corellator_def()
     int k, l, dt;
     i = 0;
     j = 0;
-    do
-    {
+    do {
         k = 0;
         token2 = strtok_r(token, sep2, &saveptr2);
-        do
-        {
+        do {
             pg_var_ml.corrs.list[j].id = i;
-            error(sscanf(token2, "%d-%d", &(pg_var_ml.corrs.list[j].t1), &(pg_var_ml.corrs.list[j].t2)) != 2, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlators ");
+            error(sscanf(token2, "%d-%d", &(pg_var_ml.corrs.list[j].t1), &(pg_var_ml.corrs.list[j].t2)) != 2, 1,
+                  "init_mc_ml " __FILE__, "Badly formatted ML correlators ");
 
             k++;
             j++;
@@ -214,12 +186,14 @@ static void parse_ml_corellator_def()
 
         dt = pg_var_ml.corrs.list[j - 1].t2 - pg_var_ml.corrs.list[j - 1].t1;
 
-        for (l = 0; l < k; l++)
-        {
-            error(pg_var_ml.corrs.list[j - 1 - l].t2 - pg_var_ml.corrs.list[j - 1 - l].t1 != dt, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (different dt)");
+        for (l = 0; l < k; l++) {
+            error(pg_var_ml.corrs.list[j - 1 - l].t2 - pg_var_ml.corrs.list[j - 1 - l].t1 != dt, 1, "init_mc_ml " __FILE__,
+                  "Badly formatted ML correlator (different dt)");
 
-            error(pg_var_ml.corrs.list[j - 1 - l].t1 < 0 || pg_var_ml.corrs.list[j - 1 - l].t1 >= GLB_T / 2 - 1, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (t1 out of bound)");
-            error(pg_var_ml.corrs.list[j - 1 - l].t2 < GLB_T / 2 || pg_var_ml.corrs.list[j - 1 - l].t2 >= GLB_T, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (t2 out of bound)");
+            error(pg_var_ml.corrs.list[j - 1 - l].t1 < 0 || pg_var_ml.corrs.list[j - 1 - l].t1 >= GLB_T / 2 - 1, 1,
+                  "init_mc_ml " __FILE__, "Badly formatted ML correlator (t1 out of bound)");
+            error(pg_var_ml.corrs.list[j - 1 - l].t2 < GLB_T / 2 || pg_var_ml.corrs.list[j - 1 - l].t2 >= GLB_T, 1,
+                  "init_mc_ml " __FILE__, "Badly formatted ML correlator (t2 out of bound)");
 
             pg_var_ml.corrs.list[j - 1 - l].n_pairs = k;
         }
@@ -228,29 +202,28 @@ static void parse_ml_corellator_def()
     } while (token != NULL);
 
     int tlist[GLB_T];
-    for (l = 0; l < GLB_T; l++)
+    for (l = 0; l < GLB_T; l++) {
         tlist[l] = 0;
-
-    for (l = 0; l < pg_var_ml.corrs.n_entries; l++)
-    {
-        tlist[pg_var_ml.corrs.list[l].t1] = tlist[pg_var_ml.corrs.list[l].t2] = 1;
-        lprintf("INIT ML", 0, " Cor Id=%d size=%d  pairs=(%d %d)\n", pg_var_ml.corrs.list[l].id, pg_var_ml.corrs.list[l].n_pairs, pg_var_ml.corrs.list[l].t1, pg_var_ml.corrs.list[l].t2);
     }
 
-    for (l = 0; l < GLB_T; l++)
-    {
-        if (tlist[l] != 0)
-        {
-            if ((l + 1) % (GLB_T / (1 << (pg_var_ml.ml_levels))) == 0)
+    for (l = 0; l < pg_var_ml.corrs.n_entries; l++) {
+        tlist[pg_var_ml.corrs.list[l].t1] = tlist[pg_var_ml.corrs.list[l].t2] = 1;
+        lprintf("INIT ML", 0, " Cor Id=%d size=%d  pairs=(%d %d)\n", pg_var_ml.corrs.list[l].id,
+                pg_var_ml.corrs.list[l].n_pairs, pg_var_ml.corrs.list[l].t1, pg_var_ml.corrs.list[l].t2);
+    }
+
+    for (l = 0; l < GLB_T; l++) {
+        if (tlist[l] != 0) {
+            if ((l + 1) % (GLB_T / (1 << (pg_var_ml.ml_levels))) == 0) {
                 lprintf("INIT ML", 0, "Warning the correlator's point %d is measured on a frozen slice\n", l);
+            }
         }
     }
 
     initialize_spatial_active_slices(tlist);
 }
 
-int init_mc_ml(pg_flow_ml *gf, char *ifile)
-{
+int init_mc_ml(pg_flow_ml *gf, char *ifile) {
     int start_t;
 
     strcpy(gf->g_start, "invalid");
@@ -276,15 +249,15 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     parse_ml_corellator_def();
 
-    lprintf("INIT ML", 0, "Blocking iteration on the observables (start/end)=(%d/%d)\n", pg_var_ml.nblkstart, pg_var_ml.nblkend);
+    lprintf("INIT ML", 0, "Blocking iteration on the observables (start/end)=(%d/%d)\n", pg_var_ml.nblkstart,
+            pg_var_ml.nblkend);
     lprintf("INIT ML", 0, "Ape smearing par=%lf\n", pg_var_ml.APEsmear);
 
     read_input(gf->read, ifile);
 
     /* fix conf_dir: put a / at the end of it */
     start_t = strlen(gf->conf_dir);
-    if (gf->conf_dir[start_t - 1] != '/')
-    {
+    if (gf->conf_dir[start_t - 1] != '/') {
         gf->conf_dir[start_t] = '/';
         gf->conf_dir[start_t + 1] = '\0';
     }
@@ -302,12 +275,11 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     /* Torellons 1pt group structure */
     report_tor_group_setup();
 
-    BCs_pars_t BCs_pars = {
-        .fermion_twisting_theta = {0., 0., 0., 0.},
-        .gauge_boundary_improvement_cs = 1.,
-        .gauge_boundary_improvement_ct = 1.,
-        .chiSF_boundary_improvement_ds = 1.,
-        .SF_BCs = 0};
+    BCs_pars_t BCs_pars = { .fermion_twisting_theta = { 0., 0., 0., 0. },
+                            .gauge_boundary_improvement_cs = 1.,
+                            .gauge_boundary_improvement_ct = 1.,
+                            .chiSF_boundary_improvement_ds = 1.,
+                            .SF_BCs = 0 };
     init_BCs(&BCs_pars);
 
 #ifdef PURE_GAUGE_ANISOTROPY
@@ -315,8 +287,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 #endif
 
     /* init gauge field */
-    switch (start_t)
-    {
+    switch (start_t) {
     case 0:
         read_gauge_field(add_dirname(gf->conf_dir, gf->g_start));
         gf->therm = 0;
@@ -355,8 +326,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     return 0;
 }
 
-int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile)
-{
+int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile) {
     gf->pg_v = &pg_var_ml;
     gf->wf = &WF_var;
     gf->poly = &poly_var;
@@ -374,7 +344,8 @@ int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile)
 
     parse_ml_corellator_def();
 
-    lprintf("INIT ML", 0, "Blocking iteration on the observables (start/end)=(%d/%d)\n", pg_var_ml.nblkstart, pg_var_ml.nblkend);
+    lprintf("INIT ML", 0, "Blocking iteration on the observables (start/end)=(%d/%d)\n", pg_var_ml.nblkstart,
+            pg_var_ml.nblkend);
     lprintf("INIT ML", 0, "Ape smearing par=%lf\n", pg_var_ml.APEsmear);
 
     read_input(gf->read, ifile);
@@ -385,12 +356,11 @@ int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile)
     /* Torellons 1pt group structure */
     report_tor_group_setup();
 
-    BCs_pars_t BCs_pars = {
-        .fermion_twisting_theta = {0., 0., 0., 0.},
-        .gauge_boundary_improvement_cs = 1.,
-        .gauge_boundary_improvement_ct = 1.,
-        .chiSF_boundary_improvement_ds = 1.,
-        .SF_BCs = 0};
+    BCs_pars_t BCs_pars = { .fermion_twisting_theta = { 0., 0., 0., 0. },
+                            .gauge_boundary_improvement_cs = 1.,
+                            .gauge_boundary_improvement_ct = 1.,
+                            .chiSF_boundary_improvement_ds = 1.,
+                            .SF_BCs = 0 };
     init_BCs(&BCs_pars);
 
 #ifdef PURE_GAUGE_ANISOTROPY
@@ -420,8 +390,7 @@ int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile)
     return 0;
 }
 
-int save_conf(pg_flow_ml *gf, int id)
-{
+int save_conf(pg_flow_ml *gf, int id) {
     char buf[256];
 
     mk_gconf_name(buf, gf, id);

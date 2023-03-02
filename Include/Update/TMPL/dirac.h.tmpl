@@ -5,32 +5,42 @@
 
 #include "Utils/generics.h"
 
-#if !defined(_SPINOR_FIELD_TYPE) 
+#if !defined(_SPINOR_FIELD_TYPE)
 #error Missing _SPINOR_FIELD_TYPE in Dphi_gpu.cu
 #endif
 #if !defined(_SUFFIX)
 #error Missing _SUFFIX in Dphi_gpu.cu
 #endif
 
-#define _CPU_F_NAME(_name,_suffix) CONCAT(_name,_suffix ## _cpu)
-#define _CPU_FUNC_INNER(_type,_name,_suffix,_args) _type _CPU_F_NAME(_name,_suffix) _args
-#define _GPU_FUNC_INNER(_type,_name,_suffix,_args) _type _GPU_F_NAME(_name,_suffix) _args
-#define _PTR_FUNC_INNER(_type,_name,_suffix,_args) extern _type (*_F_NAME(_name,_suffix)) _args
+#define _CPU_F_NAME(_name, _suffix) CONCAT(_name, _suffix##_cpu)
+#define _CPU_FUNC_INNER(_type, _name, _suffix, _args) _type _CPU_F_NAME(_name, _suffix) _args
+#define _GPU_FUNC_INNER(_type, _name, _suffix, _args) _type _GPU_F_NAME(_name, _suffix) _args
+#define _PTR_FUNC_INNER(_type, _name, _suffix, _args) extern _type(*_F_NAME(_name, _suffix)) _args
 
-#define _CONCAT_(_name,_suffix) _name ## _suffix ## _
-#define _F_NAME_(_name,_suffix) _CONCAT_(_name,_suffix)
-#define _CPU_F_NAME_(_name,_suffix) CONCAT(_name,_suffix ## _cpu_)
-#define _GPU_F_NAME_(_name,_suffix) CONCAT(_name,_suffix ## _gpu_)
-#define _CPU_FUNC_INNER_(_type,_name,_suffix,_args) _type _CPU_F_NAME_(_name,_suffix) _args
-#define _GPU_FUNC_INNER_(_type,_name,_suffix,_args) _type _GPU_F_NAME_(_name,_suffix) _args
-#define _PTR_FUNC_INNER_(_type,_name,_suffix,_args) extern _type (*_F_NAME_(_name,_suffix)) _args
+#define _CONCAT_(_name, _suffix) _name##_suffix##_
+#define _F_NAME_(_name, _suffix) _CONCAT_(_name, _suffix)
+#define _CPU_F_NAME_(_name, _suffix) CONCAT(_name, _suffix##_cpu_)
+#define _GPU_F_NAME_(_name, _suffix) CONCAT(_name, _suffix##_gpu_)
+#define _CPU_FUNC_INNER_(_type, _name, _suffix, _args) _type _CPU_F_NAME_(_name, _suffix) _args
+#define _GPU_FUNC_INNER_(_type, _name, _suffix, _args) _type _GPU_F_NAME_(_name, _suffix) _args
+#define _PTR_FUNC_INNER_(_type, _name, _suffix, _args) extern _type(*_F_NAME_(_name, _suffix)) _args
 
 #ifdef WITH_GPU
-#define _DECLARE(a,b,c) _PTR_FUNC_INNER(a,b,_SUFFIX,c); _CPU_FUNC_INNER(a,b,_SUFFIX,c); _GPU_FUNC_INNER(a,b,_SUFFIX,c)
-#define _DECLARE_(a,b,c) _PTR_FUNC_INNER_(a,b,_SUFFIX,c); _CPU_FUNC_INNER_(a,b,_SUFFIX,c); _GPU_FUNC_INNER_(a,b,_SUFFIX,c)
+#define _DECLARE(a, b, c)              \
+    _PTR_FUNC_INNER(a, b, _SUFFIX, c); \
+    _CPU_FUNC_INNER(a, b, _SUFFIX, c); \
+    _GPU_FUNC_INNER(a, b, _SUFFIX, c)
+#define _DECLARE_(a, b, c)              \
+    _PTR_FUNC_INNER_(a, b, _SUFFIX, c); \
+    _CPU_FUNC_INNER_(a, b, _SUFFIX, c); \
+    _GPU_FUNC_INNER_(a, b, _SUFFIX, c)
 #else
-#define _DECLARE(a,b,c) _PTR_FUNC_INNER(a,b,_SUFFIX,c); _CPU_FUNC_INNER(a,b,_SUFFIX,c)
-#define _DECLARE_(a,b,c) _PTR_FUNC_INNER_(a,b,_SUFFIX,c); _CPU_FUNC_INNER_(a,b,_SUFFIX,c)
+#define _DECLARE(a, b, c)              \
+    _PTR_FUNC_INNER(a, b, _SUFFIX, c); \
+    _CPU_FUNC_INNER(a, b, _SUFFIX, c)
+#define _DECLARE_(a, b, c)              \
+    _PTR_FUNC_INNER_(a, b, _SUFFIX, c); \
+    _CPU_FUNC_INNER_(a, b, _SUFFIX, c)
 #endif
 
 _DECLARE(unsigned long int, getMVM, (void));

@@ -9,7 +9,7 @@
 #include "meson_observables.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 // measure_meson_ff.c
@@ -25,6 +25,6 @@ void measure_mesons_disconnected(meson_observable *mo, spinor_field *psi0, spino
 void ff_observables(void);
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //MEASURE_MESONS_FF_H

@@ -7,7 +7,7 @@
 #ifndef GEOMETRY_MASKSTATE_H
 #define GEOMETRY_MASKSTATE_H
 #ifdef __cplusplus
-   extern "C" {
+extern "C" {
 #endif
 
 // this MUST fit in a char
@@ -20,7 +20,7 @@ enum MaskState {
     Y_DN_MASK = (1u << 5),
     Z_UP_MASK = (1u << 6),
     Z_DN_MASK = (1u << 7),
-    FULL_MASK = (1u << 8)-1
+    FULL_MASK = (1u << 8) - 1
 };
 
 static inline char invertMask(char mask) {
@@ -28,19 +28,11 @@ static inline char invertMask(char mask) {
 }
 
 #define _PRINT_BYTE "%c%c%c%c%c%c%c%c"
-#define _BINARY(byte)  \
-  (byte & 0x80 ? '1' : '0'), \
-  (byte & 0x40 ? '1' : '0'), \
-  (byte & 0x20 ? '1' : '0'), \
-  (byte & 0x10 ? '1' : '0'), \
-  (byte & 0x08 ? '1' : '0'), \
-  (byte & 0x04 ? '1' : '0'), \
-  (byte & 0x02 ? '1' : '0'), \
-  (byte & 0x01 ? '1' : '0') 
-
+#define _BINARY(byte)                                                                                           \
+    (byte & 0x80 ? '1' : '0'), (byte & 0x40 ? '1' : '0'), (byte & 0x20 ? '1' : '0'), (byte & 0x10 ? '1' : '0'), \
+        (byte & 0x08 ? '1' : '0'), (byte & 0x04 ? '1' : '0'), (byte & 0x02 ? '1' : '0'), (byte & 0x01 ? '1' : '0')
 
 #ifdef __cplusplus
-   }
+}
 #endif
 #endif
-

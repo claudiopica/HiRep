@@ -6,9 +6,7 @@
 
 #include "libhr.h"
 
-int main(int argc, char *argv[])
-{
-
+int main(int argc, char *argv[]) {
     int return_value = 0;
     double tmp[4];
     int shift[4];
@@ -58,8 +56,7 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Checking invariance of the plaquette 0pp on shifted configurations.\n ");
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", sqrt(plaq[1] * plaq[1]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (sqrt(plaq[1] * plaq[1]) > 10.e-14)
-        return_value++;
+    if (sqrt(plaq[1] * plaq[1]) > 10.e-14) { return_value++; }
 
     lprintf("MAIN", 0, "Generating two random spinor fields on the whole lattice... ");
 
@@ -91,20 +88,16 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Checking invariance of all the combinations of scalar products before and after the shift.\n ");
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[3]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[3]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[3]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[4]));
     lprintf("MAIN", 0, "(should be different from zero)\n\n");
-    if (cabs(sobs[4]) < 10.e-4)
-        return_value++;
+    if (cabs(sobs[4]) < 10.e-4) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[5]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[5]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[5]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[6]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[6]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[6]) > 10.e-14) { return_value++; }
 
     lprintf("MAIN", 0, "Generating two random spinor fields on the even lattice... ");
 
@@ -119,17 +112,14 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Applying the random shift to the spinor field... ");
-    if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0)
-    {
+    if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0) {
         shift_fields(shift, ss_e, NULL, ss_e, NULL);
         sobs[3] = spinor_field_sqnorm_f(ss_e);
         sobs[4] = spinor_field_prod_f(ss_e, ss_e + 1);
         shift_fields(shift, ss_e + 1, NULL, ss_e + 1, NULL);
         sobs[5] = spinor_field_sqnorm_f(ss_e + 1);
         sobs[6] = spinor_field_prod_f(ss_e, ss_e + 1);
-    }
-    else
-    {
+    } else {
         shift_fields(shift, ss_e, NULL, ss_e, NULL);
         sobs[3] = spinor_field_sqnorm_f(ss_e);
         sobs[4] = spinor_field_prod_f(ss_e, ss_e + 1);
@@ -147,20 +137,16 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Checking invariance of all the combinations of scalar products before and after the shift.\n ");
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[3]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[3]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[3]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[4]));
     lprintf("MAIN", 0, "(should be different from zero)\n\n");
-    if (cabs(sobs[4]) < 10.e-4)
-        return_value++;
+    if (cabs(sobs[4]) < 10.e-4) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[5]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[5]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[5]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[6]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[6]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[6]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Generating two random spinor fields on the odd lattice... ");
 
     gaussian_spinor_field(ss_o);
@@ -174,17 +160,14 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Applying the random shift to the spinor field... ");
-    if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0)
-    {
+    if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0) {
         shift_fields(shift, ss_o, NULL, ss_o, NULL);
         sobs[3] = spinor_field_sqnorm_f(ss_o);
         sobs[4] = spinor_field_prod_f(ss_o, ss_o + 1);
         shift_fields(shift, ss_o + 1, NULL, ss_o + 1, NULL);
         sobs[5] = spinor_field_sqnorm_f(ss_o + 1);
         sobs[6] = spinor_field_prod_f(ss_o, ss_o + 1);
-    }
-    else
-    {
+    } else {
         shift_fields(shift, ss_o, NULL, ss_o, NULL);
         sobs[3] = spinor_field_sqnorm_f(ss_o);
         sobs[4] = spinor_field_prod_f(ss_o, ss_o + 1);
@@ -202,20 +185,16 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Checking invariance of all the combinations of scalar products before and after the shift.\n ");
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[3]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[3]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[3]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[4]));
     lprintf("MAIN", 0, "(should be different from zero)\n\n");
-    if (cabs(sobs[4]) < 10.e-4)
-        return_value++;
+    if (cabs(sobs[4]) < 10.e-4) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[5]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[5]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[5]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[6]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[6]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[6]) > 10.e-14) { return_value++; }
 
     lprintf("MAIN", 0, "Generating and applying a random odd shift to the gauge field... ");
     ranlxd(tmp, 4);
@@ -242,8 +221,7 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Checking invariance of the plaquette 0pp on shifted configurations.\n ");
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", sqrt(plaq[1] * plaq[1]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (sqrt(plaq[1] * plaq[1]) > 10.e-14)
-        return_value++;
+    if (sqrt(plaq[1] * plaq[1]) > 10.e-14) { return_value++; }
 
     lprintf("MAIN", 0, "Generating two random spinor fields on the whole lattice... ");
 
@@ -275,20 +253,16 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Checking invariance of all the combinations of scalar products before and after the shift.\n ");
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[3]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[3]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[3]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[4]));
     lprintf("MAIN", 0, "(should be different from zero)\n\n");
-    if (cabs(sobs[4]) < 10.e-4)
-        return_value++;
+    if (cabs(sobs[4]) < 10.e-4) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[5]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[5]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[5]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[6]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[6]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[6]) > 10.e-14) { return_value++; }
 
     lprintf("MAIN", 0, "Generating two random spinor fields on the even lattice... ");
 
@@ -303,17 +277,14 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Applying the random shift to the spinor field... ");
-    if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0)
-    {
+    if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0) {
         shift_fields(shift, ss_e, NULL, ss_e, NULL);
         sobs[3] = spinor_field_sqnorm_f(ss_e);
         sobs[4] = spinor_field_prod_f(ss_e, ss_e + 1);
         shift_fields(shift, ss_e + 1, NULL, ss_e + 1, NULL);
         sobs[5] = spinor_field_sqnorm_f(ss_e + 1);
         sobs[6] = spinor_field_prod_f(ss_e, ss_e + 1);
-    }
-    else
-    {
+    } else {
         shift_fields(shift, ss_e, NULL, ss_o, NULL);
         sobs[3] = spinor_field_sqnorm_f(ss_o);
         sobs[4] = spinor_field_prod_f(ss_o, ss_o + 1);
@@ -331,20 +302,16 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Checking invariance of all the combinations of scalar products before and after the shift.\n ");
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[3]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[3]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[3]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[4]));
     lprintf("MAIN", 0, "(should be different from zero)\n\n");
-    if (cabs(sobs[4]) < 10.e-4)
-        return_value++;
+    if (cabs(sobs[4]) < 10.e-4) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[5]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[5]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[5]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[6]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[6]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[6]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Generating two random spinor fields on the odd lattice... ");
 
     gaussian_spinor_field(ss_o);
@@ -358,17 +325,14 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Applying the random shift to the spinor field... ");
-    if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0)
-    {
+    if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0) {
         shift_fields(shift, ss_o, NULL, ss_o, NULL);
         sobs[3] = spinor_field_sqnorm_f(ss_o);
         sobs[4] = spinor_field_prod_f(ss_o, ss_o + 1);
         shift_fields(shift, ss_o + 1, NULL, ss_o + 1, NULL);
         sobs[5] = spinor_field_sqnorm_f(ss_o + 1);
         sobs[6] = spinor_field_prod_f(ss_o, ss_o + 1);
-    }
-    else
-    {
+    } else {
         shift_fields(shift, ss_o, NULL, ss_e, NULL);
         sobs[3] = spinor_field_sqnorm_f(ss_e);
         sobs[4] = spinor_field_prod_f(ss_e, ss_e + 1);
@@ -386,20 +350,16 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Checking invariance of all the combinations of scalar products before and after the shift.\n ");
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[3]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[3]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[3]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[4]));
     lprintf("MAIN", 0, "(should be different from zero)\n\n");
-    if (cabs(sobs[4]) < 10.e-4)
-        return_value++;
+    if (cabs(sobs[4]) < 10.e-4) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[5]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[5]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[5]) > 10.e-14) { return_value++; }
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", cabs(sobs[6]));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(sobs[6]) > 10.e-14)
-        return_value++;
+    if (cabs(sobs[6]) > 10.e-14) { return_value++; }
 
     finalize_process();
     return return_value;

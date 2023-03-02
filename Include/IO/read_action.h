@@ -8,12 +8,12 @@
 #include "Update/integrators.h"
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 void read_action(char *filename, integrator_par **ipp);
 
 #ifdef __cplusplus
-	}
+}
 #endif
 #endif //READ_ACTION_H

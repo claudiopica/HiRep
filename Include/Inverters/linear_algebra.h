@@ -20,14 +20,14 @@
 #include "Utils/generics.h"
 
 #ifdef __cplusplus
-  extern "C" {
+extern "C" {
 #endif
 
 // Linear Algebra functions are generic
 // They are parametrized over the input types for double/single precision
 // The template is in TMPL/linear_algebra.h.tmpl
 
-// double precision 
+// double precision
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _SPINOR_TYPE suNf_spinor
 #define _REAL double
@@ -35,7 +35,7 @@
 #define _SUFFIX _f
 #include "TMPL/linear_algebra.h.tmpl"
 
-// single precision 
+// single precision
 #define _SPINOR_FIELD_TYPE spinor_field_flt
 #define _SPINOR_TYPE suNf_spinor_flt
 #define _REAL float
@@ -43,8 +43,7 @@
 #define _SUFFIX _f_flt
 #include "TMPL/linear_algebra.h.tmpl"
 
-
 #ifdef __cplusplus
-  }
+}
 #endif
 #endif

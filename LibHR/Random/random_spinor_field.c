@@ -9,8 +9,7 @@
 #include "Utils/boundary_conditions.h"
 #include "memory.h"
 
-void gaussian_spinor_field(spinor_field *s)
-{
+void gaussian_spinor_field(spinor_field *s) {
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(s->type, ix) {
         _FUSE_IDX(s->type, ix);
@@ -30,8 +29,7 @@ void gaussian_spinor_field(spinor_field *s)
     apply_BCs_on_spinor_field(s);
 }
 
-void gaussian_spinor_field_flt(spinor_field_flt *s)
-{
+void gaussian_spinor_field_flt(spinor_field_flt *s) {
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(s->type, ix) {
         _FUSE_IDX(s->type, ix);
@@ -51,8 +49,7 @@ void gaussian_spinor_field_flt(spinor_field_flt *s)
     apply_BCs_on_spinor_field_flt(s);
 }
 
-void z2_spinor_field(spinor_field *s)
-{
+void z2_spinor_field(spinor_field *s) {
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(s->type, ix) {
         _FUSE_IDX(s->type, ix);

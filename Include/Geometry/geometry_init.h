@@ -15,7 +15,7 @@
 #include "new_geometry.h"
 
 #ifdef __cplusplus
-   extern "C" {
+extern "C" {
 #endif
 
 // geometry_init.c
@@ -45,8 +45,6 @@ void test_geometry_mpi_eo(void);
 void free_geometry_mpi_eo(void);
 
 #ifdef __cplusplus
-   }
+}
 #endif
 #endif
-
-

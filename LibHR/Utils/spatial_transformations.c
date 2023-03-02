@@ -36,7 +36,7 @@ int spatial_APE_smear_wrkspace(double *smear_val,int wrkspace_in)
 
 #define gauge_field_pointer(u, ix, mu) ((u->ptr) + coord_to_index(ix, mu))
 
-//Global variables 
+//Global variables
 int *active_slices_list = NULL;
 int *glbT_to_active_slices = NULL;
 int n_active_slices;
@@ -56,79 +56,67 @@ static int *tmp_idn;
 
 static int blocking_level;
 
-void initialize_spatial_active_slices(int *tlist)
-{
-    if (NP_X != 1 || NP_Y != 1 || NP_Z != 1)
+void initialize_spatial_active_slices(int *tlist) {
+    if (NP_X != 1 || NP_Y != 1 || NP_Z != 1) {
         error(1, 1, "initialize_spatial_active_slices [spatial_transformations.c]",
               "Error the spatial transformation module can be used only with non parallel spatial boundary conditions");
+    }
 
-    if (active_slices_list == NULL)
-    {
-
+    if (active_slices_list == NULL) {
         int t = 0;
 
-        if (tlist != NULL)
-        {
+        if (tlist != NULL) {
             n_active_slices = 0;
-            for (t = 0; t < GLB_T; t++)
-            {
-                if (tlist[t] != 0 && t >= zerocoord[0] && t < zerocoord[0] + T)
-                    n_active_slices++;
+            for (t = 0; t < GLB_T; t++) {
+                if (tlist[t] != 0 && t >= zerocoord[0] && t < zerocoord[0] + T) { n_active_slices++; }
             }
             active_slices_list = malloc(n_active_slices * sizeof(int));
             n_active_slices = 0;
 
-            for (t = 0; t < GLB_T; t++)
-            {
-                if (tlist[t] != 0 && t >= zerocoord[0] && t < zerocoord[0] + T)
-                {
+            for (t = 0; t < GLB_T; t++) {
+                if (tlist[t] != 0 && t >= zerocoord[0] && t < zerocoord[0] + T) {
                     active_slices_list[n_active_slices] = t - zerocoord[0];
                     n_active_slices++;
                 }
             }
-            lprintf("SPATIAL TRASFORMATION", 0, "Partial Spatial lattice trasformations enabled (%d t-slices per proc)\n", n_active_slices);
-        }
-        else
-        {
+            lprintf("SPATIAL TRASFORMATION", 0, "Partial Spatial lattice trasformations enabled (%d t-slices per proc)\n",
+                    n_active_slices);
+        } else {
             lprintf("SPATIAL TRASFORMATION", 0, "Full Spatial lattice trasformations enabled\n");
             active_slices_list = malloc(T * sizeof(int));
             n_active_slices = T;
 
-            for (t = 0; t < T; t++)
+            for (t = 0; t < T; t++) {
                 active_slices_list[t] = t;
+            }
         }
 
         glbT_to_active_slices = malloc(GLB_T * sizeof(int));
-        for (t = 0; t < GLB_T; t++)
+        for (t = 0; t < GLB_T; t++) {
             glbT_to_active_slices[t] = -1;
+        }
 
-        for (t = 0; t < n_active_slices; t++)
+        for (t = 0; t < n_active_slices; t++) {
             glbT_to_active_slices[active_slices_list[t] + zerocoord[0]] = t;
-    }
-    else
+        }
+    } else {
         lprintf("SPATIAL TRASFORMATION", 0, "Already initialized\n");
-}
-
-void free_spatial_active_slices()
-{
-    if (active_slices_list != NULL)
-    {
-        free(active_slices_list);
     }
 }
 
-static void slice_spatial_blocking(int t, suNg_field *g_in, int *iup_in, int *idn_in, suNg_field *g_out, int *iup_out, int *idn_out)
-{
+void free_spatial_active_slices() {
+    if (active_slices_list != NULL) { free(active_slices_list); }
+}
 
+static void slice_spatial_blocking(int t, suNg_field *g_in, int *iup_in, int *idn_in, suNg_field *g_out, int *iup_out,
+                                   int *idn_out) {
     int ix, iy, iz, mu, mid, midn;
     suNg *u, *w, *v;
-    for (ix = 0; ix < X; ix++)
-        for (iy = 0; iy < Y; iy++)
-            for (iz = 0; iz < Z; iz++)
-            {
+    for (ix = 0; ix < X; ix++) {
+        for (iy = 0; iy < Y; iy++) {
+            for (iz = 0; iz < Z; iz++) {
                 mid = ipt(t, ix, iy, iz);
-                for (mu = 1; mu < 4; mu++)
-                {
+                for (mu = 1; mu < 4; mu++) {
                     u = gauge_field_pointer(g_out, mid, mu);
                     v = gauge_field_pointer(g_in, mid, mu);
                     midn = iup_in[4 * mid + mu];
@@ -141,48 +129,45 @@ static void slice_spatial_blocking(int t, suNg_field *g_in, int *iup_in, int *id
                     idn_out[4 * mid + mu] = idn_in[4 * midn + mu];
                 }
             }
+        }
+    }
 }
 
-int single_level_spatial_blocking_wrkspace(int wrk_in)
-{
+int single_level_spatial_blocking_wrkspace(int wrk_in) {
     suNg_field *g_in, *g_out;
 
     int *iup_in, *idn_in, *iup_out, *idn_out;
     int wrk_out;
-    if (wrk_in == -1)
-    {
+    if (wrk_in == -1) {
         g_in = u_gauge;
         iup_in = iup;
         idn_in = idn;
-    }
-    else
+    } else {
         set_wrk_space_and_pointers(wrk_in, &g_in, &iup_in, &idn_in);
+    }
 
     wrk_out = reserve_wrk_space_with_pointers(&g_out, &iup_out, &idn_out);
     int t;
-    for (t = 0; t < n_active_slices; t++)
+    for (t = 0; t < n_active_slices; t++) {
         slice_spatial_blocking(active_slices_list[t], g_in, iup_in, idn_in, g_out, iup_out, idn_out);
+    }
 
     return wrk_out;
 }
 
-int spatial_blocking_wrkspace(eval_spat_block eval, unsigned int level)
-{
+int spatial_blocking_wrkspace(eval_spat_block eval, unsigned int level) {
     int idx_tmp, t;
 
     static int entry = 1;
     static int init = 1;
     int last_level = 0;
-    if (blocking_level == level)
-        return wrk_idx2;
+    if (blocking_level == level) { return wrk_idx2; }
 
-    if (entry)
-    {
+    if (entry) {
         wrk_idx1 = reserve_wrk_space_with_pointers(&wrk_g_1, &wrk_iup_1, &wrk_idn_1);
         entry = 0;
         last_level = 1;
-        if (init)
-        {
+        if (init) {
             wrk_idx2 = reserve_wrk_space_with_pointers(&wrk_g_2, &wrk_iup_2, &wrk_idn_2);
 
             tmp_g = wrk_g_2;
@@ -191,19 +176,18 @@ int spatial_blocking_wrkspace(eval_spat_block eval, unsigned int level)
             init = 0;
         }
     }
-    if (eval || blocking_level > level)
-    {
+    if (eval || blocking_level > level) {
         tmp_g = u_gauge;
         tmp_iup = iup;
         tmp_idn = idn;
         blocking_level = 0;
     }
 
-    if (level != blocking_level + 1)
-        spatial_blocking_wrkspace(CONT_SBLK, level - 1);
+    if (level != blocking_level + 1) { spatial_blocking_wrkspace(CONT_SBLK, level - 1); }
 
-    for (t = 0; t < n_active_slices; t++)
+    for (t = 0; t < n_active_slices; t++) {
         slice_spatial_blocking(active_slices_list[t], tmp_g, tmp_iup, tmp_idn, wrk_g_1, wrk_iup_1, wrk_idn_1);
+    }
 
     tmp_g = wrk_g_1;
     tmp_iup = wrk_iup_1;
@@ -223,8 +207,7 @@ int spatial_blocking_wrkspace(eval_spat_block eval, unsigned int level)
 
     blocking_level++;
 
-    if (last_level)
-    {
+    if (last_level) {
         release_wrk_space(wrk_idx1);
         set_wrk_space(wrk_idx2);
         entry = 1;
@@ -234,9 +217,7 @@ int spatial_blocking_wrkspace(eval_spat_block eval, unsigned int level)
 
 #undef gauge_field_pointer
 
-void assign_spatial_rotated_wrkspace(int *map, int idx_wrkspace)
-{
-
+void assign_spatial_rotated_wrkspace(int *map, int idx_wrkspace) {
     error(NP_X != 1 || NP_Y != 1 || NP_Z != 1, 1, "generate_spatial_rotated_wrkspace [spatial_transformations.c]",
           "Error the spatial rotation module can be used on with periodic spatial boundary conditions");
 
@@ -259,52 +240,48 @@ void assign_spatial_rotated_wrkspace(int *map, int idx_wrkspace)
     int tmp;
     int mu;
 
-    for (n0 = 0; n0 < T; n0++)
-    {
+    for (n0 = 0; n0 < T; n0++) {
         ip = ipt(n0, 0, 0, 0);
         ia = ip;
-        for (n1 = 0; n1 < nsteps; n1++)
-        {
-            for (n2 = 0; n2 < nsteps; n2++)
-            {
-                for (n3 = 0; n3 < nsteps; n3++)
-                {
+        for (n1 = 0; n1 < nsteps; n1++) {
+            for (n2 = 0; n2 < nsteps; n2++) {
+                for (n3 = 0; n3 < nsteps; n3++) {
                     *pu_gauge_wrk(ia, 0) = *pu_gauge(ip, 0);
 
-                    for (mu = 1; mu < 4; mu++)
-                    {
-                        if (map[mu] > 0)
+                    for (mu = 1; mu < 4; mu++) {
+                        if (map[mu] > 0) {
                             *pu_gauge_wrk(ia, map[mu]) = *pu_gauge(ip, mu);
-                        else
-                        {
+                        } else {
                             tmp = idn_wrk(ia, -map[mu]);
                             _suNg_dagger(*pu_gauge_wrk(tmp, -map[mu]), *pu_gauge(ip, mu));
                         }
                     }
 
-                    if (map[3] > 0)
+                    if (map[3] > 0) {
                         ia = iup_wrk(ia, map[3]);
-                    else
+                    } else {
                         ia = idn_wrk(ia, -map[3]);
+                    }
                     ip = iup_wrk(ip, 3);
                 }
-                if (map[2] > 0)
+                if (map[2] > 0) {
                     ia = iup_wrk(ia, map[2]);
-                else
+                } else {
                     ia = idn_wrk(ia, -map[2]);
+                }
                 ip = iup_wrk(ip, 2);
             }
-            if (map[1] > 0)
+            if (map[1] > 0) {
                 ia = iup_wrk(ia, map[1]);
-            else
+            } else {
                 ia = idn_wrk(ia, -map[1]);
+            }
             ip = iup_wrk(ip, 1);
         }
     }
 }
 
-int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in)
-{
+int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in) {
     suNg staple, tr1, tr2;
 
     int ix, iy, iz, it, t;
@@ -321,35 +298,27 @@ int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in)
 
     wrkspace_out = reserve_wrk_space_with_pointers(&gout, &_iup, &_idn);
 
-    if (wrkspace_in == -1)
-    {
+    if (wrkspace_in == -1) {
         reset_wrk_pointers();
         _iup_in = iup;
         _idn_in = idn;
-    }
-    else
-    {
+    } else {
         set_wrk_space_and_pointers(wrkspace_in, &gin, &_iup_in, &_idn_in);
     }
 
-    for (t = 0; t < n_active_slices; t++)
-    {
+    for (t = 0; t < n_active_slices; t++) {
         it = active_slices_list[t];
-        for (ix = 0; ix < X; ix++)
-            for (iy = 0; iy < Y; iy++)
-                for (iz = 0; iz < Z; iz++)
-                {
+        for (ix = 0; ix < X; ix++) {
+            for (iy = 0; iy < Y; iy++) {
+                for (iz = 0; iz < Z; iz++) {
                     mid = ipt(it, ix, iy, iz);
 
-                    for (mu = 1; mu < 4; mu++)
-                    {
-
+                    for (mu = 1; mu < 4; mu++) {
                         _suNg_zero(v);
                         vout = (gout->ptr) + coord_to_index(mid, mu);
                         midpmu = iup_wrk(mid, mu);
 
-                        for (int i = 0; i < 2; i++)
-                        {
+                        for (int i = 0; i < 2; i++) {
                             nu = (mu + i) % 3 + 1;
                             midpnu = iup_wrk(mid, nu);
                             midmnu = idn_wrk(mid, nu);
@@ -373,6 +342,8 @@ int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in)
                         covariant_project_to_suNg(vout);
                     }
                 }
+            }
+        }
     }
 
     memcpy(_iup, _iup_in, 4 * glattice.gsize_gauge * sizeof(int));

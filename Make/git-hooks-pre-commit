@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use utf8;
+use open qw( :std :encoding(UTF-8) );
+
+use Term::ANSIColor;
+use v5.14;
+
+my $clangformat = "clang-format";
+if (system("command -v $clangformat")!=0) {
+  $clangformat = "npx clang-format";
+  system("$clangformat --version >/dev/null")==0 or die ("No clang-format found. Existing.\n");
+}
+my $rootdir = `git rev-parse --show-toplevel`;
+## only files in the index
+my $diff_output = `git diff-index --cached -p HEAD`;
+my @files_changed = ($diff_output =~ /\++\sb\/(\S+)/gs);
+## all files
+#my $diff_output = `git ls-tree -r HEAD --name-only`;
+#my @files_changed = split /\n/, $diff_output;
+
+my $format_ok = 0;
+foreach my $file ( @files_changed ) {
+  next if ( $file !~ /\.([ch](pp)?|c[uc])(\.tmpl)?$/ );
+  print "Checking $file  ";
+  my $output = `$clangformat --dry-run -Werror --ferror-limit=1 --style=file $file 2> /dev/null`;
+  #system("$clangformat --style=file -i $file 2> /dev/null");
+  if ($? != 0) {
+    $format_ok = $format_ok || 1;
+    say color("red"), "\N{BALLOT X}", color("reset");
+  } else {
+    say color("green"),"\N{HEAVY CHECK MARK}", color("reset");
+  }
+}
+
+exit $format_ok;

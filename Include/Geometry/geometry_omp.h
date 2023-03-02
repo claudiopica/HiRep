@@ -16,8 +16,7 @@
  *                      of the local and global lattice
  * @param ip            local variable that denotes the piece index
  */
-#define _PIECE_FOR(type, ip) \
-  for (int ip = 0; ip < (type)->local_master_pieces; ip++)
+#define _PIECE_FOR(type, ip) for (int ip = 0; ip < (type)->local_master_pieces; ip++)
 
 /**
  * @brief Reduced iteration over sites of a given piece. Variables given as redop parameters
@@ -32,9 +31,9 @@
  *
  */
 #define _SITE_FOR_RED(type, ip, is, redop1, redop2) \
-  _OMP_PRAGMA(_omp_parallel)                        \
-  _OMP_PRAGMA(_omp_for redop1 redop2)               \
-  for (int is = (type)->master_start[ip]; is <= (type)->master_end[ip]; is++)
+    _OMP_PRAGMA(_omp_parallel)                      \
+    _OMP_PRAGMA(_omp_for redop1 redop2)             \
+    for (int is = (type)->master_start[ip]; is <= (type)->master_end[ip]; is++)
 
 /**
  * @brief Iterate over sites of a given piece.
@@ -87,8 +86,8 @@
  * @param redop2        Variable to reduce
  */
 #define _MASTER_FOR_RED(type, is, redop1, redop2) \
-  _PIECE_FOR((type), _master_for_ip_##is)         \
-  _SITE_FOR_RED((type), _master_for_ip_##is, is, redop1, redop2)
+    _PIECE_FOR((type), _master_for_ip_##is)       \
+        _SITE_FOR_RED((type), _master_for_ip_##is, is, redop1, redop2)
 
 /**
  * @brief Iterate over all sites of the local lattice
@@ -137,9 +136,9 @@
  * @param redop2	Variable to reduce		
  */
 #define _FUSE_FOR_RED(type, ip, is, redop1, redop2) \
-  _OMP_PRAGMA(_omp_parallel)                        \
-  _OMP_PRAGMA(_omp_for redop1 redop2)               \
-  for (int ip = 0; ip < type->fuse_gauge_size; ip++)
+    _OMP_PRAGMA(_omp_parallel)                      \
+    _OMP_PRAGMA(_omp_for redop1 redop2)             \
+    for (int ip = 0; ip < type->fuse_gauge_size; ip++)
 
 /**
  * @brief Fuse reduce on the whole local lattice FIXME: more desc
@@ -150,8 +149,7 @@
  * @param redop1        Variable to reduce
  * @param redop2        Variable to reduce 
  */
-#define _FUSE_MASTER_FOR_RED(type, is, redop1, redop2) \
-  _FUSE_FOR_RED((type), _fuse_master_for_ip_##is, is, redop1, redop2)
+#define _FUSE_MASTER_FOR_RED(type, is, redop1, redop2) _FUSE_FOR_RED((type), _fuse_master_for_ip_##is, is, redop1, redop2)
 
 /**
  * @brief Iterate over all sites of the local lattice but not by index in memory
@@ -162,7 +160,7 @@
  * @param redop1        Variable to reduce
  * @param redop2        Variable to reduce
  */
-#define _ONE_SPINOR_FOR_RED(s,redop1,redop2) _MASTER_FOR_RED((s)->type,_spinor_for_is,redop1,redop2)
+#define _ONE_SPINOR_FOR_RED(s, redop1, redop2) _MASTER_FOR_RED((s)->type, _spinor_for_is, redop1, redop2)
 
 /**
  * @brief Iterate over all sites of the local lattice but not by index in memory
@@ -172,7 +170,7 @@
  * @param s             Input spinor field
  * @param ...           Variables to reduce
  */
-#define _ONE_SPINOR_FOR_SUM(s,...) _ONE_SPINOR_FOR_RED(s,_omp_sum(__VA_ARGS__),)
+#define _ONE_SPINOR_FOR_SUM(s, ...) _ONE_SPINOR_FOR_RED(s, _omp_sum(__VA_ARGS__), )
 
 /**
  * @brief Iterate over two corresponding spinors on the given fields, applying
@@ -184,9 +182,9 @@
  * @param redop1        Variable to reduce
  * @param redop2        Variable to reduce
  */
-#define _TWO_SPINORS_FOR_RED(s1,s2,redop1,redop2) \
-  _TWO_SPINORS_MATCHING(s1,s2); \
-  _ONE_SPINOR_FOR_RED(s1,redop1,redop2)
+#define _TWO_SPINORS_FOR_RED(s1, s2, redop1, redop2) \
+    _TWO_SPINORS_MATCHING(s1, s2);                   \
+    _ONE_SPINOR_FOR_RED(s1, redop1, redop2)
 
 /**
  * @brief Iterate over two corresponding spinors on the given fields, applying
@@ -197,7 +195,7 @@
  * @param s2            Second input spinor field
  * @param ...           Variables to reduce
  */
-#define _TWO_SPINORS_FOR_SUM(s1,s2,...) _TWO_SPINORS_FOR_RED(s1,s2,_omp_sum(__VA_ARGS__),)
+#define _TWO_SPINORS_FOR_SUM(s1, s2, ...) _TWO_SPINORS_FOR_RED(s1, s2, _omp_sum(__VA_ARGS__), )
 
 /**
  * @brief Iterate over three corresponding spinors on the given fields, applying
@@ -209,10 +207,10 @@
  * @param redop1        Variable to reduce
  * @param redop2        Variable to reduce
  */
-#define _THREE_SPINORS_FOR_RED(s1,s2,s3,redop1,redop2) \
-  _TWO_SPINORS_MATCHING(s1,s2); \
-  _TWO_SPINORS_MATCHING(s1,s3); \
-  _ONE_SPINOR_FOR_RED(s1,redop1,redop2)
+#define _THREE_SPINORS_FOR_RED(s1, s2, s3, redop1, redop2) \
+    _TWO_SPINORS_MATCHING(s1, s2);                         \
+    _TWO_SPINORS_MATCHING(s1, s3);                         \
+    _ONE_SPINOR_FOR_RED(s1, redop1, redop2)
 
 /**
  * @brief Iterate over all sites of the local lattice but not by index in memory but by
@@ -220,7 +218,7 @@
  *
  * @param s		Input spinor field
  */
-#define _ONE_SPINOR_FOR(s) _ONE_SPINOR_FOR_RED(s,,)
+#define _ONE_SPINOR_FOR(s) _ONE_SPINOR_FOR_RED(s, , )
 
 /**
  * @brief Iterate over two corresponding spinors on the given fields. The current spinors 
@@ -229,7 +227,7 @@
  * @param s1		First input spinor field
  * @param s2		Second input spinor field
  */
-#define _TWO_SPINORS_FOR(s1,s2) _TWO_SPINORS_FOR_RED(s1,s2,,)
+#define _TWO_SPINORS_FOR(s1, s2) _TWO_SPINORS_FOR_RED(s1, s2, , )
 
 /**
  * @brief Iterate over all three corresponding spinors on the given fields. The current 
@@ -239,7 +237,7 @@
  * @param s2		Second input spinor field
  * @param s3		Third input spinor field
  */
-#define _THREE_SPINORS_FOR(s1,s2,s3) _THREE_SPINORS_FOR_RED(s1,s2,s3,,)
+#define _THREE_SPINORS_FOR(s1, s2, s3) _THREE_SPINORS_FOR_RED(s1, s2, s3, , )
 
 /**
  * @brief Retrieve current spinor field. This macro only works insite _SPINOR_FOR, 
@@ -247,6 +245,6 @@
  *
  * @param s 		Spinor field that is being iterated over.
  */
-#define _SPINOR_PTR(s) _FIELD_AT(s,_spinor_for_is)
+#define _SPINOR_PTR(s) _FIELD_AT(s, _spinor_for_is)
 
 #endif

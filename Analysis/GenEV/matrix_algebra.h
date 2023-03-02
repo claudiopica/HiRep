@@ -11,15 +11,15 @@ double MinEigval(double *a, int n);
 
 void inverse(double *a, double *ainv, int n);
 
-int * orders(const int n,const double * vec);
+int *orders(const int n, const double *vec);
 
-void sorting(const int n,const double * vec, double * ordered_vec);
+void sorting(const int n, const double *vec, double *ordered_vec);
 
-void quicksort ( int n, double *v);
+void quicksort(int n, double *v);
 
 void elmhes(double *a, int n);
 
-void hqr(double *a, int n, double * wr, double * wi);
+void hqr(double *a, int n, double *wr, double *wi);
 
 void getvec(double *a, double *EIG, double *EIGVEC, int dim, int max_ev);
 

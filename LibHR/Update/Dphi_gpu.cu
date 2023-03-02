@@ -11,7 +11,7 @@
 #include "memory.h"
 
 #ifdef BC_T_SF_ROTATED
-    extern rhmc_par _update_par;
+extern rhmc_par _update_par;
 #endif
 
 // double precision
@@ -23,7 +23,7 @@
 #define _COMPLEX hr_complex
 #define _REAL double
 #define _GAUGE_TYPE suNf
-#define _SUFFIX 
+#define _SUFFIX
 #define _REP_SUFFIX _f
 #include "TMPL/Dphi_gpu.cu.tmpl"
 
@@ -40,4 +40,4 @@
 #define _REP_SUFFIX _f_flt
 #include "TMPL/Dphi_gpu.cu.tmpl"
 
-#endif 
+#endif

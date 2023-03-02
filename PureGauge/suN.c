@@ -15,8 +15,7 @@
 
 pg_flow flow = init_pg_flow(flow);
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     int i, n;
     Timer clock;
 
@@ -32,10 +31,11 @@ int main(int argc, char *argv[])
     for (i = 0; i < flow.therm; ++i) {
         update(&(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor);
         if (flow.therm > 20) {
-            if (i % (flow.therm / 5) == 0)
+            if (i % (flow.therm / 5) == 0) {
                 lprintf("MAIN", 0, "%d", ((i * 100) / flow.therm));
-            else if (i % (flow.therm / 20) == 0)
+            } else if (i % (flow.therm / 20) == 0) {
                 lprintf("MAIN", 0, ".");
+            }
         }
     }
     if (i) {
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 
         if (strcmp(flow.wf->make, "true") == 0) {
             static suNg_field *Vwf = NULL;
-            if (Vwf == NULL) Vwf = alloc_gfield(&glattice);
+            if (Vwf == NULL) { Vwf = alloc_gfield(&glattice); }
             double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
             suNg_field_copy(Vwf, u_gauge);
             WF_update_and_measure(flow.wf->ittype, Vwf, &(flow.wf->tmax), &(flow.wf->eps), &(flow.wf->delta), flow.wf->nmeas,

@@ -64,77 +64,68 @@ void assign_ud2u(void)
 }
 */
 
-void assign_ud2u_f(void)
-{
-  #ifdef WITH_GPU
+void assign_ud2u_f(void) {
+#ifdef WITH_GPU
     copy_from_gpu_gfield_f(u_gauge_f);
-  #endif
+#endif
 
-  if (u_gauge_f_flt != NULL)
-  {
-    double *d;
-    float *f;
+    if (u_gauge_f_flt != NULL) {
+        double *d;
+        float *f;
 
-    d = (double *)(u_gauge_f->ptr);
-    f = (float *)(u_gauge_f_flt->ptr);
+        d = (double *)(u_gauge_f->ptr);
+        f = (float *)(u_gauge_f_flt->ptr);
 
-    _OMP_PRAGMA(_omp_parallel)
-    _OMP_PRAGMA(_omp_for)
-    for (int i = 0; i < 4 * glattice.gsize_gauge * (sizeof(suNf) / sizeof(double)); i++)
-    {
-      *(f + i) = (float)(*(d + i));
+        _OMP_PRAGMA(_omp_parallel)
+        _OMP_PRAGMA(_omp_for)
+        for (int i = 0; i < 4 * glattice.gsize_gauge * (sizeof(suNf) / sizeof(double)); i++) {
+            *(f + i) = (float)(*(d + i));
+        }
     }
-  }
 
-  #ifdef WITH_GPU
+#ifdef WITH_GPU
     copy_to_gpu_gfield_f_flt(u_gauge_f_flt);
     start_sendrecv_gfield_f_flt(u_gauge_f_flt);
     complete_sendrecv_gfield_f_flt(u_gauge_f_flt);
-  #endif
+#endif
 }
 
-void assign_s2sd(spinor_field *out, spinor_field_flt *in)
-{
-  #ifdef WITH_GPU
+void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
+#ifdef WITH_GPU
     copy_from_gpu_spinor_field_f_flt(in);
-  #endif
+#endif
 
-  _TWO_SPINORS_FOR(out, in)
-  {
-    double *o = (double *)_SPINOR_PTR(out);
-    float *i = (float *)_SPINOR_PTR(in);
-    for (int n = 0; n < (8 * NF); n++)
-    {
-      *(o++) = (double)*(i++);
+    _TWO_SPINORS_FOR(out, in) {
+        double *o = (double *)_SPINOR_PTR(out);
+        float *i = (float *)_SPINOR_PTR(in);
+        for (int n = 0; n < (8 * NF); n++) {
+            *(o++) = (double)*(i++);
+        }
     }
-  }
 
-  #ifdef WITH_GPU
+#ifdef WITH_GPU
     copy_to_gpu_spinor_field_f(out);
     start_sendrecv_spinor_field_f(out);
     complete_sendrecv_spinor_field_f(out);
-  #endif
+#endif
 }
 
-void assign_sd2s(spinor_field_flt *out, spinor_field *in)
-{
-  #ifdef WITH_GPU
+void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
+#ifdef WITH_GPU
     copy_from_gpu_spinor_field_f(in);
-  #endif
+#endif
 
-  _TWO_SPINORS_FOR(out, in)
-  {
-    float *o = (float *)_SPINOR_PTR(out);
-    double *i = (double *)_SPINOR_PTR(in);
-    for (int n = 0; n < (8 * NF); n++)
-    {
-      *(o++) = (float)*(i++);
+    _TWO_SPINORS_FOR(out, in) {
+        float *o = (float *)_SPINOR_PTR(out);
+        double *i = (double *)_SPINOR_PTR(in);
+        for (int n = 0; n < (8 * NF); n++) {
+            *(o++) = (float)*(i++);
+        }
     }
-  }
 
-  #ifdef WITH_GPU
+#ifdef WITH_GPU
     copy_to_gpu_spinor_field_f_flt(out);
     start_sendrecv_spinor_field_f_flt(out);
     complete_sendrecv_spinor_field_f_flt(out);
-  #endif
+#endif
 }

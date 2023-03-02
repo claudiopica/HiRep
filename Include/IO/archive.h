@@ -15,20 +15,20 @@
 #include "spinor_field.h"
 
 #ifdef __cplusplus
-  extern "C" {
+extern "C" {
 #endif
 
 // endian.h
-int fwrite_BE_int(int* ptr, size_t n, FILE* fp);
-int fwrite_LE_int(int* ptr, size_t n, FILE* fp);
-int fwrite_BE_double(double* ptr, size_t n, FILE* fp);
-int fwrite_LE_double(double* ptr, size_t n, FILE* fp);
+int fwrite_BE_int(int *ptr, size_t n, FILE *fp);
+int fwrite_LE_int(int *ptr, size_t n, FILE *fp);
+int fwrite_BE_double(double *ptr, size_t n, FILE *fp);
+int fwrite_LE_double(double *ptr, size_t n, FILE *fp);
 
-int fread_BE_int(int* ptr, size_t n, FILE* fp);
-int fread_LE_int(int* ptr, size_t n, FILE* fp);
-int fread_BE_double(double* ptr, size_t n, FILE* fp);
-int fread_LE_double(double* ptr, size_t n, FILE* fp);
-int fread_BE_float(float* ptr, size_t n, FILE* fp);
+int fread_BE_int(int *ptr, size_t n, FILE *fp);
+int fread_LE_int(int *ptr, size_t n, FILE *fp);
+int fread_BE_double(double *ptr, size_t n, FILE *fp);
+int fread_LE_double(double *ptr, size_t n, FILE *fp);
+int fread_BE_float(float *ptr, size_t n, FILE *fp);
 
 //archive.h
 void read_gauge_field(char filename[]);
@@ -45,13 +45,12 @@ void read_gauge_field_su2(char filename[]);
 void read_gauge_field_su2q(char filename[]);
 void write_gauge_field_su2q(char filename[]);
 
-
 //TODO: check this
-void read_spinor_field_ascii(char filename[],spinor_field * sf); //this does not exist in library
+void read_spinor_field_ascii(char filename[], spinor_field *sf); //this does not exist in library
 void read_gauge_field_nocheck(char filename[]); //this does not exist in library
-void print_mat(suNg* mat); //TODO: does not exist in library
+void print_mat(suNg *mat); //TODO: does not exist in library
 
 #ifdef __cplusplus
-  }
+}
 #endif
 #endif
