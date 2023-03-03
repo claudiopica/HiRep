@@ -1,5 +1,6 @@
 [![build](https://github.com/claudiopica/HiRep/actions/workflows/build.yml/badge.svg?branch=HiRep-CUDA)](https://github.com/claudiopica/HiRep/actions/workflows/build.yml)
 [![ci](https://github.com/claudiopica/HiRep/actions/workflows/ci.yml/badge.svg?branch=HiRep-CUDA)](https://github.com/claudiopica/HiRep/actions/workflows/ci.yml)
+[![code format](https://github.com/claudiopica/HiRep/actions/workflows/check-format.yml/badge.svg?branch=HiRep-CUDA)](https://github.com/claudiopica/HiRep/actions/workflows/check-format.yml)
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://github.com/claudiopica/HiRep/blob/master/LICENSE.md)
 
 

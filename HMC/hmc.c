@@ -14,8 +14,7 @@
 #include <string.h>
 
 /* Mesons parameters */
-typedef struct input_mesons 
-{
+typedef struct input_mesons {
     char make[256];
     double precision;
     int nhits;
