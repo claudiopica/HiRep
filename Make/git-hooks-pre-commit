@@ -4,9 +4,22 @@ use strict;
 use warnings;
 use utf8;
 use open qw( :std :encoding(UTF-8) );
+use Getopt::Long 'HelpMessage';
+
 
 use Term::ANSIColor;
 use v5.14;
+
+GetOptions(
+  'diff!'      => \(my $diff = 0),
+  'all!'      => \(my $all = 0),
+  'index!'      => \(my $index = 0),
+  'help'         => sub { HelpMessage(2) },
+) or HelpMessage(1);
+
+#process command line options
+#set default
+if ($diff==0 and $all==0 and @ARGV==0) { $index = 1; }
 
 my $clangformat = "clang-format";
 if (system("command -v $clangformat")!=0) {
@@ -14,12 +27,27 @@ if (system("command -v $clangformat")!=0) {
   system("$clangformat --version >/dev/null")==0 or die ("No clang-format found. Existing.\n");
 }
 my $rootdir = `git rev-parse --show-toplevel`;
-## only files in the index
-my $diff_output = `git diff-index --cached -p HEAD`;
-my @files_changed = ($diff_output =~ /\++\sb\/(\S+)/gs);
-## all files
-#my $diff_output = `git ls-tree -r HEAD --name-only`;
-#my @files_changed = split /\n/, $diff_output;
+my @files_changed;
+
+if ($index == 1) {
+  # only files in the index
+  print("Checking git index\n");
+  my $diff_output = `git diff-index --cached -p HEAD`;
+  @files_changed = ($diff_output =~ /\++\sb\/(\S+)/gs);
+} elsif ($diff == 1) {
+  # only files changed in the last commit
+  print("Checking last git commit\n");
+  my $diff_output = `git diff --name-only HEAD HEAD~1`;
+  @files_changed = split /\n/, $diff_output;
+} elsif ($all == 1) {
+  # all files
+  print("Checking all files under git\n");
+  my $diff_output = `git ls-tree -r HEAD --name-only`;
+  @files_changed = split /\n/, $diff_output;
+} else {
+  # take file list from command line
+  @files_changed = @ARGV;
+}
 
 my $format_ok = 0;
 foreach my $file ( @files_changed ) {
@@ -36,3 +64,23 @@ foreach my $file ( @files_changed ) {
 }
 
 exit $format_ok;
+
+=head1 NAME
+
+git-hooks-per-commit - check format of source files with clang-format
+
+=head1 SYNOPSIS
+
+  Option              Default     Description
+  ----------------------------------------------------------------------------
+  --help                          Print this help
+
+  --diff              [false]     Check files changed in last git commit
+  --all               [false]     Check all source files
+  --index             [true]      Check files in the git index
+
+=head1 VERSION
+
+1.0
+
+=cut

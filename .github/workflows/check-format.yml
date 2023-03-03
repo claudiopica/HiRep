@@ -1,0 +1,26 @@
+name: check-format
+
+on:
+  pull_request:
+    branches:
+      - HiRep-CUDA
+  push:
+    branches:
+      - HiRep-CUDA
+
+# cancel previous workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download HiRep
+        run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
+
+      - name: Check format with clang-format
+        run: ./Make/git-hooks-pre-commit -d
+
