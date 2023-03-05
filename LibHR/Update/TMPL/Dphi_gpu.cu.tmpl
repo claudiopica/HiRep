@@ -248,14 +248,16 @@ void _GPU_F_NAME_(Dphi, _SUFFIX)(_FIELD_TYPE *out, _FIELD_TYPE *in) {
     _F_NAME(start_sendrecv_, _FIELD_NAME)(in);
 #endif
 
-    // Mask communication latency with calculating the points
-    // that do not rely on communications
-    _GPU_F_NAME(Dphi_inner, _SUFFIX)(out, in);
-    _F_NAME(complete_sendrecv_, _FIELD_NAME)(in);
+  // Mask communication latency with calculating the points
+  // that do not rely on communications  
+  _GPU_F_NAME(Dphi_inner,_SUFFIX)(out, in);
+  #ifdef WITH_MPI
+  _F_NAME(complete_sendrecv_,_FIELD_NAME) (in);
 
-    // After completion of communications add missing calculations
-    // that relied on communications.
-    _GPU_F_NAME(Dphi_boundary, _SUFFIX)(out, in);
+  // After completion of communications add missing calculations
+  // that relied on communications.
+  _GPU_F_NAME(Dphi_boundary,_SUFFIX) (out, in);
+  #endif 
 }
 
 /**

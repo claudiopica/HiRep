@@ -98,12 +98,11 @@ sub write_prolog {
 #ifndef STRIDED_READS_H
 #define STRIDED_READS_H
 
-#ifdef WITH_GPU
 END
 }
 
 sub write_epilog {
-    print "\n\n#endif\n#endif";
+    print "\n\n#endif";
 }
 
 sub write_idx_finder {
