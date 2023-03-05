@@ -81,7 +81,7 @@ _DECLARE(void, sync_box_to_buffer_gpu_, (geometry_descriptor * gd, box_t *src, _
     kernel_field_input *input = _F_NAME(init_kernel_input_, _FIELD_NAME)(sendbuf, in, src, gd_t);
     const int max_vol = fmax(boxEvenVolume(src), boxOddVolume(src));
     const int grid = (max_vol - 1) / BLOCK_SIZE + 1;
-    _F_NAME(box_to_buffer_kernel_, _FIELD_NAME)<<<grid, BLOCK_SIZE> > >(input, d_c, ipt_gpu);
+    _F_NAME(box_to_buffer_kernel_, _FIELD_NAME)<<<grid, BLOCK_SIZE>>>(input, d_c, ipt_gpu);
 }
 
 #undef _DECLARE
