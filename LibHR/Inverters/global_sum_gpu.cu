@@ -206,73 +206,73 @@ template <class T> void reduce(int size, int threads, int blocks, T *d_idata, T 
     if (isPow2(size)) {
         switch (threads) {
         case 1024:
-            reduce7<T, 1024, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 1024, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 512:
-            reduce7<T, 512, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 512, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 256:
-            reduce7<T, 256, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 256, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 128:
-            reduce7<T, 128, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 128, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 64:
-            reduce7<T, 64, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 64, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 32:
-            reduce7<T, 32, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 32, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 16:
-            reduce7<T, 16, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 16, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 8:
-            reduce7<T, 8, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 8, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 4:
-            reduce7<T, 4, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 4, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 2:
-            reduce7<T, 2, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 2, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 1:
-            reduce7<T, 1, true><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 1, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         }
     } else {
         switch (threads) {
         case 1024:
-            reduce7<T, 1024, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 1024, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 512:
-            reduce7<T, 512, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 512, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 256:
-            reduce7<T, 256, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 256, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 128:
-            reduce7<T, 128, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 128, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 64:
-            reduce7<T, 64, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 64, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 32:
-            reduce7<T, 32, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 32, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 16:
-            reduce7<T, 16, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 16, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 8:
-            reduce7<T, 8, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 8, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 4:
-            reduce7<T, 4, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 4, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 2:
-            reduce7<T, 2, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 2, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         case 1:
-            reduce7<T, 1, false><<<dimGrid, dimBlock, smemSize> > >(d_idata, d_odata, size);
+            reduce7<T, 1, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
             break;
         }
     }

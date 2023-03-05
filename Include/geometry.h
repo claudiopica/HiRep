@@ -29,11 +29,11 @@
 #include "Geometry/geometry_omp.h"
 #include "Geometry/new_geometry.h"
 #include "Geometry/setup.h"
+#include "Geometry/strided_reads.h"
 
 #ifdef WITH_GPU
 #include "Geometry/geometry_gpu_init.h"
 #include "Geometry/gpu_geometry.h"
-#include "Geometry/strided_reads.h"
 #include "Geometry/strided_reads_gpu.h"
 #endif
 
