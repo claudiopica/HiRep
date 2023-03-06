@@ -43,12 +43,12 @@
 #define _ALLOCATE _F_ARGS(alloc_, _FIELD_NAME, (1, f->type))
 #endif
 
-_FUNC(void, to_gpu_format_, _FIELD_NAME, (_FIELD_TYPE * out, _FIELD_TYPE * in)) {
+_FUNC(void, to_gpu_format_, _FIELD_NAME, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
     _CHECK_GEOMETRY_MATCHING(out, in);
     to_gpu_format_convert<_FIELD_DIM, _REAL, _FIELD_TYPE>(out, in);
 }
 
-_FUNC(void, to_cpu_format_, _FIELD_NAME, (_FIELD_TYPE * out, _FIELD_TYPE * in)) {
+_FUNC(void, to_cpu_format_, _FIELD_NAME, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
     _CHECK_GEOMETRY_MATCHING(out, in);
     to_cpu_format_convert<_FIELD_DIM, _REAL, _FIELD_TYPE>(out, in);
 }
