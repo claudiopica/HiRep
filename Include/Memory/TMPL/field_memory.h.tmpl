@@ -1,0 +1,90 @@
+/***************************************************************************\
+* Copyright (c) 2023, Sofie Martins                                         *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
+#include "Utils/generics.h"
+
+#if !defined _FIELD_NAME_READABLE
+#error Missing _FIELD_NAME_READABLE in field_memory.h
+#endif
+#if !defined _FIELD_NAME
+#error Missing _FIELD_NAME in field_memory.h
+#endif
+#if !defined _FIELD_TYPE
+#error Missing _FIELD_TYPE in field_memory.h
+#endif
+#if !defined _IS_SPINOR_LIKE
+#error Missing _IS_SPINOR_LIKE in field_memory.h
+#endif
+
+#define _F_ARGS(_name, _args) _FIELD_TYPE *_F_NAME(_name, _FIELD_NAME) _args
+
+#if _IS_SPINOR_LIKE == 0
+#define _n 1
+#define _ALLOCATE _F_ARGS(alloc_, (geometry_descriptor * type))
+#else
+#define _n n
+#define _ALLOCATE _F_ARGS(alloc_, (unsigned int n, geometry_descriptor *type))
+#endif
+
+/**
+ * @brief Copy _FIELD_NAME_READABLE form the host to the device by synchronizing the GPU
+ *        field data with the CPU field data.
+ *
+ * @param _FIELD_TYPE*	    Field to be copied
+ */
+void _F_NAME(copy_to_gpu_, _FIELD_NAME)(_FIELD_TYPE *);
+
+/**
+ * @brief Copy _FIELD_NAME_READABLE from the device to the host by synchronizing the CPU 
+ *        field data with the GPU field data
+ * 
+ *  @param _FIELD_TYPE*     Field to be copied
+*/
+void _F_NAME(copy_from_gpu_, _FIELD_NAME)(_FIELD_TYPE *);
+
+/**
+ * @brief Convert _FIELD_NAME_READABLE field data host geometry layout to the device
+ *        geometry layout. Read more on GPU geometry in the corresponding section
+ *        in the development manual.
+ * 
+ * @param _FIELD_TYPE*      _FIELD_NAME_READABLE that will contain the converted 
+ *                          field data.
+ * @param _FIELD_TYPE*      _FIELD_NAME_READABLE that contains the initial field data
+*/
+void _F_NAME(to_gpu_format_, _FIELD_NAME)(_FIELD_TYPE *, _FIELD_TYPE *);
+
+/**
+ * @brief Convert _FIELD_NAME_READABLE field data device geometry layout to host geometry
+ *        layout. Read more on GPU geometry in the corresponding section in the
+ *        development manual.
+ * 
+ * @brief _FIELD_TYPE*      _FIELD_NAME_READABLE that will contain the converted
+ *                          field data
+ * @brief _FIELD_TYPE*      _FIELD_NAME_READABLE that contains the initial field data
+*/
+void _F_NAME(to_cpu_format_, _FIELD_NAME)(_FIELD_TYPE *, _FIELD_TYPE *);
+
+/**
+ * @brief Free field data, other struct fields and struct pointer of field struct.
+ * 
+ * @param _FIELD_TYPE*      Field to be freed.
+*/
+void _F_NAME(free_, _FIELD_NAME)(_FIELD_TYPE *);
+
+/**
+ * @brief Allocate field struct pointer
+ * 
+ * @param geometry_descriptor Underlying lattice geometry to allocate on
+*/
+_ALLOCATE;
+
+#undef _FIELD_NAME_READABLE
+#undef _FIELD_NAME
+#undef _FIELD_TYPE
+#undef _IS_SPINOR_LIKE
+
+#undef _ALLOCATE
+#undef _F_ARGS
+#undef _n
