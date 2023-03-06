@@ -37,8 +37,8 @@ if ($index == 1) {
 } elsif ($diff == 1) {
   # only files changed in the last commit
   print("Checking last git commit\n");
-  my $diff_output = `git diff --name-only HEAD HEAD~1`;
-  @files_changed = split /\n/, $diff_output;
+  my $diff_output = `git diff HEAD HEAD~1`;
+  @files_changed = ($diff_output =~ /\++\sb\/(\S+)/gs);
 } elsif ($all == 1) {
   # all files
   print("Checking all files under git\n");
