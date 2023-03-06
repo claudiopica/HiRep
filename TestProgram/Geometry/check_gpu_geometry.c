@@ -22,6 +22,7 @@ int test_write_read_clover_force();
 int test_write_read_spinor_field_f();
 int test_write_read_sfield();
 int test_write_read_clover_ldl();
+int test_write_read_staple_field();
 
 // Single precision
 int test_write_read_gauge_field_flt();
@@ -46,6 +47,7 @@ int main(int argc, char *argv[]) {
     return_val += test_write_read_clover_ldl();
     return_val += test_write_read_clover_term();
     return_val += test_write_read_clover_force();
+    return_val += test_write_read_staple_field();
 
     return_val += test_write_read_spinor_field_f();
     return_val += test_write_read_sfield();
@@ -496,5 +498,39 @@ int test_write_read_clover_ldl() {
     free_clover_ldl(in);
     free_clover_ldl(out);
     free_clover_ldl(gpu_format);
+    return return_val;
+}
+
+int test_write_read_staple_field() {
+    lprintf("INFO", 0, " ======= TEST STAPLE FIELD ======= ");
+    int return_val = 0;
+    suNg_field *in, *gpu_format, *out;
+
+    in = alloc_staple_field(&glattice);
+    out = alloc_staple_field(&glattice);
+    gpu_format = alloc_staple_field(&glattice);
+
+    random_staple_field_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_staple_field_cpu(in));
+
+    suNg *in_mat, *out_mat;
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < 4; comp++) {
+            in_mat = _4FIELD_AT(in, ix, comp);
+            out_mat = _4FIELD_AT(out, ix, comp);
+            write_staple_field_gpu(in_mat, gpu_format, ix, comp);
+            read_staple_field_gpu(out_mat, gpu_format, ix, comp);
+        }
+    }
+
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_staple_field_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", sqnorm_staple_field_cpu(out));
+    sub_assign_staple_field_cpu(out, in);
+    double diff_norm = sqnorm_staple_field_cpu(out);
+    return_val += check_diff_norm_zero(diff_norm);
+
+    free_staple_field(in);
+    free_staple_field(out);
+    free_staple_field(gpu_format);
     return return_val;
 }

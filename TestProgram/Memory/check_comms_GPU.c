@@ -24,6 +24,7 @@ int test_comms_gtransf();
 int test_comms_clover_ldl();
 int test_comms_clover_term();
 int test_comms_clover_force();
+int test_comms_staple_field();
 
 int main(int argc, char *argv[]) {
     // Init
@@ -47,6 +48,7 @@ int main(int argc, char *argv[]) {
     return_val += test_comms_clover_ldl();
     return_val += test_comms_clover_term();
     return_val += test_comms_clover_force();
+    return_val += test_comms_staple_field();
 
     /* Single precision */
     return_val += test_comms_spinor_field_f_flt(&glattice);
@@ -466,6 +468,37 @@ int test_comms_clover_force() {
     return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end);
 
     free_clover_force(f);
+
+    return return_val;
+}
+
+int test_comms_staple_field() {
+    lprintf("INFO", 0, " ======= TEST STAPLE FIELD ======= \n");
+
+    // Setup fields on GPU
+    int return_val = 0;
+    suNg_field *f = alloc_staple_field(&glattice);
+    random_staple_field_cpu(f);
+
+    // Evaluate sqnorm in the beginning
+    double sqnorm_start = sqnorm_staple_field_cpu(f);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
+    copy_to_gpu_staple_field(f);
+
+    // Execute communications
+    start_sendrecv_staple_field(f);
+    complete_sendrecv_staple_field(f);
+
+    // Evaluate sqnorm after comms
+    copy_from_gpu_staple_field(f);
+    double sqnorm_end = sqnorm_staple_field_cpu(f);
+    lprintf("SANITY CHECK", 0, "[Out field CPU copy norm unequal zero: %0.2e]\n", sqnorm_end);
+
+    return_val += check_finiteness(sqnorm_start);
+    return_val += check_finiteness(sqnorm_end);
+    return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end);
+
+    free_staple_field(f);
 
     return return_val;
 }

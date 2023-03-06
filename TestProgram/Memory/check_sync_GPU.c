@@ -7,8 +7,6 @@
 *
 *******************************************************************************/
 
-// TODO: Differences over elementary site types
-
 #include "libhr.h"
 #include <string.h>
 
@@ -25,6 +23,7 @@ int test_sync_identical_to_cpu_gtransf();
 int test_sync_identical_to_cpu_clover_ldl();
 int test_sync_identical_to_cpu_clover_term();
 int test_sync_identical_to_cpu_clover_force();
+int test_sync_identical_to_cpu_staple_field();
 
 int main(int argc, char *argv[]) {
     // Init
@@ -58,6 +57,7 @@ int main(int argc, char *argv[]) {
     return_val += test_sync_identical_to_cpu_clover_ldl();
     return_val += test_sync_identical_to_cpu_clover_term();
     return_val += test_sync_identical_to_cpu_clover_force();
+    return_val += test_sync_identical_to_cpu_staple_field();
 
     // Finalize and return
     finalize_process();
@@ -683,7 +683,7 @@ int test_sync_identical_to_cpu_clover_force() {
     suNf *mat_gpu = (suNf *)malloc(sizeof(suNf));
     for (int i = 0; i < gd->nbuffers_spinor; ++i) {
         for (int j = 0; j < gd->sbuf_len[i]; ++j) {
-            for (int mu = 0; mu < 4; ++mu) {
+            for (int mu = 0; mu < 6; ++mu) {
                 int idx = gd->sbuf_start[i] + j;
                 int offset = gd->sbuf_start[i];
                 suNf *mat_cpu = _6FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
@@ -700,5 +700,55 @@ int test_sync_identical_to_cpu_clover_force() {
 
     return_val += check_diff_norm_zero(diff);
     free_clover_force(f);
+    return return_val;
+}
+
+int test_sync_identical_to_cpu_staple_field() {
+    lprintf("INFO", 0, " ======= TEST STAPLE FIELD ======= \n");
+    lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
+
+    // Setup fields on GPU
+    geometry_descriptor *gd = &glattice;
+    int return_val = 0;
+    suNg_field *f = alloc_staple_field(gd);
+    random_staple_field_cpu(f);
+    copy_to_gpu_staple_field(f);
+
+    //gd = &glattice;
+    int sendbuf_len = 0;
+    sendbuf_length(sendbuf_len);
+
+    // Sync to buffer on CPU and save the sendbuffer in an array
+    sync_field(f->type, 3 * sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
+    suNg *sendbuf_cpu = (suNg *)malloc(3 * sendbuf_len * sizeof(suNg));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, 3 * sendbuf_len * sizeof(suNg));
+
+    // Sync to buffer on GPU and save the sendbuffer in another array
+    sync_staple_field_gpu(f);
+    suNg *sendbuf_gpu = (suNg *)malloc(3 * sendbuf_len * sizeof(suNg));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 3 * sendbuf_len * sizeof(suNg), cudaMemcpyDeviceToHost);
+
+    // Iterate over the arrays and check
+    double diff = 0.0;
+    suNg *mat_gpu = (suNg *)malloc(sizeof(suNg));
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) {
+            for (int mu = 0; mu < 3; ++mu) {
+                int idx = gd->sbuf_start[i] + j;
+                int offset = gd->sbuf_start[i];
+                suNg *mat_cpu = _3FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
+                suNg *in_block = _3FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
+                read_strided_staple_field_gpu(mat_gpu, in_block, j, mu);
+
+                for (int comp = 0; comp < NG * NG; ++comp) {
+                    diff += creal((*mat_cpu).c[comp]) - creal((*mat_gpu).c[comp]);
+                    diff += cimag((*mat_cpu).c[comp]) - cimag((*mat_gpu).c[comp]);
+                }
+            }
+        }
+    }
+
+    return_val += check_diff_norm_zero(diff);
+    free_staple_field(f);
     return return_val;
 }

@@ -12,7 +12,6 @@
 
 // The following functions are primarily for testing purposes
 // This is all for CPU
-// TODO: Turn this into macros for easier extensibility
 
 void test_setup() {
     // TODO: other settings
@@ -128,6 +127,10 @@ void copy_clover_force_cpu(suNf_field *out, suNf_field *in) {
     memcpy(out->ptr, in->ptr, 6 * out->type->gsize_gauge * sizeof(suNf));
 }
 
+void copy_staple_field_cpu(suNg_field *out, suNg_field *in) {
+    memcpy(out->ptr, in->ptr, 3 * out->type->gsize_gauge * sizeof(suNg));
+}
+
 // ** SUB ASSIGN **
 void sub_assign_gfield_cpu(suNg_field *out, suNg_field *in) {
     suNg *site_out, *site_in;
@@ -241,6 +244,17 @@ void sub_assign_clover_force_cpu(suNf_field *out, suNf_field *in) {
             site_out = _6FIELD_AT(out, ix, comp);
             site_in = _6FIELD_AT(in, ix, comp);
             _suNf_sub_assign((*site_out), (*site_in));
+        }
+    }
+}
+
+void sub_assign_staple_field_cpu(suNg_field *out, suNg_field *in) {
+    suNg *site_out, *site_in;
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < 3; comp++) {
+            site_out = _3FIELD_AT(out, ix, comp);
+            site_in = _3FIELD_AT(in, ix, comp);
+            _suNg_sub_assign((*site_out), (*site_in));
         }
     }
 }
@@ -467,6 +481,24 @@ float sqnorm_spinor_field_f_flt_cpu(spinor_field_flt *f) {
     return (float)sqnorm;
 }
 
+double sqnorm_staple_field_cpu(suNg_field *f) {
+    suNg *site;
+    double sqnorm = 0.0;
+    _MASTER_FOR(f->type, ix) {
+        for (int comp = 0; comp < 3; comp++) {
+            double tmp;
+            site = _3FIELD_AT(f, ix, comp);
+            _suNg_sqnorm(tmp, (*site));
+            sqnorm += tmp;
+        }
+    }
+
+#ifdef WITH_MPI
+    global_sum(&sqnorm, 1);
+#endif
+    return sqnorm;
+}
+
 // Set field to zero
 void zero_gfield_cpu(suNg_field *f) {
     int len = 4 * f->type->gsize_gauge * sizeof(suNg) / sizeof(double);
@@ -556,6 +588,14 @@ void zero_clover_force_cpu(suNf_field *f) {
     }
 }
 
+void zero_staple_field_cpu(suNg_field *f) {
+    int len = 3 * f->type->gsize_gauge * sizeof(suNg) / sizeof(double);
+    double *dbl_ptr = (double *)(f->ptr);
+    for (int i = 0; i < len; ++i) {
+        dbl_ptr[i] = 0.0;
+    }
+}
+
 // ** RANDOM FIELDS FOR TESTING **
 void random_spinor_field_f_cpu(spinor_field *f) {
     int n = f->type->gsize_spinor * sizeof(suNf_spinor) / sizeof(double);
@@ -619,6 +659,11 @@ void random_clover_term_cpu(suNfc_field *f) {
 
 void random_clover_force_cpu(suNf_field *f) {
     int n = 6 * f->type->gsize_gauge * sizeof(suNf) / sizeof(double);
+    ranlxd((double *)(f->ptr), n);
+}
+
+void random_staple_field_cpu(suNg_field *f) {
+    int n = 3 * f->type->gsize_gauge * sizeof(suNg) / sizeof(double);
     ranlxd((double *)(f->ptr), n);
 }
 

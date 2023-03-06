@@ -35,6 +35,7 @@ void copy_clover_ldl_cpu(ldl_field *, ldl_field *);
 void copy_gtransf_cpu(suNg_field *, suNg_field *);
 void copy_clover_term_cpu(suNfc_field *, suNfc_field *);
 void copy_clover_force_cpu(suNf_field *, suNf_field *);
+void copy_staple_field_cpu(suNg_field *, suNg_field *);
 
 // RANDOM
 void random_spinor_field_f_cpu(spinor_field *);
@@ -50,6 +51,7 @@ void random_gtransf_cpu(suNg_field *);
 void random_clover_ldl_cpu(ldl_field *);
 void random_clover_term_cpu(suNfc_field *);
 void random_clover_force_cpu(suNf_field *);
+void random_staple_field_cpu(suNg_field *);
 
 // SUB ASSIGN
 void sub_assign_gfield_cpu(suNg_field *, suNg_field *);
@@ -63,6 +65,7 @@ void sub_assign_gtransf_cpu(suNg_field *, suNg_field *);
 void sub_assign_clover_ldl_cpu(ldl_field *, ldl_field *);
 void sub_assign_clover_term_cpu(suNfc_field *, suNfc_field *);
 void sub_assign_clover_force_cpu(suNf_field *, suNf_field *);
+void sub_assign_staple_field_cpu(suNg_field *, suNg_field *);
 
 // SQNORM
 double sqnorm_spinor_field_f_cpu(spinor_field *);
@@ -78,6 +81,7 @@ double sqnorm_sfield_cpu(scalar_field *);
 double sqnorm_clover_ldl_cpu(ldl_field *);
 double sqnorm_clover_term_cpu(suNfc_field *);
 double sqnorm_clover_force_cpu(suNf_field *);
+double sqnorm_staple_field_cpu(suNg_field *);
 
 // SET ZERO
 void zero_gfield_cpu(suNg_field *);
@@ -91,6 +95,7 @@ void zero_gtransf_cpu(suNg_field *);
 void zero_clover_ldl_cpu(ldl_field *);
 void zero_clover_term_cpu(suNfc_field *);
 void zero_clover_force_cpu(suNf_field *);
+void zero_staple_field_cpu(suNg_field *);
 
 #ifdef __cplusplus
 }

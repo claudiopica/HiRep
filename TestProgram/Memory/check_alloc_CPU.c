@@ -11,11 +11,15 @@
 // Double precision
 int test_gfield_allocation();
 int test_gfield_f_allocation();
-int test_spinor_field_allocation();
+int test_suNg_scalar_field_allocation();
 int test_avfield_allocation();
+int test_gtransf_allocation();
 int test_clover_term_allocation();
 int test_clover_force_allocation();
+int test_spinor_field_allocation();
 int test_sfield_allocation();
+int test_clover_ldl_allocation();
+int test_staple_field_allocation();
 
 // Single precision
 int test_gfield_flt_allocation();
@@ -39,6 +43,10 @@ int main(int argc, char *argv[]) {
     return_val += test_clover_term_allocation();
     return_val += test_clover_force_allocation();
     return_val += test_sfield_allocation();
+    return_val += test_suNg_scalar_field_allocation();
+    return_val += test_gtransf_allocation();
+    return_val += test_clover_ldl_allocation();
+    return_val += test_staple_field_allocation();
 
     // Single precision test block
     return_val += test_gfield_flt_allocation();
@@ -168,5 +176,38 @@ int test_sfield_allocation() {
     double sqnorm = sqnorm_sfield_cpu(f);
     return_val += check_finiteness(sqnorm);
     free_sfield(f);
+    return return_val;
+}
+
+int test_suNg_scalar_field_allocation() {
+    lprintf("INFO", 0, " ======= TEST SU(NG) SCALAR FIELD ======= \n");
+    int return_val = 0;
+    suNg_scalar_field *f = alloc_suNg_scalar_field(&glattice);
+    random_suNg_scalar_field_cpu(f);
+    double sqnorm = sqnorm_suNg_scalar_field_cpu(f);
+    return_val += check_finiteness(sqnorm);
+    free_suNg_scalar_field(f);
+    return return_val;
+}
+
+int test_clover_ldl_allocation() {
+    lprintf("INFO", 0, " ======= TEST CLOVER LDL ======= \n");
+    int return_val = 0;
+    ldl_field *f = alloc_clover_ldl(&glattice);
+    random_clover_ldl_cpu(f);
+    double sqnorm = sqnorm_clover_ldl_cpu(f);
+    return_val += check_finiteness(sqnorm);
+    free_clover_ldl(f);
+    return return_val;
+}
+
+int test_staple_field_allocation() {
+    lprintf("INFO", 0, " ======= TEST STAPLE FIELD ======= \n");
+    int return_val = 0;
+    suNg_field *f = alloc_staple_field(&glattice);
+    random_staple_field_cpu(f);
+    double sqnorm = sqnorm_staple_field_cpu(f);
+    return_val += check_finiteness(sqnorm);
+    free_staple_field(f);
     return return_val;
 }

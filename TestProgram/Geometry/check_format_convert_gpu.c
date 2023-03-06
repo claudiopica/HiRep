@@ -20,6 +20,7 @@ int test_convert_back_forth_clover_term();
 int test_convert_back_forth_clover_force();
 int test_convert_back_forth_spinor_field();
 int test_convert_back_forth_sfield();
+int test_convert_back_forth_staple_field();
 
 /* Single precision tests */
 int test_convert_back_forth_gfield_flt();
@@ -47,6 +48,7 @@ int main(int argc, char *argv[]) {
     return_val += test_convert_back_forth_clover_force();
     return_val += test_convert_back_forth_spinor_field();
     return_val += test_convert_back_forth_sfield();
+    return_val += test_convert_back_forth_staple_field();
 
     /* Single precision */
     return_val += test_convert_back_forth_gfield_flt();
@@ -443,5 +445,35 @@ int test_convert_back_forth_clover_ldl() {
     free_clover_ldl(in);
     free_clover_ldl(tmp);
     free_clover_ldl(out);
+    return check_diff_norm_zero(diff_norm);
+}
+
+int test_convert_back_forth_staple_field() {
+    lprintf("INFO", 0, " ======= TEST STAPLE FIELD ======= \n");
+
+    // Setup gfields
+    suNg_field *in, *tmp, *out;
+    in = alloc_staple_field(&glattice);
+    tmp = alloc_staple_field(&glattice);
+    out = alloc_staple_field(&glattice);
+
+    random_staple_field_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_staple_field_cpu(in));
+
+    // Convert twice
+    to_gpu_format_staple_field(tmp, in);
+    fill_buffers_staple_field(tmp);
+    to_cpu_format_staple_field(out, tmp);
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n",
+            sqnorm_staple_field_cpu(in), sqnorm_staple_field_cpu(out));
+
+    // Assert fields are equal over sqnorm
+    sub_assign_staple_field_cpu(out, in);
+    double diff_norm = sqnorm_staple_field_cpu(out);
+
+    // Free and return
+    free_staple_field(in);
+    free_staple_field(tmp);
+    free_staple_field(out);
     return check_diff_norm_zero(diff_norm);
 }
