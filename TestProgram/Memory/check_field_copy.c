@@ -8,9 +8,6 @@
 
 #include "libhr.h"
 
-// TODO: scalar field missing
-// TODO: Add communications between the steps, to make sure that the  copies are unaffected by that
-
 // Double precision
 int test_bijectivity_gfield();
 int test_bijectivity_gfield_f();
@@ -22,6 +19,7 @@ int test_bijectivity_clover_term();
 int test_bijectivity_clover_force();
 int test_bijectivity_spinor_field_f(geometry_descriptor *);
 int test_bijectivity_sfield(geometry_descriptor *);
+int test_bijectivity_staple_field();
 
 // Single precision
 int test_bijectivity_gfield_flt();
@@ -51,6 +49,7 @@ int main(int argc, char *argv[]) {
     return_val += test_bijectivity_clover_force();
     return_val += test_bijectivity_spinor_field_f(&glattice);
     return_val += test_bijectivity_sfield(&glattice);
+    return_val += test_bijectivity_staple_field();
 
     /* Single precision */
     return_val += test_bijectivity_gfield_flt();
@@ -440,5 +439,33 @@ int test_bijectivity_clover_ldl() {
 
     free_clover_ldl(in);
     free_clover_ldl(in_copy);
+    return return_val;
+}
+
+int test_bijectivity_staple_field() {
+    lprintf("INFO", 0, " ====== TEST STAPLE FIELD ======= ");
+    int return_val = 0;
+    suNg_field *in, *in_copy;
+    in = alloc_staple_field(&glattice);
+    in_copy = alloc_staple_field(&glattice);
+
+    random_staple_field_cpu(in);
+
+    copy_staple_field_cpu(in_copy, in);
+    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_staple_field_cpu(in));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_staple_field_cpu(in_copy));
+
+    copy_to_gpu_staple_field(in);
+    zero_staple_field_cpu(in);
+    fill_buffers_with_zeroes_staple_field(in);
+    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_staple_field_cpu(in));
+    copy_from_gpu_staple_field(in);
+
+    sub_assign_staple_field_cpu(in, in_copy);
+    double diff_norm = sqnorm_staple_field_cpu(in);
+    return_val += check_diff_norm_zero(diff_norm);
+
+    free_staple_field(in);
+    free_staple_field(in_copy);
     return return_val;
 }
