@@ -83,28 +83,42 @@
 #include "Utils/boundary_conditions.h"
 #include <math.h>
 
+#ifdef WITH_GPU
+#include "./eva_gpu.hpp"
+#endif
+
 #define GAMMA 3.0
-#define MAX_ROTATE 1000 /*50*/
+#define MAX_ROTATE 1000
 
 static int nop, nvc = 0;
 static double *dd, *ee;
 static hr_complex *aa, *bb, *cc, *vv;
 
+#ifdef WITH_GPU
+static hr_complex *vv_d;
+#endif
+
 static double EPSILON = 1.e-12;
 
+#ifndef WITH_GPU
 static suNf_spinor *psi = NULL;
+#endif
 
+#ifndef WITH_GPU
 static void alloc_ws_rotate(void) {
     psi = calloc(MAX_ROTATE, sizeof(suNf_spinor));
-
     error((psi == NULL), 1, "alloc_ws_rotate [linalg.c]", "Unable to allocate workspace");
 }
+#endif
 
-static void rotate(int n, spinor_field *pkk, hr_complex v[]) {
+static void rotate(int n, spinor_field *pkk, hr_complex v[], int nevt) {
     error((n < 1) || (n > MAX_ROTATE), 1, "rotate [eva.c]", "Parameter n is out of range");
 
+#ifndef WITH_GPU
     if (psi == NULL) { alloc_ws_rotate(); }
+#endif
 
+#ifndef WITH_GPU
     //Avoid OMP parallel region in MASTER_FOR
 #undef _OMP_PRAGMA
 #define _OMP_PRAGMA(s)
@@ -135,6 +149,10 @@ static void rotate(int n, spinor_field *pkk, hr_complex v[]) {
             *_FIELD_AT(&pkk[k], ix) = psi[k];
         }
     }
+#else
+    cudaMemcpy(vv_d, vv, nevt * nevt * sizeof(hr_complex), cudaMemcpyHostToDevice);
+    rotate_gpu(n, pkk, vv_d);
+#endif
 }
 
 static int alloc_aux(int nevt) {
@@ -152,6 +170,9 @@ static int alloc_aux(int nevt) {
         vv = cc + nevt * nevt;
         ee = dd + nevt;
         nvc = nevt;
+#ifdef WITH_GPU
+        cudaMalloc((void **)&vv_d, nevt * nevt * sizeof(hr_complex));
+#endif
     }
 
     error((aa == NULL) || (dd == NULL), 1, "alloc_aux [eva.c]", "Unable to allocate auxiliary arrays");
@@ -225,7 +246,7 @@ static void ritz_subsp(int nlock, int nevt, spinor_operator Op, spinor_field *ws
     }
 
     jacobi2(neff, aa, d + nlock, vv);
-    rotate(neff, ev + nlock, vv);
+    rotate(neff, ev + nlock, vv, nevt);
 }
 
 static void submat(int nev, int ia, int ib) {
