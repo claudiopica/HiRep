@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *
+* Copyright (c) 2008-2023, Claudio Pica, Sofie Martins                      *
 * All rights reserved.                                                      *
 \***************************************************************************/
 
@@ -19,6 +19,12 @@
 #include "io.h"
 #include "memory.h"
 #include "utils.h"
+
+#ifdef WITH_GPU
+#define _PTR(_field) _field->gpu_ptr
+#else
+#define _PTR(_field) _field->ptr
+#endif
 
 #ifdef BC_T_SF_ROTATED
 #include "update.h"
@@ -1362,19 +1368,19 @@ void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in) {
 
     /* alloc memory for temporary spinor field */
     if (init_dirac) { init_Dirac(); }
-    Dphi_cpu_(otmp, in);
+    Dphi_(otmp, in);
     apply_BCs_on_spinor_field(otmp);
-    spinor_field_mul_f_cpu(otmp2, rho, otmp);
-    spinor_field_g5_mulc_add_assign_f_cpu(otmp2, imu, otmp);
-    Dphi_cpu_(out, otmp2);
+    spinor_field_mul_f(otmp2, rho, otmp);
+    spinor_field_g5_mulc_add_assign_f(otmp2, imu, otmp);
+    Dphi_(out, otmp2);
 
     rho = -(4 + m0);
     spinor_field_mul_add_assign_f_cpu(out, rho, in);
     imu = -I * mu;
-    spinor_field_g5_mulc_add_assign_f_cpu(out, imu, in);
+    spinor_field_g5_mulc_add_assign_f(out, imu, in);
 
-    spinor_field_minus_f_cpu(out, out);
-    spinor_field_g5_assign_f_cpu(out);
+    spinor_field_minus_f(out, out);
+    spinor_field_g5_assign_f(out);
 
     apply_BCs_on_spinor_field(out);
 }
@@ -1737,7 +1743,6 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr) {
 #endif // With expclover
 
 /*Dirac operator with twisted mass*/
-
 void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in, tw_D_type tw_type) {
     hr_complex z;
     double norm;
@@ -1749,12 +1754,13 @@ void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in,
     error(in->type != out->type, 1, "Dxx_tw_inv [Dphi.c]", "input spinors and output must be identical");
 #endif
     if (init_dirac_tm) { init_Dirac_tm(); }
-    gtmp_ptr = gtmp->ptr;
+
+    gtmp_ptr = _PTR(gtmp);
 
     if (in->type == &glat_odd) {
         aux = gtmp;
         aux->type = &glat_odd;
-        aux->ptr = gtmp->ptr + glat_odd.master_shift;
+        _PTR(aux) = _PTR(gtmp) + glat_odd.master_shift;
         aux2 = otmp2;
     } else {
         aux = etmp;
@@ -1772,14 +1778,14 @@ void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in,
 
     // in= 1/((4+m)^2+mu^2)*((4+m) in +- i mu g5 in)
 
-    spinor_field_g5_f_cpu(aux, in);
-    spinor_field_mulc_f_cpu(aux2, z, aux);
-    spinor_field_mul_f_cpu(out, (4. + mass), in);
-    spinor_field_add_assign_f_cpu(out, aux2);
-    spinor_field_mul_f_cpu(out, norm, out);
+    spinor_field_g5_f(aux, in);
+    spinor_field_mulc_f(aux2, z, aux);
+    spinor_field_mul_f(out, (4. + mass), in);
+    spinor_field_add_assign_f(out, aux2);
+    spinor_field_mul_f(out, norm, out);
 
     gtmp->type = &glattice;
-    gtmp->ptr = gtmp_ptr;
+    _PTR(gtmp) = gtmp_ptr;
 }
 
 void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, tw_D_type tw_type) {
@@ -1800,7 +1806,6 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
     if (init_dirac_tm) { init_Dirac_tm(); }
 
     /*************************************************
-   *
    * note rho = (4. +m0)^2 + mu^2
    * D_tw_ee_(dag/direct) = rho D_tw_ee_(direct/dag)_inv
    * D_tw_ee D_tw_ee^dag = rho
@@ -1817,24 +1822,24 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
      ************************************************/
 
         Dxx_tw_inv(m0, mu, etmp, in, DIRECT);
-        spinor_field_mul_f_cpu(etmp, -rho, etmp);
-        Dphi_cpu_(otmp, etmp);
+        spinor_field_mul_f(etmp, -rho, etmp);
+        Dphi_(otmp, etmp);
         Dxx_tw_inv(m0, mu, otmp, otmp, DIRECT);
-        Dphi_cpu_(out, otmp);
-        spinor_field_mul_add_assign_f_cpu(out, rho, in);
+        Dphi_(out, otmp);
+        spinor_field_mul_add_assign_f(out, rho, in);
     } else {
         /*************************************************
      * Operators here implemented is:
      * D_pre^dag = rho - D_ee_tw  D_eo D_oo_tw_inv^dag D_oe
      ************************************************/
-        Dphi_cpu_(otmp, in);
+        Dphi_(otmp, in);
         Dxx_tw_inv(m0, mu, otmp, otmp, DAGGER);
-        Dphi_cpu_(out, otmp);
+        Dphi_(out, otmp);
         Dxx_tw_inv(m0, mu, out, out, DAGGER);
-        spinor_field_mul_f_cpu(out, -rho, out);
-        spinor_field_mul_add_assign_f_cpu(out, rho, in);
+        spinor_field_mul_f(out, -rho, out);
+        spinor_field_mul_add_assign_f(out, rho, in);
     }
-    spinor_field_g5_assign_f_cpu(out);
+    spinor_field_g5_assign_f(out);
     apply_BCs_on_spinor_field(out);
 }
 
