@@ -52,7 +52,6 @@ void rotate_gpu(int n, spinor_field *pkk, hr_complex v[]) {
 
     cudaFree(pkk_gpu_d);
 }
-
 }
 
 #endif
