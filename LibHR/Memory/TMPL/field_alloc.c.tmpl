@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2008, 2022, Claudio Pica, Sofie Martins                     *   
+* Copyright (c) 2008-2023, Claudio Pica, Sofie Martins                      *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
@@ -57,7 +57,7 @@ _DECLARE_STATIC(allocate_field_struct_, (unsigned int n, _FIELD_TYPE **f, geomet
 _DECLARE_STATIC(allocate_cpu_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
     if (alloc_mem_t & CPU_MEM) {
         int bytes_per_site = sizeof(_SITE_TYPE);
-        int number_of_sites = _NUMBER_OF_SITES(f->type, _GEOM_TYPE);
+        size_t number_of_sites = _NUMBER_OF_SITES(f->type, _GEOM_TYPE);
         size_t field_size = bytes_per_site * number_of_sites * _FIELD_DIM * n;
         f->ptr = amalloc(field_size, ALIGN);
         error((f->ptr) == NULL, 1, __func__, "Could not allocate memory space for field (data).");
@@ -94,7 +94,7 @@ _DECLARE_STATIC(allocate_gpu_field_data_, (unsigned int n, _FIELD_TYPE *f, geome
     if (alloc_mem_t & GPU_MEM) {
         cudaError_t err;
         int bytes_per_site = sizeof(_SITE_TYPE);
-        int number_of_sites = _NUMBER_OF_SITES(f->type, _GEOM_TYPE);
+        size_t number_of_sites = _NUMBER_OF_SITES(f->type, _GEOM_TYPE);
         size_t field_size = number_of_sites * bytes_per_site * _FIELD_DIM * n;
         err = cudaMalloc((void **)&(f->gpu_ptr), field_size);
         error(err != cudaSuccess, 1, __func__, "Could not allocate GPU memory space for field");

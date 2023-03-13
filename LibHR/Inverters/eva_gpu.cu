@@ -31,7 +31,9 @@ __global__ void rotate_kernel(int n, suNf_spinor **pkk, hr_complex *v, int block
     }
 }
 
-void rotate_gpu(int n, suNf_spinor *pkk, hr_complex v[]) {
+extern "C" {
+
+void rotate_gpu(int n, spinor_field *pkk, hr_complex v[]) {
     suNf_spinor **pkk_gpu = (suNf_spinor **)malloc(n * sizeof(suNf_spinor *));
     suNf_spinor **pkk_gpu_d;
     for (int i = 0; i < n; i++) {
@@ -49,6 +51,8 @@ void rotate_gpu(int n, suNf_spinor *pkk, hr_complex v[]) {
     }
 
     cudaFree(pkk_gpu_d);
+}
+
 }
 
 #endif
