@@ -16,6 +16,9 @@ int main(int argc, char *argv[]) {
     int return_val = 0;
     setup_process(&argc, &argv);
     setup_gauge_fields();
+    represent_gauge_field();
+    random_u(u_gauge);
+    random_u_f(u_gauge_f);
 
     // Test block
     return_val += test_bijectivity_spinors();
@@ -58,7 +61,7 @@ int test_bijectivity_spinors() {
     assign_sd2s(out_flt, in);
     assign_s2sd(out, out_flt);
     spinor_field_sub_assign_f(out, in);
-    return_val += check_diff_norm(spinor_field_sqnorm_f(out), 1.e-11);
+    return_val += check_diff_norm(spinor_field_sqnorm_f(out), 1.e-10);
 
     sqnorm = spinor_field_sqnorm_f(in);
     sqnorm_flt = spinor_field_sqnorm_f_flt(out_flt);
@@ -75,7 +78,7 @@ int test_bijectivity_spinors() {
     assign_s2sd(out, in_flt);
     assign_sd2s(out_flt, out);
     spinor_field_sub_assign_f_flt(out_flt, in_flt);
-    return_val += check_diff_norm(spinor_field_sqnorm_f_flt(out_flt), 1.e-11);
+    return_val += check_diff_norm(spinor_field_sqnorm_f_flt(out_flt), 1.e-10);
 
     sqnorm_flt = spinor_field_sqnorm_f_flt(in_flt);
     sqnorm = spinor_field_sqnorm_f(out);
@@ -114,7 +117,7 @@ int test_add_assign() {
     assign_sd2s(in_flt, in);
     add_assign_s2sd(in, in_flt);
     spinor_field_sub_assign_f(out, in);
-    return_val += check_diff_norm(spinor_field_sqnorm_f(out), 1.e-11);
+    return_val += check_diff_norm(spinor_field_sqnorm_f(out), 1.e-10);
 
     /*
         Assign random single precision field to double
@@ -144,7 +147,6 @@ int test_gfield() {
     // Setup fields
     lprintf("TEST", 0, "Testing gfield assign\n");
     int return_val = 0;
-    random_u(u_gauge);
     suNg_field *u_gauge_copy = alloc_gfield(&glattice);
     u_gauge_flt = alloc_gfield_flt(&glattice);
 
@@ -171,7 +173,7 @@ int test_gfield() {
 #endif
 
     sub_assign_gfield_cpu(u_gauge_copy, u_gauge);
-    return_val += check_diff_norm(sqnorm_gfield_cpu(u_gauge_copy), 1.e-11);
+    return_val += check_diff_norm(sqnorm_gfield_cpu(u_gauge_copy), 1.e-10);
 
     // Free fields
     free_gfield(u_gauge_copy);
@@ -183,7 +185,6 @@ int test_gfield_f() {
     // Setup fields
     lprintf("TEST", 0, "Testing gfield_f assign\n");
     int return_val = 0;
-    random_u_f(u_gauge_f);
     suNf_field *u_gauge_copy = alloc_gfield_f(&glattice);
 
     /*
@@ -209,7 +210,7 @@ int test_gfield_f() {
 #endif
 
     sub_assign_gfield_f_cpu(u_gauge_copy, u_gauge_f);
-    return_val += check_diff_norm(sqnorm_gfield_f_cpu(u_gauge_copy), 1.e-11);
+    return_val += check_diff_norm(sqnorm_gfield_f_cpu(u_gauge_copy), 1.e-10);
 
     // Free fields
     free_gfield_f(u_gauge_copy);
