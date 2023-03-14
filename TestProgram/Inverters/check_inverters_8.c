@@ -1,6 +1,7 @@
 /******************************************************************************
 *
 * NOCOMPILE= UPDATE_EO
+* NOCOMPILE= !DPHI_FLT
 *
 * Test of modules
 *

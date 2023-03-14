@@ -38,40 +38,6 @@
         }                                       \
     }
 
-static double spinor_field_g5_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_flt *s2) {
-    static double res;
-    _OMP_PRAGMA(single) {
-        res = 0.;
-    }
-
-    _TWO_SPINORS_FOR_SUM(s1, s2, res) {
-        float prod;
-        _spinor_g5_prod_re_f(prod, *_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
-        res += (double)prod;
-    }
-#ifdef WITH_MPI
-    global_sum(&res, 1);
-#endif
-    return res;
-}
-
-static double spinor_field_sqnorm_f_f2d(spinor_field_flt *s1) {
-    static double res;
-    _OMP_PRAGMA(single) {
-        res = 0.;
-    }
-
-    _ONE_SPINOR_FOR_SUM(s1, res) {
-        float prod;
-        _spinor_prod_re_f(prod, *_SPINOR_PTR(s1), *_SPINOR_PTR(s1));
-        res += (double)prod;
-    }
-#ifdef WITH_MPI
-    global_sum(&res, 1);
-#endif
-    return res;
-}
-
 /*
 * performs the multi-shifted QMR inversion for g5-hermitean matrices:
 * out[i] = (M-(par->shift[i]))^-1 in
@@ -311,10 +277,10 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
     notconverged = 1;
 
     spinor_field_copy_f_flt(p2, in); /* trial solution = 0 */
-    innorm2 = spinor_field_sqnorm_f_f2d(in);
+    innorm2 = spinor_field_sqnorm_f_flt(in);
     M(Mp, out);
     spinor_field_sub_f_flt(p2, p2, Mp);
-    rho = sqrt(spinor_field_sqnorm_f_f2d(p2));
+    rho = sqrt(spinor_field_sqnorm_f_flt(p2));
     lprintf("INVERTER", 60, "g5QMR_core_flt: rho init: %1.8e\n", rho * rho / innorm2);
 
     spinor_field_mul_f_flt(p2, 1.f / ((float)(rho)), p2);
@@ -325,7 +291,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
     spinor_field_zero_f_flt(q1);
     spinor_field_zero_f_flt(q2);
     flag = 1;
-    delta = spinor_field_g5_prod_re_f_f2d(p2, p2);
+    delta = spinor_field_g5_prod_re_f_flt(p2, p2);
     beta = delta;
 
     /* cg recursion */
@@ -335,7 +301,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
         M(Mp, p2);
 
         /* compute alpha */
-        alpha = spinor_field_g5_prod_re_f_f2d(p2, Mp) / delta;
+        alpha = spinor_field_g5_prod_re_f_flt(p2, Mp) / delta;
 
         /* update p1, p2 */
         spinor_field_mul_add_assign_f_flt(Mp, ((float)(-beta)), p1);
@@ -346,7 +312,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
         Mp = sptmp;
 
         /* update rho */
-        rho = sqrt(spinor_field_sqnorm_f_f2d(p2));
+        rho = sqrt(spinor_field_sqnorm_f_flt(p2));
 
         maxm = 1.e-10; /* to check if the error is going down */
 
@@ -403,7 +369,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
 
             /* update delta and beta */
             olddelta = delta;
-            delta = spinor_field_g5_prod_re_f_f2d(p2, p2);
+            delta = spinor_field_g5_prod_re_f_flt(p2, p2);
 
             lprintf("INVERTER", 60, "g5QMR_core_flt: delta=%1.8e rho=%1.8e [iter=%d]\n", delta, rho, cgiter);
             if (fabs(delta) < 1.e-6 || maxm < 1.e-3) { /* the method has failed ! */
@@ -424,7 +390,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
             M(sdbg, out);
             spinor_field_sub_assign_f_flt(sdbg, in);
             lprintf("INVERTER", 20, "g5QMR_core_flt: [%d] res=%e notconverged=%d\n", cgiter,
-                    spinor_field_sqnorm_f_f2d(sdbg) / innorm2, notconverged);
+                    spinor_field_sqnorm_f_flt(sdbg) / innorm2, notconverged);
         }
 #endif
 
@@ -435,7 +401,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
     M(Mp, out);
     ++cgiter;
     spinor_field_sub_f_flt(Mp, Mp, in);
-    norm = spinor_field_sqnorm_f_f2d(Mp) / innorm2;
+    norm = spinor_field_sqnorm_f_flt(Mp) / innorm2;
     *valid = 1;
     if (fabs(norm) > err2) {
         *valid = 0;
