@@ -57,7 +57,7 @@ jobs:
         run: ./TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters Sources StoredConfs Utils Propagator Random SpinorField Update WilsonLoops" --mpicc mpicc.openmpi --cflags "-Wall -O1 -fprofile-arcs -ftest-coverage" --ldflags "-fprofile-arcs -ftest-coverage" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.omp }} ${{ matrix.ecsw }}
 
       - name: Generate coverage report
-        run: python3 -m gcovr -x -o coverage.xml build/
+        run: pip3 install gcovr && python3 -m gcovr -x -o coverage.xml build/
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
