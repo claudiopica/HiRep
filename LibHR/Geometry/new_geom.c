@@ -146,7 +146,7 @@ int boxOddVolume(box_t *B){
 }
 
 /// Rounds up val to a multiple of modulo
-static int roundUp(int val, int const modulo) {
+static int roundUp(size_t val, int const modulo) {
     int const remainder = val % modulo; 
     if (remainder != 0) { val += modulo-remainder; }
     return val;
@@ -371,7 +371,7 @@ static box_t *makeBorderBox(char mask) {
 /// TODO: change this: make sendbuf_alloc take the full size of the sendbuffer, not the size per site
 
 /// Compute memory size for total=inner + buffers, and buffers only
-static void geometryMemSize(box_t *G, int *total, int *buffers) {
+static void geometryMemSize(box_t *G, size_t *total, size_t *buffers) {
     *total = roundUp(boxEvenVolume(G), THREADSIZE) + roundUp(boxOddVolume(G), THREADSIZE);
     *buffers = 0;
     box_t *L = G->next; //first border buffer. L3 are first, then L2
@@ -389,12 +389,12 @@ static void geometryMemSize(box_t *G, int *total, int *buffers) {
 // their length depends on the size of the boxes
 static void index_alloc() {
     // memory for ipt
-    const int ext_volume = T_EXT * X_EXT * Y_EXT * Z_EXT;
+    const size_t ext_volume = T_EXT * X_EXT * Y_EXT * Z_EXT;
     ipt = malloc(ext_volume * sizeof(*ipt));
     error((ipt == NULL), 1, __func__, "Cannot allocate memory for ipt");
 
     // compute the memory volume for array of indices
-    int main_mem_volume, buf_mem_volume;
+    size_t main_mem_volume, buf_mem_volume;
     geometryMemSize(geometryBoxes, &main_mem_volume, &buf_mem_volume);
 
     // memory for iup, idn
@@ -568,7 +568,7 @@ static void enumerate_lattice() {
         b = b->next;
     }
 
-    int main_mem_volume, buf_mem_volume;
+    size_t main_mem_volume, buf_mem_volume;
     geometryMemSize(geometryBoxes, &main_mem_volume, &buf_mem_volume);
     memset(iup, INVALID_POINT, 2 * 4 * main_mem_volume * sizeof(*iup));
     memset(imask, 0, main_mem_volume * sizeof(*imask));
