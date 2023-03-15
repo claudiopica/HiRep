@@ -15,7 +15,7 @@ template <int FIELD_DIM, typename REAL, typename SITE_TYPE>
 __global__ void to_cpu_format_kernel(SITE_TYPE *out, SITE_TYPE *in, size_t N, size_t block_size, size_t master_shift) {
     for (size_t id = blockIdx.x * blockDim.x + threadIdx.x; id < N; id += blockDim.x * gridDim.x) {
         SITE_TYPE *target;
-        int ix = id + block_size;
+        size_t ix = id + block_size;
         for (int comp = 0; comp < FIELD_DIM; ++comp) {
             target = _DFIELD_AT_PTR(out, ix, comp, master_shift, FIELD_DIM);
             read_gpu<REAL>(0, target, in, (ix - master_shift), comp, FIELD_DIM);
@@ -27,7 +27,7 @@ template <int FIELD_DIM, typename REAL, typename SITE_TYPE>
 __global__ void to_gpu_format_kernel(SITE_TYPE *out, SITE_TYPE *in, size_t N, size_t block_size, size_t master_shift) {
     for (size_t id = blockIdx.x * blockDim.x + threadIdx.x; id < N; id += blockDim.x * gridDim.x) {
         SITE_TYPE *s;
-        int ix = id + block_size;
+        size_t ix = id + block_size;
         for (int comp = 0; comp < FIELD_DIM; ++comp) {
             s = _DFIELD_AT_PTR(in, ix, comp, master_shift, FIELD_DIM);
             write_gpu<REAL>(0, s, out, (ix - master_shift), comp, FIELD_DIM);
