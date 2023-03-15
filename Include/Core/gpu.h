@@ -4,6 +4,13 @@
  */
 #ifndef GPU_H
 #define GPU_H
+
+#ifdef WITH_GPU
+#define visible __host__ __device__
+#else
+#define visible
+#endif
+
 #ifdef WITH_GPU
 
 #include <stdio.h>
