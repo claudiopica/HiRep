@@ -71,17 +71,11 @@ _DECLARE(void, sync_box_to_buffer_gpu_, (geometry_descriptor * gd, box_t *src, _
     if (gd == &glat_even) { gd_t = EVEN; }
     if (gd == &glat_odd) { gd_t = ODD; }
 
-    /* icoord array gives coordinates of inner lattice given a sendbuffer index */
-    coord4 *c = src->icoord;
-    coord4 *d_c;
-    int full_vol = boxVolume(src);
-    cudaMalloc((void **)&d_c, glattice.nbuffers_gauge * full_vol * sizeof(coord4));
-    cudaMemcpy(d_c, c, glattice.nbuffers_gauge * full_vol * sizeof(coord4), cudaMemcpyHostToDevice);
-
     kernel_field_input *input = _F_NAME(init_kernel_input_, _FIELD_NAME)(sendbuf, in, src, gd_t);
     const int max_vol = fmax(boxEvenVolume(src), boxOddVolume(src));
     const int grid = (max_vol - 1) / BLOCK_SIZE + 1;
-    _F_NAME(box_to_buffer_kernel_, _FIELD_NAME)<<<grid, BLOCK_SIZE>>>(input, d_c, ipt_gpu);
+    _F_NAME(box_to_buffer_kernel_, _FIELD_NAME)<<<grid, BLOCK_SIZE>>>(input, sb_icoord_gpu, ipt_gpu);
+    cudaFree(input);
 }
 
 #undef _DECLARE

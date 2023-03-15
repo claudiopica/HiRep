@@ -78,7 +78,7 @@ _GPU_DECLARE(sync_, (_FIELD_TYPE * f)) {
 _DECLARE(start_sendrecv_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
     geometry_descriptor *type = f->type;
-    const int mpi_chunks_per_site = sizeof(_SITE_TYPE) / sizeof(_REAL);
+    const size_t mpi_chunks_per_site = sizeof(_SITE_TYPE) / sizeof(_REAL);
 
 #ifdef WITH_NEW_GEOMETRY
     if (_F_NAME(sendrecv_guard_, _FIELD_NAME) != NULL && _F_NAME(sendrecv_guard_, _FIELD_NAME) != (void *)f->comm_req) {
@@ -99,7 +99,7 @@ _DECLARE(start_sendrecv_, (_FIELD_TYPE * f)) {
             _REAL *recv_buffer = (_REAL *)(_BUF_DFIELD_BLK(f, i, _FIELD_DIM));
             /* Data Destination Parameters */
             int recv_proc = type->rbuf_from_proc[i];
-            int number_of_sites = type->rbuf_len[i];
+            size_t number_of_sites = type->rbuf_len[i];
             size_t recv_size_in_dbl = (_FIELD_DIM)*number_of_sites * mpi_chunks_per_site;
             /* Communications */
             MPI_Irecv(recv_buffer, recv_size_in_dbl, _MPI_REAL, recv_proc, i, cart_comm, &(f->comm_req[2 * i + 1]));
@@ -114,7 +114,7 @@ _DECLARE(start_sendrecv_, (_FIELD_TYPE * f)) {
             _REAL *send_buffer = (_REAL *)(_DFIELD_AT_PTR(f->sendbuf_ptr, f->type->sbuf_start[i], 0, master_shift, _FIELD_DIM));
             /* Data Origin Parameters */
             int send_proc = type->sbuf_to_proc[i];
-            int number_of_sites = type->sbuf_len[i];
+            size_t number_of_sites = type->sbuf_len[i];
             size_t send_size_in_dbl = (_FIELD_DIM)*number_of_sites * mpi_chunks_per_site;
             /* Communications */
             MPI_Isend(send_buffer, send_size_in_dbl, _MPI_REAL, send_proc, i, cart_comm, &(f->comm_req[2 * i]));
@@ -132,7 +132,7 @@ _DECLARE(start_sendrecv_, (_FIELD_TYPE * f)) {
             _REAL *recv_buffer = (_REAL *)(_BUF_GPU_DFIELD_BLK(f, i, _FIELD_DIM));
             /* Data Destination Parameters */
             int recv_proc = type->rbuf_from_proc[i];
-            int number_of_sites = roundUp(type->rbuf_len[i], THREADSIZE);
+            size_t number_of_sites = roundUp(type->rbuf_len[i], THREADSIZE);
             size_t recv_size_in_dbl = (_FIELD_DIM)*number_of_sites * mpi_chunks_per_site;
             /* Communications */
             MPI_Irecv(recv_buffer, recv_size_in_dbl, _MPI_REAL, recv_proc, i, cart_comm, &(f->comm_req[2 * i + 1]));
@@ -148,7 +148,7 @@ _DECLARE(start_sendrecv_, (_FIELD_TYPE * f)) {
             _REAL *send_buffer = (_REAL *)(_DFIELD_AT_PTR(f->sendbuf_gpu_ptr, f->type->sbuf_start[i], 0, 0, _FIELD_DIM));
             /* Data Origin Parameters */
             int send_proc = type->sbuf_to_proc[i];
-            int number_of_sites = roundUp(type->sbuf_len[i], THREADSIZE);
+            size_t number_of_sites = roundUp(type->sbuf_len[i], THREADSIZE);
             size_t send_size_in_dbl = (_FIELD_DIM)*number_of_sites * mpi_chunks_per_site;
             /* Communications */
             MPI_Isend(send_buffer, send_size_in_dbl, _MPI_REAL, send_proc, i, cart_comm, &(f->comm_req[2 * i]));
@@ -177,10 +177,10 @@ _DECLARE(complete_sendrecv_, (_FIELD_TYPE * f)) {
 _DECLARE(fill_buffers_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
     const geometry_descriptor *type = f->type;
-    const int chunks_per_site = sizeof(_SITE_TYPE) / sizeof(_REAL);
+    const size_t chunks_per_site = sizeof(_SITE_TYPE) / sizeof(_REAL);
     if (f->comm_type & CPU_COMM) {
         _BUFFER_FOR(i) {
-            int number_of_sites = type->rbuf_len[i];
+            size_t number_of_sites = type->rbuf_len[i];
             size_t buffer_length = _FIELD_DIM * number_of_sites * chunks_per_site;
             _REAL *buffer = (_REAL *)(_BUF_DFIELD_BLK(f, i, _FIELD_DIM));
             _F_NAME(random_, _REAL)(buffer, buffer_length);
@@ -189,7 +189,7 @@ _DECLARE(fill_buffers_, (_FIELD_TYPE * f)) {
 #ifdef WITH_GPU
     if (f->comm_type & GPU_COMM) {
         _BUFFER_FOR(i) {
-            int number_of_sites = type->rbuf_len[i];
+            size_t number_of_sites = type->rbuf_len[i];
             size_t buffer_length = _FIELD_DIM * number_of_sites * chunks_per_site;
             _REAL *random_array = (_REAL *)malloc(buffer_length * sizeof(_REAL));
             _F_NAME(random_, _REAL)(random_array, buffer_length);
@@ -205,10 +205,10 @@ _DECLARE(fill_buffers_, (_FIELD_TYPE * f)) {
 _DECLARE(fill_buffers_with_zeroes_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
     const geometry_descriptor *type = f->type;
-    const int chunks_per_site = sizeof(_SITE_TYPE) / sizeof(_REAL);
+    const size_t chunks_per_site = sizeof(_SITE_TYPE) / sizeof(_REAL);
     if (f->comm_type & CPU_COMM) {
         _BUFFER_FOR(i) {
-            int number_of_sites = type->rbuf_len[i];
+            size_t number_of_sites = type->rbuf_len[i];
             size_t buffer_length = _FIELD_DIM * number_of_sites * chunks_per_site;
             _REAL *buffer = (_REAL *)(_BUF_DFIELD_BLK(f, i, _FIELD_DIM));
             memset(buffer, 0, buffer_length * sizeof(_REAL));
@@ -217,7 +217,7 @@ _DECLARE(fill_buffers_with_zeroes_, (_FIELD_TYPE * f)) {
 #ifdef WITH_GPU
     if (f->comm_type & GPU_COMM) {
         _BUFFER_FOR(i) {
-            int number_of_sites = type->rbuf_len[i];
+            size_t number_of_sites = type->rbuf_len[i];
             size_t buffer_length = _FIELD_DIM * number_of_sites * chunks_per_site;
             _REAL *buffer = (_REAL *)(_BUF_GPU_DFIELD_BLK(f, i, _FIELD_DIM));
             cudaMemset(buffer, 0, buffer_length * sizeof(_REAL));
