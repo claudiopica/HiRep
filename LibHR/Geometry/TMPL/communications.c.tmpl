@@ -78,7 +78,7 @@ _GPU_DECLARE(sync_, (_FIELD_TYPE * f)) {
 _DECLARE(start_sendrecv_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
     geometry_descriptor *type = f->type;
-    const size_t mpi_chunks_per_site = sizeof(_SITE_TYPE) / sizeof(_REAL);
+    const int mpi_chunks_per_site = sizeof(_SITE_TYPE) / sizeof(_REAL);
 
 #ifdef WITH_NEW_GEOMETRY
     if (_F_NAME(sendrecv_guard_, _FIELD_NAME) != NULL && _F_NAME(sendrecv_guard_, _FIELD_NAME) != (void *)f->comm_req) {
