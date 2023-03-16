@@ -49,6 +49,7 @@ GetOptions(
   'ldflags=s'    => \(my $ldflags = ""),
   'include=s'    => \(my $include = ""),
   'ccache!'      => \(my $ccache = 0),
+  'color!'       => \(my $color = 1),
   'help'         => sub { HelpMessage(2) },
 ) or HelpMessage(1);
 
@@ -244,6 +245,7 @@ if($omp) {
 
 # write compiler options
 if ($ccache!=0) { $cc="ccache ".$cc; $mpicc="ccache ".$mpicc; }
+if ($color!=1) { print $fh "NOCOLOR = 1\n\n"; }
 print $fh "ENV = $env\n";
 print $fh "CC = $cc\n";
 print $fh "MPICC = $mpicc\n";
@@ -286,6 +288,7 @@ write_mkflags - write flags file for compilation of HiRep
 
   --[no-]mpi          [true]      Use MPI
   --[no-]gpu          [false]     Use GPU acceleration
+  --[no-]omp          [false]     Use OpenMP acceleration
   --env               []          Environment variables used for compilation
   --cc                [gcc]       Compiler
   --mpicc             [mpicc]     MPI Compiler
@@ -296,6 +299,7 @@ write_mkflags - write flags file for compilation of HiRep
   --ldflags           []          Linking options
   --[no-]ndebug       [true]      Set ndebug flag
   --[no-]ccache       [false]     Use ccache
+  --[no-]color        [true]      Color compilation output
 
   --[no-]eo           [true]      Even-Odd preconditioning
   --[no-]newgeo       [false]     Use new geometry

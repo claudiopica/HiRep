@@ -342,6 +342,9 @@ sub read_conf {
     # add definition for POSIX features
     push(@{$options{'MACRO'}},"_XOPEN_SOURCE=600") unless ($^O eq "darwin");
 
+    # color output
+    if (exists $options{'NOCOLOR'}) {$disable_color = $options{'NOCOLOR'}; }
+
     # icc does not have the output color option 
     if ($options{'CC'}[0]=~/\bmpiicc\b/ || $options{'CC'}[0]=~/\bicc\b/) {
         $disable_color=1;
