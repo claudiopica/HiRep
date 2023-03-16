@@ -515,7 +515,7 @@ int test_write_read_staple_field() {
 
     suNg *in_mat, *out_mat;
     _MASTER_FOR(in->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
+        for (int comp = 0; comp < 3; comp++) {
             in_mat = _3FIELD_AT(in, ix, comp);
             out_mat = _3FIELD_AT(out, ix, comp);
             write_staple_field_gpu(in_mat, gpu_format, ix, comp);
