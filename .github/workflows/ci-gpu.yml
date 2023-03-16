@@ -45,6 +45,7 @@ jobs:
           NVHPC_CUDA_HOME: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/12.0"
           LD_LIBRARY_PATH: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/12.0/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/compilers/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5/lib::/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/12.0/lib64:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/math_libs/lib64"
           CUDA_MATH_LIBS: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/math_libs/12.0"
-          OPAL_PREFIX: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/mpi" 
+          OPAL_PREFIX: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/mpi"
+          PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/12.0/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/compilers/bin" 
         run: ./TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters Sources StoredConfs Utils Propagator Random SpinorField Update WilsonLoops" --mpicc mpicc --cflags "-Wall -O1" --ldflags "" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.omp }} ${{ matrix.ecsw }}
 
