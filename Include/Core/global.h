@@ -57,10 +57,10 @@ GLB_VAR(int, Y_EXT, = 0);
 GLB_VAR(int, Z_EXT, = 0);
 
 /*path blocking size*/
-GLB_VAR(int, PB_T, = 2);
-GLB_VAR(int, PB_X, = 2);
-GLB_VAR(int, PB_Y, = 2);
-GLB_VAR(int, PB_Z, = 2);
+GLB_VAR(int, PB_T, = 4);
+GLB_VAR(int, PB_X, = 4);
+GLB_VAR(int, PB_Y, = 4);
+GLB_VAR(int, PB_Z, = 4);
 
 /* MPI stuff */
 GLB_VAR(int, WORLD_SIZE, = 1); /* mpi rank for this process */

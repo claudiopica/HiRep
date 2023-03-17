@@ -377,6 +377,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in) {
         // this is achieved with comparing the condition to be different than repeat=0,1
 
         _MASTER_FOR(out->type, ix) {
+            register int thread0 = hr_threadId();
             register suNf_spinor *r = _FIELD_AT(out, ix);
             if (repeat == 0) { _spinor_zero_f(*r); }
 
@@ -422,7 +423,9 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in) {
             }
             /******************************** end of loop *********************************/
 #ifdef WITH_PROBE_MPI
-            if (hr_threadId() == 0) { probe_mpi(); }
+            +if (thread0 == 0) {
+                probe_mpi();
+            }
 #endif
 
         } /* MASTER_FOR */
@@ -625,6 +628,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in) {
 #endif
 
         _SITE_FOR(out->type, ixp, ix) {
+            register int thread0 = hr_threadId();
             int iy;
             suNf *up, *um;
             suNf_vector psi, chi, psi2, chi2;
@@ -758,7 +762,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in) {
             /******************************** end of loop *********************************/
             _spinor_mul_f(*r, -0.5, *r);
 #ifdef WITH_PROBE_MPI
-            if (hr_threadId() == 0) { probe_mpi(); }
+            if (thread0 == 0) { probe_mpi(); }
 #endif
 
         } /* SITE_FOR */
@@ -793,6 +797,7 @@ void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in) {
 
     _OMP_PRAGMA(_omp_for nowait)
     for (int _fuse_master_for_ip_ix = 0; _fuse_master_for_ip_ix < (out->type)->fuse_inner_counter; _fuse_master_for_ip_ix++) {
+        register int thread0 = hr_threadId();
         _FUSE_IDX(out->type, ix);
 
         r = _FIELD_AT(out, ix);
@@ -922,7 +927,7 @@ void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in) {
         _spinor_mul_f(*r, -0.5, *r);
 
 #ifdef WITH_PROBE_MPI
-        if (hr_threadId() == 0) { probe_mpi(); }
+        if (thread0 == 0) { probe_mpi(); }
 #endif
 
     } /* FUSE FOR */

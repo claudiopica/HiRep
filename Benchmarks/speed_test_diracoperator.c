@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
 
     lprintf("LA TEST", 0, "Flop per site = %d\n", flopsite);
     lprintf("LA TEST", 0, "Byte per site = %d\n", bytesite);
-    lprintf("LA TEST", 0, "Dirac data movement = %d bytes\n", bytesite * VOLUME);
+    lprintf("LA TEST", 0, "Dirac data movement = %e bytes\n", ((double)bytesite) * VOLUME);
 
     // speed test Dirac operator
     lprintf("LA TEST", 0, "Warmup application of the Diracoperator %d times.\n", n_warmup);
@@ -104,8 +104,8 @@ int main(int argc, char *argv[]) {
     } while (elapsed < 2000);
 
     lprintf("LA TEST", 0, "Massless Diracoperator reps: %d , data: %lf kb, time: %lf msec, GFLOPS: %1.6g , BAND: %1.6g GB/s\n",
-            n_reps, ((double)(bytesite * VOLUME)) / 1024, elapsed, ((double)n_reps * VOLUME * flopsite) / elapsed / 1.e6,
-            ((double)n_reps * VOLUME * bytesite) / elapsed / 1.e6);
+            n_reps, ((double)(bytesite) * VOLUME) / 1024, elapsed, ((double)(n_reps) * VOLUME * flopsite) / elapsed / 1.e6,
+            ((double)(n_reps) * VOLUME * bytesite) / elapsed / 1.e6);
 
     free_spinor_field_f(s0);
     free_spinor_field_f(s1);
