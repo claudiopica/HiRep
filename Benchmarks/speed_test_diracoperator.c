@@ -104,8 +104,8 @@ int main(int argc, char *argv[]) {
     } while (elapsed < 2000);
 
     lprintf("LA TEST", 0, "Massless Diracoperator reps: %d , data: %lf kb, time: %lf msec, GFLOPS: %1.6g , BAND: %1.6g GB/s\n",
-            n_reps, ((double)(bytesite) * VOLUME) / 1024, elapsed, ((double)(n_reps) * VOLUME * flopsite) / elapsed / 1.e6,
-            ((double)(n_reps) * VOLUME * bytesite) / elapsed / 1.e6);
+            n_reps, ((double)(bytesite)*VOLUME) / 1024, elapsed, ((double)(n_reps)*VOLUME * flopsite) / elapsed / 1.e6,
+            ((double)(n_reps)*VOLUME * bytesite) / elapsed / 1.e6);
 
     free_spinor_field_f(s0);
     free_spinor_field_f(s1);
