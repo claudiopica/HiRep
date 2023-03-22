@@ -1,14 +1,7 @@
-#ifndef GROUP_REPRESENT_HPP
-#define GROUP_REPRESENT_HPP
-
 #include "libhr_core.h"
 
 #define XG(m, a, b) ((m) + (a)*NG + (b))
 #define XF(m, a, b) ((m) + (a)*NF + (b))
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 visible void _group_represent2(suNf *v, suNg *u) {
 #ifdef WITH_QUATERNIONS
@@ -314,9 +307,3 @@ visible void _group_represent_flt(suNf_flt *v, suNg_flt *u) {
 
 #undef XG
 #undef XF
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif

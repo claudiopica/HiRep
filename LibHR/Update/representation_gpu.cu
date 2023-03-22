@@ -7,10 +7,6 @@
 #include "Utils/single_double_utils.h"
 #include "Utils/boundary_conditions.h"
 
-#ifdef WITH_GPU
-#include "./group_represent.hpp"
-#endif
-
 #ifdef WITH_SMEARING
 #define gauge_ptr u_gauge_s->gpu_ptr
 #else

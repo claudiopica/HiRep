@@ -11,10 +11,6 @@
 #include "memory.h"
 #include "geometry.h"
 
-#ifndef WITH_GPU
-#include "./group_represent.hpp"
-#endif
-
 void represent_gauge_field() {
 #ifdef WITH_SMEARING
     smear_gauge_field();
