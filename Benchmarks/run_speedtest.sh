@@ -59,12 +59,14 @@ print_slurm_header () {
 #SBATCH -N $NODES                  # Total number of nodes requested
 #SBATCH --time 0:02:00           # Run time (hh:mm:ss) - 1.5 hours
 #SBATCH --exclusive
-##SBATCH --qos=scavenger
+#SBATCH --constraint=hm2
 # Launch MPI-based executable
 
-# module load GCC/11.2.0   
-# module load  OpenMPI/4.1.1
-source /opt/ohpc/pub/oneAPI/setvars.sh
+. ~/spack/share/spack/setup-env.sh 
+
+#module load openmpi-4.1.4-clang-15.0.7-wuqcqaw
+module load mpich-4.1-clang-15.0.7-o3jgla4
+export LD_LIBRARY_PATH=:/home/srahman/spack/opt/spack/linux-almalinux8-zen/gcc-8.5.0/gcc-12.2.0-dplyzyl6twqs6bjthkfv3dcljl4u5hkp/lib64/
 
 export I_MPI_DEBUG=5 
 export OMP_DISPLAY_AFFINITY=TRUE 
@@ -73,9 +75,13 @@ export MPI_DSM_VERBOSE=1
 export MPI_SHARED_VERBOSE=1 
 export MPI_MEMMAP_VERBOSE=1 
 
+export UCX_NET_DEVICES=mlx5_2:1
+export UCX_RC_MLX5_TM_ENABLE=y
 
-export  OMP_PROC_BIND=close # How I am going to bind omp threads on to those places 
-export  OMP_PLACES=cores    # Where I am going to place omp threads on the hardware, here is to cores
+export OMP_AFFINITY_FORMAT=\"Thread Affinity: %.8i %.8n %.15A %.12H\"
+
+export OMP_PROC_BIND=close # How I am going to bind omp threads on to those places 
+export OMP_PLACES=cores    # Where I am going to place omp threads on the hardware, here is to cores
 "
 }
 
@@ -139,7 +145,7 @@ log:default = -1
 log:inverter = -1
 log:forcestat = 0
 EOF
-        (( maxompproc =  ( MAXNPT - npt )/NODES + 1 ))
+        ((maxompproc = (MAXPROC - npt * NPX * NPY * NPZ) / NODES + 1))
         omplist=($(seq 1 $maxompproc))
         
         for ompproc in ${omplist[@]}; do
@@ -162,7 +168,7 @@ $ifelse (( SLURM_ARRAY_TASK_ID == $counter )) ; then
 export OMP_NUM_THREADS=$ompproc
 EXECONTROL=\`tail -n1 ${outfile}_${NODES}_${npt}_${lct}_${locall}_${paral}_${ompproc}_0 | grep -e "Process finalized" | wc -l\`
 if (( EXECONTROL == 0 )) ; then
-    mpirun -n $((npt * NPX * NPY * NPZ)) --ppn $(((npt * NPX * NPY * NPZ) / NODES))  ./$EXEC -i loc_speed_${NODES}_${npt}_${lct}_${locall}_${paral}.in -o ${outfile}_${NODES}_${npt}_${lct}_${locall}_${paral}_${ompproc}
+    srun -n $((npt * NPX * NPY * NPZ)) -c$ompproc  ./$EXEC -i loc_speed_${NODES}_${npt}_${lct}_${locall}_${paral}.in -o ${outfile}_${NODES}_${npt}_${lct}_${locall}_${paral}_${ompproc}
     $parse_out_script -n ${outfile}_${NODES}_${npt}_${lct}_${locall}_${paral}_${ompproc}_0 -j job.\${SLURM_JOB_ID}.out >>${locreportfile}
 fi
 EOF
