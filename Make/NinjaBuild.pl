@@ -62,6 +62,12 @@ rule nvcc
   depfile = $out.d
   deps = gcc
 
+rule nvcc_devcode
+  command = $ENV $NVCC -ccbin $CC -MMD -MF $out.d $GPUFLAGS --device-c $in -o $out && rm $in
+  description = $setbg NVCC C DEVICE CODE $setnorm $out
+  depfile = $out.d
+  deps = gcc
+
 rule ar
   command = rm -f $out && $AR crs $out $in
   description = $setbg AR $setnorm $out
@@ -86,6 +92,10 @@ rule suN_repr
 rule strided_reads 
   command = cd $outdir && $wr_gpugeo $NG $REPR $WQUAT $GAUGE_GROUP $IS_STRIDE_FIXED
   description = $setbg GPU GOMETRY HEADERS $setnorm $out
+
+rule setup_devcode
+  command = cp -l $in $out
+  description = $setbg C DEVICE CODE SETUP $setnorm $out
 
 # build writeREPR
 wr_repr_build = $builddir/Make/Utils/autosun/
@@ -166,6 +176,18 @@ sub contains {
     return 0;
 }
 
+sub dcode_rules {
+    my ( $dir, $dcode_sources ) = @_;
+    if ( $with_gpu ) {
+        foreach( @$dcode_sources ) {
+            my $file = $_;
+            my $in = "\$root/${dir}/${file}";
+            my $out = "${in}.device.cu";
+            print "build $out: setup_devcode $in\n";
+        }
+    }
+}
+
 sub obj_rules {
     my ($name, @c_sources) = @_;
     my @c_objs = ();
@@ -174,7 +196,11 @@ sub obj_rules {
         $obj=~s/\.cu?$/\.o/;
         my $cc_rule = "cc";
         if (/\.cu$/) {
-            $cc_rule = "nvcc";
+            if (/\.device.cu$/) {
+                $cc_rule = "nvcc_devcode";
+            } else {
+                $cc_rule = "nvcc";
+            }
             if(!$with_gpu) { next; } #skip cuda files if not with_gpu
         } 
         my $absobj = abs_path($obj);
@@ -230,6 +256,16 @@ sub exclude_files {
     my ( $array_ref, $exclude_ref ) = @_;
     foreach ( @$exclude_ref ) {
         delete_element($array_ref, $_);
+    }
+}
+
+sub mark_device_code {
+    my ( $dir, $array_ref, $c_device_code_files ) = @_;
+    if ( $with_gpu ) {
+        foreach ( @$c_device_code_files ) {
+            delete_element($array_ref, $_);
+            push(@$array_ref, "$dir/$_.device.cu");
+        }
     }
 }
 
@@ -341,6 +377,9 @@ sub read_conf {
 
     # add definition for POSIX features
     push(@{$options{'MACRO'}},"_XOPEN_SOURCE=600") unless ($^O eq "darwin");
+
+    # color output
+    if (exists $options{'NOCOLOR'}) {$disable_color = $options{'NOCOLOR'}; }
 
     # icc does not have the output color option 
     if ($options{'CC'}[0]=~/\bmpiicc\b/ || $options{'CC'}[0]=~/\bicc\b/) {

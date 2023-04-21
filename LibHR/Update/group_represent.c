@@ -3,6 +3,10 @@
 #define XG(m, a, b) ((m) + (a)*NG + (b))
 #define XF(m, a, b) ((m) + (a)*NF + (b))
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 visible void _group_represent2(suNf *v, suNg *u) {
 #ifdef WITH_QUATERNIONS
     *v = *((suNf *)u);
@@ -304,6 +308,10 @@ visible void _group_represent_flt(suNf_flt *v, suNg_flt *u) {
     *v = *((suNf_flt *)u);
 #endif
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #undef XG
 #undef XF
