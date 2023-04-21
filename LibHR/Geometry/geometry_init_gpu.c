@@ -78,12 +78,12 @@ void init_neighbors_gpu() {
     cudaMemcpy(icoord_gpu, geometryBoxes->icoord, (main_mem_volume + buf_mem_volume) * sizeof(coord4), cudaMemcpyHostToDevice);
     sb_icoord_gpu = icoord_gpu + main_mem_volume;
 
-    L = geometryBoxes;
+    /*L = geometryBoxes;
     box_t *SB;
     do {
         L->icoord = icoord_gpu;
         if ((SB = L->sendBox)) { SB->icoord = sb_icoord_gpu; }
-    } while ((L = L->next));
+    } while ((L = L->next));*/
 
 #endif
 }
