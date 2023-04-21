@@ -4,8 +4,7 @@
 #include <math.h>
 #include "memory.h"
 #include "geometry.h"
-#include "Utils/single_double_utils.h"
-#include "Utils/boundary_conditions.h"
+#include "utils.h"
 
 #ifdef WITH_SMEARING
 #define gauge_ptr u_gauge_s->gpu_ptr
@@ -20,9 +19,11 @@ __global__ void represent_gauge_field_kernel(suNf *gauge_f, suNg *gauge, int N, 
         suNf Ru;
         suNg u;
         int ix = id + block_start;
-        read_gpu<double>(0, &u, gauge, ix, 0, 4);
-        _group_represent2(&Ru, &u);
-        write_gpu<double>(0, &u, gauge_f, ix, 0, 4);
+        for (int mu = 0; mu < 4; mu++) {
+            read_gpu<double>(0, &u, gauge, ix, mu, 4);
+            _group_represent2(&Ru, &u);
+            write_gpu<double>(0, &Ru, gauge_f, ix, mu, 4);
+        }
     }
 }
 
@@ -33,6 +34,14 @@ void represent_gauge_field_gpu() {
         const int grid = (N - 1) / BLOCK_SIZE + 1;
         represent_gauge_field_kernel<<<grid, BLOCK_SIZE>>>(u_gauge_f->gpu_ptr, gauge_ptr, N, block_start);
     }
+
+#ifdef DPHI_FLT
+    assign_ud2u_f();
+#endif
+
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    compute_clover_term();
+#endif
 }
 
 #endif
