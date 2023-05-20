@@ -2,7 +2,7 @@ TOPDIR = ..
 SUBDIRS := $(shell find * -maxdepth 0 -type d)
 
 #Exclude these directories
-EXCLUDEDIR :=  Deflate RotatedSF 
+EXCLUDEDIR :=  Deflate RotatedSF Benchmarks LinearAlgebra Memory
 SUBDIRS := $(filter-out $(EXCLUDEDIR), $(SUBDIRS))
 
 LIBS += $(TOPDIR)/LibHR/libhr.a

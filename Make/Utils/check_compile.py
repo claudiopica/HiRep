@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import argparse
@@ -66,6 +66,6 @@ if __name__ == '__main__':
     if(os.path.isfile(file)):
         if search_file(file, set(macros)):
             exit(0)
-        print args.f
+        print(args.f)
     else:
         sys.stderr.write("Missing file "+file)
