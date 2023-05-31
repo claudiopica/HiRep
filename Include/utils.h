@@ -42,9 +42,9 @@ typedef struct
 void init_BCs(BCs_pars_t *pars);
 void init_plaq_open_BCs(double *plaq_weight, double *rect_weight, double ct, double cs);
 
-void free_BCs();
-void apply_BCs_on_represented_gauge_field();
-void apply_BCs_on_fundamental_gauge_field();
+void free_BCs(void);
+void apply_BCs_on_represented_gauge_field(void);
+void apply_BCs_on_fundamental_gauge_field(void);
 void apply_BCs_on_momentum_field(suNg_av_field *force);
 void apply_BCs_on_spinor_field(spinor_field *sp);
 void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp);
@@ -53,7 +53,7 @@ void apply_BCs_on_clover_term(suNfc_field *);
 
 void init_pure_gauge_anisotropy(double *chi);
 
-void SF_classical_solution();
+void SF_classical_solution(void);
 
 inline int safe_mod(int x, int y)
 {

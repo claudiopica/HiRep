@@ -235,7 +235,7 @@ void read_gauge_field(char filename[])
 #else
   read_gauge_field_matrix(filename);
 #endif
-  apply_BCs_on_fundamental_gauge_field(u_gauge);
+  apply_BCs_on_fundamental_gauge_field();
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f = (suNf_field *)((void *)u_gauge);

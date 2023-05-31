@@ -448,7 +448,6 @@ void update_hb_multilevel_gb_tune(int lev, int tuning_level, double *beta, int n
     static hr_complex *one_point_gb_mean, *one_point_tor_mean;
 
     static double *one_point_gb_std, *one_point_tor_std;
-    static long double norm = 1.0;
     static long double *partial_norm;
     int nblocking = nblockingend - nblockingstart + 1;
     static hr_complex **polyf;
@@ -467,13 +466,11 @@ void update_hb_multilevel_gb_tune(int lev, int tuning_level, double *beta, int n
 
             for (i = max_mh_level - 1; i >= 0; i--)
             {
-                norm *= ml_up[i];
                 if (i == max_mh_level - 1)
                     partial_norm[i] = GLB_VOL3 * NG;
                 else
                     partial_norm[i] = ml_up[i + 1] * partial_norm[i + 1];
             }
-            norm *= GLB_VOL3 * NG;
 
             polyf = malloc(sizeof(hr_complex *) * 3);
             polyf[0] = amalloc(sizeof(hr_complex) * Y * Z * T, ALIGN);

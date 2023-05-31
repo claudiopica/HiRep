@@ -168,7 +168,7 @@ void init_BCs(BCs_pars_t *pars)
 #endif
 }
 
-void free_BCs()
+void free_BCs(void)
 {
   if (init == 0)
     return;
@@ -229,7 +229,7 @@ static void gf_SF_BCs(suNg *dn, suNg *up);
 static void gf_open_BCs();
 #endif
 
-void apply_BCs_on_fundamental_gauge_field()
+void apply_BCs_on_fundamental_gauge_field(void)
 {
   complete_gf_sendrecv(u_gauge);
 #if defined(BASIC_SF) || defined(ROTATED_SF)
@@ -685,7 +685,7 @@ static void gf_SF_BCs(suNg *dn, suNg *up)
   }
 }
 
-void SF_classical_solution()
+void SF_classical_solution(void)
 {
   double x0;
   int ix, iy, iz, it, k, index;

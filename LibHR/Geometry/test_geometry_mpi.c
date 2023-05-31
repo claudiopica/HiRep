@@ -862,13 +862,13 @@ static void search_all_blocks(unsigned int parity, unsigned int mask[4]) {
       break;
   }
   
-  /*
+  
   if(n==0) {
     lprintf("TEST_GEOMETRY",loglevel,"ERROR search_all_blocks: Block not found");
     print_block_info(&tmp);
     error(1,1,"test_geometry.c","Block initialization... FAILED");
   }
-  */
+  
 }
 
 
