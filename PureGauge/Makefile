@@ -1,11 +1,13 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
-EXES =  suN_multilevel suN suN_multilevel_measure
+EXES =  suN_multilevel suN suN_multilevel_measure suN_multilevel_measure_tune
 
 suN_multilevel_OBJS =  suN_utils_multilevel.o
 
 suN_multilevel_measure_OBJS =  suN_utils_multilevel.o
+
+suN_multilevel_measure_tune_OBJS =  suN_utils_multilevel.o
 
 suN_OBJS =  suN_utils.o
 

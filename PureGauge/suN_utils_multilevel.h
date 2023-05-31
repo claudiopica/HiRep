@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2019, Antonio Rago                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2019, Antonio Rago                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 #ifndef SUN_UTILS_ML_H
@@ -10,10 +10,8 @@
 #include "glueballs.h"
 #define GENERIC_MAX(x, y) ((x) > (y) ? (x) : (y))
 
-#define ENSURE_int(i) _Generic((i), int \
-                               : (i))
-#define ENSURE_float(f) _Generic((f), float \
-                                 : (f))
+#define ENSURE_int(i) _Generic((i), int: (i))
+#define ENSURE_float(f) _Generic((f), float: (f))
 
 #define MAX(type, x, y) \
   (type) GENERIC_MAX(ENSURE_##type(x), ENSURE_##type(y))
@@ -23,7 +21,7 @@ typedef struct _input_pg_ml
 {
 
   double beta, anisotropy, APEsmear;
-  int nhb, nor, ml_levels, nblkstart, nblkend;
+  int nhb, nor, ml_levels, nblkstart, nblkend, tune_lev;
   int *ml_niteration;
   int *ml_nskip;
   cor_list corrs;
@@ -33,7 +31,7 @@ typedef struct _input_pg_ml
   char cml_corrs[2048];
 
   /* for the reading function */
-  input_record_t read[12];
+  input_record_t read[13];
 
 } input_pg_ml;
 
@@ -47,10 +45,11 @@ typedef struct _input_pg_ml
       {"number of ML levels", "ML levels = %d", INT_T, &(varname).ml_levels},                                                 \
       {"number of iterations per level", "ML iterations per level = %s", STRING_T, &((varname).cml_niteration[0])},           \
       {"number of skip steps at the beginning of each level", "ML skip per level = %s", STRING_T, &((varname).cml_nskip[0])}, \
-      {"number of skip steps at the beginning of each level", "ML correlators = %s", STRING_T, &((varname).cml_corrs[0])},    \
+      {"Correlator definition", "ML correlators = %s", STRING_T, &((varname).cml_corrs[0])},                                  \
       {"APEsmear parameter", "APEsmear = %lf", DOUBLE_T, &(varname).APEsmear},                                                \
-      {"start index of spatial blocking level to measure glueballs", "nblkstart = %d", INT_T, &((varname).nblkstart)},                      \
-      {"end index of spatial blocking level to measure glueballs", "nblkend = %d", INT_T, &((varname).nblkend)},                      \
+      {"start index of spatial blocking level to measure glueballs", "nblkstart = %d", INT_T, &((varname).nblkstart)},        \
+      {"end index of spatial blocking level to measure glueballs", "nblkend = %d", INT_T, &((varname).nblkend)},              \
+      {"Id of the level under tuning", "ML tune level = %d", INT_T, &(varname).tune_lev},              \
       {NULL, NULL, INT_T, NULL}                                                                                               \
     }                                                                                                                         \
   }
@@ -145,7 +144,7 @@ typedef struct _pg_flow_ml
 typedef struct _pg_flow_ml_measure
 {
   char configlist[256]; /* directory to store gconfs */
- 
+
   input_pg_ml *pg_v;
 
   input_WF *wf;

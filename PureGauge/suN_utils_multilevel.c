@@ -147,6 +147,7 @@ static void parse_ml_corellator_def()
     char *token;
     /* get the first token */
     token = strtok(pg_var_ml.cml_niteration, sep);
+
     /* walk through other tokens */
     for (int i = 0; i < pg_var_ml.ml_levels; i++)
     {
@@ -181,6 +182,7 @@ static void parse_ml_corellator_def()
 
     strncpy(tmp, pg_var_ml.cml_corrs, 2048);
     token = strtok_r(tmp, sep, &saveptr1);
+    error(token == NULL, 1, "init_mc_ml " __FILE__, "Missing correlators definition");
 
     do
     {
