@@ -35,6 +35,9 @@
 #include "Geometry/geometry_gpu_init.h"
 #include "Geometry/gpu_geometry.h"
 #include "Geometry/strided_reads_gpu.h"
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+#include "Geometry/read_clover.h"
+#endif
 #endif
 
 /* this define the width of the borders for parallel dimensions

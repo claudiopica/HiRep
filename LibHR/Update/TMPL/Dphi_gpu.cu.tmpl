@@ -13,6 +13,7 @@
 #include "libhr_core.h"
 #include "memory.h"
 #include "inverters.h"
+#include "utils.h"
 #include <string.h>
 #include "Utils/generics.h"
 
@@ -208,6 +209,7 @@ _DECLARE(static void, Dphi_inner, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
  * @param out                 Output spinor field to save result
  */
 _DECLARE(static void, Dphi_boundary, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
+#ifdef WITH_MPI
     enum gd_type gd_t;
     if (in->type == &glattice) {
         gd_t = GLOBAL;
@@ -230,6 +232,8 @@ _DECLARE(static void, Dphi_boundary, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
         buffer_box = buffer_box->next;
         i++;
     }
+    cudaDeviceSynchronize();
+#endif
 }
 
 /**
@@ -252,14 +256,75 @@ void _GPU_F_NAME_(Dphi, _SUFFIX)(_FIELD_TYPE *out, _FIELD_TYPE *in) {
     // Mask communication latency with calculating the points
     // that do not rely on communications
     _GPU_F_NAME(Dphi_inner, _SUFFIX)(out, in);
-#ifdef WITH_MPI
     _F_NAME(complete_sendrecv_, _FIELD_NAME)(in);
 
-    // After completion of communications add missing calculations
-    // that relied on communications.
+// After completion of communications add missing calculations
+// that relied on communications.
+#ifdef WITH_MPI
     _GPU_F_NAME(Dphi_boundary, _SUFFIX)(out, in);
 #endif
 }
+
+#ifdef WITH_CLOVER
+void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sptr, int assign) {
+    mass = (4. + mass);
+    _PIECE_FOR(sptr->type, ixp) {
+        const int N = sptr->type->master_end[ixp] - sptr->type->master_start[ixp] + 1;
+        const int grid = (N - 1) / BLOCK_SIZE + 1;
+        const int block_start = sptr->type->master_start[ixp];
+        suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start;
+        Cphi_gpu_kernel_<_VECTOR_TYPE, _REAL><<<grid, BLOCK_SIZE>>>(_GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp),
+                                                                    cl_term_gpu, mass, assign, N, block_start);
+    }
+}
+
+void _GPU_F_NAME_(Cphi_inv, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sptr, int assign) {
+    compute_ldl_decomp(mass);
+
+    _F_NAME(start_sendrecv_, _FIELD_NAME)(sptr);
+    _F_NAME(complete_sendrecv_, _FIELD_NAME)(sptr);
+
+    start_sendrecv_clover_ldl(cl_ldl);
+    complete_sendrecv_clover_ldl(cl_ldl);
+
+    _PIECE_FOR(sptr->type, ixp) {
+        const int N = sptr->type->master_end[ixp] - sptr->type->master_start[ixp] + 1;
+        const int grid = (N - 1) / BLOCK_SIZE + 1;
+        const int block_start = sptr->type->master_start[ixp];
+        ldl_t *cl_ldl_gpu = cl_ldl->gpu_ptr + block_start;
+        Cphi_inv_kernel_<_VECTOR_TYPE, _COMPLEX, _REAL><<<grid, BLOCK_SIZE>>>(
+            _GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp), cl_ldl_gpu, mass, assign, N, block_start);
+    }
+}
+#endif
+
+#ifdef WITH_EXPCLOVER
+void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sptr, int assign, int inverse) {
+    evaluate_sw_order(&mass);
+
+    mass = (4. + mass);
+    double invexpmass = 1.0 / mass;
+    if (inverse == 1) {
+        invexpmass = -1.0 / mass;
+        mass = 1 / mass;
+    }
+
+    init_clover_exp();
+
+    int NN_loc = get_NN();
+    int NNexp_loc = get_NNexp();
+
+    _PIECE_FOR(sptr->type, ixp) {
+        const int N = sptr->type->master_end[ixp] - sptr->type->master_start[ixp] + 1;
+        const int grid = (N - 1) / BLOCK_SIZE + 1;
+        const int block_start = sptr->type->master_start[ixp];
+        suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start;
+        Cphi_gpu_kernel_<_VECTOR_TYPE, _REAL><<<grid, BLOCK_SIZE>>>(_GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp),
+                                                                    cl_term_gpu, mass, invexpmass, assign, N, block_start,
+                                                                    NN_loc, NNexp_loc);
+    }
+}
+#endif
 
 /**
  * @brief Implementation of the Wilson-Dirac operator with mass on the GPU.
@@ -368,7 +433,7 @@ _DECLARE(void, g5Dphi_eopre, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
     _CHECK_GEOMETRY_EVEN(in);
     _CHECK_GEOMETRY_EVEN(out);
 
-#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
+#if defined(BASIC_SF) || defined(ROTATED_SF)
     _CALL(SF_spinor_bcs)(in);
 #endif
 
@@ -384,7 +449,7 @@ _DECLARE(void, g5Dphi_eopre, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
     _F_NAME(spinor_field_minus, _REP_SUFFIX)(out, out);
     _F_NAME(spinor_field_g5_assign, _REP_SUFFIX)(out);
 
-#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
+#if defined(BASIC_SF) || defined(ROTATED_SF)
     _F_NAME(SF_spinor_bcs)(out);
 #endif
 }
@@ -444,6 +509,13 @@ _ALIAS_INNER(void, Dphi_eopre, _SUFFIX, (double m0, _FIELD_TYPE *out, _FIELD_TYP
 _ALIAS_INNER(void, Dphi_oepre, _SUFFIX, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in));
 _ALIAS_INNER(void, g5Dphi_eopre, _SUFFIX, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in));
 _ALIAS_INNER(void, g5Dphi_eopre_sq, _SUFFIX, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in));
+#ifdef WITH_CLOVER
+_ALIAS_INNER_(void, Cphi, _SUFFIX, (double mass, _FIELD_TYPE *, _FIELD_TYPE *, int));
+_ALIAS_INNER_(void, Cphi_inv, _SUFFIX, (double mass, _FIELD_TYPE *, _FIELD_TYPE *, int));
+#endif
+#ifdef WITH_EXPCLOVER
+_ALIAS_INNER_(void, Cphi, _SUFFIX, (double mass, _FIELD_TYPE *, _FIELD_TYPE *, int, int));
+#endif
 
 #undef _FIELD_TYPE
 #undef _SPINOR_TYPE

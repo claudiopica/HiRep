@@ -51,6 +51,19 @@ void Dphi_fused_(spinor_field *out, spinor_field *in); //TODO: should we remove 
 
 // Clover operators
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+
+#ifdef WITH_CLOVER
+extern void (*Cphi_)(double mass, spinor_field *dptr, spinor_field *sptr, int assign);
+extern void (*Cphi_inv_)(double mass, spinor_field *dptr, spinor_field *sptr, int assign);
+void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign);
+void Cphi_inv_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign);
+#endif
+
+#ifdef WITH_EXPCLOVER
+extern void (*Cphi_)(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse);
+void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse);
+#endif
+
 void Cphi(double mass, spinor_field *dptr, spinor_field *sptr);
 void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr);
 void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr);
@@ -59,6 +72,7 @@ void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr);
 void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr);
 void Cphi_diag(double mass, spinor_field *dptr, spinor_field *sptr);
 void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr);
+void Cphi_diag_inv_cpu(double mass, spinor_field *dptr, spinor_field *sptr);
 #endif
 
 // D_update.c

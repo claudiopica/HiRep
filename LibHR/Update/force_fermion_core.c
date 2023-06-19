@@ -459,8 +459,8 @@ void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue) {
         _suNf_mul(Aminus[3], -invexpmass, *s2);
 
         // double horner scheme
-        doublehorner(Cplus, Aplus);
-        doublehorner(Cminus, Aminus);
+        doublehorner(Cplus, Aplus, get_NN(), get_NNexp());
+        doublehorner(Cminus, Aminus, get_NN(), get_NNexp());
 
         // Remember rhs = eta, lhs  = xi
 
@@ -575,7 +575,7 @@ void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double resi
     suNfc Aplus[4];
     suNfc Aminus[4];
     suNfc *s0, *s1, *s2, *s3;
-    factorialCoef(Coef);
+    factorialCoef(Coef, get_NN(), get_NNexp());
     // Construct force matrices
     _MASTER_FOR(&glattice, ix) {
         // Create matrix Aplus, Aminus

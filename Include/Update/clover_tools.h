@@ -16,13 +16,20 @@ extern "C" {
 #define WITH_CLOVER_EO
 #endif
 
-double get_csw();
-void compute_ldl_decomp(double);
-void compute_clover_term();
-void clover_la_logdet(double, double, scalar_field *);
-void compute_force_logdet(double, double);
-void clover_init(double);
-void set_csw(double *);
+// This is used in Cphi_inv_ which is duplicated
+// so we need the CPU version of this to be visible,
+// mostly for testing.
+void compute_ldl_decomp_cpu(double);
+void compute_clover_term_cpu();
+void set_csw_cpu(double *);
+
+extern double (*get_csw)();
+extern void (*compute_ldl_decomp)(double);
+extern void (*compute_clover_term)();
+extern void (*clover_la_logdet)(double, double, scalar_field *);
+extern void (*compute_force_logdet)(double, double);
+extern void (*clover_init)(double);
+extern void (*set_csw)(double *);
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,7 @@
 /***************************************************************************
-* Copyright (c) 2016, Martin Hansen                                        *
-* All rights reserved.                                                     *
-***************************************************************************/
+ * Copyright (c) 2016, Martin Hansen                                        *
+ * All rights reserved.                                                     *
+ ***************************************************************************/
 
 #include "update.h"
 #include "libhr_core.h"
@@ -32,11 +32,11 @@ static double csw_value;
 
 #define im(x, i, j) cimag(x[(i) * ((i) + 1) / 2 + (j)])
 
-double get_csw() {
+double get_csw_cpu() {
     return csw_value;
 }
 
-void set_csw(double *csw) {
+void set_csw_cpu(double *csw) {
     csw_value = *csw;
     lprintf("CLOVER", 10, "Coefficient: reset to csw = %1.6f\n", csw_value);
 }
@@ -257,9 +257,9 @@ static void _compute_clover_force(int id, double coeff) {
     }
 }
 
-void compute_force_logdet(double mass, double coeff) {
+void compute_force_logdet_cpu(double mass, double coeff) {
     // Update LDL decomposition
-    compute_ldl_decomp(4.0 + mass);
+    compute_ldl_decomp_cpu(4.0 + mass);
 
 // Loop odd sites
 #ifdef WITH_FUSE_MASTER_FOR
@@ -272,9 +272,9 @@ void compute_force_logdet(double mass, double coeff) {
     }
 }
 
-void clover_la_logdet(double nf, double mass, scalar_field *la) {
+void clover_la_logdet_cpu(double nf, double mass, scalar_field *la) {
     // Update LDL decomposition
-    compute_ldl_decomp(4.0 + mass);
+    compute_ldl_decomp_cpu(4.0 + mass);
 
 // Add local action
 #ifdef WITH_FUSE_MASTER_FOR
@@ -295,7 +295,7 @@ void clover_la_logdet(double nf, double mass, scalar_field *la) {
     }
 }
 
-void compute_clover_term() {
+void compute_clover_term_cpu() {
     sigma = 0xF00F;
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(&glattice, id) {
@@ -308,12 +308,13 @@ void compute_clover_term() {
     apply_BCs_on_clover_term(cl_term);
 }
 
-void compute_ldl_decomp(double sigma0) {
+void compute_ldl_decomp_cpu(double sigma0) {
     if (sigma == sigma0) {
         return;
     } else {
         sigma = sigma0;
     }
+
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(&glattice, id) {
         _FUSE_IDX(&glattice, id);
@@ -324,7 +325,7 @@ void compute_ldl_decomp(double sigma0) {
     }
 }
 
-void clover_init(double csw) {
+void clover_init_cpu(double csw) {
     cl_term = alloc_clover_term(&glattice);
     cl_ldl = alloc_clover_ldl(&glattice);
     cl_force = alloc_clover_force(&glattice);
@@ -338,4 +339,14 @@ void clover_init(double csw) {
 #endif
 }
 
-#endif //#ifdef WITH_CLOVER
+#ifndef WITH_GPU
+double (*get_csw)(void) = get_csw_cpu;
+void (*compute_ldl_decomp)(double) = compute_ldl_decomp_cpu;
+void (*compute_clover_term)(void) = compute_clover_term_cpu;
+void (*clover_la_logdet)(double, double, scalar_field *) = clover_la_logdet_cpu;
+void (*compute_force_logdet)(double, double) = compute_force_logdet_cpu;
+void (*clover_init)(double) = clover_init_cpu;
+void (*set_csw)(double *) = set_csw_cpu;
+#endif
+
+#endif // #ifdef WITH_CLOVER

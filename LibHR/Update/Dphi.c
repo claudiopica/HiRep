@@ -1411,7 +1411,7 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in) {
  * Cphi_diag_inv = D_oo^-1 or D_ee^-1            *
  *************************************************/
 
-static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
+void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
     // Correct mass term
     mass = (4. + mass);
     // Loop over local sites
@@ -1460,7 +1460,7 @@ static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assig
     }
 }
 
-static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
+void Cphi_inv_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
     int N = 2 * NF;
     mass = (4. + mass);
 
@@ -1590,7 +1590,7 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr) {
 
 // Inverse: 0, then normal operator; 1, then inverse operator;
 // Assume hermiticity!!
-static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse) {
+void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse) {
     evaluate_sw_order(&mass);
 
     // Correct mass term
@@ -1639,8 +1639,8 @@ static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assig
 
         // Exponentiate Aplus Aminus
 
-        clover_exp(Aplus, expAplus);
-        clover_exp(Aminus, expAminus);
+        clover_exp(Aplus, expAplus, get_NN(), get_NNexp());
+        clover_exp(Aminus, expAminus, get_NN(), get_NNexp());
 
         // Correct factor (4+m)
 
@@ -1864,4 +1864,11 @@ void (*Dphi_eopre)(double m0, spinor_field *out, spinor_field *in) = Dphi_eopre_
 void (*Dphi_oepre)(double m0, spinor_field *out, spinor_field *in) = Dphi_oepre_cpu;
 void (*g5Dphi_eopre)(double m0, spinor_field *out, spinor_field *in) = g5Dphi_eopre_cpu;
 void (*g5Dphi_eopre_sq)(double m0, spinor_field *out, spinor_field *in) = g5Dphi_eopre_sq_cpu;
+#ifdef WITH_CLOVER
+void (*Cphi_)(double mass, spinor_field *, spinor_field *, int) = Cphi_cpu_;
+void (*Cphi_inv_)(double mass, _FIELD_TYPE *, _FIELD_TYPE *, int) = Cphi_inv_cpu_;
+#endif
+#ifdef WITH_EXPCLOVER
+void (*Cphi_)(double mass, _FIELD_TYPE *, _FIELD_TYPE *, int, int) = Cphi_cpu_;
+#endif
 #endif // WITH_GPU

@@ -16,7 +16,7 @@
 #endif
 
 //#include "libhr_core.h"
-#include "geometry.h"
+//#include "geometry.h"
 
 enum DIRECTION { UP = 0, DOWN = 1 };
 
@@ -84,7 +84,7 @@ template <typename REAL, typename SITE_TYPE> __device__ void write_out_spinor_fi
 extern "C" {
 #endif
 
-#define _FIELD_NAME spinor_field_f
+/*#define _FIELD_NAME spinor_field_f
 #define _FIELD_TYPE spinor_field
 #define _SITE_TYPE suNf_spinor
 #define _FIELD_DIM 1
@@ -180,7 +180,7 @@ extern "C" {
 #define _SITE_TYPE suNg
 #define _FIELD_DIM 3
 #define _REAL double
-#include "TMPL/strided_reads_gpu.h.tmpl"
+#include "TMPL/strided_reads_gpu.h.tmpl"*/
 
 #ifdef __cplusplus
 }

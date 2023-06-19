@@ -8,6 +8,8 @@
 
 #include "libhr.h"
 
+// TODO: Test exponential clover inverse
+
 int test_identical(spinor_operator, spinor_operator, char *, double);
 int test_identical_flt(spinor_operator_flt, spinor_operator_flt, char *, double);
 int test_identical_massless(spinor_operator, spinor_operator, char *, geometry_descriptor *, geometry_descriptor *, double);
@@ -43,6 +45,18 @@ void Q_eopre_sq(spinor_field *, spinor_field *);
 void Q_eopre_sq_cpu(spinor_field *, spinor_field *);
 void Q_eopre_sq_flt(spinor_field_flt *, spinor_field_flt *);
 void Q_eopre_sq_flt_cpu(spinor_field_flt *, spinor_field_flt *);
+
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+// TODO: Test only even, only odd.
+void C_massless(spinor_field *, spinor_field *);
+void C_massless_cpu(spinor_field *, spinor_field *);
+void C_assign_massless(spinor_field *, spinor_field *);
+void C_assign_massless_cpu(spinor_field *, spinor_field *);
+void C_massless_inv(spinor_field *, spinor_field *);
+void C_massless_inv_cpu(spinor_field *, spinor_field *);
+void C_assign_massless_inv(spinor_field *, spinor_field *);
+void C_assign_massless_inv_cpu(spinor_field *, spinor_field *);
+#endif
 
 int main(int argc, char *argv[]) {
     // Init
@@ -88,6 +102,31 @@ int main(int argc, char *argv[]) {
         test_identical_massless_flt(&Q_eopre_flt, &Q_eopre_flt_cpu, "EO-preconditioned flt Q", &glat_even, &glat_even, 1e-2);
     return_val += test_identical_massless_flt(&Q_eopre_sq_flt, &Q_eopre_sq_flt_cpu, "Squared EO-preconditioned flt Q",
                                               &glat_even, &glat_even, 1e-2);
+#endif
+
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    return_val += test_identical_massless(&C_massless, &C_massless_cpu, "D with Clover term", &glattice, &glattice, 1e-11);
+    return_val += test_identical_massless(&C_assign_massless, &C_assign_massless_cpu, "D with Clover term (assign)", &glattice,
+                                          &glattice, 1e-11);
+    return_val += test_identical_massless(&C_massless_inv, &C_massless_inv_cpu, "C inv (clover)", &glattice, &glattice, 1e-11);
+    return_val += test_identical_massless(&C_assign_massless_inv, &C_assign_massless_inv_cpu, "C inv assign (clover)",
+                                          &glattice, &glattice, 1e-13);
+
+    return_val +=
+        test_identical_massless(&C_massless, &C_massless_cpu, "D with Clover term Even Lattice", &glat_even, &glat_even, 1e-13);
+    return_val +=
+        test_identical_massless(&C_massless, &C_massless_cpu, "D with Clover term Odd Lattice", &glat_odd, &glat_odd, 1e-13);
+
+    return_val += test_identical_massless(&C_massless_inv, &C_massless_inv_cpu, "C_inv (clover) even lattice", &glat_even,
+                                          &glat_even, 1e-13);
+    return_val += test_identical_massless(&C_massless_inv, &C_massless_inv_cpu, "C_inv (clover) odd lattice", &glat_odd,
+                                          &glat_odd, 1e-13);
+
+    return_val += test_identical_massless(&C_assign_massless_inv, &C_assign_massless_inv_cpu,
+                                          "C inv assign (clover) even lattice", &glat_even, &glat_even, 1e-13);
+    return_val += test_identical_massless(&C_assign_massless_inv, &C_assign_massless_inv_cpu,
+                                          "C inv assign (clover) even lattice", &glat_odd, &glat_odd, 1e-13);
+
 #endif
 
     // Finalize and return
@@ -151,8 +190,16 @@ int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name
     S_s_cpu = alloc_spinor_field_f(1, gd2);
 
     gaussian_spinor_field(s);
-    spinor_field_zero_f(S_s);
-    copy_to_gpu_spinor_field_f(s);
+    gaussian_spinor_field(S_s); // needed for the assign operators
+    spinor_field_copy_f(S_s_cpu, S_s);
+    copy_from_gpu_spinor_field_f(S_s_cpu);
+
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    copy_from_gpu_clover_term(cl_term);
+    start_sendrecv_clover_term(cl_term);
+    complete_sendrecv_clover_term(cl_term);
+    copy_from_gpu_clover_ldl(cl_ldl);
+#endif
 
     lprintf("INFO", 0, "Input spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(s));
     lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(s));
@@ -162,13 +209,14 @@ int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name
     complete_sendrecv_gfield_f(u_gauge_f);
 #endif
 
-    S(S_s, s);
     S_cpu(S_s_cpu, s);
+
+    S(S_s, s);
 
     copy_from_gpu_spinor_field_f(S_s);
 
     // Sanity checks: Norms are not identically zero
-    lprintf("INFO", 0, "Output spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s));
+    lprintf("INFO", 0, "Output spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(S_s));
     lprintf("INFO", 0, "Output spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s_cpu));
 
     spinor_field_sub_assign_f_cpu(S_s_cpu, S_s);
@@ -392,3 +440,73 @@ void I_operator(spinor_field *out, spinor_field *in) {
 void I_operator_cpu(spinor_field *out, spinor_field *in) {
     spinor_field_mul_f_cpu(out, 1, in);
 }
+
+#ifdef WITH_CLOVER
+void C_massless(spinor_field *out, spinor_field *in) {
+    Cphi_(-hmass, out, in, 0);
+}
+
+void C_massless_cpu(spinor_field *out, spinor_field *in) {
+    Cphi_cpu_(-hmass, out, in, 0);
+}
+
+void C_assign_massless(spinor_field *out, spinor_field *in) {
+    Cphi_(-hmass, out, in, 1);
+}
+
+void C_assign_massless_cpu(spinor_field *out, spinor_field *in) {
+    Cphi_cpu_(-hmass, out, in, 1);
+}
+
+void C_massless_inv(spinor_field *out, spinor_field *in) {
+    Cphi_inv_(-hmass, out, in, 0);
+}
+
+void C_massless_inv_cpu(spinor_field *out, spinor_field *in) {
+    Cphi_inv_cpu_(-hmass, out, in, 0);
+}
+
+void C_assign_massless_inv(spinor_field *out, spinor_field *in) {
+    Cphi_inv_(-hmass, out, in, 1);
+}
+
+void C_assign_massless_inv_cpu(spinor_field *out, spinor_field *in) {
+    Cphi_inv_cpu_(-hmass, out, in, 1);
+}
+
+#endif
+
+#ifdef WITH_EXPCLOVER
+void C_massless(spinor_field *out, spinor_field *in) {
+    Cphi_(-hmass, out, in, 0, 0);
+}
+
+void C_massless_cpu(spinor_field *out, spinor_field *in) {
+    Cphi_cpu_(-hmass, out, in, 0, 0);
+}
+
+void C_assign_massless(spinor_field *out, spinor_field *in) {
+    Cphi_(-hmass, out, in, 1, 0);
+}
+
+void C_assign_massless_cpu(spinor_field *out, spinor_field *in) {
+    Cphi_cpu_(-hmass, out, in, 1, 0);
+}
+
+void C_massless_inv(spinor_field *out, spinor_field *in) {
+    Cphi_(-hmass, out, in, 0, 1);
+}
+
+void C_massless_inv_cpu(spinor_field *out, spinor_field *in) {
+    Cphi_cpu_(-hmass, out, in, 0, 1);
+}
+
+void C_assign_massless_inv(spinor_field *out, spinor_field *in) {
+    Cphi_(-hmass, out, in, 1, 1);
+}
+
+void C_assign_massless_inv_cpu(spinor_field *out, spinor_field *in) {
+    Cphi_cpu_(-hmass, out, in, 1, 1);
+}
+
+#endif
