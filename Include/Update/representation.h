@@ -6,17 +6,20 @@
 #ifndef REPRESENTATION_H
 #define REPRESENTATION_H
 
-#include "suN_types.h"
-#include "suN_repr_func.h"
+#include "libhr_core.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void _group_represent2(suNf *v, suNg *u);
-void _group_represent2_flt(suNf_flt *v, suNg_flt *u);
+visible void _group_represent2(suNf *v, suNg *u);
+visible void _group_represent2_flt(suNf_flt *v, suNg_flt *u);
 void represent_gauge_field();
 //void represent_gauge_field_measure(); //TODO: not defined in libhr
+
+#ifdef WITH_GPU
+void represent_gauge_field_gpu();
+#endif
 
 #ifdef __cplusplus
 }
