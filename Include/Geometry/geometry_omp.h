@@ -33,7 +33,7 @@
 #define _SITE_FOR_RED(type, ip, is, redop1, redop2) \
     _OMP_PRAGMA(_omp_parallel)                      \
     _OMP_PRAGMA(_omp_for redop1 redop2)             \
-    for (int is = (type)->master_start[ip]; is <= (type)->master_end[ip]; is++)
+    for (size_t is = (type)->master_start[ip]; is <= (type)->master_end[ip]; is++)
 
 /**
  * @brief Iterate over sites of a given piece.

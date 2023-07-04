@@ -180,8 +180,8 @@ my @libs = ("libhrobservables.a", "libhr.a"); #order is important
   );
 
   my %exclude = ( Integrators => [ "check_integrator_utils_1.c", ], 
-                  Utils => [ "check_utils_3_gb_functions.c", "check_utils_3_tor_functions.c", 
-                  ], 
+                  Utils => [ "check_utils_3_gb_functions.c", "check_utils_3_tor_functions.c", ],
+                  Geometry => [ "check_format_convert_gpu.c", ], 
   );
 
   my %extra_sources = ( "check_integrator_1" => [ "check_integrator_utils_1.c"],

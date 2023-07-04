@@ -35,18 +35,18 @@
 
 typedef struct _kernel_field_input {
     void *field_in;
-    int start_in_even;
-    int start_in;
-    int base_in[2];
+    size_t start_in_even;
+    size_t start_in;
+    size_t base_in[2];
     int stride_in;
-    int vol_in[2];
-    int master_shift_in;
+    size_t vol_in[2];
+    size_t master_shift_in;
     void *field_out;
-    int stride_out;
-    int base_out[2];
-    int start_out;
-    int vol_out[2];
-    int master_shift_out;
+    size_t stride_out;
+    size_t base_out[2];
+    size_t start_out;
+    size_t vol_out[2];
+    size_t master_shift_out;
     void *gauge;
     int *iup_gpu;
     int *idn_gpu;

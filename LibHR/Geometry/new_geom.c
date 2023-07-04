@@ -146,7 +146,7 @@ int boxOddVolume(box_t *B){
 }
 
 /// Rounds up val to a multiple of modulo
-static int roundUp(int val, int const modulo) {
+static size_t roundUp(size_t val, int const modulo) {
     int const remainder = val % modulo; 
     if (remainder != 0) { val += modulo-remainder; }
     return val;
@@ -371,7 +371,7 @@ static box_t *makeBorderBox(char mask) {
 /// TODO: change this: make sendbuf_alloc take the full size of the sendbuffer, not the size per site
 
 /// Compute memory size for total=inner + buffers, and buffers only
-static void geometryMemSize(box_t *G, int *total, int *buffers) {
+void geometryMemSize(box_t *G, size_t *total, size_t *buffers) {
     *total = roundUp(boxEvenVolume(G), THREADSIZE) + roundUp(boxOddVolume(G), THREADSIZE);
     *buffers = 0;
     box_t *L = G->next; //first border buffer. L3 are first, then L2
@@ -389,12 +389,12 @@ static void geometryMemSize(box_t *G, int *total, int *buffers) {
 // their length depends on the size of the boxes
 static void index_alloc() {
     // memory for ipt
-    const int ext_volume = T_EXT * X_EXT * Y_EXT * Z_EXT;
+    const size_t ext_volume = T_EXT * X_EXT * Y_EXT * Z_EXT;
     ipt = malloc(ext_volume * sizeof(*ipt));
     error((ipt == NULL), 1, __func__, "Cannot allocate memory for ipt");
 
     // compute the memory volume for array of indices
-    int main_mem_volume, buf_mem_volume;
+    size_t main_mem_volume, buf_mem_volume;
     geometryMemSize(geometryBoxes, &main_mem_volume, &buf_mem_volume);
 
     // memory for iup, idn
@@ -568,7 +568,7 @@ static void enumerate_lattice() {
         b = b->next;
     }
 
-    int main_mem_volume, buf_mem_volume;
+    size_t main_mem_volume, buf_mem_volume;
     geometryMemSize(geometryBoxes, &main_mem_volume, &buf_mem_volume);
     memset(iup, INVALID_POINT, 2 * 4 * main_mem_volume * sizeof(*iup));
     memset(imask, 0, main_mem_volume * sizeof(*imask));
@@ -1001,8 +1001,8 @@ static sb_handle allocSB(size_t bytes_per_site) {
     //otherwise allocate memory
     //gsize_gauge is the local volume + rsend buffers.
     //We subtract the local volume to obtain rsend buffer size = send buffer size
-    const int nsites = glattice.gsize_gauge - roundUp(boxEvenVolume(geometryBoxes), THREADSIZE) -
-                       roundUp(boxOddVolume(geometryBoxes), THREADSIZE);
+    const size_t nsites = glattice.gsize_gauge - roundUp(boxEvenVolume(geometryBoxes), THREADSIZE) -
+                          roundUp(boxOddVolume(geometryBoxes), THREADSIZE);
     lprintf(LOGTAG, 10, "Allocating SEND buf: %.1fkB [bytes per site:%zu sites=%d]\n",
             ((float)(bytes_per_site * nsites) / 1024.), bytes_per_site, nsites);
     void *buf = amalloc(nsites * bytes_per_site, ALIGN);
@@ -1052,29 +1052,30 @@ void sendbuf_report() {
 // src : source geometry box.
 // bytes_per_site : size in bytes of the local object to copy. Could be 4 gauge fields or a (half)spinor
 // sendbuf : memory destination to be send over MPI to a matching recv buffer in the extended lattice (dst)
-static void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, void *lattice, void *sendbuf) {
+static void syncBoxToBuffer(enum gd_type gd_t, size_t bytes_per_site, box_t *src, void *lattice, void *sendbuf) {
 #ifndef NDEBUG
     lprintf("SYNC", 1, "VOLUME/PARITY: SRC=%d[even=%d]/%d\n", boxVolume(src), boxEvenVolume(src), boxParity(src));
 #endif
     if (gd_t & EVEN) { //EVEN part
-        const int vol = boxEvenVolume(src);
+        const size_t vol = boxEvenVolume(src);
 
         _OMP_PARALLEL_FOR
-        for (int dix = src->base_index; dix < (src->base_index + vol); dix++) {
+        for (size_t dix = src->base_index; dix < (src->base_index + vol); dix++) {
             coord4 c = src->icoord[dix];
-            int six = ipt_ext(c.x[0], c.x[1], c.x[2], c.x[3]);
+            size_t six = ipt_ext(c.x[0], c.x[1], c.x[2], c.x[3]);
+            //printf("vol: %ld, six: %d, dix: %d\n", vol, six, dix);
             char *srcbuf = ((char *)lattice) + six * bytes_per_site;
             char *dstbuf = ((char *)sendbuf) + dix * bytes_per_site;
             memcpy(dstbuf, srcbuf, bytes_per_site);
         }
     }
     if (gd_t & ODD) { //ODD part
-        const int vol = boxOddVolume(src);
+        const size_t vol = boxOddVolume(src);
 
         _OMP_PARALLEL_FOR
-        for (int dix = src->base_index_odd; dix < (src->base_index_odd + vol); dix++) {
+        for (size_t dix = src->base_index_odd; dix < (src->base_index_odd + vol); dix++) {
             coord4 c = src->icoord[dix];
-            int six = ipt_ext(c.x[0], c.x[1], c.x[2], c.x[3]);
+            size_t six = ipt_ext(c.x[0], c.x[1], c.x[2], c.x[3]);
             char *srcbuf = ((char *)lattice) + six * bytes_per_site;
             char *dstbuf = ((char *)sendbuf) + dix * bytes_per_site;
             memcpy(dstbuf, srcbuf, bytes_per_site);
@@ -1082,7 +1083,7 @@ static void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, v
     }
 }
 
-void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like, void *latticebuf, void *sb_ptr) {
+void sync_field(geometry_descriptor *gd, size_t bytes_per_site, int is_spinor_like, void *latticebuf, void *sb_ptr) {
     enum gd_type gd_t = GLOBAL;
     //TODO: the type should really be in the descriptor itself
     // we shouldn't compare pointers...

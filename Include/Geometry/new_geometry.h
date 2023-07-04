@@ -31,7 +31,7 @@ void *sendbuf_alloc(size_t bytes_per_site);
 #ifdef WITH_GPU
 void *sendbuf_alloc_gpu(size_t bytes_per_site);
 #endif
-void sync_field(geometry_descriptor *gd, int byte_per_site, int is_spinor_like, void *latticebuf, void *sb_ptr);
+void sync_field(geometry_descriptor *gd, size_t byte_per_site, int is_spinor_like, void *latticebuf, void *sb_ptr);
 int test_define_geometry(void);
 void sendbuf_report(void);
 void sync_field_gpu(geometry_descriptor *, int, int, void *, void *);
@@ -77,6 +77,7 @@ typedef struct box_t {
 int boxEvenVolume(box_t *B);
 int boxOddVolume(box_t *B);
 int boxVolume(box_t *);
+void geometryMemSize(box_t *G, size_t *total, size_t *buffers);
 
 #define _DECLARE_SYNC_TO_BUFFER(_name, _field_type, _type) \
     void sync_box_to_buffer_gpu_##_name(geometry_descriptor *, box_t *, _field_type *, void *);
