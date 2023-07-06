@@ -21,6 +21,8 @@ void update(double *beta, int nhb, int nor);
 void set_max_mh_level(int max_lev);
 void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblockingstart,
                                      int nblockingsend, double *smear_val, cor_list *lcor);
+void update_hb_multilevel_gb_tune(int lev, int tuning_level, double *beta, int nhb, int nor, int *ml_up, int *ml_skip,
+                                  int nblockingstart, int nblockingend, double *smear_val, cor_list *lcor);
 
 //update_mt.c
 typedef struct ghmc_par {
