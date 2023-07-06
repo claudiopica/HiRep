@@ -10,8 +10,10 @@
 extern "C" {
 #endif
 
-#ifndef WITH_GPU
 static double *inverse_fact = NULL;
+
+#ifdef WITH_GPU
+__constant__ double inverse_fact_gpu[MAX_FACTORIAL];
 #endif
 
 visible static double factorial_core(int N) {
@@ -23,29 +25,34 @@ visible static double factorial_core(int N) {
 }
 
 void init_factorial() {
-#ifndef WITH_GPU
     if (inverse_fact == NULL) {
         _OMP_PRAGMA(single) {
-            inverse_fact = malloc(sizeof(double) * (MAX_FACTORIAL + 1));
+            inverse_fact = (double *)malloc(sizeof(double) * (MAX_FACTORIAL + 1));
             for (int i = 0; i <= MAX_FACTORIAL; i++) {
-                inverse_fact[i] = 1. / / factorial_core(i);
+                inverse_fact[i] = 1. / factorial_core(i);
             }
         }
     }
+
+#ifdef WITH_GPU
+    cudaMemcpyToSymbol(inverse_fact_gpu, inverse_fact, MAX_FACTORIAL * sizeof(double));
 #endif
 }
 
-visible double inverse_factorial(int i) {
 #ifdef WITH_GPU
-    return 1. / factorial_core(i);
-#else
-    return inverse_fact[i];
+deviceonly double inverse_factorial_gpu(int i) {
+    return inverse_fact_gpu[i];
+}
 #endif
+
+double inverse_factorial(int i) {
+    return inverse_fact[i];
 }
 
 void finalize_factorial() {
-#ifndef WITH_GPU
     free(inverse_fact);
+#ifdef WITH_GPU
+    cudaFree(inverse_fact_gpu);
 #endif
 }
 

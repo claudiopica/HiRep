@@ -459,8 +459,8 @@ void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue) {
         _suNf_mul(Aminus[3], -invexpmass, *s2);
 
         // double horner scheme
-        doublehorner(Cplus, Aplus, get_NN(), get_NNexp());
-        doublehorner(Cminus, Aminus, get_NN(), get_NNexp());
+        doublehorner(Cplus, Aplus);
+        doublehorner(Cminus, Aminus);
 
         // Remember rhs = eta, lhs  = xi
 

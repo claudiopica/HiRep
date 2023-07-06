@@ -360,7 +360,7 @@ void compute_ldl_decomp_gpu(double sigma0) {
         sigma = sigma0;
     }
 
-    _CUDA_CALL((&glattice), grid, N, block_start, ixp,
+    _CUDA_CALL((&glattice), grid, (N * NF * NF), block_start, ixp,
                (_compute_ldl_decomp<<<grid, BLOCK_SIZE>>>(cl_term->gpu_ptr, cl_ldl->gpu_ptr, sigma, N, block_start)));
 
     _CUDA_CALL((&glattice), grid, N, block_start, ixp, (_ldl<<<grid, BLOCK_SIZE>>>(cl_ldl->gpu_ptr, 0, N, block_start)));

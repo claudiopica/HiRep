@@ -78,13 +78,32 @@ template <typename REAL, typename SITE_TYPE> __device__ void write_out_spinor_fi
     write_gpu<REAL>(0, r, in, ix, 0, 1);
 }
 
+template <typename REAL, typename FIELD_TYPE, typename SITE_TYPE>
+__host__ __device__ void write_assign_gpu(int stride, SITE_TYPE *s, FIELD_TYPE *out, int ix, int comp, int dim) {
+    const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
+    const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
+#ifdef FIXED_STRIDE
+    int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + (comp)*n_components * (THREADSIZE);
+    const int _stride = THREADSIZE;
+#else
+    int iz = ix + ((comp)*n_components) * (THREADSIZE);
+    const int _stride = stride;
+#endif
+    REAL *out_cpx = (REAL *)out;
+    REAL *out_comp_cpx = (REAL *)s;
+    for (int i = 0; i < n_components; ++i) {
+        out_cpx[iz] += out_comp_cpx[i];
+        iz += _stride;
+    }
+}
+
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/*#define _FIELD_NAME spinor_field_f
+#define _FIELD_NAME spinor_field_f
 #define _FIELD_TYPE spinor_field
 #define _SITE_TYPE suNf_spinor
 #define _FIELD_DIM 1
@@ -180,7 +199,7 @@ extern "C" {
 #define _SITE_TYPE suNg
 #define _FIELD_DIM 3
 #define _REAL double
-#include "TMPL/strided_reads_gpu.h.tmpl"*/
+#include "TMPL/strided_reads_gpu.h.tmpl"
 
 #ifdef __cplusplus
 }
