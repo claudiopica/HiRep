@@ -8,505 +8,293 @@
 
 #include "libhr.h"
 
-// TODO: Test exponential clover inverse
-
-int test_identical(spinor_operator, spinor_operator, char *, double);
-int test_identical_flt(spinor_operator_flt, spinor_operator_flt, char *, double);
-int test_identical_massless(spinor_operator, spinor_operator, char *, geometry_descriptor *, geometry_descriptor *, double);
-int test_identical_massless_flt(spinor_operator_flt, spinor_operator_flt, char *, geometry_descriptor *, geometry_descriptor *,
-                                double);
-void Q_operator(spinor_field *, spinor_field *);
-void Q_operator_flt(spinor_field_flt *, spinor_field_flt *);
-void Q_operator_cpu(spinor_field *, spinor_field *);
-void Q_operator_flt_cpu(spinor_field_flt *, spinor_field_flt *);
-void D_operator(spinor_field *, spinor_field *);
-void D_operator_cpu(spinor_field *, spinor_field *);
-void D_operator_flt(spinor_field_flt *, spinor_field_flt *);
-void D_operator_flt_cpu(spinor_field_flt *, spinor_field_flt *);
-void I_operator(spinor_field *, spinor_field *);
-void I_operator_cpu(spinor_field *, spinor_field *);
-void D_massless(spinor_field *, spinor_field *);
-void D_massless_cpu(spinor_field *, spinor_field *);
-void D_massless_flt(spinor_field_flt *, spinor_field_flt *);
-void D_massless_flt_cpu(spinor_field_flt *, spinor_field_flt *);
-void Q_operator_sq(spinor_field *, spinor_field *);
-void Q_operator_sq_cpu(spinor_field *, spinor_field *);
-void Q_operator_sq_flt(spinor_field_flt *, spinor_field_flt *);
-void Q_operator_sq_flt_cpu(spinor_field_flt *, spinor_field_flt *);
-void D_eopre(spinor_field *, spinor_field *);
-void D_eopre_cpu(spinor_field *, spinor_field *);
-void D_eopre_flt(spinor_field_flt *, spinor_field_flt *);
-void D_eopre_flt_cpu(spinor_field_flt *, spinor_field_flt *);
-void Q_eopre(spinor_field *, spinor_field *);
-void Q_eopre_cpu(spinor_field *, spinor_field *);
-void Q_eopre_flt(spinor_field_flt *, spinor_field_flt *);
-void Q_eopre_flt_cpu(spinor_field_flt *, spinor_field_flt *);
-void Q_eopre_sq(spinor_field *, spinor_field *);
-void Q_eopre_sq_cpu(spinor_field *, spinor_field *);
-void Q_eopre_sq_flt(spinor_field_flt *, spinor_field_flt *);
-void Q_eopre_sq_flt_cpu(spinor_field_flt *, spinor_field_flt *);
-
-#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-// TODO: Test only even, only odd.
-void C_massless(spinor_field *, spinor_field *);
-void C_massless_cpu(spinor_field *, spinor_field *);
-void C_assign_massless(spinor_field *, spinor_field *);
-void C_assign_massless_cpu(spinor_field *, spinor_field *);
-void C_massless_inv(spinor_field *, spinor_field *);
-void C_massless_inv_cpu(spinor_field *, spinor_field *);
-void C_assign_massless_inv(spinor_field *, spinor_field *);
-void C_assign_massless_inv_cpu(spinor_field *, spinor_field *);
-#endif
-
-int main(int argc, char *argv[]) {
-    // Init
-    int return_val = 0;
-
-    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
-
-    // Setup process and communication
-    setup_process(&argc, &argv);
-
-    // Setup gauge field
-    setup_gauge_fields();
-
-    random_u(u_gauge);
-    represent_gauge_field();
-
-    // Test Block
-    return_val += test_identical(&I_operator, &I_operator_cpu, "Unit operator Full Lattice", 0.0);
-    return_val += test_identical(&D_operator, &D_operator_cpu, "D = Dphi Full Lattice", 1e-13);
-    return_val +=
-        test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Even Lattice", &glat_even, &glat_odd, 1e-13);
-    return_val +=
-        test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Odd Lattice", &glat_odd, &glat_even, 1e-13);
-
-    return_val += test_identical(&Q_operator, &Q_operator_cpu, "Q = g5Dphi Full Lattice", 1e-13);
-    return_val += test_identical(&Q_operator_sq, &Q_operator_sq_cpu, "Q^2 Full Lattice", 1e-12);
-    return_val += test_identical_massless(&D_eopre, &D_eopre_cpu, "EO-preconditioned D", &glat_even, &glat_even, 1e-11);
-    return_val += test_identical_massless(&Q_eopre, &Q_eopre_cpu, "EO-preconditioned Q", &glat_even, &glat_even, 1e-11);
-    return_val +=
-        test_identical_massless(&Q_eopre_sq, &Q_eopre_sq_cpu, "Squared EO-preconditioned Q", &glat_even, &glat_even, 1e-11);
-
-#ifdef DPHI_FLT
-    return_val += test_identical_flt(&D_operator_flt, &D_operator_flt_cpu, "D = Dphi_flt Full Lattice", 1e-4);
-    return_val += test_identical_massless_flt(&D_massless_flt, &D_massless_flt_cpu, "D = Dphi_flt Massless Even Lattice",
-                                              &glat_even, &glat_odd, 1e-4);
-    return_val += test_identical_massless_flt(&D_massless_flt, &D_massless_flt_cpu, "D = Dphi_flt Massless Odd Lattice",
-                                              &glat_odd, &glat_even, 1e-4);
-    return_val += test_identical_flt(&Q_operator_flt, &Q_operator_flt_cpu, "Q = g5Dphi_flt Full Lattice", 1e-4);
-    return_val += test_identical_flt(&Q_operator_sq_flt, &Q_operator_sq_flt_cpu, "Q^2 Single Precision Full Lattice", 1e-2);
-    return_val +=
-        test_identical_massless_flt(&D_eopre_flt, &D_eopre_flt_cpu, "EO-preconditioned flt D", &glat_even, &glat_even, 1e-2);
-    return_val +=
-        test_identical_massless_flt(&Q_eopre_flt, &Q_eopre_flt_cpu, "EO-preconditioned flt Q", &glat_even, &glat_even, 1e-2);
-    return_val += test_identical_massless_flt(&Q_eopre_sq_flt, &Q_eopre_sq_flt_cpu, "Squared EO-preconditioned flt Q",
-                                              &glat_even, &glat_even, 1e-2);
-#endif
-
-#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-    return_val += test_identical_massless(&C_massless, &C_massless_cpu, "D with Clover term", &glattice, &glattice, 1e-11);
-    return_val += test_identical_massless(&C_assign_massless, &C_assign_massless_cpu, "D with Clover term (assign)", &glattice,
-                                          &glattice, 1e-11);
-    return_val += test_identical_massless(&C_massless_inv, &C_massless_inv_cpu, "C inv (clover)", &glattice, &glattice, 1e-11);
-    return_val += test_identical_massless(&C_assign_massless_inv, &C_assign_massless_inv_cpu, "C inv assign (clover)",
-                                          &glattice, &glattice, 1e-13);
-
-    return_val +=
-        test_identical_massless(&C_massless, &C_massless_cpu, "D with Clover term Even Lattice", &glat_even, &glat_even, 1e-13);
-    return_val +=
-        test_identical_massless(&C_massless, &C_massless_cpu, "D with Clover term Odd Lattice", &glat_odd, &glat_odd, 1e-13);
-
-    return_val += test_identical_massless(&C_massless_inv, &C_massless_inv_cpu, "C_inv (clover) even lattice", &glat_even,
-                                          &glat_even, 1e-13);
-    return_val += test_identical_massless(&C_massless_inv, &C_massless_inv_cpu, "C_inv (clover) odd lattice", &glat_odd,
-                                          &glat_odd, 1e-13);
-
-    return_val += test_identical_massless(&C_assign_massless_inv, &C_assign_massless_inv_cpu,
-                                          "C inv assign (clover) even lattice", &glat_even, &glat_even, 1e-13);
-    return_val += test_identical_massless(&C_assign_massless_inv, &C_assign_massless_inv_cpu,
-                                          "C inv assign (clover) even lattice", &glat_odd, &glat_odd, 1e-13);
-
-#endif
-
-    // Finalize and return
-    finalize_process();
-    return return_val;
-}
-
-int test_identical(spinor_operator S, spinor_operator S_cpu, char *name, double precision) {
-    lprintf("INFO", 0, "[Testing %s]\n", name);
-
-    spinor_field *s, *S_s, *S_s_cpu;
-    int return_val = 0;
-
-    s = alloc_spinor_field_f(1, &glattice);
-    S_s = alloc_spinor_field_f(1, &glattice);
-    S_s_cpu = alloc_spinor_field_f(1, &glattice);
-
-    gaussian_spinor_field(s);
-
-    lprintf("INFO", 0, "Input spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(s));
-    lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(s));
-
-#ifdef WITH_MPI
-    start_sendrecv_gfield_f(u_gauge_f);
-    complete_sendrecv_gfield_f(u_gauge_f);
-#endif
-
-    S(S_s, s);
-    lprintf("INFO", 0, "Output spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(S_s));
-
-    S_cpu(S_s_cpu, s);
-    lprintf("INFO", 0, "Output spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s_cpu));
-
-    copy_from_gpu_spinor_field_f(S_s);
-
-    // Sanity checks: Norms are not identically zero
-    lprintf("INFO", 0, "Output spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s));
-    lprintf("INFO", 0, "Output spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s_cpu));
-
-    spinor_field_sub_assign_f_cpu(S_s_cpu, S_s);
-
-    double diff_norm = sqrt(spinor_field_sqnorm_f_cpu(S_s_cpu));
-    return_val += check_finiteness(diff_norm);
-    return_val += check_diff_norm(diff_norm, precision);
-
-    free_spinor_field_f(s);
-    free_spinor_field_f(S_s);
-    free_spinor_field_f(S_s_cpu);
-    return return_val;
-}
-
-int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name, geometry_descriptor *gd1,
-                            geometry_descriptor *gd2, double precision) {
-    lprintf("INFO", 0, "[Testing %s]\n", name);
-
-    spinor_field *s, *S_s, *S_s_cpu;
-    int return_val = 0;
-
-    s = alloc_spinor_field_f(1, gd1);
-    S_s = alloc_spinor_field_f(1, gd2);
-    S_s_cpu = alloc_spinor_field_f(1, gd2);
-
-    gaussian_spinor_field(s);
-    gaussian_spinor_field(S_s); // needed for the assign operators
-    spinor_field_copy_f(S_s_cpu, S_s);
-    copy_from_gpu_spinor_field_f(S_s_cpu);
-
-#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-    copy_from_gpu_clover_term(cl_term);
-    start_sendrecv_clover_term(cl_term);
-    complete_sendrecv_clover_term(cl_term);
-    copy_from_gpu_clover_ldl(cl_ldl);
-#endif
-
-    lprintf("INFO", 0, "Input spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(s));
-    lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(s));
-
-#ifdef WITH_MPI
-    start_sendrecv_gfield_f(u_gauge_f);
-    complete_sendrecv_gfield_f(u_gauge_f);
-#endif
-
-    S_cpu(S_s_cpu, s);
-
-    S(S_s, s);
-
-    copy_from_gpu_spinor_field_f(S_s);
-
-    // Sanity checks: Norms are not identically zero
-    lprintf("INFO", 0, "Output spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(S_s));
-    lprintf("INFO", 0, "Output spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s_cpu));
-
-    spinor_field_sub_assign_f_cpu(S_s_cpu, S_s);
-
-    double diff_norm = sqrt(spinor_field_sqnorm_f_cpu(S_s_cpu));
-    return_val += check_finiteness(diff_norm);
-    return_val += check_diff_norm(diff_norm, precision);
-
-    free_spinor_field_f(s);
-    free_spinor_field_f(S_s);
-    free_spinor_field_f(S_s_cpu);
-    return return_val;
-}
-
-int test_identical_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *name, double precision) {
-    lprintf("INFO", 0, "[Testing %s]\n", name);
-
-    spinor_field_flt *s, *S_s, *S_s_cpu;
-    int return_val = 0;
-
-    s = alloc_spinor_field_f_flt(1, &glattice);
-    S_s = alloc_spinor_field_f_flt(1, &glattice);
-    S_s_cpu = alloc_spinor_field_f_flt(1, &glattice);
-
-    gaussian_spinor_field_flt(s);
-    copy_to_gpu_spinor_field_f_flt(s);
-
-    lprintf("INFO", 0, "Input spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(s));
-    lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_flt(s));
-
-#ifdef WITH_MPI
-    start_sendrecv_gfield_f_flt(u_gauge_f_flt);
-    complete_sendrecv_gfield_f_flt(u_gauge_f_flt);
-#endif
-
-    S(S_s, s);
-    S_cpu(S_s_cpu, s);
-
-    copy_from_gpu_spinor_field_f_flt(S_s);
-
-    // Sanity checks: Norms are not identically zero
-    lprintf("INFO", 0, "Output spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(S_s));
-    lprintf("INFO", 0, "Output spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(S_s_cpu));
-
-    spinor_field_sub_assign_f_flt_cpu(S_s_cpu, S_s);
-
-    double diff_norm = sqrt(spinor_field_sqnorm_f_flt_cpu(S_s_cpu));
-    return_val += check_finiteness(diff_norm);
-    return_val += check_diff_norm(diff_norm, precision);
-
-    free_spinor_field_f_flt(s);
-    free_spinor_field_f_flt(S_s);
-    free_spinor_field_f_flt(S_s_cpu);
-    return return_val;
-}
-
-int test_identical_massless_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *name, geometry_descriptor *gd1,
-                                geometry_descriptor *gd2, double precision) {
-    lprintf("INFO", 0, "[Testing %s]\n", name);
-
-    spinor_field_flt *s, *S_s, *S_s_cpu;
-    int return_val = 0;
-
-    s = alloc_spinor_field_f_flt(1, gd1);
-    S_s = alloc_spinor_field_f_flt(1, gd2);
-    S_s_cpu = alloc_spinor_field_f_flt(1, gd2);
-
-    gaussian_spinor_field_flt(s);
-    spinor_field_zero_f_flt(S_s);
-    copy_to_gpu_spinor_field_f_flt(s);
-
-    lprintf("INFO", 0, "Input spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(s));
-    lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_flt(s));
-
-#ifdef WITH_MPI
-    start_sendrecv_gfield_f_flt(u_gauge_f_flt);
-    complete_sendrecv_gfield_f_flt(u_gauge_f_flt);
-#endif
-
-    S(S_s, s);
-    S_cpu(S_s_cpu, s);
-
-    copy_from_gpu_spinor_field_f_flt(S_s);
-
-    // Sanity checks: Norms are not identically zero
-    lprintf("INFO", 0, "Output spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(S_s));
-    lprintf("INFO", 0, "Output spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(S_s_cpu));
-
-    spinor_field_sub_assign_f_flt_cpu(S_s_cpu, S_s);
-
-    double diff_norm = sqrt(spinor_field_sqnorm_f_flt_cpu(S_s_cpu));
-    return_val += check_finiteness(diff_norm);
-    return_val += check_diff_norm(diff_norm, precision);
-
-    free_spinor_field_f_flt(s);
-    free_spinor_field_f_flt(S_s);
-    free_spinor_field_f_flt(S_s_cpu);
-    return return_val;
-}
-
-/* ============== OPERATOR DEFINITIONS ==========================*/
-
+static int errors = 0; // count the number of errors during this test uni
 static double hmass = 0.1;
 
-void D_massless(spinor_field *out, spinor_field *in) {
-    Dphi_(out, in);
+spinor_field *tmp, *in;
+spinor_field in_oe[3], in_eo[3], in_ee[3], in_oo[3];
+
+#ifdef DPHI_FLT
+spinor_field_flt *tmp_flt, *in_flt;
+spinor_field_flt in_eo_flt[3], in_oe_flt[3], in_ee_flt[3], in_oo_flt[3];
+#endif
+
+void reset_fields() {
+    in = tmp;
+#ifdef DPHI_FLT
+    in_flt = tmp_flt;
+#endif
 }
 
-void D_massless_cpu(spinor_field *out, spinor_field *in) {
-    Dphi_cpu_(out, in);
+void setup_fields_oe() {
+    in_oe[0] = get_even_part_spinor_field_f(&in[0]);
+    in_oe[1] = get_odd_part_spinor_field_f(&in[1]); // out
+    in_oe[2] = get_odd_part_spinor_field_f(&in[2]); // diff
+
+    tmp = in;
+    in = in_oe;
+#ifdef DPHI_FLT
+    in_oe_flt[0] = get_even_part_spinor_field_f_flt(&in_flt[0]);
+    in_oe_flt[1] = get_odd_part_spinor_field_f_flt(&in_flt[1]); // out
+    in_oe_flt[2] = get_odd_part_spinor_field_f_flt(&in_flt[2]); // diff
+
+    tmp_flt = in_flt;
+    in_flt = in_oe_flt;
+#endif
 }
 
-void D_massless_flt(spinor_field_flt *out, spinor_field_flt *in) {
-    Dphi_flt_(out, in);
+void setup_fields_eo() {
+    in_eo[0] = get_odd_part_spinor_field_f(&in[0]);
+    in_eo[1] = get_even_part_spinor_field_f(&in[1]); // out
+    in_eo[2] = get_even_part_spinor_field_f(&in[2]); // diff
+
+    tmp = in;
+    in = in_eo;
+
+#ifdef DPHI_FLT
+    in_eo_flt[0] = get_odd_part_spinor_field_f_flt(&in_flt[0]);
+    in_eo_flt[1] = get_even_part_spinor_field_f_flt(&in_flt[1]); // out
+    in_eo_flt[2] = get_even_part_spinor_field_f_flt(&in_flt[2]); // diff
+
+    tmp_flt = in_flt;
+    in_flt = in_eo_flt;
+#endif
 }
 
-void D_massless_flt_cpu(spinor_field_flt *out, spinor_field_flt *in) {
-    Dphi_flt_cpu_(out, in);
+void setup_fields_ee() {
+    in_ee[0] = get_even_part_spinor_field_f(&in[0]);
+    in_ee[1] = get_even_part_spinor_field_f(&in[1]); // out
+    in_ee[2] = get_even_part_spinor_field_f(&in[2]); // diff
+
+    tmp = in;
+    in = in_ee;
+
+#ifdef DPHI_FLT
+    in_ee_flt[0] = get_even_part_spinor_field_f_flt(&in_flt[0]);
+    in_ee_flt[1] = get_even_part_spinor_field_f_flt(&in_flt[1]); // out
+    in_ee_flt[2] = get_even_part_spinor_field_f_flt(&in_flt[2]); // diff
+
+    tmp_flt = in_flt;
+    in_flt = in_ee_flt;
+#endif
 }
 
-void D_operator(spinor_field *out, spinor_field *in) {
-    Dphi(-hmass, out, in);
+void setup_fields_oo() {
+    in_oo[0] = get_odd_part_spinor_field_f(&in[0]);
+    in_oo[1] = get_odd_part_spinor_field_f(&in[1]); // out
+    in_oo[2] = get_odd_part_spinor_field_f(&in[2]); // diff
+
+    tmp = in;
+    in = in_oo;
+
+#ifdef DPHI_FLT
+    in_oo_flt[0] = get_odd_part_spinor_field_f_flt(&in_flt[0]);
+    in_oo_flt[1] = get_odd_part_spinor_field_f_flt(&in_flt[1]); // out
+    in_oo_flt[2] = get_odd_part_spinor_field_f_flt(&in_flt[2]); // diff
+
+    tmp_flt = in_flt;
+    in_flt = in_oo_flt;
+#endif
 }
 
-void D_operator_cpu(spinor_field *out, spinor_field *in) {
-    Dphi_cpu(-hmass, out, in);
-}
+int main(int argc, char *argv[]) {
+    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
+    setup_process(&argc, &argv);
+    int ninputs = 1;
+    int noutputs = 1;
 
-void D_operator_flt(spinor_field_flt *out, spinor_field_flt *in) {
-    Dphi_flt(-hmass, out, in);
-}
+    in = alloc_spinor_field_f(ninputs + noutputs + 1, &glattice);
 
-void D_operator_flt_cpu(spinor_field_flt *out, spinor_field_flt *in) {
-    Dphi_flt_cpu(-hmass, out, in);
-}
+#ifdef DPHI_FLT
+    in_flt = alloc_spinor_field_f_flt(ninputs + noutputs + 1, &glattice);
+#endif
 
-void Q_operator(spinor_field *out, spinor_field *in) {
-    g5Dphi(-hmass, out, in);
-}
+    setup_random_gauge_fields();
 
-void Q_operator_cpu(spinor_field *out, spinor_field *in) {
-    g5Dphi_cpu(-hmass, out, in);
-}
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    double csw_check = get_csw(); // Query GPU setting of csw
+    set_csw_cpu(&csw_check); // Set CPU setting to the same value
+    setup_clover();
+#endif
 
-void Q_operator_flt(spinor_field_flt *out, spinor_field_flt *in) {
-    g5Dphi_flt(-hmass, out, in);
-}
+    _TEST_GPU_OP(errors, "Unit", ninputs + noutputs + 1, in, in + 1, spinor_field_mul_f(out, 1, in);
+                 spinor_field_mul_f_cpu(out, 1, in););
 
-void Q_operator_flt_cpu(spinor_field_flt *out, spinor_field_flt *in) {
-    g5Dphi_flt_cpu(-hmass, out, in);
-}
+    _TEST_GPU_OP(errors, "Dphi", ninputs + noutputs + 1, in, in + 1, Dphi(-hmass, out, in); Dphi_cpu(-hmass, out, in););
 
-void Q_operator_sq(spinor_field *out, spinor_field *in) {
-    g5Dphi_sq(-hmass, out, in);
-}
+    _TEST_GPU_OP(errors, "Dphi_", ninputs + noutputs + 1, in, in + 1, Dphi_(out, in); Dphi_cpu_(out, in););
 
-void Q_operator_sq_cpu(spinor_field *out, spinor_field *in) {
-    g5Dphi_sq_cpu(-hmass, out, in);
-}
+    _TEST_GPU_OP(errors, "g5Dphi", ninputs + noutputs + 1, in, in + 1, g5Dphi(-hmass, out, in); g5Dphi_cpu(-hmass, out, in););
 
-void Q_operator_sq_flt(spinor_field_flt *out, spinor_field_flt *in) {
-    g5Dphi_sq_flt(-hmass, out, in);
-}
+    _TEST_GPU_OP(errors, "Q^2", ninputs + noutputs + 1, in, in + 1, g5Dphi_sq(-hmass, out, in);
+                 g5Dphi_sq_cpu(-hmass, out, in););
 
-void Q_operator_sq_flt_cpu(spinor_field_flt *out, spinor_field_flt *in) {
-    g5Dphi_sq_flt_cpu(-hmass, out, in);
-}
+#ifdef DPHI_FLT
 
-void D_eopre(spinor_field *out, spinor_field *in) {
-    Dphi_eopre(-hmass, out, in);
-}
+    _TEST_GPU_OP_FLT(errors, "Dphi_flt", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt(-hmass, out, in_flt);
+                     Dphi_flt_cpu(-hmass, out, in_flt););
 
-void D_eopre_cpu(spinor_field *out, spinor_field *in) {
-    Dphi_eopre_cpu(-hmass, out, in);
-}
+    _TEST_GPU_OP_FLT(errors, "Dphi_flt_", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt_(out, in_flt);
+                     Dphi_flt_cpu_(out, in_flt););
 
-void D_eopre_flt(spinor_field_flt *out, spinor_field_flt *in) {
-    Dphi_eopre_flt(-hmass, out, in);
-}
+    _TEST_GPU_OP_FLT(errors, "g5Dphi_flt", ninputs + noutputs + 1, in_flt, in_flt + 1, g5Dphi_flt(-hmass, out, in_flt);
+                     g5Dphi_flt_cpu(-hmass, out, in_flt););
 
-void D_eopre_flt_cpu(spinor_field_flt *out, spinor_field_flt *in) {
-    Dphi_eopre_flt_cpu(-hmass, out, in);
-}
-
-void Q_eopre(spinor_field *out, spinor_field *in) {
-    g5Dphi_eopre(-hmass, out, in);
-}
-
-void Q_eopre_cpu(spinor_field *out, spinor_field *in) {
-    g5Dphi_eopre_cpu(-hmass, out, in);
-}
-
-void Q_eopre_flt(spinor_field_flt *out, spinor_field_flt *in) {
-    g5Dphi_eopre_flt(-hmass, out, in);
-}
-
-void Q_eopre_flt_cpu(spinor_field_flt *out, spinor_field_flt *in) {
-    g5Dphi_eopre_flt_cpu(-hmass, out, in);
-}
-
-void Q_eopre_sq(spinor_field *out, spinor_field *in) {
-    g5Dphi_eopre_sq(-hmass, out, in);
-}
-
-void Q_eopre_sq_cpu(spinor_field *out, spinor_field *in) {
-    g5Dphi_eopre_sq_cpu(-hmass, out, in);
-}
-
-void Q_eopre_sq_flt(spinor_field_flt *out, spinor_field_flt *in) {
-    g5Dphi_eopre_sq_flt(-hmass, out, in);
-}
-
-void Q_eopre_sq_flt_cpu(spinor_field_flt *out, spinor_field_flt *in) {
-    g5Dphi_eopre_sq_flt_cpu(-hmass, out, in);
-}
-
-void I_operator(spinor_field *out, spinor_field *in) {
-    spinor_field_mul_f(out, 1, in);
-}
-
-void I_operator_cpu(spinor_field *out, spinor_field *in) {
-    spinor_field_mul_f_cpu(out, 1, in);
-}
+    _TEST_GPU_OP_FLT(errors, "Q^2 flt", ninputs + noutputs + 1, in_flt, in_flt + 1, g5Dphi_sq_flt(-hmass, out, in_flt);
+                     g5Dphi_sq_flt_cpu(-hmass, out, in_flt););
+#endif
 
 #ifdef WITH_CLOVER
-void C_massless(spinor_field *out, spinor_field *in) {
-    Cphi_(-hmass, out, in, 0);
-}
 
-void C_massless_cpu(spinor_field *out, spinor_field *in) {
-    Cphi_cpu_(-hmass, out, in, 0);
-}
+    _TEST_GPU_OP(errors, "Cphi_", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 0);
+                 Cphi_cpu_(-hmass, out, in, 0););
 
-void C_assign_massless(spinor_field *out, spinor_field *in) {
-    Cphi_(-hmass, out, in, 1);
-}
+    _TEST_GPU_OP(errors, "Cphi_ (+=)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 1);
+                 Cphi_cpu_(-hmass, out, in, 1););
 
-void C_assign_massless_cpu(spinor_field *out, spinor_field *in) {
-    Cphi_cpu_(-hmass, out, in, 1);
-}
+    _TEST_GPU_OP(errors, "Cphi_inv_", ninputs + noutputs + 1, in, in + 1, Cphi_inv_(-hmass, out, in, 0);
+                 Cphi_inv_cpu_(-hmass, out, in, 0););
 
-void C_massless_inv(spinor_field *out, spinor_field *in) {
-    Cphi_inv_(-hmass, out, in, 0);
-}
-
-void C_massless_inv_cpu(spinor_field *out, spinor_field *in) {
-    Cphi_inv_cpu_(-hmass, out, in, 0);
-}
-
-void C_assign_massless_inv(spinor_field *out, spinor_field *in) {
-    Cphi_inv_(-hmass, out, in, 1);
-}
-
-void C_assign_massless_inv_cpu(spinor_field *out, spinor_field *in) {
-    Cphi_inv_cpu_(-hmass, out, in, 1);
-}
+    _TEST_GPU_OP(errors, "Cphi_inv_ (+=)", ninputs + noutputs + 1, in, in + 1, Cphi_inv_(-hmass, out, in, 1);
+                 Cphi_inv_cpu_(-hmass, out, in, 1););
 
 #endif
 
 #ifdef WITH_EXPCLOVER
-void C_massless(spinor_field *out, spinor_field *in) {
-    Cphi_(-hmass, out, in, 0, 0);
-}
 
-void C_massless_cpu(spinor_field *out, spinor_field *in) {
-    Cphi_cpu_(-hmass, out, in, 0, 0);
-}
+    _TEST_GPU_OP(errors, "Cphi_", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 0, 0);
+                 Cphi_cpu_(-hmass, out, in, 0, 0););
 
-void C_assign_massless(spinor_field *out, spinor_field *in) {
-    Cphi_(-hmass, out, in, 1, 0);
-}
+    _TEST_GPU_OP(errors, "Cphi_ (+=)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 1, 0);
+                 Cphi_cpu_(-hmass, out, in, 1, 0););
 
-void C_assign_massless_cpu(spinor_field *out, spinor_field *in) {
-    Cphi_cpu_(-hmass, out, in, 1, 0);
-}
+    _TEST_GPU_OP(errors, "Cphi_inv_", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 0, 1);
+                 Cphi_cpu_(-hmass, out, in, 0, 1););
 
-void C_massless_inv(spinor_field *out, spinor_field *in) {
-    Cphi_(-hmass, out, in, 0, 1);
-}
-
-void C_massless_inv_cpu(spinor_field *out, spinor_field *in) {
-    Cphi_cpu_(-hmass, out, in, 0, 1);
-}
-
-void C_assign_massless_inv(spinor_field *out, spinor_field *in) {
-    Cphi_(-hmass, out, in, 1, 1);
-}
-
-void C_assign_massless_inv_cpu(spinor_field *out, spinor_field *in) {
-    Cphi_cpu_(-hmass, out, in, 1, 1);
-}
+    _TEST_GPU_OP(errors, "Cphi_inv_ (+=)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 1, 1);
+                 Cphi_cpu_(-hmass, out, in, 1, 1););
 
 #endif
+
+    setup_fields_oe();
+
+    _TEST_GPU_OP(errors, "Dphi_ (OE)", ninputs + noutputs + 1, in, in + 1, Dphi_(out, in); Dphi_cpu_(out, in););
+
+#ifdef DPHI_FLT
+
+    _TEST_GPU_OP_FLT(errors, "Dphi_flt_ (OE)", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt_(out, in_flt);
+                     Dphi_flt_cpu_(out, in_flt););
+
+#endif
+
+    reset_fields();
+    setup_fields_eo();
+
+    _TEST_GPU_OP(errors, "Dphi_ (EO)", ninputs + noutputs + 1, in, in + 1, Dphi_(out, in); Dphi_cpu_(out, in););
+
+#ifdef DPHI_FLT
+
+    _TEST_GPU_OP_FLT(errors, "Dphi_flt_ (EO)", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt_(out, in_flt);
+                     Dphi_flt_cpu_(out, in_flt););
+
+#endif
+
+    reset_fields();
+    setup_fields_ee();
+
+    _TEST_GPU_OP(errors, "Dphi_eopre", ninputs + noutputs + 1, in, in + 1, Dphi_eopre(-hmass, out, in);
+                 Dphi_eopre_cpu(-hmass, out, in););
+
+    _TEST_GPU_OP(errors, "g5Dphi_oepre", ninputs + noutputs + 1, in, in + 1, g5Dphi_eopre(-hmass, out, in);
+                 g5Dphi_eopre_cpu(-hmass, out, in););
+
+    _TEST_GPU_OP(errors, "g5Dphi_oepre_sq", ninputs + noutputs + 1, in, in + 1, g5Dphi_eopre_sq(-hmass, out, in);
+                 g5Dphi_eopre_sq_cpu(-hmass, out, in););
+
+    _TEST_GPU_OP(errors, "Q_eopre", ninputs + noutputs + 1, in, in + 1, g5Dphi_eopre(-hmass, out, in);
+                 g5Dphi_eopre_cpu(-hmass, out, in););
+
+#ifdef DPHI_FLT
+
+    _TEST_GPU_OP_FLT(errors, "Dphi_eopre_flt", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_eopre_flt(-hmass, out, in_flt);
+                     Dphi_eopre_flt_cpu(-hmass, out, in_flt););
+
+    _TEST_GPU_OP_FLT(errors, "Q_eopre_flt", ninputs + noutputs + 1, in_flt, in_flt + 1, g5Dphi_eopre_flt(-hmass, out, in_flt);
+                     g5Dphi_eopre_flt_cpu(-hmass, out, in_flt););
+
+#endif
+
+#ifdef WITH_CLOVER
+
+    _TEST_GPU_OP(errors, "Cphi_ (EE)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 0);
+                 Cphi_cpu_(-hmass, out, in, 0););
+
+    _TEST_GPU_OP(errors, "Cphi_ (EE,+=)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 1);
+                 Cphi_cpu_(-hmass, out, in, 1););
+
+    _TEST_GPU_OP(errors, "Cphi_inv_ (EE)", ninputs + noutputs + 1, in, in + 1, Cphi_inv_(-hmass, out, in, 0);
+                 Cphi_inv_cpu_(-hmass, out, in, 0););
+
+    _TEST_GPU_OP(errors, "Cphi_inv_,EE,+=", ninputs + noutputs + 1, in, in + 1, Cphi_inv_(-hmass, out, in, 1);
+                 Cphi_inv_cpu_(-hmass, out, in, 1););
+
+#endif
+
+#ifdef WITH_EXPCLOVER
+
+    _TEST_GPU_OP(errors, "Cphi_ (EE)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 0, 0);
+                 Cphi_cpu_(-hmass, out, in, 0, 0););
+
+    _TEST_GPU_OP(errors, "Cphi_ (EE,+=)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 1, 0);
+                 Cphi_cpu_(-hmass, out, in, 1, 0););
+
+    _TEST_GPU_OP(errors, "Cphi_inv_ (EE)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 0, 1);
+                 Cphi_cpu_(-hmass, out, in, 0, 1););
+
+    _TEST_GPU_OP(errors, "Cphi_inv_,EE,+=", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 1, 1);
+                 Cphi_cpu_(-hmass, out, in, 1, 1););
+
+#endif
+
+    reset_fields();
+    setup_fields_oo();
+
+    _TEST_GPU_OP(errors, "Dphi_oepre", ninputs + noutputs + 1, in, in + 1, Dphi_oepre(-hmass, out, in);
+                 Dphi_oepre_cpu(-hmass, out, in););
+
+#ifdef WITH_CLOVER
+
+    _TEST_GPU_OP(errors, "Cphi_ (OO)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 0);
+                 Cphi_cpu_(-hmass, out, in, 0););
+
+    _TEST_GPU_OP(errors, "Cphi_ (OO,+=)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 1);
+                 Cphi_cpu_(-hmass, out, in, 1););
+
+    _TEST_GPU_OP(errors, "Cphi_inv_ (OO)", ninputs + noutputs + 1, in, in + 1, Cphi_inv_(-hmass, out, in, 0);
+                 Cphi_inv_cpu_(-hmass, out, in, 0););
+
+    _TEST_GPU_OP(errors, "Cphi_inv_,OO,+=", ninputs + noutputs + 1, in, in + 1, Cphi_inv_(-hmass, out, in, 1);
+                 Cphi_inv_cpu_(-hmass, out, in, 1););
+
+#endif
+
+#ifdef WITH_EXPCLOVER
+
+    _TEST_GPU_OP(errors, "Cphi_ (OO)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 0, 0);
+                 Cphi_cpu_(-hmass, out, in, 0, 0););
+
+    _TEST_GPU_OP(errors, "Cphi_ (OO,+=)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 1, 0);
+                 Cphi_cpu_(-hmass, out, in, 1, 0););
+
+    _TEST_GPU_OP(errors, "Cphi_inv_ (OO)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 0, 1);
+                 Cphi_cpu_(-hmass, out, in, 0, 1););
+
+    _TEST_GPU_OP(errors, "Cphi_inv_,OO,+=", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, out, in, 1, 1);
+                 Cphi_cpu_(-hmass, out, in, 1, 1););
+
+#endif
+
+    reset_fields();
+    finalize_process();
+    return errors;
+}
