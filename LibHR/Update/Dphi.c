@@ -423,9 +423,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in) {
             }
             /******************************** end of loop *********************************/
 #ifdef WITH_PROBE_MPI
-            +if (thread0 == 0) {
-                probe_mpi();
-            }
+            if (thread0 == 0) { probe_mpi(); }
 #endif
 
         } /* MASTER_FOR */
