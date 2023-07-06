@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2019, Antonio Rago                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2019, Antonio Rago                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 #ifndef SUN_UTILS_ML_H
@@ -21,7 +21,7 @@
 /* suN ML variables */
 typedef struct input_pg_ml {
     double beta, anisotropy, APEsmear;
-    int nhb, nor, ml_levels, nblkstart, nblkend;
+    int nhb, nor, ml_levels, nblkstart, nblkend, tune_lev;
     int *ml_niteration;
     int *ml_nskip;
     cor_list corrs;
@@ -30,30 +30,29 @@ typedef struct input_pg_ml {
     char cml_nskip[64];
     char cml_corrs[2048];
 
-    /* for the reading function */
-    input_record_t read[12];
+  /* for the reading function */
+  input_record_t read[13];
 
 } input_pg_ml;
 
-#define init_input_pg_ml(varname)                                                                                              \
-    {                                                                                                                          \
-        .read = {                                                                                                              \
-            { "beta", "beta = %lf", DOUBLE_T, &(varname).beta },                                                               \
-            { "anisotropy", "anisotropy = %lf", DOUBLE_T, &(varname).anisotropy },                                             \
-            { "nhb", "nhb = %d", INT_T, &(varname).nhb },                                                                      \
-            { "nor", "nor = %d", INT_T, &(varname).nor },                                                                      \
-            { "number of ML levels", "ML levels = %d", INT_T, &(varname).ml_levels },                                          \
-            { "number of iterations per level", "ML iterations per level = %s", STRING_T, &((varname).cml_niteration[0]) },    \
-            { "number of skip steps at the beginning of each level", "ML skip per level = %s", STRING_T,                       \
-              &((varname).cml_nskip[0]) },                                                                                     \
-            { "number of skip steps at the beginning of each level", "ML correlators = %s", STRING_T,                          \
-              &((varname).cml_corrs[0]) },                                                                                     \
-            { "APEsmear parameter", "APEsmear = %lf", DOUBLE_T, &(varname).APEsmear },                                         \
-            { "start index of spatial blocking level to measure glueballs", "nblkstart = %d", INT_T, &((varname).nblkstart) }, \
-            { "end index of spatial blocking level to measure glueballs", "nblkend = %d", INT_T, &((varname).nblkend) },       \
-            { NULL, NULL, INT_T, NULL }                                                                                        \
-        }                                                                                                                      \
-    }
+#define init_input_pg_ml(varname)                                                                                             \
+  {                                                                                                                           \
+    .read = {                                                                                                                 \
+      {"beta", "beta = %lf", DOUBLE_T, &(varname).beta},                                                                      \
+      {"anisotropy", "anisotropy = %lf", DOUBLE_T, &(varname).anisotropy},                                                    \
+      {"nhb", "nhb = %d", INT_T, &(varname).nhb},                                                                             \
+      {"nor", "nor = %d", INT_T, &(varname).nor},                                                                             \
+      {"number of ML levels", "ML levels = %d", INT_T, &(varname).ml_levels},                                                 \
+      {"number of iterations per level", "ML iterations per level = %s", STRING_T, &((varname).cml_niteration[0])},           \
+      {"number of skip steps at the beginning of each level", "ML skip per level = %s", STRING_T, &((varname).cml_nskip[0])}, \
+      {"Correlator definition", "ML correlators = %s", STRING_T, &((varname).cml_corrs[0])},                                  \
+      {"APEsmear parameter", "APEsmear = %lf", DOUBLE_T, &(varname).APEsmear},                                                \
+      {"start index of spatial blocking level to measure glueballs", "nblkstart = %d", INT_T, &((varname).nblkstart)},        \
+      {"end index of spatial blocking level to measure glueballs", "nblkend = %d", INT_T, &((varname).nblkend)},              \
+      {"Id of the level under tuning", "ML tune level = %d", INT_T, &(varname).tune_lev},              \
+      {NULL, NULL, INT_T, NULL}                                                                                               \
+    }                                                                                                                         \
+  }
 
 /* Polyakov variables */
 

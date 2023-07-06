@@ -1890,6 +1890,9 @@ If[cs>0,WriteString[ar,"
 "];
 startbase+=cs;];,{irrepev,1,Length[bTOrthog[px,py,pz][[irrepidx]]]}];,{charge,-1,1,2}];,{irrepidx,1,Length[bTOrthog[px,py,pz]]}];,{px,-1,1},{py,-1,1},{pz,-1,1}];
 WriteString[ar,"
+    if (polyf == NULL)
+          return;
+
     hr_complex *lpoly = NULL;
     hr_complex *gpoly = NULL;
     hr_complex *pcor = NULL;

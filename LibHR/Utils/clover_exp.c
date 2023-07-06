@@ -431,7 +431,7 @@ static void doublehornerNF3(double *C, suNfc *A) {
             for (k = 2 * NF - 2; k > 0; k--) {
                 q[k] = q[k - 1] - creal(p[k]) * qlast;
             }
-            q[0] = -p[0] * qlast + q2[j][i];
+            q[0] = -creal(p[0]) * qlast + q2[j][i];
         }
 
         for (j = 0; j < 2 * NF; j++) {
@@ -495,7 +495,7 @@ static void doublehornerNF2(double *C, suNfc *A) {
             for (k = 2 * NF - 2; k > 0; k--) {
                 q[k] = q[k - 1] - creal(p[k]) * qlast;
             }
-            q[0] = -p[0] * qlast + q2[j][i];
+            q[0] = -creal(p[0]) * qlast + q2[j][i];
         }
 
         for (j = 0; j < 2 * NF; j++) {

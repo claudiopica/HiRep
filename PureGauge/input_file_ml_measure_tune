@@ -1,0 +1,62 @@
+// Global variables
+GLB_T = 16
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 2
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+N_REP = 1
+
+rlx_level = 1
+rlx_seed = 43215
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+// Pure gauge coupling
+beta  =   6.1
+// Bare anisotropy parameter
+// anisotropy  =   2.464
+anisotropy  =   1.00
+// number of heathbath steps
+nhb   =   1 
+// number of overelaxations steps
+nor   =   4
+
+ML levels = 2
+//The number of iterations per level must be written in a order string comma separated x1,x2,x3.... (one information per level)
+ML iterations per level = 3,60
+//The number of update skip per level must be writte n in a order string comma separated x1,x2,x3.... (one information per level) (each of these must be >=1)
+ML skip per level = 2,3
+// the correlators are inputed according to the structure x1-y1|x2-y2,x3-y3,...
+// where pairs separated by a | are meant to have the same distance and will be averaged
+ML correlators = 6-8,6-9|5-8,5-9
+// The id of the level that will be measured for tuning  with 0 <= ML tune level < ML levels
+ML tune level = 0
+
+//number of spatial blocking level used to generate the glueballs correlators
+nblkstart = 0
+nblkend = 3
+//APE smearing parameter value
+APEsmear = 0.33
+
+WF:make = false
+// Wilson Flow time
+WF:tmax = 2.0
+//20
+WF:nmeas = 10
+//60
+WF:eps = 0.02
+WF:delta = 0.0001
+WF:anisotropy = 1.0
+
+polyakov:make = false
+
+// Run control variables
+configlist = list_confs.txt 
+

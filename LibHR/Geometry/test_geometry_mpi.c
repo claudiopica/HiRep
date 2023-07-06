@@ -879,7 +879,7 @@ static void search_all_blocks(unsigned int parity, unsigned int mask[4]) {
     print_block_info(&tmp);
     error(1,1,"test_geometry.c","Block initialization... FAILED");
   }
-  */
+  
 }
 
 static void initialize_blocks() {
