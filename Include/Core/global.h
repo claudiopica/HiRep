@@ -57,10 +57,10 @@ GLB_VAR(int, Y_EXT, = 0);
 GLB_VAR(int, Z_EXT, = 0);
 
 /*path blocking size*/
-GLB_VAR(int, PB_T, = 4);
-GLB_VAR(int, PB_X, = 4);
-GLB_VAR(int, PB_Y, = 4);
-GLB_VAR(int, PB_Z, = 4);
+GLB_VAR(int, PB_T, = 2);
+GLB_VAR(int, PB_X, = 2);
+GLB_VAR(int, PB_Y, = 2);
+GLB_VAR(int, PB_Z, = 2);
 
 /* MPI stuff */
 GLB_VAR(int, WORLD_SIZE, = 1); /* mpi rank for this process */
@@ -94,6 +94,11 @@ GLB_VAR(int, BLK_X, = 4);
 GLB_VAR(int, BLK_Y, = 4);
 GLB_VAR(int, BLK_Z, = 4);
 
+#define BLK_T_GPU 4
+#define BLK_X_GPU 4
+#define BLK_Y_GPU 4
+#define BLK_Z_GPU 4
+
 /* Geometry structures */
 GLB_VAR(geometry_descriptor, glattice, = { 0 }); /* global lattice */
 GLB_VAR(geometry_descriptor, glat_even, = { 0 }); /* global even lattice */
@@ -124,8 +129,12 @@ GLB_VAR(coord4 *, sb_icoord_gpu);
 #define BLOCK_SIZE_LINEAR_ALGEBRA 512
 #define BLOCK_SIZE_GLOBAL_SUM 512
 #define BLOCK_SIZE_DIRAC 256
+#define BLOCK_SIZE_CLOVER 256
 #define BLOCK_SIZE_DIRAC_FLT 512
 #define BLOCK_SIZE_SYNC 32
+
+GLB_VAR(cudaStream_t, non_default_stream, = NULL);
+GLB_VAR(kernel_field_input, **input, = NULL);
 
 GLB_VAR(input_gpu, gpu_var, = init_input_gpu(gpu_var));
 GLB_VAR(int, gpu_id, = 0);

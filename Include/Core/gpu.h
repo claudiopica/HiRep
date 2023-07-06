@@ -7,8 +7,11 @@
 
 #ifdef WITH_GPU
 #define visible __host__ __device__
+#define deviceonly __device__
 #else
+//#define visible inline
 #define visible
+#define deviceonly
 #endif
 
 #ifdef WITH_GPU

@@ -26,6 +26,7 @@
 #include "Utils/wilsonflow.h"
 #include "Utils/work_space.h"
 #include "Utils/factorial.h"
+#include "Utils/metrics.h"
 
 // void cross_prod(suNg_vector *v1, suNg_vector *v2, suNg_vector *v3); //TOOD: this is not defined in libhr
 // void cross_prod_flt(suNg_vector_flt *v1, suNg_vector_flt *v2, suNg_vector_flt *v3); //TOOD: this is not defined in libhr
