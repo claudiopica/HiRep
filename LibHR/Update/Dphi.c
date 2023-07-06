@@ -1718,12 +1718,14 @@ void Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     apply_BCs_on_spinor_field(dptr);
 }
 
+#ifdef WITH_GPU
 void Cphi_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr) {
     //apply_BCs_on_spinor_field(sptr);
     Dphi_flt_(dptr, sptr);
     Cphi_flt_(mass, dptr, sptr, 1, 0);
     //apply_BCs_on_spinor_field(dptr);
 }
+#endif
 
 void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi(mass, dptr, sptr);
@@ -1915,9 +1917,9 @@ void (*g5Dphi_eopre)(double m0, spinor_field *out, spinor_field *in) = g5Dphi_eo
 void (*g5Dphi_eopre_sq)(double m0, spinor_field *out, spinor_field *in) = g5Dphi_eopre_sq_cpu;
 #ifdef WITH_CLOVER
 void (*Cphi_)(double mass, spinor_field *, spinor_field *, int) = Cphi_cpu_;
-void (*Cphi_inv_)(double mass, _FIELD_TYPE *, _FIELD_TYPE *, int) = Cphi_inv_cpu_;
+void (*Cphi_inv_)(double mass, spinor_field *, spinor_field *, int) = Cphi_inv_cpu_;
 #endif
 #ifdef WITH_EXPCLOVER
-void (*Cphi_)(double mass, _FIELD_TYPE *, _FIELD_TYPE *, int, int) = Cphi_cpu_;
+void (*Cphi_)(double mass, spinor_field *, spinor_field *, int, int) = Cphi_cpu_;
 #endif
 #endif // WITH_GPU

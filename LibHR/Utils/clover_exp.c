@@ -381,8 +381,7 @@ deviceonly void clover_exp_gpu(suNfc *Aplus, suNfc *expAplus, int NN, int NNexp)
 #endif
 #endif
 
-#if !(NF == 2) && !(NF == 3)
-void clover_exp(suNfc *Xin, suNfc *u) {
+void clover_exp_taylor(suNfc *Xin, suNfc *u) {
     suNfc Xk[4], tmp[4];
     _su2Nfc_unit(u);
     _su2Nfc_unit(Xk);
@@ -410,6 +409,9 @@ void clover_exp(suNfc *Xin, suNfc *u) {
         if (sqrt(error) < 1e-28) { break; }
     }
 }
+
+#if !(NF == 2) && !(NF == 3)
+#define clover_exp clover_exp_taylor
 
 #ifdef WITH_GPU
 deviceonly void clover_exp_gpu(suNfc *Xin, suNfc *u, int NN, int NNexp) {

@@ -1,5 +1,6 @@
-
 #ifdef WITH_MPI
+
+#ifdef WITH_GPU
 
 #include <hwloc.h>
 #include <hwloc/cudart.h>
@@ -77,4 +78,5 @@ int find_physically_close_CPU_core() {
     return cpu;
 }
 
+#endif
 #endif

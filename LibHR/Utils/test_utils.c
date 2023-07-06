@@ -75,6 +75,7 @@ void compare_diff_flt(int errors, float abs1, float abs2) {
     lprintf("GPU TEST", 2, "%s rel=%.10e abs=%.10e diff=%.10e\n", msg, rel, fabs(abs1), fabs(abs1 - abs2));
 }
 
+#ifdef WITH_GPU
 /// @brief Compare two spinor fields in the cpu and gpu parts of out by comparing the MAX and L2 norm
 /// @param out Input spinor_field. Th function compare its cpu and gpu parts
 /// @param diff Additional spinor_field used for scratch work space
@@ -101,6 +102,8 @@ void compare_cpu_gpu_flt(int errors, spinor_field_flt *out, spinor_field_flt *di
     lprintf("GPU TEST", 2, "%s MAX norm=%.10e L2 norm=%.10e\n", msg, res, sqrt(norm2));
 }
 
+#endif
+
 void evaluate_timer_resolution(Timer clock) {
     timer_lap(&clock); //time in microseconds
     double elapsed = timer_lap(&clock); //time in microseconds
@@ -116,17 +119,21 @@ void setup_random_gauge_fields() {
 #ifdef DPHI_FLT
     u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
     u_gauge_flt = alloc_gfield_flt(&glattice);
+
+    assign_ud2u();
+#ifdef WITH_GPU
     assign_ud2u_cpu();
-    assign_ud2u_gpu();
+#endif
+
 #endif
 
     represent_gauge_field();
-
+#ifdef DPHI_FLT
+    assign_ud2u_f();
+#ifdef WITH_GPU
     assign_ud2u_f_cpu();
-    assign_ud2u_f_gpu();
-
-    lprintf("SANITY CHECK", 0, "gauge sqnorm: %0.6e\n", sqnorm_gfield_f_cpu(u_gauge_f));
-    lprintf("SANITY CHECK", 0, "gauge flt sqnorm: %0.6e\n", sqnorm_gfield_f_flt_cpu(u_gauge_f_flt));
+#endif
+#endif
 
 #ifdef WITH_MPI
     start_sendrecv_gfield_f(u_gauge_f);
@@ -139,10 +146,14 @@ void setup_random_gauge_fields() {
 void setup_clover() {
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
     lprintf("MAIN", 10, "Setup clover\n");
+#ifdef WITH_GPU
     copy_from_gpu_clover_term(cl_term);
+#endif
     start_sendrecv_clover_term(cl_term);
     complete_sendrecv_clover_term(cl_term);
+#ifdef WITH_GPU
     copy_from_gpu_clover_force(cl_force);
+#endif
     lprintf("MAIN", 10, "done.\n");
 #endif
 }
@@ -152,7 +163,9 @@ void setup_random_fields(int n, spinor_field s[]) {
     lprintf("MAIN", 10, "Setup random spinor fields\n");
     for (int i = 0; i < n; i++) {
         gaussian_spinor_field(&s[i]);
+#ifdef WITH_GPU
         copy_to_gpu_spinor_field_f(&s[i]);
+#endif
     }
     spinor_field_sanity_check(n, s);
     lprintf("MAIN", 10, "done.\n");
@@ -164,7 +177,9 @@ void setup_random_fields_flt(int n, spinor_field_flt s[]) {
     lprintf("MAIN", 10, "Setup single precision random spinor fields\n");
     for (int i = 0; i < n; i++) {
         gaussian_spinor_field_flt(&s[i]);
+#ifdef WITH_GPU
         copy_to_gpu_spinor_field_f_flt(&s[i]);
+#endif
     }
     spinor_field_sanity_check_flt(n, s);
     lprintf("MAIN", 10, "done.\n");

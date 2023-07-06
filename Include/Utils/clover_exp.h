@@ -20,6 +20,7 @@ visible void _su2Nfc_trace(hr_complex *p, suNfc *A);
 void factorialCoef(double *C, int NN, int NNexp);
 
 void clover_exp(suNfc *Aplus, suNfc *expAplus);
+void clover_exp_taylor(suNfc *Aplus, suNfc *expAplus);
 void evaluate_sw_order(double *mass);
 void doublehorner(double *C, suNfc *A);
 
