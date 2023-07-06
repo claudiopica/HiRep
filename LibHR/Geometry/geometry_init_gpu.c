@@ -51,6 +51,18 @@ void init_neighbors_gpu() {
     error_id = cudaMemcpyToSymbol(&Z_EXT_GPU, &Z_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);
     error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
 
+    error_id = cudaMemcpyToSymbol(&T_GPU, &T, sizeof(int), 0, cudaMemcpyHostToDevice);
+    error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding T_EXT to global constant memory.\n");
+
+    error_id = cudaMemcpyToSymbol(&X_GPU, &X, sizeof(int), 0, cudaMemcpyHostToDevice);
+    error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding X_EXT to global constant memory.\n");
+
+    error_id = cudaMemcpyToSymbol(&Y_GPU, &Y, sizeof(int), 0, cudaMemcpyHostToDevice);
+    error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Y_EXT to global constant memory.\n");
+
+    error_id = cudaMemcpyToSymbol(&Z_GPU, &Z, sizeof(int), 0, cudaMemcpyHostToDevice);
+    error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
+
 #ifdef FERMION_THETA
     error_id = cudaMemcpyToSymbol(&eitheta_gpu[0], &eitheta[0], sizeof(hr_complex) * 4, 0, cudaMemcpyHostToDevice);
     error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
@@ -78,12 +90,11 @@ void init_neighbors_gpu() {
     cudaMemcpy(icoord_gpu, geometryBoxes->icoord, (main_mem_volume + buf_mem_volume) * sizeof(coord4), cudaMemcpyHostToDevice);
     sb_icoord_gpu = icoord_gpu + main_mem_volume;
 
-    /*L = geometryBoxes;
-    box_t *SB;
-    do {
-        L->icoord = icoord_gpu;
-        if ((SB = L->sendBox)) { SB->icoord = sb_icoord_gpu; }
-    } while ((L = L->next));*/
+    cudaStreamCreate(&non_default_stream);
 
+    input = (kernel_field_input **)malloc(glattice.nbuffers_spinor * sizeof(kernel_field_input) / 2);
+    for (int i = 0; i < glattice.nbuffers_spinor / 2; i++) {
+        cudaMalloc((void **)&input[i], sizeof(kernel_field_input));
+    }
 #endif
 }

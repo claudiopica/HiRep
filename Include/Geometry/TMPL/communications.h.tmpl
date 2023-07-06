@@ -40,6 +40,34 @@ void _GPU_F_NAME(sync_, _FIELD_NAME)(_FIELD_TYPE *);
 void _F_NAME(fill_buffers_, _FIELD_NAME)(_FIELD_TYPE *);
 void _F_NAME(fill_buffers_with_zeroes_, _FIELD_NAME)(_FIELD_TYPE *);
 
+/**
+ * @brief Check that the communications of _FIELD_TYPE are not locked and if 
+ *        they are throw an error. Only protects of simultaneous communications
+ *        if compiled WITH_NEW_GEOMETRY
+ * 
+ * @param _FIELD_TYPE*      _FIELD_NAME_READABLLE whos communications can
+ *                          be locked
+*/
+void _F_NAME(check_sendrecv_guard_, _FIELD_NAME)(_FIELD_TYPE *);
+
+/**
+ * @brief Locks communications. Only protects of simultaneous communications
+ *        if compiled WITH_NEW_GEOMETRY
+ * 
+ * @param _FIELD_TYPE*      _FIELD_NAME_READABLLE whos communications can
+ *                          be locked
+*/
+void _F_NAME(lock_communications_, _FIELD_NAME)(_FIELD_TYPE *);
+
+/**
+ * @brief Releases communications. Only protects of simultaneous communications
+ *        if compiled WITH_NEW_GEOMETRY
+ * 
+ * @param _FIELD_TYPE*      _FIELD_NAME_READABLLE whos communications can
+ *                          be locked
+*/
+void _F_NAME(release_communications_, _FIELD_NAME)(_FIELD_TYPE *);
+
 #undef _FIELD_NAME_READABLE
 #undef _FIELD_NAME
 #undef _FIELD_TYPE

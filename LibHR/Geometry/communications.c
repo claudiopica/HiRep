@@ -8,10 +8,6 @@
 #include "io.h"
 #include "random.h"
 
-// TODO: put gpu as last suffix
-// TODO: fill buffers needs gpu suffix
-// TODO: MPI error management
-
 #define random_double ranlxd
 #define random_float ranlxs
 
@@ -34,6 +30,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 1
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME spinor_field_f_flt
@@ -42,6 +39,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 1
 #define _MPI_REAL MPI_FLOAT
 #define _REAL float
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME sfield
@@ -50,6 +48,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 1
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #undef _GEOM_TYPE
@@ -65,6 +64,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 4
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME gfield_flt
@@ -73,6 +73,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 4
 #define _MPI_REAL MPI_FLOAT
 #define _REAL float
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME gfield_f
@@ -81,6 +82,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 4
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME gfield_f_flt
@@ -89,6 +91,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 4
 #define _MPI_REAL MPI_FLOAT
 #define _REAL float
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME suNg_scalar_field
@@ -97,6 +100,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 1
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME avfield
@@ -105,6 +109,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 4
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME gtransf
@@ -113,6 +118,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 1
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME clover_ldl
@@ -121,6 +127,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 1
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME clover_term
@@ -129,6 +136,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 4
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME clover_force
@@ -137,6 +145,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 6
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #define _FIELD_NAME staple_field
@@ -145,6 +154,7 @@ void probe_mpi(void) {
 #define _FIELD_DIM 3
 #define _MPI_REAL MPI_DOUBLE
 #define _REAL double
+#include "TMPL/lock_communications.c.tmpl"
 #include "TMPL/communications.c.tmpl"
 
 #undef _GEOM_TYPE

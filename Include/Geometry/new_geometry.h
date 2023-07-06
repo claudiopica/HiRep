@@ -71,8 +71,6 @@ typedef struct box_t {
         sendBox; ///< if this is a border corresponding to a Recv buffer, this is the box to copy data from, i.e. corresponding to the Send buffer
     struct box_t *next; ///< link to next box. NULL if last
 } box_t;
-//TODO: do we want to add vol, even_vol, odd_vol for avoid recomputing them every time?
-//TODO: do we want to precompute ipt_ext for sendboxes?
 
 int boxEvenVolume(box_t *B);
 int boxOddVolume(box_t *B);
@@ -82,8 +80,16 @@ void geometryMemSize(box_t *G, size_t *total, size_t *buffers);
 #define _DECLARE_SYNC_TO_BUFFER(_name, _field_type, _type) \
     void sync_box_to_buffer_gpu_##_name(geometry_descriptor *, box_t *, _field_type *, void *);
 
+#define _DECLARE_SYNC_TO_BUFFER_REDUCED(_name, _field_type, _type)                                           \
+    void sync_box_to_buffer_gpu_reduced_##_name(geometry_descriptor *, box_t *, _field_type *, void *, int); \
+    void sync_box_reduced_init_##_name(geometry_descriptor *, box_t *, _field_type *, void *, int);
+
 _DECLARE_SYNC_TO_BUFFER(spinor_field_f, spinor_field, suNf_spinor);
 _DECLARE_SYNC_TO_BUFFER(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt);
+
+_DECLARE_SYNC_TO_BUFFER_REDUCED(spinor_field_f, spinor_field, suNf_spinor);
+_DECLARE_SYNC_TO_BUFFER_REDUCED(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt)
+
 _DECLARE_SYNC_TO_BUFFER(sfield, scalar_field, double);
 
 _DECLARE_SYNC_TO_BUFFER(gfield, suNg_field, suNg);

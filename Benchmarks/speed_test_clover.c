@@ -33,7 +33,6 @@ int main(int argc, char *argv[]) {
     int flopsite = flops_per_site(CPHI);
     int bytesite = bytes_per_site(CPHI);
 
-    // This segfaults if compiled with DPHI_FLT. Why?
     _WARMUP_SPEEDTEST(clock, n_warmup, time_target, n_reps, __cphi);
     _RUN_SPEEDTEST(clock, n_warmup, time_target, n_reps, flopsite, bytesite, __cphi);
 

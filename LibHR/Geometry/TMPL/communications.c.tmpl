@@ -37,10 +37,6 @@
 // Need to send the rounded up buffer length only for the GPU
 #define roundUp(_val, _mod) ((((_val - 1) / (_mod)) + 1) * (_mod))
 
-#if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)
-static void *_F_NAME(sendrecv_guard_, _FIELD_NAME) = NULL;
-#endif
-
 _DECLARE(sync_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
 #ifdef WITH_NEW_GEOMETRY
@@ -85,7 +81,8 @@ _DECLARE(start_sendrecv_, (_FIELD_TYPE * f)) {
         lprintf("TEST", 0, "commtype = %d\n", f->comm_type);
         error(1, 1, __func__, "More simultaneous communication attempted. Exiting...\n");
     }
-    _F_NAME(sendrecv_guard_, _FIELD_NAME) = (void *)f->comm_req;
+
+    _F_NAME(lock_communications_, _FIELD_NAME)(f);
 #endif
 
     // CPU comms
@@ -162,9 +159,8 @@ _DECLARE(complete_sendrecv_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
     geometry_descriptor *type = f->type;
     int nreq = 2 * _NUMBER_OF_BUFFERS(type, _GEOM_TYPE);
-#ifdef WITH_NEW_GEOMETRY
-    _F_NAME(sendrecv_guard_, _FIELD_NAME) = NULL;
-#endif
+    _F_NAME(release_communications_, _FIELD_NAME)(f);
+
     if (nreq > 0) {
         MPI_Status status[nreq];
         MPI_Waitall(nreq, f->comm_req, status);
