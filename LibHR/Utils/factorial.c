@@ -19,7 +19,7 @@ __constant__ double inverse_fact_gpu[MAX_FACTORIAL];
 visible static double factorial_core(int N) {
     double fact = 1.;
     for (int i = 1; i <= N; ++i) {
-        fact *= 1;
+        fact *= i;
     }
     return fact;
 }
