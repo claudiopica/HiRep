@@ -201,7 +201,7 @@ visible void clover_exp_NF3_begin(suNfc *Aplus, suNfc *expAplus, suNfc *A2, suNf
 }
 
 //Optimized to reduce operations!
-visible void clover_exp_NF3_end(suNfc *Aplus, suNf *expAplus, suNfc *A2, suNfc *A3, hr_complex q[]) {
+visible void clover_exp_NF3_end(suNfc *Aplus, suNfc *expAplus, suNfc *A2, suNfc *A3, double q[]) {
     suNfc A0[3], tmp1[4], tmp2[3];
     _suNfc_unit(A0[0]);
     _suNfc_unit(A0[2]);
@@ -236,8 +236,8 @@ visible void clover_exp_NF3_end(suNfc *Aplus, suNf *expAplus, suNfc *A2, suNfc *
     _su2Nfc_times_su2Nfc_assign_herm(expAplus, A3, tmp1);
 }
 
-void clover_exp(suNfc *Aplus, suNfc *expAplus, int NN, int NNexp) {
-    suNfc A0[3], A2[4], A3[4], tmp1[4], tmp2[3];
+void clover_exp(suNfc *Aplus, suNfc *expAplus) {
+    suNfc A2[4], A3[4];
 
     int i = 0, j = 0;
     hr_complex p[2 * NF - 1];
@@ -261,12 +261,12 @@ void clover_exp(suNfc *Aplus, suNfc *expAplus, int NN, int NNexp) {
         q[0] = inverse_factorial(i) - creal(p[0]) * qlast;
     }
 
-    cover_exp_NF3_end(Aplus, expAplus, A2, A3, p);
+    clover_exp_NF3_end(Aplus, expAplus, A2, A3, q);
 }
 
 #ifdef WITH_GPU
 deviceonly void clover_exp_gpu(suNfc *Aplus, suNfc *expAplus, int NN, int NNexp) {
-    suNfc A0[3], A2[4], A3[4], tmp1[4], tmp2[3];
+    suNfc A2[4], A3[4];
 
     int i = 0, j = 0;
     hr_complex p[2 * NF - 1];
@@ -290,7 +290,7 @@ deviceonly void clover_exp_gpu(suNfc *Aplus, suNfc *expAplus, int NN, int NNexp)
         q[0] = inverse_factorial_gpu(i) - creal(p[0]) * qlast;
     }
 
-    cover_exp_NF3_end(Aplus, expAplus, A2, A3, p);
+    clover_exp_NF3_end(Aplus, expAplus, A2, A3, q);
 }
 #endif
 #endif
