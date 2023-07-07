@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "Evaluating the clover exp via Cayley Hamilton repr\n");
     clover_exp(test, exptest);
 
-    lprintf("MAIN", 0, "Comparing the resutls\n");
+    lprintf("MAIN", 0, "Comparing the results\n");
 
     for (i = 0; i < 4; i++) {
         _suNf_sub_assign(exptest[i], exptest2[i]);

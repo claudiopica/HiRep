@@ -1378,7 +1378,7 @@ void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in) {
     Dphi_(out, otmp2);
 
     rho = -(4 + m0);
-    spinor_field_mul_add_assign_f_cpu(out, rho, in);
+    spinor_field_mul_add_assign_f(out, rho, in);
     imu = -I * mu;
     spinor_field_g5_mulc_add_assign_f(out, imu, in);
 
@@ -1411,7 +1411,7 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in) {
  * Cphi_diag_inv = D_oo^-1 or D_ee^-1            *
  *************************************************/
 
-static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
+void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
     // Correct mass term
     mass = (4. + mass);
     // Loop over local sites
@@ -1460,12 +1460,12 @@ static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assig
     }
 }
 
-static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
+void Cphi_inv_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
     int N = 2 * NF;
     mass = (4. + mass);
 
     // Update LDL decomposition
-    compute_ldl_decomp(mass);
+    compute_ldl_decomp_cpu(mass);
 
     // Loop over local sites
     _MASTER_FOR(dptr->type, ix) {
@@ -1499,11 +1499,8 @@ static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int a
             _complex_mulr(x[i + N], 1. / creal(dn[n]), x[i + N]);
             for (int k = i + 1; k < N; k++) {
                 n = k * (k + 1) / 2 + i;
-
                 c = conj(up[n]);
-
                 _complex_mul_sub_assign(x[i], c, x[k]);
-
                 c = conj(dn[n]);
                 _complex_mul_sub_assign(x[i + N], c, x[k + N]);
             }
@@ -1520,14 +1517,26 @@ static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int a
 // BC for clover term in open/schrödinger functional.
 void Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     apply_BCs_on_spinor_field(sptr);
-    Dphi_cpu_(dptr, sptr);
+    Dphi_(dptr, sptr);
     Cphi_(mass, dptr, sptr, 1);
     apply_BCs_on_spinor_field(dptr);
 }
 
+void Cphi_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr) {
+    //TODO: Apply boundary conditions
+    //TODO: CPU implementation
+
+#ifndef WITH_GPU
+    error(1, __func__, "Single precision clover-improved dirac operator not implemented for CPU\n");
+#else
+    Dphi_flt_(dptr, sptr);
+    Cphi_flt_(mass, dptr, sptr, 1);
+#endif
+}
+
 void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi(mass, dptr, sptr);
-    spinor_field_g5_assign_f_cpu(dptr);
+    spinor_field_g5_assign_f(dptr);
 }
 
 void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
@@ -1541,18 +1550,18 @@ void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     if (init_dirac) { init_Dirac(); }
 
     apply_BCs_on_spinor_field(sptr);
-    Dphi_cpu_(otmp, sptr);
+    Dphi_(otmp, sptr);
     Cphi_inv_(mass, otmp, otmp, 0);
     apply_BCs_on_spinor_field(otmp);
-    Dphi_cpu_(dptr, otmp);
-    spinor_field_minus_f_cpu(dptr, dptr);
+    Dphi_(dptr, otmp);
+    spinor_field_minus_f(dptr, dptr);
     Cphi_(mass, dptr, sptr, 1);
     apply_BCs_on_spinor_field(dptr);
 }
 
 void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi_eopre(mass, dptr, sptr);
-    spinor_field_g5_assign_f_cpu(dptr);
+    spinor_field_g5_assign_f(dptr);
 }
 
 void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
@@ -1576,6 +1585,24 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr) {
     apply_BCs_on_spinor_field(dptr);
 }
 
+#ifdef WITH_GPU
+void Cphi_diag_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr) {
+    // Here (dptr == sptr) is allowed
+    // TODO: boundary conditions other than periodic not supported yet
+    //apply_BCs_on_spinor_field(sptr);
+    Cphi_flt_(mass, dptr, sptr, 0);
+    //apply_BCs_on_spinor_field(dptr);
+}
+
+void Cphi_diag_inv_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr) {
+    // Here (dptr == sptr) is allowed
+    // TODO: boundary conditions other than periodic not supported yet
+    //apply_BCs_on_spinor_field(sptr);
+    Cphi_inv_flt_(mass, dptr, sptr, 0);
+    //apply_BCs_on_spinor_field(dptr);
+}
+#endif
+
 #endif // #ifdef WITH_CLOVER
 
 #ifdef WITH_EXPCLOVER
@@ -1590,7 +1617,7 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr) {
 
 // Inverse: 0, then normal operator; 1, then inverse operator;
 // Assume hermiticity!!
-static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse) {
+void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse) {
     evaluate_sw_order(&mass);
 
     // Correct mass term
@@ -1686,14 +1713,23 @@ static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assig
 
 void Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     apply_BCs_on_spinor_field(sptr);
-    Dphi_cpu_(dptr, sptr);
+    Dphi_(dptr, sptr);
     Cphi_(mass, dptr, sptr, 1, 0);
     apply_BCs_on_spinor_field(dptr);
 }
 
+#ifdef WITH_GPU
+void Cphi_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr) {
+    //apply_BCs_on_spinor_field(sptr);
+    Dphi_flt_(dptr, sptr);
+    Cphi_flt_(mass, dptr, sptr, 1, 0);
+    //apply_BCs_on_spinor_field(dptr);
+}
+#endif
+
 void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi(mass, dptr, sptr);
-    spinor_field_g5_assign_f_cpu(dptr);
+    spinor_field_g5_assign_f(dptr);
 }
 
 void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
@@ -1707,18 +1743,18 @@ void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     if (init_dirac) { init_Dirac(); }
 
     apply_BCs_on_spinor_field(sptr);
-    Dphi_cpu_(otmp, sptr);
+    Dphi_(otmp, sptr);
     Cphi_(mass, otmp, otmp, 0, 1);
     apply_BCs_on_spinor_field(otmp);
-    Dphi_cpu_(dptr, otmp);
-    spinor_field_minus_f_cpu(dptr, dptr);
+    Dphi_(dptr, otmp);
+    spinor_field_minus_f(dptr, dptr);
     Cphi_(mass, dptr, sptr, 1, 0);
     apply_BCs_on_spinor_field(dptr);
 }
 
 void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi_eopre(mass, dptr, sptr);
-    spinor_field_g5_assign_f_cpu(dptr);
+    spinor_field_g5_assign_f(dptr);
 }
 
 void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
@@ -1737,11 +1773,26 @@ void Cphi_diag(double mass, spinor_field *dptr, spinor_field *sptr) {
 
 void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr) {
     // Here (dptr == sptr) is allowed
-
     apply_BCs_on_spinor_field(sptr);
     Cphi_(mass, dptr, sptr, 0, 1);
     apply_BCs_on_spinor_field(dptr);
 }
+
+#ifdef WITH_GPU
+void Cphi_diag_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr) {
+    // Here (dptr == sptr) is allowed
+    //apply_BCs_on_spinor_field(sptr);
+    Cphi_flt_(mass, dptr, sptr, 0, 0);
+    //apply_BCs_on_spinor_field(dptr);
+}
+
+void Cphi_diag_inv_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr) {
+    // Here (dptr == sptr) is allowed
+    //apply_BCs_on_spinor_field(sptr);
+    Cphi_flt_(mass, dptr, sptr, 0, 1);
+    //apply_BCs_on_spinor_field(dptr);
+}
+#endif
 
 #endif // With expclover
 
@@ -1864,4 +1915,11 @@ void (*Dphi_eopre)(double m0, spinor_field *out, spinor_field *in) = Dphi_eopre_
 void (*Dphi_oepre)(double m0, spinor_field *out, spinor_field *in) = Dphi_oepre_cpu;
 void (*g5Dphi_eopre)(double m0, spinor_field *out, spinor_field *in) = g5Dphi_eopre_cpu;
 void (*g5Dphi_eopre_sq)(double m0, spinor_field *out, spinor_field *in) = g5Dphi_eopre_sq_cpu;
+#ifdef WITH_CLOVER
+void (*Cphi_)(double mass, spinor_field *, spinor_field *, int) = Cphi_cpu_;
+void (*Cphi_inv_)(double mass, spinor_field *, spinor_field *, int) = Cphi_inv_cpu_;
+#endif
+#ifdef WITH_EXPCLOVER
+void (*Cphi_)(double mass, spinor_field *, spinor_field *, int, int) = Cphi_cpu_;
+#endif
 #endif // WITH_GPU

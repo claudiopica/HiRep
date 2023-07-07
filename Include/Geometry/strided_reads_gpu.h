@@ -16,7 +16,7 @@
 #endif
 
 //#include "libhr_core.h"
-#include "geometry.h"
+//#include "geometry.h"
 
 enum DIRECTION { UP = 0, DOWN = 1 };
 
@@ -76,6 +76,25 @@ __device__ void in_gauge_field(GAUGE_TYPE *u, const GAUGE_TYPE *in, int ix, int 
 
 template <typename REAL, typename SITE_TYPE> __device__ void write_out_spinor_field(SITE_TYPE *r, SITE_TYPE *in, int ix) {
     write_gpu<REAL>(0, r, in, ix, 0, 1);
+}
+
+template <typename REAL, typename FIELD_TYPE, typename SITE_TYPE>
+__host__ __device__ void write_assign_gpu(int stride, SITE_TYPE *s, FIELD_TYPE *out, int ix, int comp, int dim) {
+    const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
+    const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
+#ifdef FIXED_STRIDE
+    int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + (comp)*n_components * (THREADSIZE);
+    const int _stride = THREADSIZE;
+#else
+    int iz = ix + ((comp)*n_components) * (THREADSIZE);
+    const int _stride = stride;
+#endif
+    REAL *out_cpx = (REAL *)out;
+    REAL *out_comp_cpx = (REAL *)s;
+    for (int i = 0; i < n_components; ++i) {
+        out_cpx[iz] += out_comp_cpx[i];
+        iz += _stride;
+    }
 }
 
 #endif

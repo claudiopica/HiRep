@@ -575,7 +575,7 @@ void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double resi
     suNfc Aplus[4];
     suNfc Aminus[4];
     suNfc *s0, *s1, *s2, *s3;
-    factorialCoef(Coef);
+    factorialCoef(Coef, get_NN(), get_NNexp());
     // Construct force matrices
     _MASTER_FOR(&glattice, ix) {
         // Create matrix Aplus, Aminus

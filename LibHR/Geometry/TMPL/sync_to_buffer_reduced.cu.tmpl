@@ -1,0 +1,277 @@
+/***************************************************************************\
+* Copyright (c) 2023, Sofie Martins                                         *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
+#include "Utils/generics.h"
+#include "libhr_core.h"
+
+#if !defined _FIELD_NAME
+#error Missing _FIELD_NAME in sync_to_buffer_reduced.cu
+#endif
+#if !defined _FIELD_TYPE
+#error Missing _FIELD_TYPE in sync_to_buffer_reduced.cu
+#endif
+#if !defined _SITE_TYPE
+#error Missing _SITE_TYPE in sync_to_buffer_reduced.cu
+#endif
+#if !defined _GAUGE_TYPE
+#error Missing _GAUGE_TYPE in sync_to_buffer_reduced.cu
+#endif
+#if !defined _HSPINOR_TYPE
+#error Missing _SITE_TYPE in sync_to_buffer_reduced.cu
+#endif
+#if !defined _FIELD_DIM
+#error Missing _FIELD_DIM in sync_to_buffer_reduced.cu
+#endif
+#if !defined _REP_SUFFIX
+#error missing _REP_SUFFIX in sync_to_buffer_reduced.cu
+#endif
+
+#define _KERNEL(_name, _args) __global__ _FUNC(void, _name, _FIELD_NAME, _args)
+#define _DECLARE(_type, _name, _args) _FUNC(_type, _name, _FIELD_NAME, _args)
+
+#define GFIELD(_gauge, _suffix) CONCAT(_gauge, _suffix)
+
+// TODO: Manage the kernel inputs better
+_DECLARE(void, init_kernel_input_, (void *sendbuf, _FIELD_TYPE *in, box_t *box, gd_type gd_t, _GAUGE_TYPE *gauge, int buf)) {
+    kernel_field_input *input_h = (kernel_field_input *)malloc(sizeof(kernel_field_input));
+    input_h->field_in = (void *)(in->gpu_ptr - in->type->master_shift);
+    input_h->field_out = sendbuf;
+    input_h->gauge = (void *)gauge;
+    input_h->base_in[0] = geometryBoxes->base_index;
+    input_h->base_in[1] = geometryBoxes->base_index_odd;
+    input_h->base_out[0] = box->base_index;
+    input_h->base_out[1] = box->base_index_odd;
+    input_h->vol_in[0] = boxEvenVolume(geometryBoxes);
+    input_h->vol_in[1] = boxOddVolume(geometryBoxes);
+    input_h->vol_out[0] = boxEvenVolume(box);
+    input_h->vol_out[1] = boxOddVolume(box);
+    input_h->master_shift_in = in->type->master_shift;
+    input_h->master_shift_out = 0;
+    input_h->iup_gpu = iup_gpu;
+    input_h->idn_gpu = idn_gpu;
+    input_h->imask_gpu = imask_gpu;
+    input_h->gd_in = gd_t;
+
+    cudaMemcpy(input[buf], input_h, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
+    free(input_h);
+}
+
+_KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoord, int *ipt_gpu, char mask)) {
+    _SITE_TYPE *in = (_SITE_TYPE *)input->field_in;
+
+    _KERNEL_PIECE_FOR(piece) {
+        _IF_IN_BOX_OUT(input, piece) {
+            int ix = blockIdx.x * blockDim.x + threadIdx.x;
+            coord4 c = icoord[ix + input->base_out[piece - 1]];
+            int iy = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]);
+            _GAUGE_TYPE u;
+            _HSPINOR_TYPE r, sn;
+            _GAUGE_TYPE *gauge = (_GAUGE_TYPE *)input->gauge;
+
+            // TODO: This is not correct. We need mask(ix) & T_UP_MASK from the buffer
+            // without inversion
+            if (!(input->imask_gpu[iy] & T_DN_MASK)) {
+                _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
+                int ixg = input->idn_gpu[4 * iy];
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+                read_gpu<_REAL>(0, &u, gauge, ixg, 0, 4);
+
+                _vector_add_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_T_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[0] = sn.c[1];
+
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 1);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 3);
+
+                _vector_add_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_T_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[1] = sn.c[1];
+                write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
+            }
+
+            if (!(input->imask_gpu[iy] & T_UP_MASK)) {
+                _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+                read_gpu<_REAL>(0, &u, gauge, iy, 0, 4);
+
+                _vector_sub_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[0] = sn.c[1];
+
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 1);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 3);
+
+                _vector_sub_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[1] = sn.c[1];
+                write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
+            }
+
+            if (!(input->imask_gpu[iy] & X_DN_MASK)) {
+                _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
+                int ixg = input->idn_gpu[4 * iy + 1];
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+                read_gpu<_REAL>(0, &u, gauge, ixg, 1, 4);
+
+                _vector_i_add_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[0] = sn.c[1];
+
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 1);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+
+                _vector_i_add_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[1] = sn.c[1];
+                write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
+            }
+
+            if (!(input->imask_gpu[iy] & X_UP_MASK)) {
+                _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 3);
+                read_gpu<_REAL>(0, &u, gauge, iy, 1, 4);
+
+                _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[0] = sn.c[1];
+
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 1);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+
+                _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[1] = sn.c[1];
+                write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
+            }
+
+            if (!(input->imask_gpu[iy] & Y_DN_MASK)) {
+                _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
+                int ixg = input->idn_gpu[4 * iy + 2];
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+                read_gpu<_REAL>(0, &u, gauge, ixg, 2, 4);
+
+                _vector_add_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[0] = sn.c[1];
+
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 1);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+
+                _vector_sub_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[1] = sn.c[1];
+                write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
+            }
+
+            if (!(input->imask_gpu[iy] & Y_UP_MASK)) {
+                _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 3);
+                read_gpu<_REAL>(0, &u, gauge, iy, 2, 4);
+
+                _vector_sub_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[0] = sn.c[1];
+
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 1);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+
+                _vector_add_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[1] = sn.c[1];
+                write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
+            }
+
+            if (!(input->imask_gpu[iy] & Z_DN_MASK)) {
+                _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
+                int ixg = input->idn_gpu[4 * iy + 3];
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+                read_gpu<_REAL>(0, &u, gauge, ixg, 3, 4);
+
+                _vector_i_add_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[0] = sn.c[1];
+
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 1);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 3);
+                _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[1] = sn.c[1];
+                write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
+            }
+
+            if (!(input->imask_gpu[iy] & Z_UP_MASK)) {
+                _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+                read_gpu<_REAL>(0, &u, gauge, iy, 3, 4);
+
+                _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[0] = sn.c[1];
+
+                in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 1);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 3);
+
+                _vector_i_add_assign_f(sn.c[0], sn.c[1]);
+                _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
+
+                r.c[1] = sn.c[1];
+                write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
+            }
+        }
+    }
+}
+
+_DECLARE(void, sync_box_reduced_init_, (geometry_descriptor * gd, box_t *src, _FIELD_TYPE *in, void *sendbuf, int buf)) {
+    enum gd_type gd_t = GLOBAL;
+    if (gd == &glat_even) { gd_t = EVEN; }
+    if (gd == &glat_odd) { gd_t = ODD; }
+
+    _GAUGE_TYPE *gauge = GFIELD(u_gauge, _REP_SUFFIX)->gpu_ptr;
+    _F_NAME(init_kernel_input_, _FIELD_NAME)(sendbuf, in, src, gd_t, gauge, buf);
+}
+
+_DECLARE(void, sync_box_to_buffer_gpu_reduced_,
+         (geometry_descriptor * gd, box_t *src, _FIELD_TYPE *in, void *sendbuf, int buf)) {
+    const int max_vol = fmax(boxEvenVolume(src), boxOddVolume(src));
+    const int grid = (max_vol - 1) / BLOCK_SIZE + 1;
+    _F_NAME(box_to_buffer_kernel_reduced_, _FIELD_NAME)<<<grid, BLOCK_SIZE>>>(input[buf], sb_icoord_gpu, ipt_gpu, src->mask);
+}
+
+#undef _DECLARE
+#undef _KERNEL
+
+#undef _FIELD_NAME
+#undef _FIELD_TYPE
+#undef _SITE_TYPE
+#undef _GAUGE_TYPE
+#undef _HSPINOR_TYPE
+#undef _FIELD_DIM
+#undef _GEOM_TYPE
+#undef _COMPLEX
+#undef _REAL
+#undef _REP_SUFFIX

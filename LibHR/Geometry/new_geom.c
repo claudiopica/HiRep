@@ -1063,7 +1063,6 @@ static void syncBoxToBuffer(enum gd_type gd_t, size_t bytes_per_site, box_t *src
         for (size_t dix = src->base_index; dix < (src->base_index + vol); dix++) {
             coord4 c = src->icoord[dix];
             size_t six = ipt_ext(c.x[0], c.x[1], c.x[2], c.x[3]);
-            //printf("vol: %ld, six: %d, dix: %d\n", vol, six, dix);
             char *srcbuf = ((char *)lattice) + six * bytes_per_site;
             char *dstbuf = ((char *)sendbuf) + dix * bytes_per_site;
             memcpy(dstbuf, srcbuf, bytes_per_site);

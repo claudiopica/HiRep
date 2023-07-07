@@ -1,20 +1,210 @@
 /***************************************************************************\
-* Copyright (c) 2022, Sofie Martins                                         *   
+* Copyright (c) 2022, Sofie Martins, Claudio Pica                           *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#include "utils.h"
-#include "libhr_core.h"
-#include "random.h"
-#include "io.h"
-#include "inverters.h"
+#include "libhr.h"
 #include <string.h>
+
+static double EPSILON = 1.e-14;
+static float EPSILON_FLT = 1.e-4;
+
+// logger level 10 for a more verbose setting
+
+double spinor_max(suNf_spinor *s) {
+    double *a = (double *)s;
+    double max = 0.;
+    for (int i = 0; i < sizeof(suNf_spinor) / sizeof(*a); i++) {
+        double v = fabs(a[i]);
+        if (max < v) { max = v; }
+    }
+    return max;
+}
+
+float spinor_max_flt(suNf_spinor_flt *s) {
+    float *a = (float *)s;
+    float max = 0.;
+    for (int i = 0; i < sizeof(suNf_spinor_flt) / sizeof(*a); i++) {
+        float v = fabs(a[i]);
+        if (max < v) { max = v; }
+    }
+    return max;
+}
+
+double spinor_field_findmax_f(spinor_field *in) {
+    double max = 0.;
+    _ONE_SPINOR_FOR(in) {
+        suNf_spinor c = *_SPINOR_PTR(in);
+        double v = spinor_max(&c);
+        if (max < v) { max = v; }
+    }
+#ifdef WITH_MPI
+    global_max(&max, 1);
+#endif
+    return max;
+}
+
+float spinor_field_findmax_f_flt(spinor_field_flt *in) {
+    float max = 0.;
+    _ONE_SPINOR_FOR(in) {
+        suNf_spinor_flt c = *_SPINOR_PTR(in);
+        float v = spinor_max_flt(&c);
+        if (max < v) { max = v; }
+    }
+#ifdef WITH_MPI
+    global_max_flt(&max, 1);
+#endif
+    return max;
+}
+
+/// @brief  Check if the two inputs are the same within a given relative precision of EPSILON
+/// @param abs1
+/// @param abs2
+void compare_diff(int errors, double abs1, double abs2) {
+    double rel = fabs(abs1 - abs2) / fabs(abs1);
+    const char *msg = (rel > EPSILON) ? ++errors, "[FAIL]" : "[ OK ]";
+    lprintf("GPU TEST", 2, "%s rel=%.10e abs=%.10e diff=%.10e\n", msg, rel, fabs(abs1), fabs(abs1 - abs2));
+}
+
+/// @brief  Check if the two inputs are the same within a given relative precision of EPSILON
+/// @param abs1
+/// @param abs2
+void compare_diff_flt(int errors, float abs1, float abs2) {
+    float rel = fabs(abs1 - abs2) / fabs(abs1);
+    const char *msg = (rel > EPSILON_FLT) ? ++errors, "[FAIL]" : "[ OK ]";
+    lprintf("GPU TEST", 2, "%s rel=%.10e abs=%.10e diff=%.10e\n", msg, rel, fabs(abs1), fabs(abs1 - abs2));
+}
+
+#ifdef WITH_GPU
+/// @brief Compare two spinor fields in the cpu and gpu parts of out by comparing the MAX and L2 norm
+/// @param out Input spinor_field. Th function compare its cpu and gpu parts
+/// @param diff Additional spinor_field used for scratch work space
+void compare_cpu_gpu(int errors, spinor_field *out, spinor_field *diff) {
+    spinor_field_copy_f_gpu(diff, out);
+    copy_from_gpu_spinor_field_f(diff);
+    spinor_field_sub_assign_f_cpu(diff, out);
+    double res = spinor_field_findmax_f(diff);
+    double norm2 = spinor_field_sqnorm_f_cpu(diff);
+    const char *msg = (res > EPSILON) ? ++errors, "[FAIL]" : "[ OK ]";
+    lprintf("GPU TEST", 2, "%s MAX norm=%.10e L2 norm=%.10e\n", msg, res, sqrt(norm2));
+}
+
+/// @brief Compare two spinor fields in the cpu and gpu parts of out by comparing the MAX and L2 norm
+/// @param out Input spinor_field. Th function compare its cpu and gpu parts
+/// @param diff Additional spinor_field used for scratch work space
+void compare_cpu_gpu_flt(int errors, spinor_field_flt *out, spinor_field_flt *diff) {
+    spinor_field_copy_f_flt_gpu(diff, out);
+    copy_from_gpu_spinor_field_f_flt(diff);
+    spinor_field_sub_assign_f_flt_cpu(diff, out);
+    float res = spinor_field_findmax_f_flt(diff);
+    float norm2 = spinor_field_sqnorm_f_flt_cpu(diff);
+    const char *msg = (res > EPSILON_FLT) ? ++errors, "[FAIL]" : "[ OK ]";
+    lprintf("GPU TEST", 2, "%s MAX norm=%.10e L2 norm=%.10e\n", msg, res, sqrt(norm2));
+}
+
+#endif
+
+void evaluate_timer_resolution(Timer clock) {
+    timer_lap(&clock); //time in microseconds
+    double elapsed = timer_lap(&clock); //time in microseconds
+    lprintf("LA TEST", 0, "Timer resolution = %lf usec\n", elapsed);
+    lprintf("LA TEST", 0, "Nominal timer resolution = %lf usec\n", timer_res());
+}
+
+void setup_random_gauge_fields() {
+    lprintf("MAIN", 10, "Setup random gauge fields\n");
+    setup_gauge_fields();
+    random_u(u_gauge);
+
+#ifdef DPHI_FLT
+    u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
+    u_gauge_flt = alloc_gfield_flt(&glattice);
+
+    assign_ud2u();
+#ifdef WITH_GPU
+    assign_ud2u_cpu();
+#endif
+
+#endif
+
+    represent_gauge_field();
+#ifdef DPHI_FLT
+    assign_ud2u_f();
+#ifdef WITH_GPU
+    assign_ud2u_f_cpu();
+#endif
+#endif
+
+#ifdef WITH_MPI
+    start_sendrecv_gfield_f(u_gauge_f);
+    complete_sendrecv_gfield_f(u_gauge_f);
+#endif
+
+    lprintf("MAIN", 10, "done.\n");
+}
+
+void setup_clover() {
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    lprintf("MAIN", 10, "Setup clover\n");
+#ifdef WITH_GPU
+    copy_from_gpu_clover_term(cl_term);
+#endif
+    start_sendrecv_clover_term(cl_term);
+    complete_sendrecv_clover_term(cl_term);
+#ifdef WITH_GPU
+    copy_from_gpu_clover_force(cl_force);
+#endif
+    lprintf("MAIN", 10, "done.\n");
+#endif
+}
+
+// different function to setup gauge fields and clover
+void setup_random_fields(int n, spinor_field s[]) {
+    lprintf("MAIN", 10, "Setup random spinor fields\n");
+    for (int i = 0; i < n; i++) {
+        gaussian_spinor_field(&s[i]);
+#ifdef WITH_GPU
+        copy_to_gpu_spinor_field_f(&s[i]);
+#endif
+    }
+    spinor_field_sanity_check(n, s);
+    lprintf("MAIN", 10, "done.\n");
+}
+
+/// Generates an array of gaussian spinor fields
+/// and copy the results in the gpu memory
+void setup_random_fields_flt(int n, spinor_field_flt s[]) {
+    lprintf("MAIN", 10, "Setup single precision random spinor fields\n");
+    for (int i = 0; i < n; i++) {
+        gaussian_spinor_field_flt(&s[i]);
+#ifdef WITH_GPU
+        copy_to_gpu_spinor_field_f_flt(&s[i]);
+#endif
+    }
+    spinor_field_sanity_check_flt(n, s);
+    lprintf("MAIN", 10, "done.\n");
+}
+
+void spinor_field_sanity_check(int ninputs, spinor_field *in) {
+    for (int i = 0; i < ninputs; i++) {
+        spinor_field *s = in + i;
+        double res = spinor_field_sqnorm_f(s);
+        lprintf("SANITY CHECK", 10, "Input spinor field nr %d square norm: %lf (should be nonzero)\n", i, res);
+    }
+}
+
+void spinor_field_sanity_check_flt(int ninputs, spinor_field_flt *in) {
+    for (int i = 0; i < ninputs; i++) {
+        spinor_field_flt *s = in + i;
+        double res = spinor_field_sqnorm_f_flt(s);
+        lprintf("SANITY CHECK", 10, "Input spinor field nr %d square norm: %lf (should be nonzero)\n", i, res);
+    }
+}
 
 // The following functions are primarily for testing purposes
 // This is all for CPU
 
 void test_setup() {
-    // TODO: other settings
     rlxd_init(1, 205);
     rlxs_init(2, 208);
 }

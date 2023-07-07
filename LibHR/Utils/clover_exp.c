@@ -1,13 +1,11 @@
-#include "utils.h"
-#include "libhr_core.h"
-#include "memory.h"
-#include "Update/clover_tools.h"
+#include "Utils/clover_exp.h"
+#include "Utils/factorial.h"
 #include "io.h"
+#include "update.h"
 
 #include <math.h>
 #include <float.h>
 
-#define MAX_EXP_ORDER 100
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
 #endif
@@ -17,35 +15,16 @@
 static int NN;
 static int NNexp;
 
-static double *inverse_fact;
-static int init_exp = 0;
-
-static double factorial(int N) {
-    int i;
-    double fact = 1.;
-    for (i = 1; i <= N; ++i) {
-        fact *= i;
-    }
-    return fact;
-}
-
 int get_NNexp() {
     return NNexp;
 }
 
+int get_NN() {
+    return NN;
+}
+
 void init_clover_exp() {
-    if (init_exp == 0) {
-        int i;
-
-        inverse_fact = malloc(sizeof(double) * MAX_EXP_ORDER);
-
-        inverse_fact[0] = 1.;
-        for (i = 1; i < MAX_EXP_ORDER; i++) {
-            inverse_fact[i] = 1. / factorial(i);
-        }
-
-        init_exp = 1;
-    }
+    init_factorial();
 }
 
 void evaluate_sw_order(double *mass) {
@@ -62,7 +41,7 @@ void evaluate_sw_order(double *mass) {
         a = c * exp(c);
         b = DBL_EPSILON;
 
-        for (n = 1; n < MAX_EXP_ORDER; n++) {
+        for (n = 1; n < MAX_FACTORIAL; n++) {
             a *= c;
             b *= (double)(n + 1);
 
@@ -77,8 +56,9 @@ void evaluate_sw_order(double *mass) {
         error(0 == 0, 1, "set_sw_order" __FILE__, "SW parameters are out of range");
     }
 }
+
 //C = B*A when C hermitian!
-void _su2Nfc_times_su2Nfc_herm(suNfc *C, suNfc *B, suNfc *A) {
+visible void _su2Nfc_times_su2Nfc_herm(suNfc *C, suNfc *B, suNfc *A) {
     // new zero component
     _suNfc_times_suNfc(C[0], B[0], A[0]);
     _suNfc_times_suNfc_assign(C[0], B[1], A[2]);
@@ -95,7 +75,7 @@ void _su2Nfc_times_su2Nfc_herm(suNfc *C, suNfc *B, suNfc *A) {
 }
 
 //C = B*A
-void _su2Nfc_times_su2Nfc(suNfc *C, suNfc *B, suNfc *A) {
+visible void _su2Nfc_times_su2Nfc(suNfc *C, suNfc *B, suNfc *A) {
     // new zero component
     _suNfc_times_suNfc(C[0], B[0], A[0]);
     _suNfc_times_suNfc_assign(C[0], B[1], A[2]);
@@ -114,7 +94,7 @@ void _su2Nfc_times_su2Nfc(suNfc *C, suNfc *B, suNfc *A) {
 }
 
 // C += A*B
-void _su2Nfc_times_su2Nfc_assign(suNfc *C, suNfc *B, suNfc *A) {
+visible void _su2Nfc_times_su2Nfc_assign(suNfc *C, suNfc *B, suNfc *A) {
     // new zero component
     _suNfc_times_suNfc_assign(C[0], B[0], A[0]);
     _suNfc_times_suNfc_assign(C[0], B[1], A[2]);
@@ -133,7 +113,7 @@ void _su2Nfc_times_su2Nfc_assign(suNfc *C, suNfc *B, suNfc *A) {
 }
 
 //C += B*A when C hermitian!
-void _su2Nfc_times_su2Nfc_assign_herm(suNfc *C, suNfc *B, suNfc *A) {
+visible void _su2Nfc_times_su2Nfc_assign_herm(suNfc *C, suNfc *B, suNfc *A) {
     // new zero component
     _suNfc_times_suNfc_assign(C[0], B[0], A[0]);
     _suNfc_times_suNfc_assign(C[0], B[1], A[2]);
@@ -150,7 +130,7 @@ void _su2Nfc_times_su2Nfc_assign_herm(suNfc *C, suNfc *B, suNfc *A) {
 }
 
 //trace of B*A
-void _su2Nfc_times_su2Nfc_trace(hr_complex *trace, suNfc *B, suNfc *A) {
+visible void _su2Nfc_times_su2Nfc_trace(hr_complex *trace, suNfc *B, suNfc *A) {
     suNfc aux;
 
     _suNfc_times_suNfc(aux, B[0], A[0]);
@@ -162,9 +142,9 @@ void _su2Nfc_times_su2Nfc_trace(hr_complex *trace, suNfc *B, suNfc *A) {
 }
 
 //trace of the square of a 2NF hermitian matrix
-void _su2Nfc_times_su2Nfc_trace_herm_sq(hr_complex *trace, suNfc *B) {
+visible void _su2Nfc_times_su2Nfc_trace_herm_sq(hr_complex *trace, suNfc *B) {
     suNfc aux;
-    double auxtrace;
+    hr_complex auxtrace;
 
     _suNfc_times_suNfc(aux, B[1], B[2]);
     _suNfc_trace(auxtrace, aux);
@@ -173,17 +153,17 @@ void _su2Nfc_times_su2Nfc_trace_herm_sq(hr_complex *trace, suNfc *B) {
 
     _suNfc_trace(*trace, aux);
 
-    *trace = *trace + 2 * auxtrace;
+    *trace = *trace + 2 * creal(auxtrace);
 }
 
-void _su2Nfc_unit(suNfc *A) {
+visible void _su2Nfc_unit(suNfc *A) {
     _suNfc_unit(A[0]);
     _suNfc_unit(A[3]);
     _suNfc_zero(A[1]);
     _suNfc_zero(A[2]);
 }
 
-void _su2Nfc_trace(hr_complex *p, suNfc *A) {
+visible void _su2Nfc_trace(hr_complex *p, suNfc *A) {
     hr_complex aux = 0.;
     _suNfc_trace(aux, A[0]);
     _suNfc_trace(*p, A[3]);
@@ -192,16 +172,9 @@ void _su2Nfc_trace(hr_complex *p, suNfc *A) {
 
 #if (NF == 3)
 
-static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus) {
-    suNfc A0[3], A2[4], A3[4], tmp1[4], tmp2[3];
-
-    int i = 0, j = 0;
-    hr_complex p[2 * NF - 1];
+visible void clover_exp_NF3_begin(suNfc *Aplus, suNfc *expAplus, suNfc *A2, suNfc *A3, hr_complex p[]) {
     _su2Nfc_times_su2Nfc_herm(A2, Aplus, Aplus);
     _su2Nfc_times_su2Nfc_herm(A3, A2, Aplus);
-    _suNfc_unit(A0[0]);
-    _suNfc_unit(A0[2]);
-    _suNfc_zero(A0[1]);
 
     _su2Nfc_times_su2Nfc_trace_herm_sq(&p[0], A3);
     _su2Nfc_times_su2Nfc_trace(&p[1], A3, A2);
@@ -224,26 +197,15 @@ static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus) {
     p[0] = p[3] * p[3] / 2 + p[4] * p[2] + (p[4] * p[4] * p[4] - p[0]) / 6;
     p[1] = -p[1] / 5 + p[4] * p[3];
 
-    p[2] += +p[4] * p[4] / 2;
+    p[2] += p[4] * p[4] / 2;
+}
 
-    double q[2 * NF];
-    for (i = 0; i < 2 * NF; i++) {
-        q[i] = 0.;
-    }
-
-    double qlast;
-    q[0] = inverse_fact[NN];
-
-    for (i = NN - 1; i >= 0; i--) {
-        qlast = q[2 * NF - 1];
-        q[2 * NF - 1] = q[2 * NF - 2];
-        for (j = 2 * NF - 2; j > 0; j--) {
-            q[j] = q[j - 1] - creal(p[j]) * qlast;
-        }
-        q[0] = inverse_fact[i] - creal(p[0]) * qlast;
-    }
-
-    //Optimized to reduce operations!
+//Optimized to reduce operations!
+visible void clover_exp_NF3_end(suNfc *Aplus, suNfc *expAplus, suNfc *A2, suNfc *A3, double q[]) {
+    suNfc A0[3], tmp1[4], tmp2[3];
+    _suNfc_unit(A0[0]);
+    _suNfc_unit(A0[2]);
+    _suNfc_zero(A0[1]);
 
     _suNfc_mul_add(expAplus[0], q[0], A0[0], q[1], Aplus[0]);
     _suNfc_mul(tmp1[0], q[2], A2[0]);
@@ -273,19 +235,70 @@ static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus) {
 
     _su2Nfc_times_su2Nfc_assign_herm(expAplus, A3, tmp1);
 }
+
+void clover_exp(suNfc *Aplus, suNfc *expAplus) {
+    suNfc A2[4], A3[4];
+
+    int i = 0, j = 0;
+    hr_complex p[2 * NF - 1];
+
+    clover_exp_NF3_begin(Aplus, expAplus, A2, A3, p);
+
+    double q[2 * NF];
+    for (i = 0; i < 2 * NF; i++) {
+        q[i] = 0.;
+    }
+
+    double qlast;
+    q[0] = inverse_factorial(NN);
+
+    for (i = NN - 1; i >= 0; i--) {
+        qlast = q[2 * NF - 1];
+        q[2 * NF - 1] = q[2 * NF - 2];
+        for (j = 2 * NF - 2; j > 0; j--) {
+            q[j] = q[j - 1] - creal(p[j]) * qlast;
+        }
+        q[0] = inverse_factorial(i) - creal(p[0]) * qlast;
+    }
+
+    clover_exp_NF3_end(Aplus, expAplus, A2, A3, q);
+}
+
+#ifdef WITH_GPU
+deviceonly void clover_exp_gpu(suNfc *Aplus, suNfc *expAplus, int NN, int NNexp) {
+    suNfc A2[4], A3[4];
+
+    int i = 0, j = 0;
+    hr_complex p[2 * NF - 1];
+
+    clover_exp_NF3_begin(Aplus, expAplus, A2, A3, p);
+
+    double q[2 * NF];
+    for (i = 0; i < 2 * NF; i++) {
+        q[i] = 0.;
+    }
+
+    double qlast;
+    q[0] = inverse_factorial_gpu(NN);
+
+    for (i = NN - 1; i >= 0; i--) {
+        qlast = q[2 * NF - 1];
+        q[2 * NF - 1] = q[2 * NF - 2];
+        for (j = 2 * NF - 2; j > 0; j--) {
+            q[j] = q[j - 1] - creal(p[j]) * qlast;
+        }
+        q[0] = inverse_factorial_gpu(i) - creal(p[0]) * qlast;
+    }
+
+    clover_exp_NF3_end(Aplus, expAplus, A2, A3, q);
+}
+#endif
 #endif
 
 #if (NF == 2)
 
-static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus) {
-    suNfc A0[3], A2[4], tmp1[4];
-
-    int i = 0, j = 0;
-    hr_complex p[2 * NF - 1];
+visible void clover_exp_NF2_begin(suNfc *Aplus, suNfc *expAplus, suNfc *A2, hr_complex p[]) {
     _su2Nfc_times_su2Nfc_herm(A2, Aplus, Aplus);
-    _suNfc_unit(A0[0]);
-    _suNfc_unit(A0[2]);
-    _suNfc_zero(A0[1]);
 
     _su2Nfc_times_su2Nfc_trace_herm_sq(&p[0], A2);
     _su2Nfc_times_su2Nfc_trace(&p[1], Aplus, A2);
@@ -294,38 +307,78 @@ static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus) {
     p[0] = -p[0] / 4 + p[2] * p[2] / 8;
     p[1] = -p[1] / 3;
     p[2] = -p[2] / 2;
+}
+
+//Optimized to reduce operations!
+visible void clover_exp_NF2_end(suNfc *Aplus, suNfc *expAplus, suNfc *A2, double q[]) {
+    suNfc A0[3], tmp1[4];
+    _suNfc_unit(A0[0]);
+    _suNfc_unit(A0[2]);
+    _suNfc_zero(A0[1]);
+
+    _suNfc_mul_add(expAplus[0], q[0], A0[0], q[1], Aplus[0]);
+    _suNfc_mul_add(tmp1[0], q[2], A0[0], q[3], Aplus[0]);
+    _suNfc_mul_add(expAplus[1], q[0], A0[1], q[1], Aplus[1]);
+    _suNfc_mul_add(tmp1[1], q[2], A0[1], q[3], Aplus[1]);
+    _suNfc_dagger(tmp1[2], tmp1[1]);
+    _suNfc_mul_add(expAplus[3], q[0], A0[2], q[1], Aplus[3]);
+    _suNfc_mul_add(tmp1[3], q[2], A0[2], q[3], Aplus[3]);
+    _su2Nfc_times_su2Nfc_assign_herm(expAplus, A2, tmp1);
+}
+
+void clover_exp(suNfc *Aplus, suNfc *expAplus) {
+    suNfc A2[4];
+    int i = 0, j = 0;
+    hr_complex p[2 * NF - 1];
+
+    clover_exp_NF2_begin(Aplus, expAplus, A2, p);
 
     double q[2 * NF];
     for (i = 0; i < 2 * NF; i++) {
         q[i] = 0.;
     }
     double qlast;
-    q[0] = inverse_fact[NN];
+    q[0] = inverse_factorial(NN);
+
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[2 * NF - 1];
         q[2 * NF - 1] = q[2 * NF - 2];
         for (j = 2 * NF - 2; j > 0; j--) {
             q[j] = q[j - 1] - creal(p[j]) * qlast;
         }
-        q[0] = inverse_fact[i] - creal(p[0]) * qlast;
+        q[0] = inverse_factorial(i) - creal(p[0]) * qlast;
     }
 
-    //Optimized to reduce operations!
-
-    _suNfc_mul_add(expAplus[0], q[0], A0[0], q[1], Aplus[0]);
-    _suNfc_mul_add(tmp1[0], q[2], A0[0], q[3], Aplus[0]);
-
-    _suNfc_mul_add(expAplus[1], q[0], A0[1], q[1], Aplus[1]);
-    _suNfc_mul_add(tmp1[1], q[2], A0[1], q[3], Aplus[1]);
-
-    _suNfc_dagger(tmp1[2], tmp1[1]);
-
-    _suNfc_mul_add(expAplus[3], q[0], A0[2], q[1], Aplus[3]);
-    _suNfc_mul_add(tmp1[3], q[2], A0[2], q[3], Aplus[3]);
-
-    _su2Nfc_times_su2Nfc_assign_herm(expAplus, A2, tmp1);
+    clover_exp_NF2_end(Aplus, expAplus, A2, q);
 }
 
+#ifdef WITH_GPU
+deviceonly void clover_exp_gpu(suNfc *Aplus, suNfc *expAplus, int NN, int NNexp) {
+    suNfc A2[4];
+    int i = 0, j = 0;
+    hr_complex p[2 * NF - 1];
+
+    clover_exp_NF2_begin(Aplus, expAplus, A2, p);
+
+    double q[2 * NF];
+    for (i = 0; i < 2 * NF; i++) {
+        q[i] = 0.;
+    }
+    double qlast;
+    q[0] = inverse_factorial_gpu(NN);
+
+    for (i = NN - 1; i >= 0; i--) {
+        qlast = q[2 * NF - 1];
+        q[2 * NF - 1] = q[2 * NF - 2];
+        for (j = 2 * NF - 2; j > 0; j--) {
+            q[j] = q[j - 1] - creal(p[j]) * qlast;
+        }
+        q[0] = inverse_factorial_gpu(i) - creal(p[0]) * qlast;
+    }
+
+    clover_exp_NF2_end(Aplus, expAplus, A2, q);
+}
+#endif
 #endif
 
 void clover_exp_taylor(suNfc *Xin, suNfc *u) {
@@ -357,18 +410,42 @@ void clover_exp_taylor(suNfc *Xin, suNfc *u) {
     }
 }
 
-inline void clover_exp(suNfc *Aplus, suNfc *expAplus) {
-#if (NF == 2)
-    clover_exp_NF2(Aplus, expAplus);
-#elif (NF == 3)
-    clover_exp_NF3(Aplus, expAplus);
-#else
-    clover_exp_taylor(Aplus, expAplus);
-#endif
+#if !(NF == 2) && !(NF == 3)
+#define clover_exp clover_exp_taylor
+
+#ifdef WITH_GPU
+deviceonly void clover_exp_gpu(suNfc *Xin, suNfc *u, int NN, int NNexp) {
+    suNfc Xk[4], tmp[4];
+    _su2Nfc_unit(u);
+    _su2Nfc_unit(Xk);
+
+    int k = 1;
+    int i = 0;
+    double error = 0., erroraux;
+    while (1) {
+        _su2Nfc_times_su2Nfc(tmp, Xk, Xin);
+
+        for (i = 0; i < 4; i++) {
+            _suNfc_mul(Xk[i], 1. / k, tmp[i]);
+            _suNfc_add_assign(u[i], Xk[i]);
+        }
+
+        k++;
+
+        error = 0.;
+
+        for (i = 0; i < 4; i++) {
+            _suNfc_sqnorm(erroraux, Xk[i]);
+            error += erroraux;
+        }
+
+        if (sqrt(error) < 1e-28) { break; }
+    }
 }
+#endif
+#endif
 
 #if (NF == 3)
-
 static void doublehornerNF3(double *C, suNfc *A) {
     suNfc A2[4], A3[4];
     hr_complex p[2 * NF - 1];
@@ -395,12 +472,18 @@ static void doublehornerNF3(double *C, suNfc *A) {
     p[4] = -p[4] / 2;
 
     int i, j, k;
-    double q[2 * NF], q2[NNexp + 1][2 * NF], qlast;
+    double q[2 * NF], qlast;
+    #ifndef __cplusplus
+    double q2[NNexp + 1][2 * NF];
+    #else
+    // TODO: this does not work yet for GPU
+    double **q2 = (double **)malloc((NNexp + 1) * 2 * NF);
+    #endif
 
     //  for(i=0; i<2*NF-1;i++)printf("p[%d] = %2.20e\n", i, creal(p[i]));
 
     for (j = 0; j <= NNexp; j++) {
-        q[0] = inverse_fact[NNexp + 2];
+        q[0] = inverse_factorial(NNexp + 2);
         for (k = 1; k < 2 * NF; k++) {
             q[k] = 0.;
         }
@@ -411,7 +494,7 @@ static void doublehornerNF3(double *C, suNfc *A) {
             for (k = 2 * NF - 2; k > 0; k--) {
                 q[k] = q[k - 1] - creal(p[k]) * qlast;
             }
-            q[0] = -creal(p[0]) * qlast + inverse_fact[i + j + 1];
+            q[0] = -creal(p[0]) * qlast + inverse_factorial(i + j + 1);
         }
 
         for (i = 0; i < 2 * NF; i++) {
@@ -444,7 +527,6 @@ static void doublehornerNF3(double *C, suNfc *A) {
 #endif
 
 #if (NF == 2)
-
 static void doublehornerNF2(double *C, suNfc *A) {
     suNfc A2[4];
     hr_complex p[2 * NF - 1];
@@ -464,7 +546,7 @@ static void doublehornerNF2(double *C, suNfc *A) {
     //  for(i=0; i<2*NF-1;i++)printf("p[%d] = %2.20e\n", i, creal(p[i]));
 
     for (j = 0; j <= NNexp; j++) {
-        q[0] = inverse_fact[NNexp + 2];
+        q[0] = inverse_factorial(NNexp + 2);
         for (k = 1; k < 2 * NF; k++) {
             q[k] = 0.;
         }
@@ -475,7 +557,7 @@ static void doublehornerNF2(double *C, suNfc *A) {
             for (k = 2 * NF - 2; k > 0; k--) {
                 q[k] = q[k - 1] - creal(p[k]) * qlast;
             }
-            q[0] = -creal(p[0]) * qlast + inverse_fact[i + j + 1];
+            q[0] = -creal(p[0]) * qlast + inverse_factorial(i + j + 1);
         }
 
         for (i = 0; i < 2 * NF; i++) {
@@ -506,7 +588,7 @@ static void doublehornerNF2(double *C, suNfc *A) {
 }
 #endif
 
-inline void doublehorner(double *C, suNfc *A) {
+void doublehorner(double *C, suNfc *A) {
 #if (NF == 3)
     doublehornerNF3(C, A);
 #elif (NF == 2)
@@ -516,13 +598,13 @@ inline void doublehorner(double *C, suNfc *A) {
 #endif
 }
 
-void factorialCoef(double *C) {
+void factorialCoef(double *C, int NN, int NNexp) {
     int i, j;
 
     for (j = 0; j < NNexp; j++) {
         for (i = 0; i < NNexp; i++) {
             if (i + j <= NNexp) {
-                C[(NNexp)*i + j] = inverse_fact[i + j + 1];
+                C[(NNexp)*i + j] = inverse_factorial(i + j + 1);
             } else {
                 C[(NNexp)*i + j] = 0.;
             }

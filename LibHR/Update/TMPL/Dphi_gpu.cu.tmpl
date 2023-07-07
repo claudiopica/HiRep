@@ -15,6 +15,8 @@
 #include "inverters.h"
 #include <string.h>
 #include "Utils/generics.h"
+#include <stdio.h>
+#include <unistd.h>
 
 #if !defined(_FIELD_TYPE)
 #error Missing _FIELD_TYPE in Dphi_gpu.cu
@@ -65,6 +67,9 @@ static int _VAR(bc_initialized, _SUFFIX) = 0;
 static _FIELD_TYPE *_VAR(gtmp, _SUFFIX) = NULL;
 static _FIELD_TYPE *_VAR(etmp, _SUFFIX) = NULL;
 static _FIELD_TYPE *_VAR(otmp, _SUFFIX) = NULL;
+static kernel_field_input *_VAR(input_d, _SUFFIX) = NULL;
+
+#define max(a, b) (a > b ? a : b)
 
 /**
  * @brief Initializes the boundary conditions for fermion twisting
@@ -126,6 +131,9 @@ _DECLARE(static void, free_mem, ()) {
  */
 _DECLARE(static void, init_Dirac, ()) {
     if (_VAR(init, _SUFFIX)) {
+        // Field input
+        cudaMalloc((void **)&_VAR(input_d, _SUFFIX), sizeof(kernel_field_input));
+
         // Change standard communication and allocation mode
         // Since the tmp fields are only allocated on the GPU
         comm_t current_std_comm_t = std_comm_t;
@@ -144,31 +152,28 @@ _DECLARE(static void, init_Dirac, ()) {
     }
 }
 
-_DECLARE(static kernel_field_input *, init_kernel_input,
-         (_FIELD_TYPE * out, _FIELD_TYPE *in, const _GAUGE_TYPE *u, box_t *box, gd_type gd_t)) {
-    kernel_field_input *input = (kernel_field_input *)malloc(sizeof(kernel_field_input));
-    input->field_in = (void *)in->gpu_ptr;
-    input->field_out = (void *)out->gpu_ptr;
-    input->base_in[0] = box->base_index;
-    input->base_in[1] = box->base_index_odd;
-    input->base_out[0] = geometryBoxes->base_index_odd;
-    input->base_out[1] = geometryBoxes->base_index;
-    input->vol_in[0] = boxEvenVolume(box);
-    input->vol_in[1] = boxOddVolume(box);
-    input->vol_out[0] = boxOddVolume(geometryBoxes);
-    input->vol_out[1] = boxEvenVolume(geometryBoxes);
-    input->master_shift_in = in->type->master_shift;
-    input->master_shift_out = out->type->master_shift;
-    input->gauge = (void *)u;
-    input->iup_gpu = iup_gpu;
-    input->idn_gpu = idn_gpu;
-    input->imask_gpu = imask_gpu;
-    input->gd_in = gd_t;
+_DECLARE(static void, init_kernel_input, (_FIELD_TYPE * out, _FIELD_TYPE *in, const _GAUGE_TYPE *u, box_t *box, gd_type gd_t)) {
+    kernel_field_input *input_h = (kernel_field_input *)malloc(sizeof(kernel_field_input));
+    input_h->field_in = (void *)(in->gpu_ptr - in->type->master_shift);
+    input_h->field_out = (void *)(out->gpu_ptr - out->type->master_shift);
+    input_h->base_in[0] = box->base_index;
+    input_h->base_in[1] = box->base_index_odd;
+    input_h->base_out[0] = geometryBoxes->base_index_odd;
+    input_h->base_out[1] = geometryBoxes->base_index;
+    input_h->vol_in[0] = boxEvenVolume(box);
+    input_h->vol_in[1] = boxOddVolume(box);
+    input_h->vol_out[0] = boxOddVolume(geometryBoxes);
+    input_h->vol_out[1] = boxEvenVolume(geometryBoxes);
+    input_h->master_shift_in = in->type->master_shift;
+    input_h->master_shift_out = out->type->master_shift;
+    input_h->gauge = (void *)u;
+    input_h->iup_gpu = iup_gpu;
+    input_h->idn_gpu = idn_gpu;
+    input_h->imask_gpu = imask_gpu;
+    input_h->gd_in = gd_t;
 
-    kernel_field_input *input_d;
-    cudaMalloc((void **)&input_d, sizeof(kernel_field_input));
-    cudaMemcpy(input_d, input, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
-    return input_d;
+    cudaMemcpy(_VAR(input_d, _SUFFIX), input_h, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
+    free(input_h);
 }
 
 /**
@@ -179,7 +184,7 @@ _DECLARE(static kernel_field_input *, init_kernel_input,
  * @param in                  Input spinor field, defined on GPU copy
  * @param out                 Output spinor field to save result
  */
-_DECLARE(static void, Dphi_inner, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
+_DECLARE(static void, Dphi_inner_init, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
     enum gd_type gd_t;
     if (in->type == &glattice) {
         gd_t = GLOBAL;
@@ -190,12 +195,13 @@ _DECLARE(static void, Dphi_inner, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
     }
 
     const _GAUGE_TYPE *gauge = GFIELD(u_gauge, _REP_SUFFIX)->gpu_ptr;
-    int grid = (boxEvenVolume(geometryBoxes) - 1) / BLOCK_SIZE + 1;
-    kernel_field_input *input = _GPU_F_NAME(init_kernel_input, _SUFFIX)(out, in, gauge, geometryBoxes, gd_t);
-    Dphi_gpu_inner_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE>>>(input);
-    cudaFree(input);
-    CudaCheckError();
-    cudaDeviceSynchronize();
+    _GPU_F_NAME(init_kernel_input, _SUFFIX)(out, in, gauge, geometryBoxes, gd_t);
+}
+
+_DECLARE(static void, Dphi_inner, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
+    int grid = (max(boxEvenVolume(geometryBoxes), boxOddVolume(geometryBoxes)) - 1) / BLOCK_SIZE_DIRAC + 1;
+    Dphi_gpu_inner_kernel<_HSPINOR_TYPE, _REAL, _COMPLEX, _SPINOR_TYPE, _GAUGE_TYPE>
+        <<<grid, BLOCK_SIZE_DIRAC, 0, non_default_stream>>>(_VAR(input_d, _SUFFIX));
 }
 
 /**
@@ -225,8 +231,8 @@ _DECLARE(static void, Dphi_boundary, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
     while (buffer_box && i <= nbuffers) {
         const _GAUGE_TYPE *gauge = GFIELD(u_gauge, _REP_SUFFIX)->gpu_ptr;
         int grid = (boxEvenVolume(geometryBoxes) - 1) / BLOCK_SIZE + 1;
-        kernel_field_input *input = _GPU_F_NAME(init_kernel_input, _SUFFIX)(out, in, gauge, buffer_box, gd_t);
-        Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE>>>(input);
+        _GPU_F_NAME(init_kernel_input, _SUFFIX)(out, in, gauge, buffer_box, gd_t);
+        Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE>>>(_VAR(input_d, _SUFFIX));
         buffer_box = buffer_box->next;
         i++;
     }
@@ -242,24 +248,84 @@ void _GPU_F_NAME_(Dphi, _SUFFIX)(_FIELD_TYPE *out, _FIELD_TYPE *in) {
     // Input parameter validity checks
     _CHECK_GEOMETRY_EO(in, out);
     // TODO: Possibly add: Fields are not null, fields are unequal (SAM)
-
     //init_bc_gpu();
+    if (_VAR(init, _SUFFIX)) { _GPU_F_NAME(init_Dirac, _SUFFIX)(); }
+
+    _F_NAME(sync_reduced_init_, _FIELD_NAME)(in);
+    _GPU_F_NAME(Dphi_inner_init, _SUFFIX)(out, in);
 
 #ifdef WITH_MPI
-    _F_NAME(start_sendrecv_, _FIELD_NAME)(in);
+    _F_NAME(start_sendrecv_reduced_, _FIELD_NAME)(in);
 #endif
-
-    // Mask communication latency with calculating the points
-    // that do not rely on communications
     _GPU_F_NAME(Dphi_inner, _SUFFIX)(out, in);
 #ifdef WITH_MPI
-    _F_NAME(complete_sendrecv_, _FIELD_NAME)(in);
-
-    // After completion of communications add missing calculations
-    // that relied on communications.
+    _F_NAME(complete_sendrecv_reduced_, _FIELD_NAME)(in);
     _GPU_F_NAME(Dphi_boundary, _SUFFIX)(out, in);
 #endif
+    cudaDeviceSynchronize();
 }
+
+#ifdef WITH_CLOVER
+void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sptr, int assign) {
+    mass = (4. + mass);
+    _PIECE_FOR(sptr->type, ixp) {
+        const int N = sptr->type->master_end[ixp] - sptr->type->master_start[ixp] + 1;
+        const int grid = (N - 1) / BLOCK_SIZE_CLOVER + 1;
+        const int block_start = sptr->type->master_start[ixp];
+        suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start;
+        Cphi_gpu_kernel_<_VECTOR_TYPE, _REAL><<<grid, BLOCK_SIZE_CLOVER>>>(_GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp),
+                                                                           cl_term_gpu, mass, assign, N, block_start);
+    }
+}
+
+void _GPU_F_NAME_(Cphi_inv, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sptr, int assign) {
+    mass = (4. + mass);
+    compute_ldl_decomp(mass);
+
+    _F_NAME(start_sendrecv_, _FIELD_NAME)(sptr);
+    _F_NAME(complete_sendrecv_, _FIELD_NAME)(sptr);
+
+    start_sendrecv_clover_ldl(cl_ldl);
+    complete_sendrecv_clover_ldl(cl_ldl);
+
+    _PIECE_FOR(sptr->type, ixp) {
+        const int N = sptr->type->master_end[ixp] - sptr->type->master_start[ixp] + 1;
+        const int grid = (N - 1) / BLOCK_SIZE_CLOVER + 1;
+        const int block_start = sptr->type->master_start[ixp];
+        ldl_t *cl_ldl_gpu = cl_ldl->gpu_ptr + block_start;
+        Cphi_inv_kernel_<_VECTOR_TYPE, _COMPLEX, _REAL><<<grid, BLOCK_SIZE_CLOVER>>>(
+            _GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp), cl_ldl_gpu, mass, assign, N, block_start);
+    }
+}
+#endif
+
+#ifdef WITH_EXPCLOVER
+void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sptr, int assign, int inverse) {
+    evaluate_sw_order(&mass);
+
+    mass = (4. + mass);
+    double invexpmass = 1.0 / mass;
+    if (inverse == 1) {
+        invexpmass = -1.0 / mass;
+        mass = 1 / mass;
+    }
+
+    init_clover_exp();
+
+    int NN_loc = get_NN();
+    int NNexp_loc = get_NNexp();
+
+    _PIECE_FOR(sptr->type, ixp) {
+        const int N = sptr->type->master_end[ixp] - sptr->type->master_start[ixp] + 1;
+        const int grid = (N - 1) / BLOCK_SIZE_CLOVER + 1;
+        const int block_start = sptr->type->master_start[ixp];
+        suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start;
+        Cphi_gpu_kernel_<_VECTOR_TYPE, _REAL><<<grid, BLOCK_SIZE_CLOVER>>>(_GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp),
+                                                                           cl_term_gpu, mass, invexpmass, assign, N,
+                                                                           block_start, NN_loc, NNexp_loc);
+    }
+}
+#endif
 
 /**
  * @brief Implementation of the Wilson-Dirac operator with mass on the GPU.
@@ -423,18 +489,6 @@ _DECLARE(void, g5Dphi_sq, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
     _GPU_F_NAME(g5Dphi, _SUFFIX)(m0, out, _VAR(gtmp, _SUFFIX));
 }
 
-/* For WITH_GPU: Map the GPU functions to the default functions. */
-/*unsigned long int (*getMVM) ()=getMVM_gpu;
-void (*Dphi_) (spinor_field *out, spinor_field *in)=Dphi_gpu_;
-void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_gpu;
-void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_gpu;
-void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_sq_gpu;
-void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=Dphi_eopre_gpu;
-void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in)=Dphi_oepre_gpu;
-void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_gpu;
-void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_sq_gpu;
-*/
-
 _ALIAS_INNER(unsigned long int, getMVM, _SUFFIX, ());
 _ALIAS_INNER_(void, Dphi, _SUFFIX, (_FIELD_TYPE * out, _FIELD_TYPE *in));
 _ALIAS_INNER(void, Dphi, _SUFFIX, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in));
@@ -444,6 +498,14 @@ _ALIAS_INNER(void, Dphi_eopre, _SUFFIX, (double m0, _FIELD_TYPE *out, _FIELD_TYP
 _ALIAS_INNER(void, Dphi_oepre, _SUFFIX, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in));
 _ALIAS_INNER(void, g5Dphi_eopre, _SUFFIX, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in));
 _ALIAS_INNER(void, g5Dphi_eopre_sq, _SUFFIX, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in));
+
+#ifdef WITH_CLOVER
+_ALIAS_INNER_(void, Cphi, _SUFFIX, (double mass, _FIELD_TYPE *, _FIELD_TYPE *, int));
+_ALIAS_INNER_(void, Cphi_inv, _SUFFIX, (double mass, _FIELD_TYPE *, _FIELD_TYPE *, int));
+#endif
+#ifdef WITH_EXPCLOVER
+_ALIAS_INNER_(void, Cphi, _SUFFIX, (double mass, _FIELD_TYPE *, _FIELD_TYPE *, int, int));
+#endif
 
 #undef _FIELD_TYPE
 #undef _SPINOR_TYPE
@@ -455,6 +517,7 @@ _ALIAS_INNER(void, g5Dphi_eopre_sq, _SUFFIX, (double m0, _FIELD_TYPE *out, _FIEL
 #undef _FIELD_NAME
 #undef _REP_SUFFIX
 #undef _REAL
+#undef _SUNFC
 
 #undef _VAR
 #undef _GPU_F_NAME_

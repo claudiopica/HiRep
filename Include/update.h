@@ -23,5 +23,6 @@
 #include "Update/staples.h"
 #include "Update/stout_smearing.h"
 #include "Update/update_algo.h"
+#include "Update/twisted_bc.h"
 
 #endif

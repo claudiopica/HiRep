@@ -20,6 +20,7 @@
 
 #include "Geometry/geometry_indexing.h"
 #include "Geometry/communications.h"
+#include "Geometry/communications_reduced.h"
 #include "Geometry/cpu_geometry.h"
 #include "Geometry/geometry_check.h"
 #include "Geometry/geometry_descriptor.h"
@@ -30,11 +31,14 @@
 #include "Geometry/new_geometry.h"
 #include "Geometry/setup.h"
 #include "Geometry/strided_reads.h"
+#include "Geometry/hr_sendrecv.h"
 
 #ifdef WITH_GPU
+#include "Geometry/gpu_affinity.h"
 #include "Geometry/geometry_gpu_init.h"
 #include "Geometry/gpu_geometry.h"
 #include "Geometry/strided_reads_gpu.h"
+#include "Geometry/read_clover.h"
 #endif
 
 /* this define the width of the borders for parallel dimensions

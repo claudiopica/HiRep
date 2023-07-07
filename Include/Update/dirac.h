@@ -10,6 +10,8 @@
 /// - D_update.c
 /// - D_ff.c
 
+// TODO: Clean up all the ifdefs here
+
 #ifndef DIRAC_H
 #define DIRAC_H
 
@@ -50,8 +52,38 @@ void Dphi_fused_(spinor_field *out, spinor_field *in); //TODO: should we remove 
 #endif
 
 // Clover operators
+#ifdef WITH_CLOVER
+extern void (*Cphi_)(double mass, spinor_field *dptr, spinor_field *sptr, int assign);
+extern void (*Cphi_inv_)(double mass, spinor_field *dptr, spinor_field *sptr, int assign);
+
+#ifdef WITH_GPU // Only implemented for GPU
+extern void (*Cphi_flt_)(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr, int assign);
+extern void (*Cphi_inv_flt_)(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr, int assign);
+void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign);
+void Cphi_inv_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign);
+#endif
+#endif
+
+#ifdef WITH_EXPCLOVER
+extern void (*Cphi_)(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse);
+
+#ifdef WITH_GPU // Only implemented for GPU
+extern void (*Cphi_flt_)(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr, int assign, int inverse);
+extern void (*Cphi_inv_flt_)(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr, int assign, int inverse);
+void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse);
+#endif
+
+#endif
+
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+
+#ifdef WITH_GPU
+void Cphi_diag_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr);
+void Cphi_diag_inv_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr);
+#endif
+
 void Cphi(double mass, spinor_field *dptr, spinor_field *sptr);
+void Cphi_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr);
 void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr);
 void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr);
 void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr);
@@ -59,6 +91,7 @@ void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr);
 void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr);
 void Cphi_diag(double mass, spinor_field *dptr, spinor_field *sptr);
 void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr);
+void Cphi_diag_inv_cpu(double mass, spinor_field *dptr, spinor_field *sptr);
 #endif
 
 // D_update.c

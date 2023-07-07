@@ -63,11 +63,16 @@ void select_GPU(input_gpu gpu_var_init) {
       * print info on local rank, process ID, node ID etc.
       * use hwloc to bind according to ideal CPU topology (SAM)
     */
-    cudaSetDevice(PID);
+
+    int rank = atoi(getenv("OMPI_COMM_WORLD_LOCAL_RANK"));
+    cudaSetDevice(rank);
     int current_device;
     cudaGetDevice(&current_device);
     lprintf("GPU_INIT", 0, "GPU Affinity: GPU Node %d has been bound to MPI Thread of Rank %d\n", current_device, PID);
     enable_GPU_peer_to_peer_access();
+
+    find_physically_close_CPU_core();
+
 #endif
 }
 
@@ -78,7 +83,6 @@ void select_GPU(input_gpu gpu_var_init) {
  *                            GPU
  */
 int enable_GPU_peer_to_peer_access() {
-// TODO: For more than one node we need to use local MPI ranks instead of PIDs (SAM)
 #if defined(WITH_MPI)
     int device_count = 0;
     cudaGetDeviceCount(&device_count);

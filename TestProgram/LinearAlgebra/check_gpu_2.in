@@ -15,9 +15,9 @@ gpuID = 0
 N_REP = 1
 
 //Logger levels (default = -1)
-log:default = -1
-log:inverter = -1
-log:forcestat = 0
+log:default = 2
+log:inverter = 2
+log:forcestat = 2
 
 // Random generator
 rlx_level = 1

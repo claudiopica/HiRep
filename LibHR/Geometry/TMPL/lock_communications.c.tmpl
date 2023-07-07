@@ -1,0 +1,57 @@
+/***************************************************************************\
+* Copyright (c) 2023, Sofie Martins, Claudio Pica                           *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
+#include <string.h>
+#include "geometry.h"
+#include "Utils/generics.h"
+
+#if !defined _FIELD_NAME
+#error Missing _FIELD_NAME in communications.c
+#endif
+#if !defined _FIELD_TYPE
+#error Missing _FIELD_TYPE in communications.c
+#endif
+#if !defined _SITE_TYPE
+#error Missing _SITE_TYPE in communications.c
+#endif
+#if !defined _FIELD_DIM
+#error Missing _FIELD_DIM in communications.c
+#endif
+#if !defined _GEOM_TYPE
+#error Missing _GEOM_TYPE in communications.c
+#endif
+#if !defined _MPI_REAL
+#error Missing _MPI_REAL in communications.c
+#endif
+#if !defined _REAL
+#error Missing _REAL in communications.c
+#endif
+
+#define _DECLARE(_name, _args) _FUNC(void, _name, _FIELD_NAME, _args)
+
+#if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)
+static void *_F_NAME(sendrecv_guard_, _FIELD_NAME) = NULL;
+#endif
+
+_DECLARE(check_sendrecv_guard_, (_FIELD_TYPE * f)) {
+#if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)
+    if (_F_NAME(sendrecv_guard_, _FIELD_NAME) != NULL && _F_NAME(sendrecv_guard_, _FIELD_NAME) != (void *)f->comm_req) {
+        lprintf("TEST", 0, "commtype = %d\n", f->comm_type);
+        error(1, 1, __func__, "More simultaneous communication attempted. Exiting...\n");
+    }
+#endif
+}
+
+_DECLARE(lock_communications_, (_FIELD_TYPE * f)) {
+#if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)
+    _F_NAME(sendrecv_guard_, _FIELD_NAME) = (void *)f->comm_req;
+#endif
+}
+
+_DECLARE(release_communications_, (_FIELD_TYPE * f)) {
+#if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)
+    _F_NAME(sendrecv_guard_, _FIELD_NAME) = NULL;
+#endif
+}
