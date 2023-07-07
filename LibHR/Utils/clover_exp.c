@@ -473,12 +473,12 @@ static void doublehornerNF3(double *C, suNfc *A) {
 
     int i, j, k;
     double q[2 * NF], qlast;
-    #ifndef __cplusplus
+#ifndef __cplusplus
     double q2[NNexp + 1][2 * NF];
-    #else
+#else
     // TODO: this does not work yet for GPU
     double **q2 = (double **)malloc((NNexp + 1) * 2 * NF);
-    #endif
+#endif
 
     //  for(i=0; i<2*NF-1;i++)printf("p[%d] = %2.20e\n", i, creal(p[i]));
 
