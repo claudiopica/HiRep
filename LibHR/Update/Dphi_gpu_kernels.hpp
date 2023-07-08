@@ -158,7 +158,7 @@
 #define read_reduced(iy, in, sn, piece)                                          \
     do {                                                                         \
         const int block_offset = input->base_in[(piece)-1];                      \
-        const _HSPINOR_TYPE *in_offset = (_HSPINOR_TYPE *)((in) + block_offset); \
+        const HSPINOR_TYPE *in_offset = (HSPINOR_TYPE *)((in) + block_offset); \
         const int iy_loc = (iy)-block_offset;                                    \
         read_gpu<REAL>(0, &(sn), in_offset, iy_loc, 0, 1);                       \
     } while (0)
