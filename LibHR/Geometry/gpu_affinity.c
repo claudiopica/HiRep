@@ -18,6 +18,7 @@
  * 
 */
 
+#ifdef HWLOC
 static hwloc_topology_t topology = NULL;
 
 hwloc_topology_t init_topology() {
@@ -78,5 +79,6 @@ int find_physically_close_CPU_core() {
     return cpu;
 }
 
+#endif
 #endif
 #endif

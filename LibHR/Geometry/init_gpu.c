@@ -71,7 +71,9 @@ void select_GPU(input_gpu gpu_var_init) {
     lprintf("GPU_INIT", 0, "GPU Affinity: GPU Node %d has been bound to MPI Thread of Rank %d\n", current_device, PID);
     enable_GPU_peer_to_peer_access();
 
+#ifdef HWLOC
     find_physically_close_CPU_core();
+#endif
 
 #endif
 }

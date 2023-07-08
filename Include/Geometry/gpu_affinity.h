@@ -6,7 +6,7 @@
 #ifndef GPU_AFFINITY_H
 #define GPU_AFFINITY_H
 
-#ifdef WITH_MPI
+#if defined(WITH_MPI) && defined(HWLOC)
 int find_physically_close_CPU_core();
 #endif
 
