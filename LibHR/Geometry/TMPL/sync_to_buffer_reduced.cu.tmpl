@@ -70,9 +70,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
             _HSPINOR_TYPE r, sn;
             _GAUGE_TYPE *gauge = (_GAUGE_TYPE *)input->gauge;
 
-            // TODO: This is not correct. We need mask(ix) & T_UP_MASK from the buffer
-            // without inversion
-            if (!(input->imask_gpu[iy] & T_DN_MASK)) {
+            if (mask & T_UP_MASK) {
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 int ixg = input->idn_gpu[4 * iy];
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
@@ -94,7 +92,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
                 write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
             }
 
-            if (!(input->imask_gpu[iy] & T_UP_MASK)) {
+            if (mask & T_DN_MASK) {
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
                 in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
@@ -115,7 +113,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
                 write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
             }
 
-            if (!(input->imask_gpu[iy] & X_DN_MASK)) {
+            if (mask & X_UP_MASK) {
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 int ixg = input->idn_gpu[4 * iy + 1];
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
@@ -137,7 +135,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
                 write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
             }
 
-            if (!(input->imask_gpu[iy] & X_UP_MASK)) {
+            if (mask & X_DN_MASK) {
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
                 in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 3);
@@ -158,7 +156,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
                 write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
             }
 
-            if (!(input->imask_gpu[iy] & Y_DN_MASK)) {
+            if (mask & Y_UP_MASK) {
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 int ixg = input->idn_gpu[4 * iy + 2];
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
@@ -180,7 +178,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
                 write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
             }
 
-            if (!(input->imask_gpu[iy] & Y_UP_MASK)) {
+            if (mask & Y_DN_MASK) {
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
                 in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 3);
@@ -201,7 +199,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
                 write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
             }
 
-            if (!(input->imask_gpu[iy] & Z_DN_MASK)) {
+            if (mask & Z_UP_MASK) {
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 int ixg = input->idn_gpu[4 * iy + 3];
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
@@ -222,7 +220,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
                 write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
             }
 
-            if (!(input->imask_gpu[iy] & Z_UP_MASK)) {
+            if (mask & Z_UP_MASK) {
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
                 in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
@@ -256,10 +254,10 @@ _DECLARE(void, sync_box_reduced_init_, (geometry_descriptor * gd, box_t *src, _F
 }
 
 _DECLARE(void, sync_box_to_buffer_gpu_reduced_,
-         (geometry_descriptor * gd, box_t *src, _FIELD_TYPE *in, void *sendbuf, int buf)) {
+         (geometry_descriptor * gd, box_t *src, _FIELD_TYPE *in, void *sendbuf, int buf, char mask)) {
     const int max_vol = fmax(boxEvenVolume(src), boxOddVolume(src));
     const int grid = (max_vol - 1) / BLOCK_SIZE + 1;
-    _F_NAME(box_to_buffer_kernel_reduced_, _FIELD_NAME)<<<grid, BLOCK_SIZE>>>(input[buf], sb_icoord_gpu, ipt_gpu, src->mask);
+    _F_NAME(box_to_buffer_kernel_reduced_, _FIELD_NAME)<<<grid, BLOCK_SIZE>>>(input[buf], sb_icoord_gpu, ipt_gpu, mask);
 }
 
 #undef _DECLARE

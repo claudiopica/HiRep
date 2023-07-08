@@ -80,8 +80,8 @@ void geometryMemSize(box_t *G, size_t *total, size_t *buffers);
 #define _DECLARE_SYNC_TO_BUFFER(_name, _field_type, _type) \
     void sync_box_to_buffer_gpu_##_name(geometry_descriptor *, box_t *, _field_type *, void *);
 
-#define _DECLARE_SYNC_TO_BUFFER_REDUCED(_name, _field_type, _type)                                           \
-    void sync_box_to_buffer_gpu_reduced_##_name(geometry_descriptor *, box_t *, _field_type *, void *, int); \
+#define _DECLARE_SYNC_TO_BUFFER_REDUCED(_name, _field_type, _type)                                                 \
+    void sync_box_to_buffer_gpu_reduced_##_name(geometry_descriptor *, box_t *, _field_type *, void *, int, char); \
     void sync_box_reduced_init_##_name(geometry_descriptor *, box_t *, _field_type *, void *, int);
 
 _DECLARE_SYNC_TO_BUFFER(spinor_field_f, spinor_field, suNf_spinor);

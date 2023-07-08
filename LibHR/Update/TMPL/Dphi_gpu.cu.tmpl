@@ -171,6 +171,7 @@ _DECLARE(static void, init_kernel_input, (_FIELD_TYPE * out, _FIELD_TYPE *in, co
     input_h->idn_gpu = idn_gpu;
     input_h->imask_gpu = imask_gpu;
     input_h->gd_in = gd_t;
+    input_h->mask = box->mask;
 
     cudaMemcpy(_VAR(input_d, _SUFFIX), input_h, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
     free(input_h);
