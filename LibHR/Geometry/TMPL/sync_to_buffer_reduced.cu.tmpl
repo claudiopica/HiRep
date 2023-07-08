@@ -117,7 +117,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 int ixg = input->idn_gpu[4 * iy + 1];
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
-                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 3);
                 read_gpu<_REAL>(0, &u, gauge, ixg, 1, 4);
 
                 _vector_i_add_assign_f(sn.c[0], sn.c[1]);
@@ -160,7 +160,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 int ixg = input->idn_gpu[4 * iy + 2];
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
-                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);
+                in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 3);
                 read_gpu<_REAL>(0, &u, gauge, ixg, 2, 4);
 
                 _vector_add_assign_f(sn.c[0], sn.c[1]);
@@ -220,7 +220,7 @@ _KERNEL(box_to_buffer_kernel_reduced_, (kernel_field_input * input, coord4 *icoo
                 write_gpu<_REAL>(0, &r, out, ix, 0, _FIELD_DIM);
             }
 
-            if (mask & Z_UP_MASK) {
+            if (mask & Z_DN_MASK) {
                 _HSPINOR_TYPE *out = (_HSPINOR_TYPE *)((_SITE_TYPE *)input->field_out + input->base_out[piece - 1]);
                 in_spinor_field<_REAL>(&(sn.c[0]), in, iy, 0);
                 in_spinor_field<_REAL>(&(sn.c[1]), in, iy, 2);

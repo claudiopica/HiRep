@@ -206,8 +206,8 @@
     _vector_i_mul_add_assign_f(r.c[3], -0.5, sn.c[1]);
 
 #define DPHI_RED_Z_DN_GPU(r, sn)                       \
-    _vector_mul_add_assign_f(r.c[0], -0.5, sn.c[1]);   \
-    _vector_i_mul_add_assign_f(r.c[2], -0.5, sn.c[1]); \
+    _vector_mul_add_assign_f(r.c[0], -0.5, sn.c[0]);   \
+    _vector_i_mul_add_assign_f(r.c[2], -0.5, sn.c[0]); \
     _vector_mul_add_assign_f(r.c[1], -0.5, sn.c[1]);   \
     _vector_i_mul_sub_assign_f(r.c[3], -0.5, sn.c[1]);
 
