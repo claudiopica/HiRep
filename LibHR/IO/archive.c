@@ -243,7 +243,7 @@ void read_gauge_field_matrix(char filename[]) {
         if (GLB_T != d[1] || GLB_X != d[2] || GLB_Y != d[3] || GLB_Z != d[4]) {
             lprintf("ERROR", 0, "Read value of global lattice size (%d,%d,%d,%d) do not match input file (%d,%d,%d,%d).\n",
                     d[1], d[2], d[3], d[4], GLB_T, GLB_X, GLB_Y, GLB_Z);
-            error(1, 1, "read_gauge_field " __FILE__, "Gauge group mismatch");
+            error(1, 1, "read_gauge_field " __FILE__, "Lattice dimension mismatch");
         }
         error(fread_BE_double(&plaq, (size_t)(1), fp) != (1), 1, "read_gauge_field", "Failed to read gauge field plaquette");
     }

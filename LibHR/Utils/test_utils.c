@@ -135,9 +135,20 @@ void setup_random_gauge_fields() {
 #endif
 #endif
 
+#if defined(WITH_GPU) && defined(ALLOCATE_REPR_GAUGE_FIELD)
+    copy_from_gpu_gfield_f(u_gauge_f);
+#endif
+
 #ifdef WITH_MPI
     start_sendrecv_gfield_f(u_gauge_f);
     complete_sendrecv_gfield_f(u_gauge_f);
+
+#endif
+
+#if defined(WITH_GPU) && defined(ALLOCATE_REPR_GAUGE_FIELD) && defined(DPHI_FLT)
+    copy_from_gpu_gfield_f_flt(u_gauge_f_flt);
+    start_sendrecv_gfield_f_flt(u_gauge_f_flt);
+    complete_sendrecv_gfield_f_flt(u_gauge_f_flt);
 #endif
 
     lprintf("MAIN", 10, "done.\n");

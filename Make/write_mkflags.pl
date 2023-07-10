@@ -40,6 +40,7 @@ GetOptions(
   'vect!'        => \(my $vect = 0),
   'fuse!'        => \(my $fuse = 0),
   'probempi!'    => \(my $probempi = 0),
+  'hwloc!'       => \(my $hwloc = 0),
   'env=s'        => \(my $env = ""),
   'cc=s'         => \(my $cc = "gcc"),
   'mpicc=s'      => \(my $mpicc = "mpicc"),
@@ -233,6 +234,11 @@ $vect && print $fh "MACRO += SIMD_VECTOR_HIREP\n";
 $fuse && print $fh "MACRO += WITH_FUSE_MASTER_FOR\n";
 # write probe mpi
 $probempi && print $fh "MACRO += WITH_PROBE_MPI\n";
+# write hwloc
+$hwloc && print $fh "MACRO += HWLOC\n";
+if ($hwloc) {
+    $ldflags .=" -lhwloc";
+}
 # write mpi
 $mpi && print $fh "MACRO += WITH_MPI\n";
 # write GPU
@@ -327,6 +333,7 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]bartiming    [false]     Enable MPI barriers in timing
   --[no-]memory       [false]     Print memory usage
   --[no-]force        [false]     Print statistics for forces in molecular dynamics
+  --[no-]hwloc        [false]     Improved process (and possibly gpu) affinity using hwloc
 
 =head1 VERSION
 

@@ -39,14 +39,6 @@
 #define _DIR(MASK) ((MASK & UP_MASK) ? UP : DOWN)
 #define _MU(MASK) ((MASK & T_MASK) ? 0 : (MASK & X_MASK) ? 1 : (MASK & Y_MASK) ? 2 : 3)
 
-#define _FIND_BUFFER_DIRECTION(_ix, _iy, _mu, _dir, _piece, _input)            \
-    _iy = blockIdx.x * blockDim.x + threadIdx.x + _input->base_in[_piece - 1]; \
-    const char DIR_MASK = _input->imask_gpu[iy];                               \
-    _mu = _MU(DIR_MASK);                                                       \
-    const int dir_inverted = _DIR(DIR_MASK);                                   \
-    _ix = find_neighbor(_input, _iy, dir_inverted, _mu);                       \
-    _dir = !dir_inverted;
-
 // Kernel structure
 #define _KERNEL_PIECE_FOR(_piece) for (int _piece = EVEN; _piece <= ODD; _piece++)
 
@@ -77,6 +69,7 @@ typedef struct _kernel_field_input {
     int *idn_gpu;
     char *imask_gpu;
     enum gd_type gd_in;
+    char mask;
 } kernel_field_input;
 
 #endif
