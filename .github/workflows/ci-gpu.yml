@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: clean up
-        run: rm -rf .
+        run: rm -rf ./*
 
       - name: create working dir
         run: rm -rf HiRep && mkdir HiRep
