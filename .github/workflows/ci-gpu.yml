@@ -18,12 +18,16 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: show env
+        run: pwd && ls -lah && who am i
+        
       - name: Download HiRep
         run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
 
   
   run-tests:
     runs-on: self-hosted
+    needs: prepare
 
     strategy:
       # Ensures that jobs are not cancelled is one job fails
