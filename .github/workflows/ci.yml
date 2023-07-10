@@ -29,8 +29,6 @@ jobs:
         exclude:
           - nc: 3
             repr: ADJ
-          - mpi: "-mpi"
-            omp: "-omp"
           - omp: "-omp"
 
     steps:
