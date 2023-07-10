@@ -2,12 +2,10 @@
 
 #ifdef WITH_GPU
 
-#include <hwloc.h>
-#include <hwloc/cudart.h>
-//#include <hwloc/cuda.h>
 #include <mpi.h>
 #include "global.h"
 #include "io.h"
+#include "Geometry/gpu_affinity.h"
 
 /**
  * TODO:
@@ -31,7 +29,7 @@ hwloc_topology_t init_topology() {
 
 hwloc_bitmap_t physically_close_cpuset(hwloc_topology_t top) {
     hwloc_bitmap_t cpuset = hwloc_bitmap_alloc();
-    hwloc_cudart_get_device_cpuset(top, PID, cpuset);
+    hwloc_cudart_get_device_cpuset(top, gpu_id, cpuset);
     return cpuset;
 }
 

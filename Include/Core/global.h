@@ -76,6 +76,7 @@ GLB_VAR(MPI_Comm, cart_comm, = MPI_COMM_NULL); /* cartesian communicator for the
 
 GLB_VAR(int, RID, = 0); /* Replica ID of this process */
 GLB_VAR(int, PID, = 0); /* Process ID inside a replica */
+GLB_VAR(int, LID, = 0); /* Process ID inside a replica local to the node */
 
 GLB_VAR(int, CID, = 0); /* Cartesian ID inside a replica */
 GLB_VAR(int, COORD[4], = { 0 }); /* cartesian coordinates for this process */

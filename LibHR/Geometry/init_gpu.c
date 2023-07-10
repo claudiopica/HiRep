@@ -53,8 +53,9 @@ void init_gpu(input_gpu gpu_var_init) {
  *                              GPU
  */
 void select_GPU(input_gpu gpu_var_init) {
-#ifndef WITH_MPI /* For Single GPU -> select device with ID=0 */
-    cudaSetDevice(gpu_var_init.gpuID);
+#ifndef WITH_MPI /* For Single GPU -> select device from input file */
+    gpu_id = gpu_var_init.gpuID;
+    cudaSetDevice(gpu_id);
     lprintf("GPU_INIT", 0, "Using GPU #%d\n", gpu_var_init.gpuID);
 #else /* For Multi-GPU -> bind devices to local ranks using hwloc */
     /*
@@ -64,11 +65,11 @@ void select_GPU(input_gpu gpu_var_init) {
       * use hwloc to bind according to ideal CPU topology (SAM)
     */
 
-    int rank = atoi(getenv("OMPI_COMM_WORLD_LOCAL_RANK"));
-    cudaSetDevice(rank);
+    gpu_id = LID; // use local process id to select a GPU
+    cudaSetDevice(gpu_id);
     int current_device;
     cudaGetDevice(&current_device);
-    lprintf("GPU_INIT", 0, "GPU Affinity: GPU Node %d has been bound to MPI Thread of Rank %d\n", current_device, PID);
+    lprintf("GPU_INIT", 0, "GPU Affinity: GPU %d has been bound to MPI Rank %d (local %d)\n", current_device, PID, LID);
     enable_GPU_peer_to_peer_access();
 
 #ifdef HWLOC

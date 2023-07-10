@@ -143,10 +143,13 @@ int setup_process(int *argc, char ***argv) {
     PID = MPI_PID;
     WORLD_SIZE = MPI_WORLD_SIZE;
     RID = 0;
+    // TODO: improve the local rank
+    LID = atoi(getenv("OMPI_COMM_WORLD_LOCAL_RANK"));
 
 #else
     RID = 0;
     PID = 0;
+    LID = 0;
     WORLD_SIZE = 1;
 #endif
 
