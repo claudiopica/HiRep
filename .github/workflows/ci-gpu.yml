@@ -18,6 +18,9 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: cleanup
+        run: sudo rm -rf ./*
+
       - name: create working dir
         run: rm -rf HiRep && mkdir HiRep
 
@@ -35,6 +38,7 @@ jobs:
     strategy:
       # Ensures that jobs are not cancelled is one job fails
       fail-fast: false
+      max-parallel: 1
       matrix:
         nc: [2, 3]
         repr: [FUND, ADJ]
