@@ -1,13 +1,13 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2023, Antonio Rago                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
-*
-* Main pure gauge program
-*
-*******************************************************************************/
+ *
+ * Main multilvel test program
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -31,6 +31,7 @@
 #include "suN_utils_multilevel.h"
 #include "setup.h"
 #include "glueballs.h"
+#include "gaugefix.h"
 
 pg_flow_ml_measure flow = init_pg_flow_ml_measure(flow);
 
@@ -67,19 +68,18 @@ int main(int argc, char *argv[])
 
     lprintf("MAIN", 0, "\n\nConfiguration %d from %s\n", i, cnfg_filename);
 
-    read_gauge_field(cnfg_filename);
+    read_gauge_field(cnfg_filename); 
 
     apply_BCs_on_fundamental_gauge_field();
 
     gettimeofday(&start, 0);
-
-    update_hb_multilevel_gb_tune(0,flow.pg_v->tune_lev, &(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor, flow.pg_v->ml_niteration, flow.pg_v->ml_nskip, flow.pg_v->nblkstart, flow.pg_v->nblkend, &(flow.pg_v->APEsmear), &(flow.pg_v->corrs));
+    
+    update_hb_multilevel_gb_tune(0, flow.pg_v->tune_lev);
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);
-    lprintf("MAIN", 0, "ML Measure & update#%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
+    lprintf("MAIN", 0, "ML Measure & update #%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
     lprintf("MAIN", 0, "Plaquette %1.18e\n", avr_plaquette());
-
   }
 
   /* close communications */

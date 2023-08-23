@@ -281,12 +281,12 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     lprintf("INIT ML", 0, "bare anisotropy=%lf\n", pg_var_ml.anisotropy);
     lprintf("INIT ML", 0, "nhb=%d nor=%d\n", pg_var_ml.nhb, pg_var_ml.nor);
 
-    set_max_mh_level(pg_var_ml.ml_levels);
-
     pg_var_ml.ml_niteration = malloc(sizeof(int) * pg_var_ml.ml_levels);
     pg_var_ml.ml_nskip = malloc(sizeof(int) * pg_var_ml.ml_levels);
 
     parse_ml_corellator_def();
+
+    init_hb_multilevel(pg_var_ml.ml_levels, pg_var_ml.beta, pg_var_ml.nhb, pg_var_ml.nor, pg_var_ml.ml_niteration, pg_var_ml.ml_nskip, pg_var_ml.nblkstart, pg_var_ml.nblkend, pg_var_ml.APEsmear, &(pg_var_ml.corrs));
 
     lprintf("INIT ML", 0, "Blocking iteration on the observables (start/end)=(%d/%d)\n", pg_var_ml.nblkstart, pg_var_ml.nblkend);
     lprintf("INIT ML", 0, "Ape smearing par=%lf\n", pg_var_ml.APEsmear);
@@ -372,6 +372,7 @@ int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile)
     gf->pg_v = &pg_var_ml;
     gf->wf = &WF_var;
     gf->poly = &poly_var;
+    pg_var_ml.tune_lev = -1;
 
     read_input(pg_var_ml.read, ifile);
 
@@ -379,12 +380,18 @@ int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile)
     lprintf("INIT ML", 0, "bare anisotropy=%lf\n", pg_var_ml.anisotropy);
     lprintf("INIT ML", 0, "nhb=%d nor=%d\n", pg_var_ml.nhb, pg_var_ml.nor);
 
-    set_max_mh_level(pg_var_ml.ml_levels);
+    error(pg_var_ml.nhb < 0, 1, "init_mc_ml_measure", "Number of heatbath steps (nhb) cannot be < 0\n");
+    error(pg_var_ml.nor < 0, 1, "init_mc_ml_measure", "Number of overrelaxation steps (nor) cannot be < 0\n");
+    error(pg_var_ml.tune_lev < -1 || pg_var_ml.tune_lev >= pg_var_ml.ml_levels, 1, "init_mc_ml_measure", "Op tune level must be 0 <= tune_lev < ml_levels\n");
 
     pg_var_ml.ml_niteration = malloc(sizeof(int) * pg_var_ml.ml_levels);
     pg_var_ml.ml_nskip = malloc(sizeof(int) * pg_var_ml.ml_levels);
 
     parse_ml_corellator_def();
+    if (pg_var_ml.tune_lev != -1)
+        lprintf("INIT ML", 0, "ML tuning level=%d\n", pg_var_ml.tune_lev);
+
+    init_hb_multilevel(pg_var_ml.ml_levels, pg_var_ml.beta, pg_var_ml.nhb, pg_var_ml.nor, pg_var_ml.ml_niteration, pg_var_ml.ml_nskip, pg_var_ml.nblkstart, pg_var_ml.nblkend, pg_var_ml.APEsmear, &(pg_var_ml.corrs));
 
     lprintf("INIT ML", 0, "Blocking iteration on the observables (start/end)=(%d/%d)\n", pg_var_ml.nblkstart, pg_var_ml.nblkend);
     lprintf("INIT ML", 0, "Ape smearing par=%lf\n", pg_var_ml.APEsmear);

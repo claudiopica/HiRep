@@ -20,9 +20,9 @@ void project_gauge_field(void);
 void update(double *beta, int nhb, int nor);
 void random_su2(double rho, double s[]);
 
-void set_max_mh_level(int max_lev);
-void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblockingstart, int nblockingsend, double *smear_val, cor_list *lcor);
-void update_hb_multilevel_gb_tune(int lev, int tuning_level, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblockingstart, int nblockingend, double *smear_val, cor_list *lcor);
+void init_hb_multilevel(int lev, double lbeta, int lnhb, int lnor, int *lml_up, int *lml_skip, int lnblockingstart, int lnblockingend, double lsmear_val, cor_list *llcor);
+void update_hb_multilevel_gb_measure(int lev);
+void update_hb_multilevel_gb_tune(int lev, int tuning_level);
 
 /* functions and structures for the MRE algorithm */
 typedef struct
@@ -117,8 +117,8 @@ void force_hmc(double, void *);
 void force_hmc_tm(double, void *);
 void force_rhmc(double, void *);
 void force0(double, void *);
-void force_hmc_auxfields(double, void *); //Force from a four_fermion monomial
-void force_hmc_ff(double, void *);		  //Force from a HMC_ff or Hasenbusch_ff monomial
+void force_hmc_auxfields(double, void *); // Force from a four_fermion monomial
+void force_hmc_ff(double, void *);		  // Force from a HMC_ff or Hasenbusch_ff monomial
 
 void gaussian_momenta(suNg_av_field *momenta);
 void gaussian_scalar_momenta(suNg_scalar_field *momenta);

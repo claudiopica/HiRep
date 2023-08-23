@@ -87,11 +87,11 @@ int main(int argc, char *argv[])
 
     gettimeofday(&start, 0);
 
-    update_hb_multilevel_gb_measure(0, &(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor, flow.pg_v->ml_niteration, flow.pg_v->ml_nskip, flow.pg_v->nblkstart,  flow.pg_v->nblkend, &(flow.pg_v->APEsmear), &(flow.pg_v->corrs));
+    update_hb_multilevel_gb_measure(0);
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);
-    lprintf("MAIN", 0, "ML Measure & update#%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
+    lprintf("MAIN", 0, "ML Measure & update #%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
     lprintf("MAIN", 0, "Plaquette %1.18e\n", avr_plaquette());
 
     if (strcmp(flow.wf->make, "true") == 0)
