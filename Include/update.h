@@ -22,7 +22,7 @@ void random_su2(double rho, double s[]);
 
 void init_hb_multilevel(int lev, double lbeta, int lnhb, int lnor, int *lml_up, int *lml_skip, int lnblockingstart, int lnblockingend, double lsmear_val, cor_list *llcor);
 void update_hb_multilevel_gb_measure(int lev);
-void update_hb_multilevel_gb_tune(int lev, int tuning_level);
+void update_hb_multilevel_gb_tune(int tuning_level);
 
 /* functions and structures for the MRE algorithm */
 typedef struct

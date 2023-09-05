@@ -1561,7 +1561,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *g
             {
                 MPI_Wait(req_1pt + i, MPI_STATUS_IGNORE);
             }
-
+    MPI_Barrier(GLB_COMM);
 #else
     gb1_bf = gb_storage;
 #endif

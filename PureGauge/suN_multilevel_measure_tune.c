@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     gettimeofday(&start, 0);
     
-    update_hb_multilevel_gb_tune(0, flow.pg_v->tune_lev);
+    update_hb_multilevel_gb_tune(flow.pg_v->tune_lev);
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);

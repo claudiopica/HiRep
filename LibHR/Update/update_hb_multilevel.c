@@ -435,7 +435,7 @@ static void measure_tune(int nblocking, long double *partial_norm, hr_complex *g
 #endif
 }
 
-void update_hb_multilevel_gb_tune(int lev, int tuning_level)
+static void __update_hb_multilevel_gb_tune(int lev, int tuning_level)
 {
     int i, j;
     static hr_complex *one_point_gb, *one_point_tor;
@@ -475,11 +475,12 @@ void update_hb_multilevel_gb_tune(int lev, int tuning_level)
             for (j = 0; j < ml_skip[lev]; j++)
                 update_mh(lev);
 
-            update_hb_multilevel_gb_tune(lev + 1, tuning_level);
+            __update_hb_multilevel_gb_tune(lev + 1, tuning_level);
 
             if (lev == tuning_level)
             {
-                measure_tune(nblocking, partial_norm + lev, one_point_gb,
+
+                measure_tune(nblocking, &(partial_norm[lev]), one_point_gb,
                              total_n_glue_op * nblocking * n_active_slices,
                              one_point_tor,
                              total_n_tor_op * n_active_slices);
@@ -504,11 +505,16 @@ void update_hb_multilevel_gb_tune(int lev, int tuning_level)
 
             if (lev == tuning_level)
             {
-                measure_tune(nblocking, partial_norm + lev, one_point_gb,
+                measure_tune(nblocking, &(partial_norm[lev]), one_point_gb,
                              total_n_glue_op * nblocking * n_active_slices,
                              one_point_tor,
                              total_n_tor_op * n_active_slices);
             }
         }
     }
+}
+
+void update_hb_multilevel_gb_tune(int tuning_level)
+{
+    __update_hb_multilevel_gb_tune(0, tuning_level);
 }
