@@ -418,6 +418,8 @@ static void measure_tune(int nblocking, long double *partial_norm, hr_complex *g
     for (int j = 0; j < nglue; j++)
         glue_in[j] *= *partial_norm;
 
+    lprintf("MEASURE_TUNE", 0, "\nGlueball operator tune measure\n");
+
     collect_1pt_glueball_functions(lcor, nblocking, glue_in);
 
     for (int j = 0; j < nglue; j++)
@@ -427,6 +429,8 @@ static void measure_tune(int nblocking, long double *partial_norm, hr_complex *g
 #if total_n_tor_op > 0
     for (int j = 0; j < ntor; j++)
         tor_in[j] *= *partial_norm;
+
+    lprintf("MEASURE_TUNE", 0, "\nTorellon operator tune measure\n");
 
     collect_1pt_torellon_functions(lcor, tor_in, NULL);
     for (int j = 0; j < ntor; j++)
