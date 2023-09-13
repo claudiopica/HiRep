@@ -179,18 +179,12 @@ stcharge[-1]="-";
 
 
 (*names setup and location of the created files*)
-makefilestrm = OpenRead["./Makefile"];
-While[True,
- makefileline = StringDelete[ReadLine[makefilestrm], " "];
- topdir = StringCases[makefileline, "TOPDIR=" ~~ x__ -> x];
- If[topdir != {} 0, Break[]]
- ]
-Close[makefilestrm];
+topdir="../../.."
 
 opfilename = topdir<>"/LibHR/Observables/glueballs_op.c";
 torfilename = topdir<>"/LibHR/Observables/torellons_op.c";
 
-headerfilename = topdir<>"/Include/glueballs.h";
+headerfilename = topdir<>"/Include/Observables/glueballs.h";
 checktorfunctionsfilename= topdir<>"/TestProgram/Utils/check_utils_3_tor_functions.c";
 checkgbfunctionsfilename= topdir<>"/TestProgram/Utils/check_utils_3_gb_functions.c";
 
@@ -570,7 +564,7 @@ MapOptoCindex for the C indetification of the operators and Oplist for the repor
 *)
 GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ,RMatrixOp, TorTmp,RMatrixTor,Tor,Px, Py, Pz, irrepindex, i, charge},
   ar=OpenAppend[checkgbfunctionsfilename,FormatType->InputForm];
-  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#include \"libhr.h\"\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullgbcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_glue_op>0\nhr_complex tmp[3];\n#endif\nint return_value=0;\n"];
+  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullgbcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_glue_op>0\nhr_complex tmp[3];\n#endif\nint return_value=0;\n"];
   Do[
     Do[
       Do[ 
@@ -622,7 +616,7 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
   WriteString[ar,"#undef unrotfunreturn\n#undef rotfun\n#undef Complex\nreturn return_value;\n}\n"];
   Close[ar];
   ar=OpenAppend[checktorfunctionsfilename,FormatType->InputForm];
-  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#include \"libhr.h\"\n#define Complex(a,b) ((a)+I*(b))\nstatic int fulltorcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_tor_op>0\nhr_complex tmp[3];\n#endif\nint return_value=0;\n"];
+  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fulltorcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_tor_op>0\nhr_complex tmp[3];\n#endif\nint return_value=0;\n"];
   Do[
     Do[
       Do[ 
@@ -795,12 +789,10 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
 
   ar=OpenAppend[opfilename, FormatType -> InputForm];
   WriteString[ar, "
-#include <stdlib.h>
-#include \"global.h\"
-#include \"geometry.h\"
-#include \"suN.h\"
+#include \"observables.h\"
+#include \"libhr_core.h\"
+#include \"io.h\"
 #include \"utils.h\"
-#include \"glueballs.h\"
 #include <string.h>\n"];
   WriteString[ar,"#define npaths ",pathindex,"\n"];
   WriteString[ar,"static double PI=3.141592653589793238462643383279502884197;\n"];
@@ -829,12 +821,10 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
   
    ar=OpenAppend[torfilename, FormatType -> InputForm];
    WriteString[ar, "
-#include <stdlib.h>
-#include \"global.h\"
-#include \"geometry.h\"
-#include \"suN.h\"
+#include \"observables.h\"
+#include \"libhr_core.h\"
+#include \"io.h\"
 #include \"utils.h\"
-#include \"glueballs.h\"
 #include <string.h>\n"];
   WriteString[ar,"#define ntors ",torindex,"\n"];
   WriteString[ar,"static hr_complex *tor_path_storage=NULL;\n"];
@@ -958,8 +948,11 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
     WriteString[ar, "#ifndef GLUEBALLS_H
 #define GLUEBALLS_H
 #include \"hr_complex.h\"
-#include \"logger.h\"
-#include \"suN.h\"
+#include \"suN_types.h\"
+#include \"IO/logger.h\"
+#ifdef __cplusplus
+extern \"C\" {
+#endif
 
 int **direct_spatial_rotations();
 int **inverse_spatial_rotations();
@@ -1017,7 +1010,12 @@ void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_
     WriteString[ar, "#define total_n_glue_op ",maxopCnumber,"\n"];
     WriteString[ar, "#define total_n_tor_op ",maxtorCnumber,"\n"];
     WriteString[ar, "#define npoly_dist ",Max[npolydist,1],"\n"];
-    WriteString[ar,"#endif\n"];
+    WriteString[ar,"
+#ifdef __cplusplus
+}
+#endif
+#endif
+"];
     Close[ar];
     ];
 
@@ -1561,7 +1559,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *g
             {
                 MPI_Wait(req_1pt + i, MPI_STATUS_IGNORE);
             }
-
+    MPI_Barrier(GLB_COMM);
 #else
     gb1_bf = gb_storage;
 #endif

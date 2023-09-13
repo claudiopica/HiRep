@@ -1,19 +1,11 @@
-/// Headerfile for:
-/// - glueballs.c
-/// - glueballs_op.c
-/// - torellons_op.c
-
 #ifndef GLUEBALLS_H
 #define GLUEBALLS_H
-
 #include "hr_complex.h"
 #include "suN_types.h"
-
+#include "IO/logger.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// void measure_glueballs(); //TODO: not in libhr
 
 int **direct_spatial_rotations();
 int **inverse_spatial_rotations();
@@ -56,5 +48,4 @@ void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_
 #ifdef __cplusplus
 }
 #endif
-
 #endif

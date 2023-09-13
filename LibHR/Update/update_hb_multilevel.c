@@ -25,8 +25,17 @@
 
 static int *dyn_gauge = NULL;
 static int max_mh_level;
+static double beta;
+static int nhb;
+static int nor;
+static int *ml_up;
+static int *ml_skip;
+static int nblockingstart;
+static int nblockingend;
+static double smear_val;
+static cor_list *lcor;
 
-#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 static void g_up_Dirichlet_BCs() {
     int ix, iy, iz, index, lev;
 
@@ -48,7 +57,7 @@ static void g_up_Dirichlet_BCs() {
 }
 #endif
 
-#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED) || defined(BC_T_MIXED)
+#if defined(BASIC_SF) || defined(ROTATED_SF) || defined(BC_T_MIXED)
 static void g_dn_Dirichlet_BCs() {
     int ix, iy, iz, index, lev;
 
@@ -116,7 +125,7 @@ static void init_hb_multihit_boundary() {
         dyn_gauge[i] = 1;
     }
 
-#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
+#if defined(BASIC_SF) || defined(ROTATED_SF)
     g_up_Dirichlet_BCs();
     g_dn_Dirichlet_BCs();
 #endif
@@ -147,7 +156,7 @@ static void init_hb_multihit_boundary() {
     }
 }
 
-static void update_mh_all(int lev, double *beta, int type) {
+static void update_mh_all(int lev, int type) {
     static int count = PROJECT_INTERVAL;
     static int *loc_dyn;
     loc_dyn = dyn_gauge + lev * (glattice.gsize_gauge * 4);
@@ -176,7 +185,7 @@ static void update_mh_all(int lev, double *beta, int type) {
             for (int j = glat_even.master_start[0]; j <= glat_even.master_end[0]; j++) {
                 if (loc_dyn[j * 4 + mu] != 0) {
                     staples(j, mu, &v);
-                    cabmar(*beta, pu_gauge(j, mu), &v, type);
+                    cabmar(beta, pu_gauge(j, mu), &v, type);
                 }
             }
 #ifdef WITH_MPI
@@ -190,7 +199,7 @@ static void update_mh_all(int lev, double *beta, int type) {
                 for (int j = glat_even.master_start[i]; j <= glat_even.master_end[i]; j++) {
                     if (loc_dyn[j * 4 + mu] != 0) {
                         staples(j, mu, &v);
-                        cabmar(*beta, pu_gauge(j, mu), &v, type);
+                        cabmar(beta, pu_gauge(j, mu), &v, type);
                     }
                 }
             }
@@ -207,7 +216,7 @@ static void update_mh_all(int lev, double *beta, int type) {
             for (int j = glat_odd.master_start[0]; j <= glat_odd.master_end[0]; j++) {
                 if (loc_dyn[j * 4 + mu] != 0) {
                     staples(j, mu, &v);
-                    cabmar(*beta, pu_gauge(j, mu), &v, type);
+                    cabmar(beta, pu_gauge(j, mu), &v, type);
                 }
             }
 #ifdef WITH_MPI
@@ -221,7 +230,7 @@ static void update_mh_all(int lev, double *beta, int type) {
                 for (int j = glat_odd.master_start[i]; j <= glat_odd.master_end[i]; j++) {
                     if (loc_dyn[j * 4 + mu] != 0) {
                         staples(j, mu, &v);
-                        cabmar(*beta, pu_gauge(j, mu), &v, type);
+                        cabmar(beta, pu_gauge(j, mu), &v, type);
                     }
                 }
             }
@@ -229,32 +238,43 @@ static void update_mh_all(int lev, double *beta, int type) {
     }
 }
 
-static void update_mh(int lev, double *beta, int nhb, int nor) {
+static void update_mh(int lev) {
     for (int n = 0; n < nhb; n++) {
-        update_mh_all(lev, beta, 0);
+        update_mh_all(lev, 0);
     }
 
     for (int n = 0; n < nor; n++) {
-        update_mh_all(lev, beta, 1);
+        update_mh_all(lev, 1);
     }
 
     start_sendrecv_gfield(u_gauge);
 }
 
-void set_max_mh_level(int lev) {
-    max_mh_level = lev;
+void init_hb_multilevel(int lev, double lbeta, int lnhb, int lnor, int *lml_up, int *lml_skip, int lnblockingstart,
+                        int lnblockingend, double lsmear_val, cor_list *llcor) {
+    _OMP_PRAGMA(master) {
+        max_mh_level = lev;
+        beta = lbeta;
+        nhb = lnhb;
+        nor = lnor;
+        ml_up = lml_up;
+        ml_skip = lml_skip;
+        nblockingstart = lnblockingstart;
+        nblockingend = lnblockingend;
+        smear_val = lsmear_val;
+        lcor = llcor;
+    }
 }
 
-void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblockingstart,
-                                     int nblockingend, double *smear_val, cor_list *lcor) {
+void update_hb_multilevel_gb_measure(int lev) {
     int i, j;
     static hr_complex *one_point_gb;
     static hr_complex *one_point_tor;
     static long double norm = 1.0;
     static long double poly_norm;
+    struct timeval start, end, etime;
     int nblocking = nblockingend - nblockingstart + 1;
     static hr_complex **polyf;
-    Timer clock;
 
     if (lev == 0) {
         if (dyn_gauge == NULL) {
@@ -272,7 +292,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             polyf[1] = amalloc(sizeof(hr_complex) * X * Z * T, ALIGN);
             polyf[2] = amalloc(sizeof(hr_complex) * X * Y * T, ALIGN);
         }
-        timer_set(&clock);
+        gettimeofday(&start, 0);
 
         memset(one_point_gb, 0, sizeof(hr_complex) * total_n_glue_op * nblocking * n_active_slices);
         memset(one_point_tor, 0, sizeof(hr_complex) * total_n_tor_op * n_active_slices);
@@ -284,31 +304,32 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     if (lev < max_mh_level - 1) {
         for (i = 0; i < ml_up[lev]; i++) {
             for (j = 0; j < ml_skip[lev]; j++) {
-                update_mh(lev, beta, nhb, nor);
+                update_mh(lev);
             }
 
-            update_hb_multilevel_gb_measure(lev + 1, beta, nhb, nor, ml_up, ml_skip, nblockingstart, nblockingend, smear_val,
-                                            lcor);
+            update_hb_multilevel_gb_measure(lev + 1);
         }
     } else {
         for (i = 0; i < ml_up[lev]; i++) {
             for (j = 0; j < ml_skip[lev]; j++) {
-                update_mh(lev, beta, nhb, nor);
+                update_mh(lev);
             }
 
 #if total_n_glue_op > 0
-            measure_1pt_glueballs(nblockingstart, nblockingend, smear_val, one_point_gb);
+            measure_1pt_glueballs(nblockingstart, nblockingend, &smear_val, one_point_gb);
 #endif
 
 #if total_n_tor_op > 0
-            measure_1pt_torellons(smear_val, one_point_tor, polyf);
+            measure_1pt_torellons(&smear_val, one_point_tor, polyf);
 #endif
         }
     }
 
     if (lev == 0) {
-        double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
-        lprintf("HB MULTILEVEL", 0, "Update and 1pt measure done [%lf sec]\n", elapsed_sec);
+        gettimeofday(&end, 0);
+
+        timeval_subtract(&etime, &end, &start);
+        lprintf("HB MULTILEVEL", 0, "Update and 1pt measure done [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
 
 #if total_n_glue_op > 0
 
@@ -341,62 +362,47 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         collect_1pt_torellon_functions(lcor, one_point_tor, polyf);
 #endif
 
-        elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
-        lprintf("HB MULTILEVEL", 0, "1pt writing done [%lf sec]\n", elapsed_sec);
+        gettimeofday(&start, 0);
+        timeval_subtract(&etime, &start, &end);
+
+        lprintf("HB MULTILEVEL", 0, "1pt writing done [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
     }
 }
 
-static void accumulate_tune_measures(int nstep, long double *partial_norm, hr_complex *glue_in, int nglue, hr_complex *tor_in,
-                                     int ntor, hr_complex *m_glue, double *m2_glue, hr_complex *m_tor, double *m2_tor) {
-    for (int j = 0; j < nglue; j++) {
-        m_glue[j] += glue_in[j] / *partial_norm / nstep;
-        m2_glue[j] += _complex_prod_re(glue_in[j] / *partial_norm, glue_in[j] / *partial_norm) / nstep;
-        glue_in[j] = 0.;
-    }
-    for (int j = 0; j < ntor; j++) {
-        m_tor[j] += tor_in[j] / *partial_norm / nstep;
-        m2_tor[j] += _complex_prod_re(tor_in[j] / *partial_norm, tor_in[j] / *partial_norm) / nstep;
-        tor_in[j] = 0.;
-    }
-}
-static void measure_tune(int nstep, int nblocking, cor_list *lcor, hr_complex *glue_in, int nglue, hr_complex *tor_in, int ntor,
-                         hr_complex *m_glue, double *m2_glue, hr_complex *m_tor, double *m2_tor) {
+static void measure_tune(int nblocking, long double *partial_norm, hr_complex *glue_in, int nglue, hr_complex *tor_in,
+                         int ntor) {
 #if total_n_glue_op > 0
-
     for (int j = 0; j < nglue; j++) {
-        m2_glue[j] -= _complex_prod_re(m_glue[j], m_glue[j]);
-        glue_in[j] = m_glue[j] / sqrt(m2_glue[j] / (nstep - 1));
+        glue_in[j] *= *partial_norm;
     }
+
+    lprintf("MEASURE_TUNE", 0, "\nGlueball operator tune measure\n");
 
     collect_1pt_glueball_functions(lcor, nblocking, glue_in);
 
     for (int j = 0; j < nglue; j++) {
         glue_in[j] = 0;
-        m2_glue[j] = 0.;
-        m_glue[j] = 0.;
     }
+
 #endif
 #if total_n_tor_op > 0
-
     for (int j = 0; j < ntor; j++) {
-        m2_tor[j] -= _complex_prod_re(m_tor[j], m_tor[j]);
-        tor_in[j] = m_tor[j] / sqrt(m2_tor[j] / (nstep - 1));
+        tor_in[j] *= *partial_norm;
     }
+
+    lprintf("MEASURE_TUNE", 0, "\nTorellon operator tune measure\n");
+
     collect_1pt_torellon_functions(lcor, tor_in, NULL);
     for (int j = 0; j < ntor; j++) {
-        m2_tor[j] = 0.;
-        m_tor[j] = 0.;
         tor_in[j] = 0.;
     }
+
 #endif
 }
-void update_hb_multilevel_gb_tune(int lev, int tuning_level, double *beta, int nhb, int nor, int *ml_up, int *ml_skip,
-                                  int nblockingstart, int nblockingend, double *smear_val, cor_list *lcor) {
+
+static void __update_hb_multilevel_gb_tune(int lev, int tuning_level) {
     int i, j;
     static hr_complex *one_point_gb, *one_point_tor;
-    static hr_complex *one_point_gb_mean, *one_point_tor_mean;
-
-    static double *one_point_gb_std, *one_point_tor_std;
     static long double *partial_norm;
     int nblocking = nblockingend - nblockingstart + 1;
     static hr_complex **polyf;
@@ -405,18 +411,11 @@ void update_hb_multilevel_gb_tune(int lev, int tuning_level, double *beta, int n
             init_hb_multihit_boundary();
             one_point_gb = malloc(sizeof(hr_complex) * total_n_glue_op * nblocking * n_active_slices);
             one_point_tor = malloc(sizeof(hr_complex) * total_n_tor_op * n_active_slices);
-            one_point_gb_mean = malloc(sizeof(hr_complex) * total_n_glue_op * nblocking * n_active_slices);
-            one_point_tor_mean = malloc(sizeof(hr_complex) * total_n_tor_op * n_active_slices);
-            one_point_gb_std = malloc(sizeof(double) * total_n_glue_op * nblocking * n_active_slices);
-            one_point_tor_std = malloc(sizeof(double) * total_n_tor_op * n_active_slices);
             partial_norm = malloc(sizeof(*partial_norm) * max_mh_level);
 
-            for (i = max_mh_level - 1; i >= 0; i--) {
-                if (i == max_mh_level - 1) {
-                    partial_norm[i] = GLB_VOL3 * NG;
-                } else {
-                    partial_norm[i] = ml_up[i + 1] * partial_norm[i + 1];
-                }
+            partial_norm[max_mh_level - 1] = 1.0 / (GLB_VOL3 * NG);
+            for (i = max_mh_level - 2; i >= 0; i--) {
+                partial_norm[i] = partial_norm[i + 1] / ml_up[i + 1];
             }
 
             polyf = malloc(sizeof(hr_complex *) * 3);
@@ -427,10 +426,6 @@ void update_hb_multilevel_gb_tune(int lev, int tuning_level, double *beta, int n
 
         memset(one_point_gb, 0, sizeof(hr_complex) * total_n_glue_op * nblocking * n_active_slices);
         memset(one_point_tor, 0, sizeof(hr_complex) * total_n_tor_op * n_active_slices);
-        memset(one_point_gb_mean, 0, sizeof(hr_complex) * total_n_glue_op * nblocking * n_active_slices);
-        memset(one_point_tor_mean, 0, sizeof(hr_complex) * total_n_tor_op * n_active_slices);
-        memset(one_point_gb_std, 0, sizeof(double) * total_n_glue_op * nblocking * n_active_slices);
-        memset(one_point_tor_std, 0, sizeof(double) * total_n_tor_op * n_active_slices);
         memset(polyf[0], 0, sizeof(hr_complex) * Y * Z * T);
         memset(polyf[1], 0, sizeof(hr_complex) * X * Z * T);
         memset(polyf[2], 0, sizeof(hr_complex) * X * Y * T);
@@ -439,50 +434,39 @@ void update_hb_multilevel_gb_tune(int lev, int tuning_level, double *beta, int n
     if (lev < max_mh_level - 1) {
         for (i = 0; i < ml_up[lev]; i++) {
             for (j = 0; j < ml_skip[lev]; j++) {
-                update_mh(lev, beta, nhb, nor);
+                update_mh(lev);
             }
 
-            update_hb_multilevel_gb_tune(lev + 1, tuning_level, beta, nhb, nor, ml_up, ml_skip, nblockingstart, nblockingend,
-                                         smear_val, lcor);
+            __update_hb_multilevel_gb_tune(lev + 1, tuning_level);
 
             if (lev == tuning_level) {
-                accumulate_tune_measures(ml_up[lev], partial_norm + lev, one_point_gb,
-                                         total_n_glue_op * nblocking * n_active_slices, one_point_tor,
-                                         total_n_tor_op * n_active_slices, one_point_gb_mean, one_point_gb_std,
-                                         one_point_tor_mean, one_point_tor_std);
+                measure_tune(nblocking, &(partial_norm[lev]), one_point_gb, total_n_glue_op * nblocking * n_active_slices,
+                             one_point_tor, total_n_tor_op * n_active_slices);
             }
-        }
-        if (lev == tuning_level) {
-            measure_tune(ml_up[lev], nblocking, lcor, one_point_gb, total_n_glue_op * nblocking * n_active_slices,
-                         one_point_tor, total_n_tor_op * n_active_slices, one_point_gb_mean, one_point_gb_std,
-                         one_point_tor_mean, one_point_tor_std);
         }
     } else {
         for (i = 0; i < ml_up[lev]; i++) {
             for (j = 0; j < ml_skip[lev]; j++) {
-                update_mh(lev, beta, nhb, nor);
+                update_mh(lev);
             }
 
 #if total_n_glue_op > 0
-            measure_1pt_glueballs(nblockingstart, nblockingend, smear_val, one_point_gb);
+            measure_1pt_glueballs(nblockingstart, nblockingend, &smear_val, one_point_gb);
 
 #endif
 
 #if total_n_tor_op > 0
-            measure_1pt_torellons(smear_val, one_point_tor, polyf);
+            measure_1pt_torellons(&smear_val, one_point_tor, polyf);
 #endif
 
             if (lev == tuning_level) {
-                accumulate_tune_measures(ml_up[lev], partial_norm + lev, one_point_gb,
-                                         total_n_glue_op * nblocking * n_active_slices, one_point_tor,
-                                         total_n_tor_op * n_active_slices, one_point_gb_mean, one_point_gb_std,
-                                         one_point_tor_mean, one_point_tor_std);
+                measure_tune(nblocking, &(partial_norm[lev]), one_point_gb, total_n_glue_op * nblocking * n_active_slices,
+                             one_point_tor, total_n_tor_op * n_active_slices);
             }
         }
-        if (lev == tuning_level) {
-            measure_tune(ml_up[lev], nblocking, lcor, one_point_gb, total_n_glue_op * nblocking * n_active_slices,
-                         one_point_tor, total_n_tor_op * n_active_slices, one_point_gb_mean, one_point_gb_std,
-                         one_point_tor_mean, one_point_tor_std);
-        }
     }
+}
+
+void update_hb_multilevel_gb_tune(int tuning_level) {
+    __update_hb_multilevel_gb_tune(0, tuning_level);
 }

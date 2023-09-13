@@ -18,11 +18,10 @@ void project_gauge_field(void);
 void update(double *beta, int nhb, int nor);
 
 //update_hb_multilevel.c
-void set_max_mh_level(int max_lev);
-void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblockingstart,
-                                     int nblockingsend, double *smear_val, cor_list *lcor);
-void update_hb_multilevel_gb_tune(int lev, int tuning_level, double *beta, int nhb, int nor, int *ml_up, int *ml_skip,
-                                  int nblockingstart, int nblockingend, double *smear_val, cor_list *lcor);
+void init_hb_multilevel(int lev, double lbeta, int lnhb, int lnor, int *lml_up, int *lml_skip, int lnblockingstart,
+                        int lnblockingend, double lsmear_val, cor_list *llcor);
+void update_hb_multilevel_gb_measure(int lev);
+void update_hb_multilevel_gb_tune(int tuning_level);
 
 //update_mt.c
 typedef struct ghmc_par {

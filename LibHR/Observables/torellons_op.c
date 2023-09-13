@@ -1,9 +1,9 @@
+
 #include "observables.h"
 #include "libhr_core.h"
-#include "utils.h"
 #include "io.h"
+#include "utils.h"
 #include <string.h>
-
 #define ntors 57
 static hr_complex *tor_path_storage = NULL;
 static hr_complex poly0(int in) {
@@ -3152,6 +3152,8 @@ void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_
             lprintf("Measure ML", 0, "\n");
         }
     }
+
+    if (polyf == NULL) { return; }
 
     hr_complex *lpoly = NULL;
     hr_complex *gpoly = NULL;

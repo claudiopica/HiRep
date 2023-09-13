@@ -120,6 +120,7 @@ my @libs = ("libhrobservables.a", "libhr.a"); #order is important
     "suN" => [ "suN.c", "suN_utils.c", ],
     "suN_multilevel" => [ "suN_multilevel.c", "suN_utils_multilevel.c", ],
     "suN_multilevel_measure" => [ "suN_multilevel_measure.c", "suN_utils_multilevel.c", ],
+    "suN_multilevel_measure_tune" => [ "suN_multilevel_measure_tune.c", "suN_utils_multilevel.c", ],
   );
 
   add_exes($topdir, \%exes, \@libs);
@@ -190,7 +191,7 @@ my @libs = ("libhrobservables.a", "libhr.a"); #order is important
   my %extra_sources = ( "check_integrator_1" => [ "check_integrator_utils_1.c"],
                         "check_update_1" => [ "../../HMC/hmc_utils.c" ],
                         "check_update_2" => [ "../../HMC/hmc_utils.c" ],
-                        "check_utils_3" => [ "check_utils_3_gb_functions.c","check_utils_3_tor_functions.c"],
+  #                      "check_utils_3" => [ "check_utils_3_gb_functions.c","check_utils_3_tor_functions.c"],
   );
 
   # Put a dir in this list if it only needs to link to libhr core without observables

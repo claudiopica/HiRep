@@ -4,7 +4,6 @@
 #include "io.h"
 #include "utils.h"
 #include <string.h>
-
 #define npaths 17
 static double PI = 3.141592653589793238462643383279502884197;
 static hr_complex *mom_def_Cp_tr_paths = NULL;
@@ -1311,7 +1310,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *g
             if (listsent[i] == 1) { MPI_Wait(req_1pt + i, MPI_STATUS_IGNORE); }
         }
     }
-
+    MPI_Barrier(GLB_COMM);
 #else
     gb1_bf = gb_storage;
 #endif

@@ -1,4 +1,3 @@
-#define MAIN_PROGRAM
 
 #include <qdp-config.h>
 #include <stdlib.h>

@@ -9,14 +9,12 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include "io.h"
-#include "ranlux.h"
+#include "Random/ranlux.h"
 #include "geometry.h"
 #include "update.h"
 #include "global.h"
