@@ -2234,6 +2234,9 @@ void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_
             lprintf("Measure ML", 0, "\n");
         }
 
+    if (polyf == NULL)
+          return;
+
     hr_complex *lpoly = NULL;
     hr_complex *gpoly = NULL;
     hr_complex *pcor = NULL;
