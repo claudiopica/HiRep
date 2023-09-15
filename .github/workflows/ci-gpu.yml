@@ -53,11 +53,11 @@ jobs:
           OMPI_MCA_mca_base_component_show_load_errors: 0
           CUDA_HPC: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1"
           MPI_HOME: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5"
-          NVHPC_CUDA_HOME: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/12.0"
-          LD_LIBRARY_PATH: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/12.0/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/compilers/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5/lib::/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/12.0/lib64:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/math_libs/lib64"
-          CUDA_MATH_LIBS: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/math_libs/12.0"
+          NVHPC_CUDA_HOME: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/11.8"
+          LD_LIBRARY_PATH: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/11.8/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/compilers/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5/lib::/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/11.8/lib64:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/math_libs/lib64"
+          CUDA_MATH_LIBS: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/math_libs/11.8"
           OPAL_PREFIX: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/mpi"
-          PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/12.0/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/compilers/bin" 
+          PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/11.8/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/compilers/bin" 
           GITHUB_WORKSPACE: /home/git_runner/actions-runner/_work/HiRep/HiRep/HiRep
         run: export GITHUB_WORKSPACE=/home/git_runner/actions-runner/_work/HiRep/HiRep/HiRep && ./HiRep/TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters LinearAlgebra Memory" --gpu --newgeo --fixedstr --no-color --mpicc mpicc --cflags "-Wall -O1" --ldflags "" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.omp }} ${{ matrix.ecsw }}
 
