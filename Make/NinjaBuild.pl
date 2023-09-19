@@ -57,14 +57,8 @@ rule cc
   deps = gcc
 
 rule nvcc
-  command = $ENV $NVCC -ccbin $CC -MMD -MF $out.d $GPUFLAGS --device-c $in -o $out
+  command = $ENV $NVCC -ccbin $CC -MMD -MF $out.d $GPUFLAGS --x cu --device-c $in -o $out
   description = $setbg NVCC $setnorm $out
-  depfile = $out.d
-  deps = gcc
-
-rule nvcc_devcode
-  command = $ENV $NVCC -ccbin $CC -MMD -MF $out.d $GPUFLAGS --device-c $in -o $out && rm $in
-  description = $setbg NVCC C DEVICE CODE $setnorm $out
   depfile = $out.d
   deps = gcc
 
@@ -92,10 +86,6 @@ rule suN_repr
 rule strided_reads 
   command = cd $outdir && $wr_gpugeo $NG $REPR $WQUAT $GAUGE_GROUP $IS_STRIDE_FIXED
   description = $setbg GPU GOMETRY HEADERS $setnorm $out
-
-rule setup_devcode
-  command = cp -l $in $out
-  description = $setbg C DEVICE CODE SETUP $setnorm $out
 
 # build writeREPR
 wr_repr_build = $builddir/Make/Utils/autosun/
@@ -192,17 +182,16 @@ sub obj_rules {
     my ($name, @c_sources) = @_;
     my @c_objs = ();
     foreach ( @c_sources ) {
-        my $obj = $_;
-        $obj=~s/\.cu?$/\.o/;
         my $cc_rule = "cc";
         if (/\.cu$/) {
-            if (/\.device.cu$/) {
-                $cc_rule = "nvcc_devcode";
-            } else {
-                $cc_rule = "nvcc";
-            }
             if(!$with_gpu) { next; } #skip cuda files if not with_gpu
+            $cc_rule = "nvcc";
+            if (/\.device\.cu$/) {
+                $_ =~ s/\.device\.cu//;
+            }
         } 
+        my $obj = $_;
+        $obj=~s/\.cu?$/\.o/;
         my $absobj = abs_path($obj);
         $absobj =~ s/^$absroot\///;
         $obj = "\$builddir/$absobj";
@@ -260,8 +249,8 @@ sub exclude_files {
 }
 
 sub mark_device_code {
-    my ( $dir, $array_ref, $c_device_code_files ) = @_;
     if ( $with_gpu ) {
+        my ( $dir, $array_ref, $c_device_code_files ) = @_;
         foreach ( @$c_device_code_files ) {
             delete_element($array_ref, $_);
             push(@$array_ref, "$dir/$_.device.cu");
