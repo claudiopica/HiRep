@@ -31,6 +31,7 @@ jobs:
   run-tests:
     runs-on: self-hosted
     needs: prepare
+    timeout-minutes: 10
 
     strategy:
       # Ensures that jobs are not cancelled is one job fails
