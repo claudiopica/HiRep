@@ -1523,7 +1523,12 @@ sub write_suN_multiply {
 	if ($N<$Nmax) { #unroll all
 		my ($k)=(0);
 		for(my $i=0;$i<$N;$i++){
-			print "      _complex_mul((r).$cname\[$i\],(u).$cname\[$k\],(s).$cname\[0\]);\\\n";
+			print "      _complex_mul((r).$cname\[$i\],(u).$cname\[$k\],(s).$cname\[0\]);";
+			if ($N == 1) {
+				print "\n";
+			} else {
+				print "\\\n";
+			}
 			$k++;
 			for(my $j=1;$j<$N;$j++){
 				print "      _complex_mul_assign((r).$cname\[$i\],(u).$cname\[$k\],(s).$cname\[$j\])";
@@ -1760,7 +1765,12 @@ sub write_suN_inverse_multiply {
 	if ($N<$Nmax) { #unroll all
 		my ($k)=(0);
 		for(my $i=0;$i<$N;$i++){
-			print "      _complex_mul_star((r).$cname\[$i\],(s).$cname\[0\],(u).$cname\[$k\]);\\\n";
+			print "      _complex_mul_star((r).$cname\[$i\],(s).$cname\[0\],(u).$cname\[$k\]);";
+			if ($N == 1) {
+				print "\n";
+			} else {
+				print "\\\n";
+			}
 			for(my $j=1;$j<$N;$j++){
 				$k+=$N;
 				print "      _complex_mul_star_assign((r).$cname\[$i\],(s).$cname\[$j\],(u).$cname\[$k\])";
