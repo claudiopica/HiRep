@@ -51,15 +51,15 @@ jobs:
       - name: Run Tests
         env: 
           OMPI_MCA_mca_base_component_show_load_errors: 0
-          CUDA_HPC: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1"
-          MPI_HOME: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5"
-          NVHPC_CUDA_HOME: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/11.8"
-          LD_LIBRARY_PATH: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/11.8/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/compilers/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5/lib::/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/11.8/lib64:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/math_libs/lib64"
-          CUDA_MATH_LIBS: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/math_libs/11.8"
-          OPAL_PREFIX: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/mpi"
-          CUDA_INCLUDE: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/11.8/include"
-          MPI_INCLUDE: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5/include"
-          PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/comm_libs/openmpi4/openmpi-4.0.5/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/cuda/11.8/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.1/compilers/bin" 
+          CUDA_HPC: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7"
+          MPI_HOME: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest"
+          NVHPC_CUDA_HOME: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2"
+          LD_LIBRARY_PATH: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/compilers/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest/lib::/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2/lib64:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/math_libs/lib64"
+          PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/compilers/bin"
+          CUDA_MATH_LIBS: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/math_libs/12.2"
+          OPAL_PREFIX: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/mpi"
+          CUDA_INCLUDE: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2/include"
+          MPI_INCLUDE: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest/include"
           GITHUB_WORKSPACE: /home/git_runner/actions-runner/_work/HiRep/HiRep/HiRep
           UCX_MEMTYPE_CACHE: "n"
         run: export UCX_MEMTYPE_CACHE=n && export GITHUB_WORKSPACE=/home/git_runner/actions-runner/_work/HiRep/HiRep/HiRep && ./HiRep/TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters LinearAlgebra Memory" --gpu --newgeo --fixedstr --no-color --mpicc gcc --cflags "-Wall -O1" --include "-I${MPI_INCLUDE}  -I${CUDA_INCLUDE} -I${CUDA_MATH_LIBS}/targets/x86_64-linux/include/" --ldflags "-L${MPI_HOME}/lib -L${NVHPC_CUDA_HOME}/lib64 -L${CUDA_HPC}/compilers/lib -L${CUDA_HPC}/math_libs/lib64 -lmpi" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.omp }} ${{ matrix.ecsw }}
