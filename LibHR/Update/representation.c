@@ -64,6 +64,7 @@ void represent_gauge_field() {
         }
     }
 #else
+    complete_sendrecv_gfield(u_gauge);
     represent_gauge_field_gpu();
 #endif
 
