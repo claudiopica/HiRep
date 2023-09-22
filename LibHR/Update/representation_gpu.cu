@@ -28,20 +28,22 @@ __global__ void represent_gauge_field_kernel(suNf *gauge_f, suNg *gauge, int N, 
 }
 
 void represent_gauge_field_gpu() {
-    _PIECE_FOR(u_gauge_f->type, ixp) {
-        const int N = u_gauge_f->type->master_end[ixp] - u_gauge_f->type->master_start[ixp] + 1;
-        const int block_start = u_gauge_f->type->master_start[ixp];
-        const int grid = (N - 1) / BLOCK_SIZE + 1;
+    box_t *L = geometryBoxes;
+    while (L) {
+        int N = boxEvenVolume(L);
+        int block_start = L->base_index;
+        int grid = (N - 1) / BLOCK_SIZE + 1;
         represent_gauge_field_kernel<<<grid, BLOCK_SIZE>>>(u_gauge_f->gpu_ptr, gauge_ptr, N, block_start);
+
+        N = boxOddVolume(L);
+        block_start = L->base_index_odd;
+        grid = (N - 1) / BLOCK_SIZE + 1;
+        represent_gauge_field_kernel<<<grid, BLOCK_SIZE>>>(u_gauge_f->gpu_ptr, gauge_ptr, N, block_start);
+
+        if (L->type == INNER) { complete_sendrecv_gfield(u_gauge); }
+
+        L = L->next;
     }
-
-#ifdef DPHI_FLT
-    assign_ud2u_f();
-#endif
-
-#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-    compute_clover_term();
-#endif
 }
 
 #endif
