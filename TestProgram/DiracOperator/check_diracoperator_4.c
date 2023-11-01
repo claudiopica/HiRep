@@ -41,8 +41,8 @@ int compute_gamma(int g[4], int ic) {
     int return_value = 0;
 
     spinor_field *in, *out;
-    in = alloc_spinor_field_f(1, &glattice);
-    out = alloc_spinor_field_f(1, &glattice);
+    in = alloc_spinor_field(1, &glattice);
+    out = alloc_spinor_field(1, &glattice);
 
     for (int mu = 0; mu < 4; mu++) {
         for (int beta = 0; beta < 4; beta++) {
@@ -79,7 +79,7 @@ int compute_gamma(int g[4], int ic) {
             _suNg_unit(*_4FIELD_AT(u_gauge, ix, mu));
         }
 
-        //start_sendrecv_gfield(u_gauge); Non-mpi test
+        //start_sendrecv_suNg_field(u_gauge); Non-mpi test
         represent_gauge_field();
 
         dbl = 0.;
@@ -108,14 +108,14 @@ int compute_gamma(int g[4], int ic) {
             if (fabs(dbl - GLB_T * GLB_X * GLB_Y * GLB_Z) > 1.e-14) { lprintf("ERROR", 0, "source sqnorm=%f\n", dbl); }
 
 #ifdef WITH_GPU
-            copy_to_gpu_spinor_field_f(in);
-            copy_to_gpu_gfield_f(u_gauge_f);
+            copy_to_gpu_spinor_field(in);
+            copy_to_gpu_suNf_field(u_gauge_f);
 #endif
 
             Dphi_(out, in);
 
 #ifdef WITH_GPU
-            copy_from_gpu_spinor_field_f(out);
+            copy_from_gpu_spinor_field(out);
 #endif
 
             dbl = spinor_field_sqnorm_f_cpu(out);
@@ -203,8 +203,8 @@ int compute_gamma(int g[4], int ic) {
         }
     }
 
-    free_spinor_field_f(in);
-    free_spinor_field_f(out);
+    free_spinor_field(in);
+    free_spinor_field(out);
     return return_value;
 }
 
@@ -223,7 +223,7 @@ int main(int argc, char *argv[]) {
     random_u(u_gauge);
     lprintf("MAIN", 0, "done.\n");
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
 
     represent_gauge_field();
 

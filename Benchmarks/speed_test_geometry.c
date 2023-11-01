@@ -63,7 +63,7 @@ void simple_write_cpu(spinor_field *in) {
 int main(int argc, char *argv[]) {
     int bytesite = sizeof(suNf_vector);
     setup_process(&argc, &argv);
-    spinor_field *in = alloc_spinor_field_f(1, &glattice);
+    spinor_field *in = alloc_spinor_field(1, &glattice);
     gaussian_spinor_field(in);
 
     Timer clock;

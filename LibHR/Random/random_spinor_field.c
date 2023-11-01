@@ -23,7 +23,7 @@ void gaussian_spinor_field(spinor_field *s) {
     spinor_field_mul_f_cpu(s, c1, s);
 
 #ifdef WITH_GPU
-    copy_to_gpu_spinor_field_f(s);
+    copy_to_gpu_spinor_field(s);
 #endif
 
     apply_BCs_on_spinor_field(s);
@@ -43,7 +43,7 @@ void gaussian_spinor_field_flt(spinor_field_flt *s) {
     spinor_field_mul_f_flt_cpu(s, c1, s);
 
 #ifdef WITH_GPU
-    copy_to_gpu_spinor_field_f_flt(s);
+    copy_to_gpu_spinor_field_flt(s);
 #endif
 
     apply_BCs_on_spinor_field_flt(s);

@@ -114,16 +114,16 @@ int main(int argc, char *argv[]) {
     _SPEED_TEST_RNG(ranlxd, rlxd_init, double);
     _SPEED_TEST_RNG(ranlxs, rlxs_init, float);
 
-    spinor_field *in = alloc_spinor_field_f(1, &glattice);
+    spinor_field *in = alloc_spinor_field(1, &glattice);
     _SPEED_TEST_RANDOM_FIELD("Gaussian spinor field", in, gaussian_spinor_field(in););
 
-    spinor_field_flt *in_flt = alloc_spinor_field_f_flt(1, &glattice);
+    spinor_field_flt *in_flt = alloc_spinor_field_flt(1, &glattice);
     _SPEED_TEST_RANDOM_FIELD("Gaussian spinor field single precision", in_flt, gaussian_spinor_field_flt(in_flt););
 
-    suNg_field *u = alloc_gfield(&glattice);
+    suNg_field *u = alloc_suNg_field(&glattice);
     _SPEED_TEST_RANDOM_FIELD("Random gauge field", in, random_u(u););
 
-    suNg_av_field *avf = alloc_avfield(&glattice);
+    suNg_av_field *avf = alloc_suNg_av_field(&glattice);
     _SPEED_TEST_RANDOM_FIELD("Gaussian momenta", in, gaussian_momenta(avf););
 
     suNg_scalar_field *sf = alloc_suNg_scalar_field(&glattice);

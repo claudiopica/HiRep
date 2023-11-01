@@ -51,86 +51,72 @@ void afree(void *addr);
 //convert.cu
 
 #define _FIELD_NAME_READABLE "Spinor field"
-#define _FIELD_NAME spinor_field_f
 #define _FIELD_TYPE spinor_field
 #define _IS_SPINOR_LIKE 1
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Single precision spinor field"
-#define _FIELD_NAME spinor_field_f_flt
 #define _FIELD_TYPE spinor_field_flt
 #define _IS_SPINOR_LIKE 1
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Scalar field"
-#define _FIELD_NAME sfield
 #define _FIELD_TYPE scalar_field
 #define _IS_SPINOR_LIKE 1
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Gauge field"
-#define _FIELD_NAME gfield
 #define _FIELD_TYPE suNg_field
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Single precision gauge field"
-#define _FIELD_NAME gfield_flt
 #define _FIELD_TYPE suNg_field_flt
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Represented gauge field"
-#define _FIELD_NAME gfield_f
 #define _FIELD_TYPE suNf_field
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Represented single precision gauge field"
-#define _FIELD_NAME gfield_f_flt
 #define _FIELD_TYPE suNf_field_flt
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "SU(NG) scalar field"
-#define _FIELD_NAME suNg_scalar_field
 #define _FIELD_TYPE suNg_scalar_field
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "SU(NG) algebra vector field"
-#define _FIELD_NAME avfield
 #define _FIELD_TYPE suNg_av_field
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Gauge transformation"
-#define _FIELD_NAME gtransf
-#define _FIELD_TYPE suNg_field
+#define _FIELD_TYPE gtransf
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Clover ldl field"
-#define _FIELD_NAME clover_ldl
 #define _FIELD_TYPE ldl_field
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Clover term"
-#define _FIELD_NAME clover_term
-#define _FIELD_TYPE suNfc_field
+#define _FIELD_TYPE clover_term
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Clover force"
-#define _FIELD_NAME clover_force
-#define _FIELD_TYPE suNf_field
+#define _FIELD_TYPE clover_force
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Staple field"
-#define _FIELD_NAME staple_field
-#define _FIELD_TYPE suNg_field
+#define _FIELD_TYPE staple_field
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 

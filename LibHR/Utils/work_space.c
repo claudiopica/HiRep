@@ -123,7 +123,7 @@ int reserve_wrk_space() {
         _idn_wrk = _idn_wrk_new;
         _wrk_reserved = _wrk_reserved_new;
 
-        _g_wrk[n_alloc] = alloc_gfield(&glattice);
+        _g_wrk[n_alloc] = alloc_suNg_field(&glattice);
 
         error((_g_wrk[n_alloc] == NULL), 1, "reserve_wrk_space [work_space.c]", "Cannot allocate memory");
 
@@ -180,7 +180,7 @@ void free_wrk_space() {
     int j;
     if (n_alloc != 0) {
         for (j = 0; j < n_alloc; j++) {
-            free_gfield(_g_wrk[j]);
+            free_suNg_field(_g_wrk[j]);
             free(_iup_wrk[j]);
         }
 

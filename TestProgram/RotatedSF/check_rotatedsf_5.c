@@ -65,11 +65,11 @@ int main(int argc, char *argv[]) {
 
     lprintf("MAIN", 0, "This test implements a comparison with a working code of Stefan Sint\n");
 
-    u_gauge = alloc_gfield(&glattice);
-    u_gauge_f = alloc_gfield_f(&glattice);
+    u_gauge = alloc_suNg_field(&glattice);
+    u_gauge_f = alloc_suNf_field(&glattice);
 
-    lprintf("MAIN", 0, "Reading gauge configuration from file :gfield_sint.dat\n");
-    read_gauge_field_nocheck("gfield_sint.dat");
+    lprintf("MAIN", 0, "Reading gauge configuration from file :suNg_field_sint.dat\n");
+    read_gauge_field_nocheck("suNg_field_sint.dat");
 
     lprintf("MAIN", 0, "Value of the plaquette in Sint's normalization %f\n",
             (avr_plaquette() * 6 * GLB_T * GLB_X * GLB_Y * GLB_Z * NG - 3 * 2 * GLB_X * GLB_Y * GLB_Z * NG) /
@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 
     represent_gauge_field();
 
-    s0 = alloc_spinor_field_f(6, &glattice);
+    s0 = alloc_spinor_field(6, &glattice);
     s1 = s0 + 1;
     s2 = s1 + 1;
     s3 = s2 + 1;
@@ -197,9 +197,9 @@ int main(int argc, char *argv[]) {
         lprintf("SPINOR",0,"%.10f %.10f\n",((complex*)(_FIELD_AT(s3,i)))[j].re,((complex*)(_FIELD_AT(s3,i)))[j].im);
     }
   */
-    free_gfield(u_gauge);
-    free_gfield_f(u_gauge_f);
-    free_spinor_field_f(s0);
+    free_suNg_field(u_gauge);
+    free_suNf_field(u_gauge_f);
+    free_spinor_field(s0);
 
     finalize_process();
     exit(0);

@@ -26,10 +26,10 @@ void find_spec_H2(double *max, double *min) {
 
     d1 = malloc(sizeof(*d1) * nevt);
 #ifdef UPDATE_EO
-    ev = alloc_spinor_field_f(nevt, &glat_even);
+    ev = alloc_spinor_field(nevt, &glat_even);
     MVM += max_H(&H2, &glat_even, max);
 #else
-    ev = alloc_spinor_field_f(nevt, &glattice);
+    ev = alloc_spinor_field(nevt, &glattice);
     MVM += max_H(&H2, &glattice, max);
 #endif
 
@@ -45,7 +45,7 @@ void find_spec_H2(double *max, double *min) {
     lprintf("SPECLIMITS", 0, "Range = [%1.8e,%1.8e] [MVM = %d]\n", *min, *max, MVM);
 
     free(d1);
-    free_spinor_field_f(ev);
+    free_spinor_field(ev);
 
     return;
 }

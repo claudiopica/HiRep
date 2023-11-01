@@ -37,8 +37,8 @@ for all field types not only for the `spinor_field`, I could write a macro that 
     }
 
 _DECLARE_USELESS_FUNCTION(spinor_field, suNf_spinor)
-_DECLARE_USELESS_FUNCTION(gfield, suNg)
-_DECLARE_USELESS_FUNCTION(gfield_f, suNf)
+_DECLARE_USELESS_FUNCTION(suNg_field, suNg)
+_DECLARE_USELESS_FUNCTION(suNf_field, suNf)
 ```
 
 * The code is for example in a performance bottleneck GPU kernel and needs to be unrolled. A good example here are the macros in `Geometry/gpu_geometry.h`, that implement manually unrolled for loops over the components of different elementary site types. This unrolling is crucial to best performance and cannot be avoided, however, unrolling the sometimes over 200 components of the site types directly in the kernels would render the code unmanagable.

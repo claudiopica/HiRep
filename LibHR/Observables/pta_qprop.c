@@ -48,13 +48,13 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 #ifndef NDEBUG
     spinor_field *test_e = 0;
     spinor_field *test = 0;
-    test = alloc_spinor_field_f(1, &glattice);
-    test_e = alloc_spinor_field_f(1, &glat_even);
+    test = alloc_spinor_field(1, &glattice);
+    test_e = alloc_spinor_field(1, &glat_even);
 #endif
 
-    res = alloc_spinor_field_f(1, &glattice);
+    res = alloc_spinor_field(1, &glattice);
 
-    in = alloc_spinor_field_f(2 * nm + 1, &glat_even);
+    in = alloc_spinor_field(2 * nm + 1, &glat_even);
     resdn = in + 1;
     resd = resdn + nm;
 
@@ -183,12 +183,12 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 
     /* free memory */
 
-    free_spinor_field_f(in);
-    free_spinor_field_f(res);
+    free_spinor_field(in);
+    free_spinor_field(res);
     free(shift);
 #ifndef NDEBUG
-    free_spinor_field_f(test_e);
-    free_spinor_field_f(test);
+    free_spinor_field(test_e);
+    free_spinor_field(test);
 #endif
 }
 
@@ -212,11 +212,11 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 
 #ifndef NDEBUG
     spinor_field *test = 0;
-    test = alloc_spinor_field_f(1, &glattice);
+    test = alloc_spinor_field(1, &glattice);
 #endif
 
     /* allocate input spinor field */
-    in = alloc_spinor_field_f(1 + 2 * nm, &glattice);
+    in = alloc_spinor_field(1 + 2 * nm, &glattice);
     resdn = in + 1;
     resd = resdn + nm;
 
@@ -304,10 +304,10 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
     lprintf("PROPAGATOR", 10, "QMR MVM = %d\n", cgiter);
 
     /* free memory */
-    free_spinor_field_f(in);
+    free_spinor_field(in);
     free(shift);
 #ifndef NDEBUG
-    free_spinor_field_f(test);
+    free_spinor_field(test);
 #endif
 }
 
@@ -326,7 +326,7 @@ void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 #endif
 
     /* allocate input spinor field */
-    in = alloc_spinor_field_f(1, &glattice);
+    in = alloc_spinor_field(1, &glattice);
 
     /* the source is on the first even site */
     spinor_field_zero_f(in);
@@ -374,5 +374,5 @@ void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
     lprintf("PROPAGATOR", 10, "MINRES MVM = %d", cgiter);
 
     /* free input spinor field */
-    free_spinor_field_f(in);
+    free_spinor_field(in);
 }

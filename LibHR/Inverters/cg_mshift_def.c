@@ -37,7 +37,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 #endif
 
     /* allocate spinors fields and aux real variables */
-    p = alloc_spinor_field_f(3 + par->n, in->type);
+    p = alloc_spinor_field(3 + par->n, in->type);
     k = p + par->n;
     r = k + 1;
     Mk = r + 1;
@@ -134,7 +134,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
     }
 
     /* free memory */
-    free_spinor_field_f(p);
+    free_spinor_field(p);
     free(z1);
     free(z2);
     free(z3);
@@ -159,7 +159,7 @@ int cg_mshift_def(mshift_par *par, spinor_operator M, spinor_operator P, spinor_
     spinor_field *p1, *p2;
 
     /* allocate spinors fields and aux real variables */
-    p1 = alloc_spinor_field_f(2, in->type);
+    p1 = alloc_spinor_field(2, in->type);
     p2 = p1 + 1;
 
     /* split input vector */
@@ -193,7 +193,7 @@ int cg_mshift_def(mshift_par *par, spinor_operator M, spinor_operator P, spinor_
     lprintf("INVERTER", 10, "CG_mshift: MVM = %d/%d\n", msiter, cgiter);
 
     /* free memory */
-    free_spinor_field_f(p1);
+    free_spinor_field(p1);
 
     return cgiter;
 }

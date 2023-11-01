@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     print_gd(&glattice);
 
     unit_u(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     // test plaquette value
     double p = avr_plaquette();

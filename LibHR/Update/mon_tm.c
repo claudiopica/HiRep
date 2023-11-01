@@ -59,7 +59,7 @@ static void tm_add_local_action(monomial const *m, scalar_field *loc_action) {
 static void tm_free(monomial *m) {
     mon_tm_par *par = (mon_tm_par *)m->data.par;
 
-    if (par->pf != NULL) { free_spinor_field_f(par->pf); }
+    if (par->pf != NULL) { free_spinor_field(par->pf); }
 
     free(par);
     free(m);
@@ -74,10 +74,10 @@ monomial *tm_create(monomial_data const *data) {
 
     // Allocate memory for spinor field
     if (mon_init) {
-        tmp_pf = alloc_spinor_field_f(1, &glat_default);
+        tmp_pf = alloc_spinor_field(1, &glat_default);
         mon_init = 0;
     }
-    par->pf = alloc_spinor_field_f(1, &glat_default);
+    par->pf = alloc_spinor_field(1, &glat_default);
 
     // Setup force parameters
     par->fpar.id = data->id;

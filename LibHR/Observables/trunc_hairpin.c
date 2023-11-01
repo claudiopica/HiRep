@@ -274,7 +274,7 @@ static void compute_evs() {
     double ubnd = 0.;
 
 #ifndef NDEBUG
-    spinor_field *test = alloc_spinor_field_f(1, &glattice);
+    spinor_field *test = alloc_spinor_field(1, &glattice);
 #endif /* NDEBUG */
 
     if (pars.n_eigenvalues <= 0) { return; }
@@ -324,7 +324,7 @@ static void compute_evs() {
     }
 
 #ifndef NDEBUG
-    free_spinor_field_f(test);
+    free_spinor_field(test);
 #endif /* NDEBUG */
 
     afree(ev_mask);
@@ -632,7 +632,7 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
 
     spinor_field *sinktmp, *sink_trunc;
 #ifndef NDEBUG
-    spinor_field *test = alloc_spinor_field_f(1, &glattice);
+    spinor_field *test = alloc_spinor_field(1, &glattice);
 #endif /* NDEBUG */
 
     /* set up inverters parameters */
@@ -821,7 +821,7 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
     }
 
 #ifndef NDEBUG
-    free_spinor_field_f(test);
+    free_spinor_field(test);
 #endif /* NDEBUG */
 
     lprintf("GET_SINKS_QMR", loglevel + 1, "QMR MVM = %d\n", cgiter);
@@ -969,13 +969,13 @@ void ata_qprop_init(ata_qprop_pars *p) {
     /* eigenvector related stuff */
     if (pars.n_eigenvalues != 0) {
         ev = (spinor_field **)malloc(sizeof(spinor_field *) * pars.n_masses);
-        ev[0] = alloc_spinor_field_f(pars.n_masses * pars.n_eigenvalues, &glattice);
+        ev[0] = alloc_spinor_field(pars.n_masses * pars.n_eigenvalues, &glattice);
         for (m = 0; m < pars.n_masses; m++) {
             ev[m] = ev[0] + m * pars.n_eigenvalues;
         }
-        compute_evs_ws = alloc_spinor_field_f(pars.eva_nevt - pars.n_eigenvalues + 2, &glattice);
-        max_H2_ev_ws = alloc_spinor_field_f(3, &glattice);
-        ev_propagator_ws = alloc_spinor_field_f(3, &glattice);
+        compute_evs_ws = alloc_spinor_field(pars.eva_nevt - pars.n_eigenvalues + 2, &glattice);
+        max_H2_ev_ws = alloc_spinor_field(3, &glattice);
+        ev_propagator_ws = alloc_spinor_field(3, &glattice);
     } else {
         ev = NULL;
         compute_evs_ws = NULL;
@@ -985,8 +985,8 @@ void ata_qprop_init(ata_qprop_pars *p) {
 
     /* hopping expansion related stuff */
     if (pars.hopping_order >= 0) {
-        hopping_propagator_ws = alloc_spinor_field_f(3, &glattice);
-        hopping_remainder_ws = alloc_spinor_field_f(1, &glattice);
+        hopping_propagator_ws = alloc_spinor_field(3, &glattice);
+        hopping_remainder_ws = alloc_spinor_field(1, &glattice);
     } else {
         hopping_propagator_ws = NULL;
         hopping_remainder_ws = NULL;
@@ -994,12 +994,12 @@ void ata_qprop_init(ata_qprop_pars *p) {
 
     /* noisy sources related stuff */
     if (pars.n_sources_truncation > 0 || pars.dilution == EXACT) {
-        stoc_propagator_ws = alloc_spinor_field_f(2 + pars.n_masses, &glattice);
+        stoc_propagator_ws = alloc_spinor_field(2 + pars.n_masses, &glattice);
 #ifdef QMR_INVERTER
-        create_sinks_QMR_ws = alloc_spinor_field_f(2 + pars.n_masses, &glattice);
-        QMR2_source = alloc_spinor_field_f(1, &glattice);
-        QMR2_sinks = alloc_spinor_field_f(pars.n_masses, &glattice);
-        QMR2_sinks_trunc = alloc_spinor_field_f(pars.n_masses, &glattice);
+        create_sinks_QMR_ws = alloc_spinor_field(2 + pars.n_masses, &glattice);
+        QMR2_source = alloc_spinor_field(1, &glattice);
+        QMR2_sinks = alloc_spinor_field(pars.n_masses, &glattice);
+        QMR2_sinks_trunc = alloc_spinor_field(pars.n_masses, &glattice);
 #endif /* QMR_INVERTER */
     } else {
         stoc_propagator_ws = NULL;
@@ -1018,26 +1018,26 @@ void ata_qprop_free() {
     if (init_flag != 1) { return; }
 
     if (pars.n_eigenvalues != 0) {
-        free_spinor_field_f(ev[0]);
+        free_spinor_field(ev[0]);
         afree(ev);
-        free_spinor_field_f(compute_evs_ws);
-        free_spinor_field_f(max_H2_ev_ws);
-        free_spinor_field_f(ev_propagator_ws);
+        free_spinor_field(compute_evs_ws);
+        free_spinor_field(max_H2_ev_ws);
+        free_spinor_field(ev_propagator_ws);
     }
 
     if (pars.hopping_order >= 0) {
-        free_spinor_field_f(hopping_propagator_ws);
-        free_spinor_field_f(hopping_remainder_ws);
+        free_spinor_field(hopping_propagator_ws);
+        free_spinor_field(hopping_remainder_ws);
     }
 
     if (pars.n_sources_truncation > 0 || pars.dilution == EXACT) {
-        free_spinor_field_f(stoc_propagator_ws);
+        free_spinor_field(stoc_propagator_ws);
 #ifdef QMR_INVERTER
-        free_spinor_field_f(create_sinks_QMR_ws);
+        free_spinor_field(create_sinks_QMR_ws);
 
-        free_spinor_field_f(QMR2_source);
-        free_spinor_field_f(QMR2_sinks);
-        free_spinor_field_f(QMR2_sinks_trunc);
+        free_spinor_field(QMR2_source);
+        free_spinor_field(QMR2_sinks);
+        free_spinor_field(QMR2_sinks_trunc);
 #endif /* QMR_INVERTER */
     }
     init_flag = 0;
@@ -1050,7 +1050,7 @@ static void QMR_init() {
     int cgiter = 0;
 
 #ifndef NDEBUG
-    spinor_field *test = alloc_spinor_field_f(1, &glattice);
+    spinor_field *test = alloc_spinor_field(1, &glattice);
 #endif /* NDEBUG */
 
     gaussian_spinor_field(QMR2_source);
@@ -1095,7 +1095,7 @@ static void QMR_init() {
 #endif /* NDEBUG */
 
 #ifndef NDEBUG
-    free_spinor_field_f(test);
+    free_spinor_field(test);
 #endif /* NDEBUG */
 
     lprintf("QMR_INIT", loglevel + 1, "QMR MVM = %d\n", cgiter);

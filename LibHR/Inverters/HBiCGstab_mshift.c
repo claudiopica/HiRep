@@ -48,7 +48,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
     }
 #endif
 
-    s = alloc_spinor_field_f((par->n) + 6, in->type);
+    s = alloc_spinor_field((par->n) + 6, in->type);
     r = s + par->n;
     r1 = r + 1;
     o = r1 + 1;
@@ -223,7 +223,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
 #endif
 
     /* free memory */
-    free_spinor_field_f(s);
+    free_spinor_field(s);
     free(z1);
     free(sflags);
 

@@ -107,8 +107,8 @@ void unit_gauge(suNg_field *gauge) {
             }
         }
     }
-    start_sendrecv_gfield(gauge);
-    complete_sendrecv_gfield(gauge);
+    start_sendrecv_suNg_field(gauge);
+    complete_sendrecv_suNg_field(gauge);
 }
 
 typedef struct fourvector {

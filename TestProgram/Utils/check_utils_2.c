@@ -9,7 +9,7 @@
 static hr_complex spat_avr_0pp_wrk() {
     static hr_complex pa, tmp;
     suNg_field *_u = u_gauge_wrk();
-    start_sendrecv_gfield(_u);
+    start_sendrecv_suNg_field(_u);
 
     _OMP_PRAGMA(single) {
         pa = tmp = 0.;
@@ -19,7 +19,7 @@ static hr_complex spat_avr_0pp_wrk() {
         if (ixp == glattice.inner_master_pieces) {
             _OMP_PRAGMA(master)
             /* wait for gauge field to be transfered */
-            complete_sendrecv_gfield(_u);
+            complete_sendrecv_suNg_field(_u);
             _OMP_PRAGMA(barrier)
         }
         _SITE_FOR_SUM(&glattice, ixp, ix, pa) {
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
 
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n\n");
 

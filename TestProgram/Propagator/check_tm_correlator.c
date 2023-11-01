@@ -251,9 +251,9 @@ int main(int argc, char *argv[]) {
 
     setup_gauge_fields();
 
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4, &glattice);
-    spinor_field *propmu0 = alloc_spinor_field_f(4, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4, &glattice);
+    spinor_field *propmu0 = alloc_spinor_field(4, &glattice);
 
     read_input(glb_var.read, get_input_filename());
     read_input(cor_var.read, get_input_filename());

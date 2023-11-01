@@ -32,15 +32,15 @@ int main(int argc, char *argv[]) {
     setup_process(&argc, &argv);
     setup_gauge_fields();
 
-    s0 = alloc_spinor_field_f(2, &glattice);
+    s0 = alloc_spinor_field(2, &glattice);
     s1 = s0 + 1;
-    f0 = alloc_spinor_field_f_flt(2, &glattice);
+    f0 = alloc_spinor_field_flt(2, &glattice);
     f1 = f0 + 1;
 
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     fflush(stdout);
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n");
 
@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
 
     if (sqrt(sig) > 10.e-7) { return_value = 1; }
 
-    free_spinor_field_f(s0);
-    free_spinor_field_f_flt(f0);
+    free_spinor_field(s0);
+    free_spinor_field_flt(f0);
 
     finalize_process();
     return return_value;

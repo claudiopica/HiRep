@@ -40,9 +40,9 @@ void force_rhmc(double dt, void *vpar) {
     mpar.max_iter = 0; /* no limit */
 
     if (n_ws < ratio->order + 1) {
-        if (chi != NULL) { free_spinor_field_f(chi); }
+        if (chi != NULL) { free_spinor_field(chi); }
         n_ws = ratio->order + 1;
-        chi = alloc_spinor_field_f(n_ws, &glattice);
+        chi = alloc_spinor_field(n_ws, &glattice);
         Hchi = chi + n_ws - 1;
     }
 

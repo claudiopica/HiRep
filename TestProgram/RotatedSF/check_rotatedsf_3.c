@@ -54,9 +54,9 @@ int main(int argc, char *argv[]) {
 
     init_BCs(&BCs_pars);
 
-    u_gauge = alloc_gfield(&glattice);
-    u_gauge_f = alloc_gfield_f(&glattice);
-    s0 = alloc_spinor_field_f(4, &glattice);
+    u_gauge = alloc_suNg_field(&glattice);
+    u_gauge_f = alloc_suNf_field(&glattice);
+    s0 = alloc_spinor_field(4, &glattice);
     s1 = s0 + 1;
     s2 = s1 + 1;
     s3 = s2 + 1;
@@ -87,9 +87,9 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", sqrt(sig));
     lprintf("MAIN", 0, "(should be around 1*10^(-10) or so)\n\n");
 
-    free_gfield(u_gauge);
-    free_gfield_f(u_gauge_f);
-    free_spinor_field_f(s0);
+    free_suNg_field(u_gauge);
+    free_suNf_field(u_gauge_f);
+    free_spinor_field(s0);
 
     finalize_process();
     exit(0);

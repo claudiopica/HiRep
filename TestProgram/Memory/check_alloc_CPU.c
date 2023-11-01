@@ -9,21 +9,21 @@
 #include "libhr.h"
 
 // Double precision
-int test_gfield_allocation();
-int test_gfield_f_allocation();
+int test_suNg_field_allocation();
+int test_suNf_field_allocation();
 int test_suNg_scalar_field_allocation();
-int test_avfield_allocation();
+int test_suNg_av_field_allocation();
 int test_gtransf_allocation();
 int test_clover_term_allocation();
 int test_clover_force_allocation();
 int test_spinor_field_allocation();
-int test_sfield_allocation();
-int test_clover_ldl_allocation();
+int test_scalar_field_allocation();
+int test_ldl_field_allocation();
 int test_staple_field_allocation();
 
 // Single precision
-int test_gfield_flt_allocation();
-int test_gfield_f_flt_allocation();
+int test_suNg_field_flt_allocation();
+int test_suNf_field_flt_allocation();
 int test_spinor_field_flt_allocation();
 
 int main(int argc, char *argv[]) {
@@ -36,21 +36,21 @@ int main(int argc, char *argv[]) {
     test_setup();
 
     // Double precision test block
-    return_val += test_gfield_allocation();
-    return_val += test_gfield_f_allocation();
+    return_val += test_suNg_field_allocation();
+    return_val += test_suNf_field_allocation();
     return_val += test_spinor_field_allocation();
-    return_val += test_avfield_allocation();
+    return_val += test_suNg_av_field_allocation();
     return_val += test_clover_term_allocation();
     return_val += test_clover_force_allocation();
-    return_val += test_sfield_allocation();
+    return_val += test_scalar_field_allocation();
     return_val += test_suNg_scalar_field_allocation();
     return_val += test_gtransf_allocation();
-    return_val += test_clover_ldl_allocation();
+    return_val += test_ldl_field_allocation();
     return_val += test_staple_field_allocation();
 
     // Single precision test block
-    return_val += test_gfield_flt_allocation();
-    return_val += test_gfield_f_flt_allocation();
+    return_val += test_suNg_field_flt_allocation();
+    return_val += test_suNf_field_flt_allocation();
     return_val += test_spinor_field_flt_allocation();
 
     // Finalize and return
@@ -58,65 +58,65 @@ int main(int argc, char *argv[]) {
     return return_val;
 }
 
-int test_gfield_allocation() {
+int test_suNg_field_allocation() {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD ======= \n");
     int return_val = 0;
-    suNg_field *f = alloc_gfield(&glattice);
-    random_gfield_cpu(f);
-    double sqnorm = sqnorm_gfield_cpu(f);
+    suNg_field *f = alloc_suNg_field(&glattice);
+    random_suNg_field_cpu(f);
+    double sqnorm = sqnorm_suNg_field_cpu(f);
     return_val += check_finiteness(sqnorm);
-    free_gfield(f);
+    free_suNg_field(f);
     return return_val;
 }
 
-int test_gfield_f_allocation() {
+int test_suNf_field_allocation() {
     lprintf("INFO", 0, " ======= TEST REPRESENTED GAUGE FIELD ======= \n");
     int return_val = 0;
-    suNf_field *f = alloc_gfield_f(&glattice);
-    random_gfield_f_cpu(f);
-    double sqnorm = sqnorm_gfield_f_cpu(f);
+    suNf_field *f = alloc_suNf_field(&glattice);
+    random_suNf_field_cpu(f);
+    double sqnorm = sqnorm_suNf_field_cpu(f);
     return_val += check_finiteness(sqnorm);
-    free_gfield_f(f);
+    free_suNf_field(f);
     return return_val;
 }
 
-int test_gfield_flt_allocation() {
+int test_suNg_field_flt_allocation() {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
-    suNg_field_flt *f = alloc_gfield_flt(&glattice);
-    random_gfield_flt_cpu(f);
-    float sqnorm = sqnorm_gfield_flt_cpu(f);
+    suNg_field_flt *f = alloc_suNg_field_flt(&glattice);
+    random_suNg_field_flt_cpu(f);
+    float sqnorm = sqnorm_suNg_field_flt_cpu(f);
     return_val += check_finiteness(sqnorm);
-    free_gfield_flt(f);
+    free_suNg_field_flt(f);
     return return_val;
 }
 
-int test_gfield_f_flt_allocation() {
+int test_suNf_field_flt_allocation() {
     lprintf("INFO", 0, " ======= TEST REPRESENTED GAUGE FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
-    suNf_field_flt *f = alloc_gfield_f_flt(&glattice);
-    random_gfield_f_flt_cpu(f);
-    float sqnorm = sqnorm_gfield_f_flt_cpu(f);
+    suNf_field_flt *f = alloc_suNf_field_flt(&glattice);
+    random_suNf_field_flt_cpu(f);
+    float sqnorm = sqnorm_suNf_field_flt_cpu(f);
     return_val += check_finiteness(sqnorm);
-    free_gfield_f_flt(f);
+    free_suNf_field_flt(f);
     return return_val;
 }
 
-int test_avfield_allocation() {
+int test_suNg_av_field_allocation() {
     lprintf("INFO", 0, " ======= TEST SU(N) ALGEBRA VECTOR FIELD ======= \n");
     int return_val = 0;
-    suNg_av_field *f = alloc_avfield(&glattice);
-    random_avfield_cpu(f);
-    double sqnorm = sqnorm_avfield_cpu(f);
+    suNg_av_field *f = alloc_suNg_av_field(&glattice);
+    random_suNg_av_field_cpu(f);
+    double sqnorm = sqnorm_suNg_av_field_cpu(f);
     return_val += check_finiteness(sqnorm);
-    free_avfield(f);
+    free_suNg_av_field(f);
     return return_val;
 }
 
 int test_gtransf_allocation() {
     lprintf("INFO", 0, " ======= GAUGE TRANSFORMATION ======= \n");
     int return_val = 0;
-    suNg_field *f = alloc_gtransf(&glattice);
+    gtransf *f = alloc_gtransf(&glattice);
     random_gtransf_cpu(f);
     double sqnorm = sqnorm_gtransf_cpu(f);
     return_val += check_finiteness(sqnorm);
@@ -127,7 +127,7 @@ int test_gtransf_allocation() {
 int test_clover_term_allocation() {
     lprintf("INFO", 0, " ======= CLOVER TERM ======= \n");
     int return_val = 0;
-    suNfc_field *f = alloc_clover_term(&glattice);
+    clover_term *f = alloc_clover_term(&glattice);
     random_clover_term_cpu(f);
     double sqnorm = sqnorm_clover_term_cpu(f);
     return_val += check_finiteness(sqnorm);
@@ -138,7 +138,7 @@ int test_clover_term_allocation() {
 int test_clover_force_allocation() {
     lprintf("INFO", 0, " ======= CLOVER FORCE ======= \n");
     int return_val = 0;
-    suNf_field *f = alloc_clover_force(&glattice);
+    clover_force *f = alloc_clover_force(&glattice);
     random_clover_force_cpu(f);
     double sqnorm = sqnorm_clover_force_cpu(f);
     return_val += check_finiteness(sqnorm);
@@ -149,33 +149,33 @@ int test_clover_force_allocation() {
 int test_spinor_field_allocation() {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
     int return_val = 0;
-    spinor_field *f = alloc_spinor_field_f(1, &glattice);
+    spinor_field *f = alloc_spinor_field(1, &glattice);
     gaussian_spinor_field(f);
     double sqnorm = spinor_field_sqnorm_f_cpu(f);
     return_val += check_finiteness(sqnorm);
-    free_spinor_field_f(f);
+    free_spinor_field(f);
     return return_val;
 }
 
 int test_spinor_field_flt_allocation() {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
-    spinor_field_flt *f = alloc_spinor_field_f_flt(1, &glattice);
+    spinor_field_flt *f = alloc_spinor_field_flt(1, &glattice);
     gaussian_spinor_field_flt(f);
     double sqnorm = spinor_field_sqnorm_f_flt_cpu(f);
     return_val += check_finiteness(sqnorm);
-    free_spinor_field_f_flt(f);
+    free_spinor_field_flt(f);
     return return_val;
 }
 
-int test_sfield_allocation() {
+int test_scalar_field_allocation() {
     lprintf("INFO", 0, " ======= TEST SFIELD ======= \n");
     int return_val = 0;
-    scalar_field *f = alloc_sfield(1, &glattice);
-    random_sfield_cpu(f);
-    double sqnorm = sqnorm_sfield_cpu(f);
+    scalar_field *f = alloc_scalar_field(1, &glattice);
+    random_scalar_field_cpu(f);
+    double sqnorm = sqnorm_scalar_field_cpu(f);
     return_val += check_finiteness(sqnorm);
-    free_sfield(f);
+    free_scalar_field(f);
     return return_val;
 }
 
@@ -190,21 +190,21 @@ int test_suNg_scalar_field_allocation() {
     return return_val;
 }
 
-int test_clover_ldl_allocation() {
+int test_ldl_field_allocation() {
     lprintf("INFO", 0, " ======= TEST CLOVER LDL ======= \n");
     int return_val = 0;
-    ldl_field *f = alloc_clover_ldl(&glattice);
-    random_clover_ldl_cpu(f);
-    double sqnorm = sqnorm_clover_ldl_cpu(f);
+    ldl_field *f = alloc_ldl_field(&glattice);
+    random_ldl_field_cpu(f);
+    double sqnorm = sqnorm_ldl_field_cpu(f);
     return_val += check_finiteness(sqnorm);
-    free_clover_ldl(f);
+    free_ldl_field(f);
     return return_val;
 }
 
 int test_staple_field_allocation() {
     lprintf("INFO", 0, " ======= TEST STAPLE FIELD ======= \n");
     int return_val = 0;
-    suNg_field *f = alloc_staple_field(&glattice);
+    staple_field *f = alloc_staple_field(&glattice);
     random_staple_field_cpu(f);
     double sqnorm = sqnorm_staple_field_cpu(f);
     return_val += check_finiteness(sqnorm);

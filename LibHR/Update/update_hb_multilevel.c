@@ -177,7 +177,7 @@ static void update_mh_all(int lev, int type) {
         for (int mu = 0; mu < 4; mu++) {
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                start_sendrecv_gfield(u_gauge);
+                start_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -190,7 +190,7 @@ static void update_mh_all(int lev, int type) {
             }
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                complete_sendrecv_gfield(u_gauge);
+                complete_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -208,7 +208,7 @@ static void update_mh_all(int lev, int type) {
         for (int mu = 0; mu < 4; mu++) {
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                start_sendrecv_gfield(u_gauge);
+                start_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -221,7 +221,7 @@ static void update_mh_all(int lev, int type) {
             }
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                complete_sendrecv_gfield(u_gauge);
+                complete_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -247,7 +247,7 @@ static void update_mh(int lev) {
         update_mh_all(lev, 1);
     }
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
 }
 
 void init_hb_multilevel(int lev, double lbeta, int lnhb, int lnor, int *lml_up, int *lml_skip, int lnblockingstart,

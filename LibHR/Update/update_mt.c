@@ -31,8 +31,8 @@ void init_ghmc(ghmc_par *par) {
 
     lprintf("GHMC", 0, "Initializing...\n");
 
-    /* allocate space for the backup copy of gfield */
-    if (u_gauge_old == NULL) { u_gauge_old = alloc_gfield(&glattice); }
+    /* allocate space for the backup copy of suNg_field */
+    if (u_gauge_old == NULL) { u_gauge_old = alloc_suNg_field(&glattice); }
     suNg_field_copy(u_gauge_old, u_gauge);
 
     /* allocate space for the backup copy of the scalar field */
@@ -43,14 +43,14 @@ void init_ghmc(ghmc_par *par) {
 
     /* allocate space for backup copy of four fermion fields */
     if (four_fermion_active) {
-        if (ff_sigma_old == NULL) { ff_sigma_old = alloc_sfield(1, &glattice); }
-        if (ff_pi_old == NULL) { ff_pi_old = alloc_sfield(1, &glattice); }
+        if (ff_sigma_old == NULL) { ff_sigma_old = alloc_scalar_field(1, &glattice); }
+        if (ff_pi_old == NULL) { ff_pi_old = alloc_scalar_field(1, &glattice); }
         scalar_field_copy(ff_sigma_old, ff_sigma);
         scalar_field_copy(ff_pi_old, ff_pi);
     }
 
     /* allocate momenta */
-    if (suN_momenta == NULL) { suN_momenta = alloc_avfield(&glattice); }
+    if (suN_momenta == NULL) { suN_momenta = alloc_suNg_av_field(&glattice); }
     if (u_scalar != NULL) {
         if (scalar_momenta == NULL) { scalar_momenta = alloc_suNg_scalar_field(&glattice); }
     }
@@ -62,7 +62,7 @@ void init_ghmc(ghmc_par *par) {
 
     /* allocate memory for the local action */
     /* NOTE: should this be moved into local_action.c ? */
-    if (la == NULL) { la = alloc_sfield(1, &glattice); }
+    if (la == NULL) { la = alloc_scalar_field(1, &glattice); }
 
     /* copy update parameters */
     update_par = *par;
@@ -80,7 +80,7 @@ void free_ghmc() {
 
     /* free momenta */
     if (u_gauge_old != NULL) {
-        free_gfield(u_gauge_old);
+        free_suNg_field(u_gauge_old);
         u_gauge_old = NULL;
     }
     if (u_scalar_old != NULL) {
@@ -88,7 +88,7 @@ void free_ghmc() {
         u_scalar_old = NULL;
     }
     if (suN_momenta != NULL) {
-        free_avfield(suN_momenta);
+        free_suNg_av_field(suN_momenta);
         suN_momenta = NULL;
     }
     if (scalar_momenta != NULL) {
@@ -96,7 +96,7 @@ void free_ghmc() {
         scalar_momenta = NULL;
     }
     if (la != NULL) {
-        free_sfield(la);
+        free_scalar_field(la);
         la = NULL;
     }
 
@@ -218,7 +218,7 @@ int update_ghmc() {
                 scalar_field_copy(ff_sigma, ff_sigma_old);
                 scalar_field_copy(ff_pi, ff_pi_old);
             }
-            start_sendrecv_gfield(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
+            start_sendrecv_suNg_field(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
             if (u_scalar != NULL) {
                 start_sendrecv_suNg_scalar_field(
                     u_scalar); /* this may not be needed if we always guarantee that we copy also the buffers */

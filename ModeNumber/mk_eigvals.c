@@ -241,9 +241,9 @@ int main(int argc, char *argv[]) {
     init_BCs(NULL);
 
     /* alloc global gauge fields */
-    u_gauge = alloc_gfield(&glattice);
+    u_gauge = alloc_suNg_field(&glattice);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    u_gauge_f = alloc_gfield_f(&glattice);
+    u_gauge_f = alloc_suNf_field(&glattice);
 #endif
 
     lprintf("MAIN", 0, "EVA Parameters:\n");
@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
     spinor_field *eva_vec, *eva_ws;
 
     eva_val = malloc(sizeof(double) * eig_var.nevt);
-    eva_vec = alloc_spinor_field_f(eig_var.nevt + 1, &glattice);
+    eva_vec = alloc_spinor_field(eig_var.nevt + 1, &glattice);
     eva_ws = eva_vec + eig_var.nevt;
 
     mupp = fabs(hevamass + 4) + 4;
@@ -321,11 +321,11 @@ int main(int argc, char *argv[]) {
     free_BCs();
 
     free(eva_val);
-    free_spinor_field_f(eva_vec);
+    free_spinor_field(eva_vec);
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_gfield_f(u_gauge_f);
+    free_suNf_field(u_gauge_f);
 #endif
 
     finalize_process();

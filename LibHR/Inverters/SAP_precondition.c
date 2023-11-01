@@ -7,7 +7,7 @@ void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spin
     spinor_field *stmp1;
     spinor_field *stmp2;
 
-    res = alloc_spinor_field_f(3, in->type);
+    res = alloc_spinor_field(3, in->type);
     stmp1 = res + 1;
     stmp2 = res + 2;
 
@@ -74,5 +74,5 @@ void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spin
     }
 
     // Free temporary spinors
-    free_spinor_field_f(res);
+    free_spinor_field(res);
 }

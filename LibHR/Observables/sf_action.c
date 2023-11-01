@@ -137,7 +137,7 @@ static double E_8_top(int ix, int k) {
 double SF_action(double beta) {
     double pa = 0.;
     int ix, iy, iz, index;
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
     if (COORD[0] == 0) {
         for (ix = 0; ix < X; ++ix) {
             for (iy = 0; iy < Y; ++iy) {

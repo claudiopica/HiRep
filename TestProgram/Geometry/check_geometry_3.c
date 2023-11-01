@@ -23,12 +23,12 @@ int checkNorm(char *name, double norm_diff) {
 }
 
 #define checkForErrors(_LABEL)                                                                                                 \
-    start_sendrecv_spinor_field_f(in);                                                                                         \
-    complete_sendrecv_spinor_field_f(in);                                                                                      \
-    start_sendrecv_spinor_field_f(even);                                                                                       \
-    complete_sendrecv_spinor_field_f(even);                                                                                    \
-    start_sendrecv_spinor_field_f(odd);                                                                                        \
-    complete_sendrecv_spinor_field_f(odd);                                                                                     \
+    start_sendrecv_spinor_field(in);                                                                                         \
+    complete_sendrecv_spinor_field(in);                                                                                      \
+    start_sendrecv_spinor_field(even);                                                                                       \
+    complete_sendrecv_spinor_field(even);                                                                                    \
+    start_sendrecv_spinor_field(odd);                                                                                        \
+    complete_sendrecv_spinor_field(odd);                                                                                     \
     in_diff = spinor_field_sqnorm_f(in) - in_norm;                                                                             \
     even_diff = spinor_field_sqnorm_f(even) - even_norm;                                                                       \
     odd_diff = spinor_field_sqnorm_f(odd) - odd_norm;                                                                          \
@@ -55,9 +55,9 @@ int main(int argc, char *argv[]) {
     print_gd(&glat_odd);
 #endif
 
-    spinor_field *in = alloc_spinor_field_f(1, &glattice);
-    spinor_field *even = alloc_spinor_field_f(1, &glat_even);
-    spinor_field *odd = alloc_spinor_field_f(1, &glat_odd);
+    spinor_field *in = alloc_spinor_field(1, &glattice);
+    spinor_field *even = alloc_spinor_field(1, &glat_even);
+    spinor_field *odd = alloc_spinor_field(1, &glat_odd);
 
     gaussian_spinor_field(in);
 

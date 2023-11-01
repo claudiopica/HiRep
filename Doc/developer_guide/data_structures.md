@@ -144,14 +144,14 @@ The index in the 1D array is bijectively mapped to the coordinates in space and 
 
 The elementary site type does not fully describe a physical field. What is missing is information on whether the field is located on the sites or the links and what its dimension is, i.e. how many elements belong to a single site or link. Operations on fields in `HiRep` refer to fields that are associated with a particular field type, dimension and geometry, which has a particular interpretation in physics. The following descriptors are used in `HiRep`
 
-* `spinor_field_f`, `spinor field` located on sites, one element per site, corresponds to spinor field in physics
-* `sfield`, `scalar field` located on sites, one element per site, corresponds to scalar field in physics
-* `gfield`, `suNg_field` located on links, four elements per link, corresponds to a gauge field that has four directions, corresponds to gauge field in physics
-* `gfield_f`, suNf_field, located on links, four elements per link, corresponds to a gauge field (four directions) in the fermion representation, corresponds to gauge field in physics
+* `spinor_field`, `spinor field` located on sites, one element per site, corresponds to spinor field in physics
+* `scalar_field`, `scalar field` located on sites, one element per site, corresponds to scalar field in physics
+* `suNg_field`, `suNg_field` located on links, four elements per link, corresponds to a gauge field that has four directions, corresponds to gauge field in physics
+* `suNf_field`, suNf_field, located on links, four elements per link, corresponds to a gauge field (four directions) in the fermion representation, corresponds to gauge field in physics
 * `suNg_scalar_field`, located on links, one element per link
-* `avfield`, located on links, four elements per link
+* `suNg_av_field`, located on links, four elements per link
 * `gtransf`, `suNg` field located on links, one element per link, corresponds to a gauge transformation in physics
-* `clover_ldl`, `ldl_field` located on links, one element per link
+* `ldl_field`, `ldl_field` located on links, one element per link
 * `clover_term`, `suNfc_field` located on links, four elements per link
 * `clover_force`, `suNf_field`, located on links, six elements per link
 

@@ -6,9 +6,6 @@
 #include "Utils/generics.h"
 #include "libhr_core.h"
 
-#if !defined _FIELD_NAME
-#error Missing _FIELD_NAME in communications_gpu.c
-#endif
 #if !defined _FIELD_TYPE
 #error Missing _FIELD_TYPE in communications_gpu.c
 #endif
@@ -19,8 +16,8 @@
 #error Missing _FIELD_DIM in communications_gpu.c
 #endif
 
-#define _KERNEL(_name, _args) __global__ _FUNC(void, _name, _FIELD_NAME, _args)
-#define _DECLARE(_type, _name, _args) _FUNC(_type, _name, _FIELD_NAME, _args)
+#define _KERNEL(_name, _args) __global__ _FUNC(void, _name, _FIELD_TYPE, _args)
+#define _DECLARE(_type, _name, _args) _FUNC(_type, _name, _FIELD_TYPE, _args)
 
 _DECLARE(kernel_field_input *, init_kernel_input_, (void *sendbuf, _FIELD_TYPE *in, box_t *box, gd_type gd_t)) {
     kernel_field_input *input = (kernel_field_input *)malloc(sizeof(kernel_field_input));
@@ -71,17 +68,16 @@ _DECLARE(void, sync_box_to_buffer_gpu_, (geometry_descriptor * gd, box_t *src, _
     if (gd == &glat_even) { gd_t = EVEN; }
     if (gd == &glat_odd) { gd_t = ODD; }
 
-    kernel_field_input *input = _F_NAME(init_kernel_input_, _FIELD_NAME)(sendbuf, in, src, gd_t);
+    kernel_field_input *input = _F_NAME(init_kernel_input_, _FIELD_TYPE)(sendbuf, in, src, gd_t);
     const int max_vol = fmax(boxEvenVolume(src), boxOddVolume(src));
     const int grid = (max_vol - 1) / BLOCK_SIZE + 1;
-    _F_NAME(box_to_buffer_kernel_, _FIELD_NAME)<<<grid, BLOCK_SIZE>>>(input, sb_icoord_gpu, ipt_gpu);
+    _F_NAME(box_to_buffer_kernel_, _FIELD_TYPE)<<<grid, BLOCK_SIZE>>>(input, sb_icoord_gpu, ipt_gpu);
     cudaFree(input);
 }
 
 #undef _DECLARE
 #undef _KERNEL
 
-#undef _FIELD_NAME
 #undef _FIELD_TYPE
 #undef _SITE_TYPE
 #undef _FIELD_DIM

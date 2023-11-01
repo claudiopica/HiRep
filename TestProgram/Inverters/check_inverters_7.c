@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     par.shift = (double *)malloc(sizeof(double) * (par.n));
     par.err2 = 1.e-20;
     par.max_iter = 0;
-    res = alloc_spinor_field_f(2 * par.n + 2, &glattice);
+    res = alloc_spinor_field(2 * par.n + 2, &glattice);
     s1 = res + par.n;
     s2 = s1 + 1;
     res2 = s2 + 1;
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
         if (tau > 10 * par.err2) { return_value += 1; }
     }
 
-    free_spinor_field_f(res);
+    free_spinor_field(res);
 
     free(par.shift);
 

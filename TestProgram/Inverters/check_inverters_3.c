@@ -31,8 +31,8 @@ int main(int argc, char *argv[]) {
     random_u(u_gauge);
     lprintf("MAIN", 0, "done.\n");
 
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     represent_gauge_field();
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
     par.shift = (double *)malloc(sizeof(double) * (par.n));
     par.err2 = 1.e-28;
     par.max_iter = 0;
-    res = alloc_spinor_field_f(par.n + 2,
+    res = alloc_spinor_field(par.n + 2,
 #ifdef UPDATE_EO
                                &glat_even
 #else
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
         if (tau > par.err2) { return_value += 1; }
     }
 
-    free_spinor_field_f(res);
+    free_spinor_field(res);
     free(par.shift);
     finalize_process();
 

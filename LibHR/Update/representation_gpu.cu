@@ -40,7 +40,7 @@ void represent_gauge_field_gpu() {
         grid = (N - 1) / BLOCK_SIZE + 1;
         represent_gauge_field_kernel<<<grid, BLOCK_SIZE>>>(u_gauge_f->gpu_ptr, gauge_ptr, N, block_start);
 
-        if (L->type == INNER) { complete_sendrecv_gfield(u_gauge); }
+        if (L->type == INNER) { complete_sendrecv_suNg_field(u_gauge); }
 
         L = L->next;
     }

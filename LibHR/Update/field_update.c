@@ -27,28 +27,28 @@ void update_gauge_field(double dt, void *vpar) {
 #endif
 
     field_gauge_par *par = (field_gauge_par *)vpar;
-    suNg_field *gfield = *par->field;
+    suNg_field *suNg_field = *par->field;
     suNg_av_field *force = *par->momenta;
 
 #ifdef WITH_GPU
     exec_field_update(gfield, force, dt);
 #else
     _MASTER_FOR(&glattice, ix) {
-        ExpX(dt, _4FIELD_AT(force, ix, 0), _4FIELD_AT(gfield, ix, 0));
-        ExpX(dt, _4FIELD_AT(force, ix, 1), _4FIELD_AT(gfield, ix, 1));
-        ExpX(dt, _4FIELD_AT(force, ix, 2), _4FIELD_AT(gfield, ix, 2));
-        ExpX(dt, _4FIELD_AT(force, ix, 3), _4FIELD_AT(gfield, ix, 3));
+        ExpX(dt, _4FIELD_AT(force, ix, 0), _4FIELD_AT(suNg_field, ix, 0));
+        ExpX(dt, _4FIELD_AT(force, ix, 1), _4FIELD_AT(suNg_field, ix, 1));
+        ExpX(dt, _4FIELD_AT(force, ix, 2), _4FIELD_AT(suNg_field, ix, 2));
+        ExpX(dt, _4FIELD_AT(force, ix, 3), _4FIELD_AT(suNg_field, ix, 3));
     }
 #endif
 
     if (count & _PROJ_BIT) {
         count = 0;
         project_gauge_field();
-        complete_sendrecv_gfield(u_gauge);
+        complete_sendrecv_suNg_field(u_gauge);
     } else {
         count++;
-        start_sendrecv_gfield(u_gauge);
-        complete_sendrecv_gfield(u_gauge);
+        start_sendrecv_suNg_field(u_gauge);
+        complete_sendrecv_suNg_field(u_gauge);
     }
 
     represent_gauge_field();

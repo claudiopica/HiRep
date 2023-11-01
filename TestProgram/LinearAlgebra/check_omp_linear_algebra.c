@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
     spinor_field *s0, *s1, *s2, *s3;
 
-    s0 = alloc_spinor_field_f(4, &glattice);
+    s0 = alloc_spinor_field(4, &glattice);
     s1 = s0 + 1;
     s2 = s1 + 1;
     s3 = s2 + 1;

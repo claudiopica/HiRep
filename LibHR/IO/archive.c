@@ -48,7 +48,7 @@ void write_gauge_field_matrix(char filename[]) {
 #endif
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
     apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions
 #endif
 
@@ -191,7 +191,7 @@ void write_gauge_field_matrix(char filename[]) {
 #endif
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
     apply_BCs_on_represented_gauge_field(); //Restore the right boundary conditions
 #endif
 }
@@ -368,8 +368,8 @@ void read_gauge_field_matrix(char filename[]) {
     free(buff);
 
     /* start sendrecv of global gauge field */
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     /* check average plaquette */
     testplaq = avr_plaquette();

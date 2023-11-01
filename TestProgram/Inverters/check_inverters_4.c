@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
     fflush(stdout);
     random_u(u_gauge);
 
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
     lprintf("MAIN", 0, "done.\n");
     represent_gauge_field();
 
@@ -79,8 +79,8 @@ int main(int argc, char *argv[]) {
     nev = 8;
     nevt = 20;
 
-    spinor_field *ws = alloc_spinor_field_f(2, &glattice);
-    ev = alloc_spinor_field_f(iw + 1, &glattice);
+    spinor_field *ws = alloc_spinor_field(2, &glattice);
+    ev = alloc_spinor_field(iw + 1, &glattice);
     double d1[iw];
 
     ubnd = 1.05f * power(30, Op1, ws);

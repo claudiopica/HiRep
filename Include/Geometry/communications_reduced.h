@@ -24,12 +24,10 @@ extern "C" {
 #endif
 
 #define _FIELD_NAME_READABLE "Spinor field"
-#define _FIELD_NAME spinor_field_f
 #define _FIELD_TYPE spinor_field
 #include "TMPL/communications_reduced.h.tmpl"
 
 #define _FIELD_NAME_READABLE "Single precision spinor field"
-#define _FIELD_NAME spinor_field_f_flt
 #define _FIELD_TYPE spinor_field_flt
 #include "TMPL/communications_reduced.h.tmpl"
 

@@ -241,9 +241,9 @@ int main(int argc, char *argv[]) {
     /*  init_BCs(NULL);*/
 
     /* alloc global gauge fields */
-    /*u_gauge=alloc_gfield(&glattice);
+    /*u_gauge=alloc_suNg_field(&glattice);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-  u_gauge_f=alloc_gfield_f(&glattice);
+  u_gauge_f=alloc_suNf_field(&glattice);
 #endif
 
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
@@ -274,9 +274,9 @@ int main(int argc, char *argv[]) {
     spinor_field *prop_1;
     spinor_field *prop_2;
 
-    source = alloc_spinor_field_f(4, &glattice);
-    prop_1 = alloc_spinor_field_f(4, &glattice);
-    prop_2 = alloc_spinor_field_f(4, &glattice);
+    source = alloc_spinor_field(4, &glattice);
+    prop_1 = alloc_spinor_field(4, &glattice);
+    prop_2 = alloc_spinor_field(4, &glattice);
 
     while (1) {
         struct timeval start, end, etime, e2time;
@@ -338,17 +338,17 @@ int main(int argc, char *argv[]) {
         if (list == NULL) { break; }
     }
 
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop_1);
-    free_spinor_field_f(prop_2);
+    free_spinor_field(source);
+    free_spinor_field(prop_1);
+    free_spinor_field(prop_2);
 
     if (list != NULL) { fclose(list); }
 
     free_BCs();
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_gfield_f(u_gauge_f);
+    free_suNf_field(u_gauge_f);
 #endif
 
     finalize_process();

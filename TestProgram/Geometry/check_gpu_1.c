@@ -45,9 +45,9 @@ int main(int argc, char *argv[]) {
     setup_process(&argc, &argv);
 
     // Allocate memory for CPU and GPU spinor fields
-    sf1 = alloc_spinor_field_f(sfsize, &glattice);
-    sf2 = alloc_spinor_field_f(sfsize, &glattice);
-    sf3 = alloc_spinor_field_f(sfsize, &glattice);
+    sf1 = alloc_spinor_field(sfsize, &glattice);
+    sf2 = alloc_spinor_field(sfsize, &glattice);
+    sf3 = alloc_spinor_field(sfsize, &glattice);
 
     // Assign random field to CPU
     for (int i = 0; i < sfsize; i++) {
@@ -58,13 +58,13 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < sfsize; i++) {
         spinor_field_copy_f_cpu(&sf2[i], &sf1[i]);
         //print_spinor_field_cpu(&sf2[i]);
-        copy_to_gpu_spinor_field_f(&sf2[i]);
+        copy_to_gpu_spinor_field(&sf2[i]);
         spinor_field_zero_f_cpu(&sf2[i]);
         //print_spinor_field_cpu(&sf2[i]);
         spinor_field_copy_f(&sf3[i], &sf2[i]);
-        copy_from_gpu_spinor_field_f(&sf2[i]);
+        copy_from_gpu_spinor_field(&sf2[i]);
         //print_spinor_field_cpu(&sf2[i]);
-        copy_from_gpu_spinor_field_f(&sf3[i]);
+        copy_from_gpu_spinor_field(&sf3[i]);
     }
 
     // Calculate norm on CPU

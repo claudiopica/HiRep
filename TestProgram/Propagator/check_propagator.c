@@ -122,8 +122,8 @@ void create_sequential_source_point(spinor_field *source, int tf, spinor_field *
     }
 
     for (beta = 0; beta < 4 * NF; ++beta) {
-        start_sendrecv_spinor_field_f(source + beta);
-        complete_sendrecv_spinor_field_f(source + beta);
+        start_sendrecv_spinor_field(source + beta);
+        complete_sendrecv_spinor_field(source + beta);
     }
 }
 
@@ -146,11 +146,11 @@ int main(int argc, char *argv[]) {
     spinor_field *source_seq;
     spinor_field *prop_seq;
 
-    source = alloc_spinor_field_f(4, &glattice);
-    source_seq = alloc_spinor_field_f(4 * NF, &glattice);
-    prop_1 = alloc_spinor_field_f(4 * NF, &glattice);
-    prop_2 = alloc_spinor_field_f(4 * NF, &glattice);
-    prop_seq = alloc_spinor_field_f(4 * NF, &glattice);
+    source = alloc_spinor_field(4, &glattice);
+    source_seq = alloc_spinor_field(4 * NF, &glattice);
+    prop_1 = alloc_spinor_field(4 * NF, &glattice);
+    prop_2 = alloc_spinor_field(4 * NF, &glattice);
+    prop_seq = alloc_spinor_field(4 * NF, &glattice);
 
     for (k = 0; k < 4 * NF; k++) {
         spinor_field_zero_f(prop_1 + k);
@@ -171,8 +171,8 @@ int main(int argc, char *argv[]) {
 
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
 
     gettimeofday(&start, 0);
@@ -199,11 +199,11 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "Random configuration analysed in [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
 
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(source_seq);
-    free_spinor_field_f(prop_1);
-    free_spinor_field_f(prop_2);
-    free_spinor_field_f(prop_seq);
+    free_spinor_field(source);
+    free_spinor_field(source_seq);
+    free_spinor_field(prop_1);
+    free_spinor_field(prop_2);
+    free_spinor_field(prop_seq);
 
     lprintf("MAIN", 0, "return_value = %d\n", return_value);
     finalize_process();

@@ -36,7 +36,7 @@ void project_gauge_field(void) {
     }
 #endif
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
 }
 
 #if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
@@ -143,7 +143,7 @@ static void update_all(double *beta, int type) {
             char mask = FULL_MASK;
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                start_sendrecv_gfield(u_gauge);
+                start_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -156,7 +156,7 @@ static void update_all(double *beta, int type) {
             }
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                complete_sendrecv_gfield(u_gauge);
+                complete_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -173,7 +173,7 @@ static void update_all(double *beta, int type) {
             char mask = FULL_MASK;
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                start_sendrecv_gfield(u_gauge);
+                start_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -186,7 +186,7 @@ static void update_all(double *beta, int type) {
             }
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                complete_sendrecv_gfield(u_gauge);
+                complete_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -216,7 +216,7 @@ static void update_all(double *beta, int type) {
         for (int mu = 0; mu < 4; mu++) {
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                start_sendrecv_gfield(u_gauge);
+                start_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -229,7 +229,7 @@ static void update_all(double *beta, int type) {
             }
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                complete_sendrecv_gfield(u_gauge);
+                complete_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -247,7 +247,7 @@ static void update_all(double *beta, int type) {
         for (int mu = 0; mu < 4; mu++) {
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                start_sendrecv_gfield(u_gauge);
+                start_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -260,7 +260,7 @@ static void update_all(double *beta, int type) {
             }
 #ifdef WITH_MPI
             _OMP_PRAGMA(master) {
-                complete_sendrecv_gfield(u_gauge);
+                complete_sendrecv_suNg_field(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -289,5 +289,5 @@ void update(double *beta, int nhb, int nor) {
         update_all(beta, 1);
     }
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
 }

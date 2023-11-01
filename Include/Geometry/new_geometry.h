@@ -84,25 +84,25 @@ void geometryMemSize(box_t *G, size_t *total, size_t *buffers);
     void sync_box_to_buffer_gpu_reduced_##_name(geometry_descriptor *, box_t *, _field_type *, void *, int, char); \
     void sync_box_reduced_init_##_name(geometry_descriptor *, box_t *, _field_type *, void *, int);
 
-_DECLARE_SYNC_TO_BUFFER(spinor_field_f, spinor_field, suNf_spinor);
-_DECLARE_SYNC_TO_BUFFER(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt);
+_DECLARE_SYNC_TO_BUFFER(spinor_field, spinor_field, suNf_spinor);
+_DECLARE_SYNC_TO_BUFFER(spinor_field_flt, spinor_field_flt, suNf_spinor_flt);
 
-_DECLARE_SYNC_TO_BUFFER_REDUCED(spinor_field_f, spinor_field, suNf_spinor);
-_DECLARE_SYNC_TO_BUFFER_REDUCED(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt)
+_DECLARE_SYNC_TO_BUFFER_REDUCED(spinor_field, spinor_field, suNf_spinor);
+_DECLARE_SYNC_TO_BUFFER_REDUCED(spinor_field_flt, spinor_field_flt, suNf_spinor_flt)
 
-_DECLARE_SYNC_TO_BUFFER(sfield, scalar_field, double);
+_DECLARE_SYNC_TO_BUFFER(scalar_field, scalar_field, double);
 
-_DECLARE_SYNC_TO_BUFFER(gfield, suNg_field, suNg);
-_DECLARE_SYNC_TO_BUFFER(gfield_f, suNf_field, suNf);
-_DECLARE_SYNC_TO_BUFFER(gfield_flt, suNg_field_flt, suNg_flt);
-_DECLARE_SYNC_TO_BUFFER(gfield_f_flt, suNf_field_flt, suNf_flt);
+_DECLARE_SYNC_TO_BUFFER(suNg_field, suNg_field, suNg);
+_DECLARE_SYNC_TO_BUFFER(suNf_field, suNf_field, suNf);
+_DECLARE_SYNC_TO_BUFFER(suNg_field_flt, suNg_field_flt, suNg_flt);
+_DECLARE_SYNC_TO_BUFFER(suNf_field_flt, suNf_field_flt, suNf_flt);
 _DECLARE_SYNC_TO_BUFFER(suNg_scalar_field, suNg_scalar_field, suNg_vector);
-_DECLARE_SYNC_TO_BUFFER(avfield, suNg_av_field, suNg_algebra_vector);
-_DECLARE_SYNC_TO_BUFFER(gtransf, suNg_field, suNg);
-_DECLARE_SYNC_TO_BUFFER(clover_ldl, ldl_field, ldl_t);
-_DECLARE_SYNC_TO_BUFFER(clover_term, suNfc_field, suNfc);
-_DECLARE_SYNC_TO_BUFFER(clover_force, suNf_field, suNf);
-_DECLARE_SYNC_TO_BUFFER(staple_field, suNg_field, suNg);
+_DECLARE_SYNC_TO_BUFFER(suNg_av_field, suNg_av_field, suNg_algebra_vector);
+_DECLARE_SYNC_TO_BUFFER(gtransf, gtransf, suNg);
+_DECLARE_SYNC_TO_BUFFER(ldl_field, ldl_field, ldl_t);
+_DECLARE_SYNC_TO_BUFFER(clover_term, clover_term, suNfc);
+_DECLARE_SYNC_TO_BUFFER(clover_force, clover_force, suNf);
+_DECLARE_SYNC_TO_BUFFER(staple_field, staple_field, suNg);
 
 #ifdef __cplusplus
 }

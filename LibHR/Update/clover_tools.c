@@ -327,7 +327,7 @@ void compute_ldl_decomp_cpu(double sigma0) {
 
 void clover_init_cpu(double csw) {
     cl_term = alloc_clover_term(&glattice);
-    cl_ldl = alloc_clover_ldl(&glattice);
+    cl_ldl = alloc_ldl_field(&glattice);
     cl_force = alloc_clover_force(&glattice);
 
     sigma = 0xF00F;

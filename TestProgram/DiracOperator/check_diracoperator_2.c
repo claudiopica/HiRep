@@ -72,16 +72,16 @@ int main(int argc, char *argv[]) {
     unit_u(u_gauge);
     represent_gauge_field();
 
-    ps0 = alloc_spinor_field_f(3, &glattice);
+    ps0 = alloc_spinor_field(3, &glattice);
     ps1 = ps0 + 1;
     ps2 = ps1 + 1;
 
 #ifdef WITH_GPU
-    copy_from_gpu_gfield(u_gauge);
-    copy_from_gpu_gfield_f(u_gauge_f);
-    copy_from_gpu_spinor_field_f(ps0);
-    copy_from_gpu_spinor_field_f(ps1);
-    copy_from_gpu_spinor_field_f(ps2);
+    copy_from_gpu_suNg_field(u_gauge);
+    copy_from_gpu_suNf_field(u_gauge_f);
+    copy_from_gpu_spinor_field(ps0);
+    copy_from_gpu_spinor_field(ps1);
+    copy_from_gpu_spinor_field(ps2);
 #endif
 
     pi = 4.0 * atan(1.0);
@@ -194,26 +194,26 @@ int main(int argc, char *argv[]) {
         }
 
 #ifdef WITH_GPU
-        copy_to_gpu_gfield(u_gauge);
-        copy_to_gpu_gfield_f(u_gauge_f);
-        copy_to_gpu_spinor_field_f(ps0);
-        copy_to_gpu_spinor_field_f(ps1);
-        copy_to_gpu_spinor_field_f(ps2);
+        copy_to_gpu_suNg_field(u_gauge);
+        copy_to_gpu_suNf_field(u_gauge_f);
+        copy_to_gpu_spinor_field(ps0);
+        copy_to_gpu_spinor_field(ps1);
+        copy_to_gpu_spinor_field(ps2);
 #endif
 
-        start_sendrecv_spinor_field_f(ps0);
-        complete_sendrecv_spinor_field_f(ps0);
+        start_sendrecv_spinor_field(ps0);
+        complete_sendrecv_spinor_field(ps0);
 
 #ifdef WITH_GPU
         // After copy back to device we need to communicate again
-        start_sendrecv_gfield_f(u_gauge_f);
-        complete_sendrecv_gfield_f(u_gauge_f);
+        start_sendrecv_suNf_field(u_gauge_f);
+        complete_sendrecv_suNf_field(u_gauge_f);
 #endif
 
         Dphi(hmass, ps2, ps0);
 
-        start_sendrecv_spinor_field_f(ps1);
-        complete_sendrecv_spinor_field_f(ps1);
+        start_sendrecv_spinor_field(ps1);
+        complete_sendrecv_spinor_field(ps1);
 
         spinor_field_mul_add_assign_f(ps1, -1.0, ps2);
         sig = spinor_field_sqnorm_f(ps1) / spinor_field_sqnorm_f(ps0);

@@ -22,8 +22,8 @@ void unit_gauge(suNg_field *gauge) {
             }
         }
     }
-    start_sendrecv_gfield(gauge);
-    complete_sendrecv_gfield(gauge);
+    start_sendrecv_suNg_field(gauge);
+    complete_sendrecv_suNg_field(gauge);
 }
 
 suNg_field *g;
@@ -31,12 +31,12 @@ static int init = 0;
 
 static void init_g() {
     if (!init) {
-        g = alloc_gfield(&glattice);
+        g = alloc_suNg_field(&glattice);
         unit_gauge(g);
     }
 }
 static void free_g() {
-    if (init) { free_gfield(g); }
+    if (init) { free_suNg_field(g); }
 }
 
 static void gUgmu(suNg_field *gauge) {
@@ -56,8 +56,8 @@ static void gUgmu(suNg_field *gauge) {
             }
         }
     }
-    start_sendrecv_gfield(gauge);
-    complete_sendrecv_gfield(gauge);
+    start_sendrecv_suNg_field(gauge);
+    complete_sendrecv_suNg_field(gauge);
 }
 
 void random_gauge_transform(suNg_field *gauge) {
@@ -77,8 +77,8 @@ void random_gauge_transform(suNg_field *gauge) {
         }
     }
 
-    start_sendrecv_gfield(g);
-    complete_sendrecv_gfield(g);
+    start_sendrecv_suNg_field(g);
+    complete_sendrecv_suNg_field(g);
     gUgmu(gauge);
 }
 
@@ -142,8 +142,8 @@ void reunit(suNg_field *fixed_gauge) {
             }
         }
     }
-    start_sendrecv_gfield(fixed_gauge);
-    complete_sendrecv_gfield(fixed_gauge);
+    start_sendrecv_suNg_field(fixed_gauge);
+    complete_sendrecv_suNg_field(fixed_gauge);
 }
 
 double gaugefix_action(int fix_dir, suNg_field *gauge) {
@@ -301,8 +301,8 @@ void su2_hit(int fix_dir, int parity, double overrelax, suNg_field *fixed_gauge,
             }
         }
     }
-    start_sendrecv_gfield(g);
-    complete_sendrecv_gfield(g);
+    start_sendrecv_suNg_field(g);
+    complete_sendrecv_suNg_field(g);
 }
 
 double gaugefixstep(int fix_dir, double overrelax, suNg_field *fixed_gauge) {
@@ -343,8 +343,8 @@ double gaugefix(int fix_dir, double overrelax, int max_it, double fix_tol, suNg_
     // Reunitarize at the end
     if ((it % REUNIT) != 0) { reunit(fixed_gauge); }
 
-    start_sendrecv_gfield(fixed_gauge);
-    complete_sendrecv_gfield(fixed_gauge);
+    start_sendrecv_suNg_field(fixed_gauge);
+    complete_sendrecv_suNg_field(fixed_gauge);
 
     new_act = gaugefix_action(fix_dir, fixed_gauge);
     free_g();

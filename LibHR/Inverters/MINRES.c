@@ -38,7 +38,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
    * objects of the same type are allocated together
    */
 
-    memall = alloc_spinor_field_f(5, in->type);
+    memall = alloc_spinor_field(5, in->type);
     q1 = memall;
     q2 = q1 + 1;
     p1 = q2 + 1;
@@ -143,7 +143,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
     }
 
     /* free memory */
-    free_spinor_field_f(memall);
+    free_spinor_field(memall);
 
     /* return number of cg iter */
     return cgiter;
@@ -220,7 +220,7 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
    * objects of the same type are allocated together
    */
 
-    memall = alloc_spinor_field_f_flt(5, in->type);
+    memall = alloc_spinor_field_flt(5, in->type);
     q1 = memall;
     q2 = q1 + 1;
     p1 = q2 + 1;
@@ -325,7 +325,7 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
     }
 
     /* free memory */
-    free_spinor_field_f_flt(memall);
+    free_spinor_field_flt(memall);
 
     /* return number of cg iter */
     return cgiter;

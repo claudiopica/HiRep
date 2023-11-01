@@ -89,7 +89,7 @@ static void rhmc_add_local_action(monomial const *m, scalar_field *loc_action) {
 static void rhmc_free(monomial *m) {
     mon_rhmc_par *par = (mon_rhmc_par *)m->data.par;
 
-    if (par->pf != NULL) { free_spinor_field_f(par->pf); }
+    if (par->pf != NULL) { free_spinor_field(par->pf); }
 
     r_app_free(&par->ratio);
     free(par);
@@ -105,12 +105,12 @@ monomial *rhmc_create(monomial_data const *data) {
 
     // Allocate memory for mon_rhmc_par
     if (mon_init) {
-        tmp_pf = alloc_spinor_field_f(1, &glat_default);
+        tmp_pf = alloc_spinor_field(1, &glat_default);
         r_APP.order = 16;
         r_app_alloc(&r_APP);
         mon_init = 0;
     }
-    par->pf = alloc_spinor_field_f(1, &glat_default);
+    par->pf = alloc_spinor_field(1, &glat_default);
 
     // Setup force parameters
     par->fpar.id = data->id;

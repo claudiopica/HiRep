@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     // add 2 for the output results used in the macro TEST
     int ninputs = 3; //max number of inputs
     spinor_field_flt *in;
-    in = alloc_spinor_field_f_flt(ninputs + 2, &glattice);
+    in = alloc_spinor_field_flt(ninputs + 2, &glattice);
 
     for (int k = 0; k < niter; k++) {
         lprintf("TEST", 0, "Loop #%d\n=====================================================\n", k);
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
                          spinor_field_lc3_f_flt_cpu(c1, c2, &in[0], &in[1], &in[2]););
     }
 
-    free_spinor_field_f_flt(in);
+    free_spinor_field_flt(in);
     finalize_process();
 
     return errors;

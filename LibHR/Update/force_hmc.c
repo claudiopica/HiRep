@@ -18,10 +18,10 @@ static spinor_field *xi = NULL;
 #endif
 
 void free_force_hmc() {
-    free_spinor_field_f(Xs);
+    free_spinor_field(Xs);
 #ifdef UPDATE_EO
-    free_spinor_field_f(eta);
-    free_spinor_field_f(xi);
+    free_spinor_field(eta);
+    free_spinor_field(xi);
 #endif
 }
 
@@ -29,14 +29,14 @@ void init_force_hmc() {
     static int init = 0;
     if (init == 0) {
 #ifndef UPDATE_EO
-        Xs = alloc_spinor_field_f(3, &glattice);
+        Xs = alloc_spinor_field(3, &glattice);
         Ys = Xs + 1;
         eta = Ys + 1;
 #else
-        Xs = alloc_spinor_field_f(2, &glattice);
+        Xs = alloc_spinor_field(2, &glattice);
         Ys = Xs + 1;
-        eta = alloc_spinor_field_f(1, &glat_even);
-        xi = alloc_spinor_field_f(1, &glat_odd);
+        eta = alloc_spinor_field(1, &glat_even);
+        xi = alloc_spinor_field(1, &glat_odd);
         Xs->type = &glat_even;
         Ys->type = &glat_even;
 #endif

@@ -164,7 +164,7 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile) {
         break;
     }
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
 
     apply_BCs_on_fundamental_gauge_field();
 
@@ -192,9 +192,9 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
     static spinor_field **pf_copy = NULL;
 
     if (suN_momenta_copy == NULL) {
-        suN_momenta_copy = alloc_avfield(&glattice);
+        suN_momenta_copy = alloc_suNg_av_field(&glattice);
 
-        u_gauge_copy = alloc_gfield(&glattice);
+        u_gauge_copy = alloc_suNg_field(&glattice);
         suNg_field_copy(u_gauge_copy, u_gauge);
 
         if (u_scalar != NULL) {
@@ -207,7 +207,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
         }
     }
 
-    if (la == NULL) { la = alloc_sfield(1, &glattice); }
+    if (la == NULL) { la = alloc_scalar_field(1, &glattice); }
 
     if (regenerate == 0) {
         /* generate new momenta */
@@ -233,7 +233,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
             m->gaussian_pf(m);
 
             if (msf != NULL) {
-                if (pf_copy[i] == NULL) { pf_copy[i] = alloc_spinor_field_f(1, msf->type); }
+                if (pf_copy[i] == NULL) { pf_copy[i] = alloc_spinor_field(1, msf->type); }
 
                 spinor_field_copy_f(pf_copy[i], msf);
             }

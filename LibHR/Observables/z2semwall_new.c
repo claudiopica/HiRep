@@ -113,15 +113,15 @@ static void z2semwall_qprop_init(int nm, double *m, double acc) {
         QMR_par.err2 = .5 * acc;
         QMR_par.max_iter = 0;
 
-        resd = alloc_spinor_field_f(QMR_par.n, &glat_even);
+        resd = alloc_spinor_field(QMR_par.n, &glat_even);
 
-        eta = alloc_spinor_field_f(5, &glat_even);
+        eta = alloc_spinor_field(5, &glat_even);
         eta2 = eta + 4;
-        psi0 = alloc_spinor_field_f(5 * nm, &glattice);
+        psi0 = alloc_spinor_field(5 * nm, &glattice);
         psi = psi0 + 4 * nm;
 
 #ifdef GAUSSIAN_NOISE
-        QMR_noise = alloc_spinor_field_f(nm + 1, &glat_even);
+        QMR_noise = alloc_spinor_field(nm + 1, &glat_even);
         QMR_resdn = QMR_noise + 1;
         /* noisy background */
         gaussian_spinor_field(QMR_noise);
@@ -145,15 +145,15 @@ static void z2semwall_qprop_init(int nm, double *m, double acc) {
 void z2semwall_qprop_free_new() {
     error(init == 0, 1, "z2semwall.c", "z2semwall method not initialized!");
 
-    free_spinor_field_f(eta);
-    free_spinor_field_f(psi0);
-    free_spinor_field_f(resd);
+    free_spinor_field(eta);
+    free_spinor_field(psi0);
+    free_spinor_field(resd);
 
     free(shift);
     free(mass);
 
 #ifdef GAUSSIAN_NOISE
-    free_spinor_field_f(QMR_noise);
+    free_spinor_field(QMR_noise);
 #endif
     init = 0;
 }

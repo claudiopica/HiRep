@@ -164,8 +164,8 @@ void read_gauge_field_eolexi_BE(char filename[]) {
     if (PID == 0) { fclose(fp); }
 
     /* start sendrecv of global gauge field */
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     plaq = avr_plaquette();
     lprintf("IO", 0, "Configuration [%s] read.  Plaquette=%e\n", filename, plaq);
@@ -336,8 +336,8 @@ void read_gauge_field_eolexi_LE(char filename[]) {
     if (PID == 0) { fclose(fp); }
 
     /* start sendrecv of global gauge field */
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     plaq = avr_plaquette();
     lprintf("IO", 0, "Configuration [%s] read.  Plaquette=%e\n", filename, plaq);

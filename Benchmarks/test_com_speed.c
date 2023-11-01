@@ -27,28 +27,28 @@ static void random_g(suNg_field *g) {
     }
 }
 
-static void transform(suNg_field *gtransf, suNg_field *gfield) {
+static void transform(suNg_field *gtransf, suNg_field *suNg_field) {
     _MASTER_FOR(&glattice, ix) {
         for (int mu = 0; mu < 4; mu++) {
             int iy = iup(ix, mu);
-            suNg *u = _4FIELD_AT(gfield, ix, mu);
+            suNg *u = _4FIELD_AT(suNg_field, ix, mu);
             suNg v;
             _suNg_times_suNg_dagger(v, *u, *_FIELD_AT(gtransf, iy));
             _suNg_times_suNg(*u, *_FIELD_AT(gtransf, ix), v);
         }
     }
 
-    start_sendrecv_gfield(gfield);
-    complete_sendrecv_gfield(gfield);
+    start_sendrecv_suNg_field(suNg_field);
+    complete_sendrecv_suNg_field(suNg_field);
 }
 
-static void transform_s(suNg_field *gfield, spinor_field *in) {
+static void transform_s(suNg_field *suNg_field, spinor_field *in) {
     suNf_vector tmp1, tmp2, tmp3, tmp4;
     suNf gfx;
     _MASTER_FOR(&glattice, ix) {
         suNf_spinor *s = _FIELD_AT(in, ix);
 
-        _group_represent2(&gfx, _FIELD_AT(gfield, ix));
+        _group_represent2(&gfx, _FIELD_AT(suNg_field, ix));
 
         _suNf_multiply(tmp1, gfx, s->c[0]);
         _suNf_multiply(tmp2, gfx, s->c[1]);
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     start_sendrecv_gtransf(g);
     complete_sendrecv_gtransf(g);
 
-    s1 = alloc_spinor_field_f(1, &glattice);
+    s1 = alloc_spinor_field(1, &glattice);
 
     gaussian_spinor_field(s1);
 
@@ -105,9 +105,9 @@ int main(int argc, char *argv[]) {
 
     //warmup
     for (k = 0; k < 20; k++) {
-        start_sendrecv_gfield(u_gauge);
+        start_sendrecv_suNg_field(u_gauge);
 
-        complete_sendrecv_gfield(u_gauge);
+        complete_sendrecv_suNg_field(u_gauge);
     }
 
     MPI_Barrier(GLB_COMM);
@@ -118,9 +118,9 @@ int main(int argc, char *argv[]) {
     for (k = 0; k < repts; k++) {
         gettimeofday(&start, 0);
 
-        start_sendrecv_gfield(u_gauge);
+        start_sendrecv_suNg_field(u_gauge);
 
-        complete_sendrecv_gfield(u_gauge);
+        complete_sendrecv_suNg_field(u_gauge);
 
         gettimeofday(&end, 0);
         transform(g, u_gauge);
@@ -148,9 +148,9 @@ int main(int argc, char *argv[]) {
     for (k = 0; k < repts; k++) {
         gettimeofday(&start, 0);
 
-        start_sendrecv_spinor_field_f(s1);
+        start_sendrecv_spinor_field(s1);
 
-        complete_sendrecv_spinor_field_f(s1);
+        complete_sendrecv_spinor_field(s1);
 
         gettimeofday(&end, 0);
         transform_s(g, s1);
@@ -284,7 +284,7 @@ int main(int argc, char *argv[]) {
         elapsed_var = 0.;
         for (i = 0; i < repts; i++) {
             tmp = 0;
-            start_sendrecv_spinor_field_f(s1);
+            start_sendrecv_spinor_field(s1);
             for (j = 0; j < steps[k]; j++) {
                 for (l = 0; l < singlestep / 2; l++) {
                     tmp = tmp + l * 0.0000021234512;
@@ -292,7 +292,7 @@ int main(int argc, char *argv[]) {
             }
 
             gettimeofday(&start, 0);
-            complete_sendrecv_spinor_field_f(s1);
+            complete_sendrecv_spinor_field(s1);
             gettimeofday(&end, 0);
             transform_s(g, s1);
 
@@ -322,14 +322,14 @@ int main(int argc, char *argv[]) {
         for (i = 0; i < repts; i++) {
             tmp = 0;
             gettimeofday(&start, 0);
-            start_sendrecv_spinor_field_f(s1);
+            start_sendrecv_spinor_field(s1);
             for (j = 0; j < steps[k]; j++) {
                 for (l = 0; l < singlestep / 2; l++) {
                     tmp = tmp + l * 0.00021234512;
                 }
             }
 
-            complete_sendrecv_spinor_field_f(s1);
+            complete_sendrecv_spinor_field(s1);
             gettimeofday(&end, 0);
             transform_s(g, s1);
 
@@ -359,7 +359,7 @@ int main(int argc, char *argv[]) {
         elapsed_var = 0.;
         for (i = 0; i < repts; i++) {
             tmp = 0;
-            start_sendrecv_gfield(u_gauge);
+            start_sendrecv_suNg_field(u_gauge);
             for (j = 0; j < steps[k]; j++) {
                 for (l = 0; l < singlestep / 2; l++) {
                     tmp = tmp + l * 0.00021234512;
@@ -367,7 +367,7 @@ int main(int argc, char *argv[]) {
             }
 
             gettimeofday(&start, 0);
-            complete_sendrecv_gfield(u_gauge);
+            complete_sendrecv_suNg_field(u_gauge);
             gettimeofday(&end, 0);
             transform(g, u_gauge);
 
@@ -396,14 +396,14 @@ int main(int argc, char *argv[]) {
         for (i = 0; i < repts; i++) {
             tmp = 0;
             gettimeofday(&start, 0);
-            start_sendrecv_gfield(u_gauge);
+            start_sendrecv_suNg_field(u_gauge);
             for (j = 0; j < steps[k]; j++) {
                 for (l = 0; l < singlestep / 2; l++) {
                     tmp = tmp + l * 0.00021234512;
                 }
             }
 
-            complete_sendrecv_gfield(u_gauge);
+            complete_sendrecv_suNg_field(u_gauge);
             gettimeofday(&end, 0);
             transform(g, u_gauge);
 

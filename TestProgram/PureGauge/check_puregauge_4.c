@@ -8,7 +8,7 @@
 
 #define blk_level 7
 
-static suNg_field *g;
+static gtransf *g;
 
 static void random_g(void) {
     _MASTER_FOR(&glattice, ix) {
@@ -105,7 +105,7 @@ static void transform_u(void) {
         }
     }
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
     // smear_gauge_field();
 }
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n");
     lprintf("MAIN", 0, "\n\n");

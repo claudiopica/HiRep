@@ -8,9 +8,6 @@
 #if !defined _FIELD_NAME_READABLE
 #error Missing _FIELD_NAME_READABLE in communications.h
 #endif
-#if !defined _FIELD_NAME
-#error Missing _FIELD_NAME in communications.h
-#endif
 #if !defined _FIELD_TYPE
 #error Missing _FIELD_TYPE in communications.h
 #endif
@@ -21,17 +18,16 @@
  * @param _FIELD_TYPE*	    _FIELD_NAME_READABLE that needs to be synchronized 
  *                          across nodes
  */
-void _F_NAME(complete_sendrecv_reduced_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(complete_sendrecv_reduced_, _FIELD_TYPE)(_FIELD_TYPE *);
 /**
  * @brief Fill buffers and start MPI requests to send and receive.
  *
  * @param _FIELD_TYPE*		_FIELD_NAME_READABLE that needs to be synchronized
  *                          across nodes
  */
-void _F_NAME(start_sendrecv_reduced_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(start_sendrecv_reduced_, _FIELD_TYPE)(_FIELD_TYPE *);
 
-void _F_NAME(sync_reduced_init_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(sync_reduced_init_, _FIELD_TYPE)(_FIELD_TYPE *);
 
 #undef _FIELD_NAME_READABLE
-#undef _FIELD_NAME
 #undef _FIELD_TYPE

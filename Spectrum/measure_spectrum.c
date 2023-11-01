@@ -202,8 +202,8 @@ int main(int argc, char *argv[]) {
 
     if (strcmp(ff_var.make, "true") == 0) {
         four_fermion_active = 1;
-        ff_sigma = alloc_sfield(1, &glattice);
-        ff_pi = alloc_sfield(1, &glattice);
+        ff_sigma = alloc_scalar_field(1, &glattice);
+        ff_pi = alloc_scalar_field(1, &glattice);
     }
 
     init_discon_correlators();
@@ -304,9 +304,9 @@ int main(int argc, char *argv[]) {
 
     if (four_fermion_active == 1) { free_triplet_discon_observables(); }
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_gfield_f(u_gauge_f);
+    free_suNf_field(u_gauge_f);
 #endif
 
     finalize_process();

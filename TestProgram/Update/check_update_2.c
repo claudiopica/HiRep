@@ -25,7 +25,7 @@ hmc_flow flow = init_hmc_flow(flow);
 ### this might have to be changed  if update_ghmc is modified.
 */
 
-void clover_field_copy(suNf_field *g1, suNf_field *g2) {
+void clover_field_copy(clover_force *g1, clover_force *g2) {
 #ifdef CHECK_SPINOR_MATCHING
     _TWO_SPINORS_MATCHING(g1, g2);
 #endif
@@ -45,8 +45,8 @@ int main(int argc, char *argv[]) {
 #ifdef WITH_EXPCLOVER
     // This is the check of the exponential clover term
 
-    spinor_field *Xl = alloc_spinor_field_f(1, &glattice);
-    spinor_field *Yl = alloc_spinor_field_f(1, &glattice);
+    spinor_field *Xl = alloc_spinor_field(1, &glattice);
+    spinor_field *Yl = alloc_spinor_field(1, &glattice);
 
     create_z2_volume_source(Xl);
     create_z2_volume_source(Yl);
@@ -54,7 +54,7 @@ int main(int argc, char *argv[]) {
     fermion_force_begin();
     force_clover_fermion_taylor(Xl, Yl, 1.0);
 
-    suNf_field *cl_force2;
+    clover_force *cl_force2;
     cl_force2 = alloc_clover_force(&glattice);
     clover_field_copy(cl_force2, cl_force);
 

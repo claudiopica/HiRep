@@ -88,7 +88,7 @@ void init_modenumber(double m, double inv, int nh, char *approxfile) {
   lprintf("PROJCORRELATOR",0,"Ratio of eigenvalues for correlator = %e\n",ratio);
 */
 
-    x = alloc_spinor_field_f(7, &glattice);
+    x = alloc_spinor_field(7, &glattice);
     w0 = x + 2;
     w1 = x + 3;
     w2 = x + 4;
@@ -100,7 +100,7 @@ void init_modenumber(double m, double inv, int nh, char *approxfile) {
 void free_modenumber() {
     error(init == 0, 1, "modenumber.c", "Not initialized!");
     free(par.shift);
-    free_spinor_field_f(x);
+    free_spinor_field(x);
     init = 0;
 }
 

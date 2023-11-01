@@ -13,12 +13,12 @@ int main(int argc, char *argv[]) {
     setup_process(&argc, &argv);
     setup_gauge_fields();
 
-    suNg_field *h_gauge = alloc_gfield(&glattice);
+    suNg_field *h_gauge = alloc_suNg_field(&glattice);
     suNg *poly = amalloc(sizeof(suNg) * X * Y * Z, ALIGN);
 
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     double st_plaq_ave;
     double st_plaq[3];
@@ -109,8 +109,8 @@ int main(int argc, char *argv[]) {
 
     WL_free();
 
-    free_gfield(u_gauge);
-    free_gfield(h_gauge);
+    free_suNg_field(u_gauge);
+    free_suNg_field(h_gauge);
     afree(poly);
 
     afree(WL[0]);

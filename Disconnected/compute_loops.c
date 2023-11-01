@@ -127,9 +127,9 @@ int main(int argc, char *argv[]) {
 
     free_BCs();
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_gfield_f(u_gauge_f);
+    free_suNf_field(u_gauge_f);
 #endif
 
     /* close communications */

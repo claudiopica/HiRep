@@ -45,23 +45,23 @@ static spinor_field *etmp2 = NULL;
 
 static void free_mem() {
     if (gtmp != NULL) {
-        free_spinor_field_f(gtmp);
+        free_spinor_field(gtmp);
         gtmp = NULL;
     }
     if (etmp != NULL) {
-        free_spinor_field_f(etmp);
+        free_spinor_field(etmp);
         etmp = NULL;
     }
     if (etmp2 != NULL) {
-        free_spinor_field_f(etmp2);
+        free_spinor_field(etmp2);
         etmp2 = NULL;
     }
     if (otmp != NULL) {
-        free_spinor_field_f(otmp);
+        free_spinor_field(otmp);
         otmp = NULL;
     }
     if (otmp2 != NULL) {
-        free_spinor_field_f(otmp2);
+        free_spinor_field(otmp2);
         otmp2 = NULL;
     }
     init_dirac = 1;
@@ -69,17 +69,17 @@ static void free_mem() {
 
 static void init_Dirac() {
     if (init_dirac) {
-        gtmp = alloc_spinor_field_f(1, &glattice);
-        etmp = alloc_spinor_field_f(1, &glat_even);
-        etmp2 = alloc_spinor_field_f(1, &glat_even);
-        otmp = alloc_spinor_field_f(1, &glat_odd);
+        gtmp = alloc_spinor_field(1, &glattice);
+        etmp = alloc_spinor_field(1, &glat_even);
+        etmp2 = alloc_spinor_field(1, &glat_even);
+        otmp = alloc_spinor_field(1, &glat_odd);
         atexit(&free_mem);
         init_dirac = 0;
     }
 }
 static void init_Dirac_tm() {
     if (init_dirac_tm) {
-        otmp2 = alloc_spinor_field_f(1, &glat_odd);
+        otmp2 = alloc_spinor_field(1, &glat_odd);
         atexit(&free_mem);
         init_dirac_tm = 0;
     }
@@ -367,7 +367,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in) {
 
     /* start communication of input spinor field */
 #ifdef WITH_MPI
-    start_sendrecv_spinor_field_f(in);
+    start_sendrecv_spinor_field(in);
 #endif
 
     /************************ loop over all lattice sites *************************/
@@ -432,7 +432,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in) {
         if (!repeat) {
             // lprintf("MAIN", 0, "Doing complete sendrecv repeat=%d\n",repeat);
             /* wait for spinor to be transfered */
-            complete_sendrecv_spinor_field_f(in);
+            complete_sendrecv_spinor_field(in);
         }
 #endif
     }
@@ -452,7 +452,7 @@ void Dphi_cpu_new_(spinor_field *restrict out, spinor_field *restrict in) {
     /************************ loop over all lattice sites *************************/
     /* start communication of input spinor field */
 #ifdef WITH_MPI
-    start_sendrecv_spinor_field_f(in);
+    start_sendrecv_spinor_field(in);
 #endif
 
     // we repeat the loop over the master lattice twice
@@ -510,7 +510,7 @@ void Dphi_cpu_new_(spinor_field *restrict out, spinor_field *restrict in) {
 #ifdef WITH_MPI
     // lprintf("MAIN", 0, "Doing complete sendrecv repeat=%d\n",repeat);
     /* wait for spinor to be transfered */
-    complete_sendrecv_spinor_field_f(in);
+    complete_sendrecv_spinor_field(in);
 #endif
 
     // loop over receive buffers
@@ -615,13 +615,13 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in) {
 
     /************************ loop over all lattice sites *************************/
     /* start communication of input spinor field */
-    start_sendrecv_spinor_field_f(in);
+    start_sendrecv_spinor_field(in);
 
     _PIECE_FOR(out->type, ixp) {
 #ifdef WITH_MPI
         if (ixp == out->type->inner_master_pieces) {
             /* wait for spinor to be transfered */
-            complete_sendrecv_spinor_field_f(in);
+            complete_sendrecv_spinor_field(in);
         }
 #endif
 
@@ -782,7 +782,7 @@ void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in) {
     /************************ loop over all lattice sites *************************/
     /* start communication of input spinor field */
     _OMP_PRAGMA(master) {
-        start_sendrecv_spinor_field_f(in);
+        start_sendrecv_spinor_field(in);
     }
 
     int iy;
@@ -932,7 +932,7 @@ void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in) {
 #ifdef WITH_MPI
 
     _OMP_PRAGMA(master) {
-        complete_sendrecv_spinor_field_f(in);
+        complete_sendrecv_spinor_field(in);
     }
     _OMP_BARRIER
 #endif

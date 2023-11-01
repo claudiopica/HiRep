@@ -749,10 +749,10 @@ void force_fermion_core_cpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_od
 #endif //UPDATE_EO
 
     // Communicate spinor field
-    start_sendrecv_spinor_field_f(Xs);
-    complete_sendrecv_spinor_field_f(Xs);
-    start_sendrecv_spinor_field_f(Ys);
-    complete_sendrecv_spinor_field_f(Ys);
+    start_sendrecv_spinor_field(Xs);
+    complete_sendrecv_spinor_field(Xs);
+    start_sendrecv_spinor_field(Ys);
+    complete_sendrecv_spinor_field(Ys);
 
     // HERE!!!!!
 #if defined(WITH_CLOVER)
@@ -875,8 +875,8 @@ void force_fermion_core_cpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_od
 #endif
 
     // Communicate spinor field
-    start_sendrecv_spinor_field_f(Xs);
-    start_sendrecv_spinor_field_f(Ys);
+    start_sendrecv_spinor_field(Xs);
+    start_sendrecv_spinor_field(Ys);
 
     // HERE!!!!!
 #if defined(WITH_CLOVER)
@@ -896,8 +896,8 @@ void force_fermion_core_cpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_od
     _PIECE_FOR(&glattice, xp) {
         if (xp == glattice.inner_master_pieces) {
             _OMP_PRAGMA(master) {
-                complete_sendrecv_spinor_field_f(Xs);
-                complete_sendrecv_spinor_field_f(Ys);
+                complete_sendrecv_spinor_field(Xs);
+                complete_sendrecv_spinor_field(Ys);
             }
             _OMP_PRAGMA(barrier)
         }

@@ -51,7 +51,7 @@ static int MINRES_mshift_core(short int *flags, mshift_par *par, spinor_operator
    * objects of the same type are allocated together
    */
 
-    memall = alloc_spinor_field_f(2 * (par->n) + 3, in->type);
+    memall = alloc_spinor_field(2 * (par->n) + 3, in->type);
     q1 = (spinor_field **)malloc(sizeof(spinor_field *) * par->n);
     q2 = (spinor_field **)malloc(sizeof(spinor_field *) * par->n);
     for (i = 0; i < par->n; i++) {
@@ -182,7 +182,7 @@ static int MINRES_mshift_core(short int *flags, mshift_par *par, spinor_operator
     }
 
     /* free memory */
-    free_spinor_field_f(memall);
+    free_spinor_field(memall);
     free(q1);
     free(q2);
     free(r);

@@ -6,25 +6,25 @@
 
 #include "libhr.h"
 
-static void random_g(suNg_field *g) {
+static void random_g(gtransf *g) {
     _MASTER_FOR(&glattice, ix) {
         random_suNg(_FIELD_AT(g, ix));
     }
 }
 
-static void transform(suNg_field *gtransf, suNg_field *gfield) {
+static void transform(gtransf *gtransf, suNg_field *suNg_field) {
     _MASTER_FOR(&glattice, ix) {
         for (int mu = 0; mu < 4; mu++) {
             int iy = iup(ix, mu);
-            suNg *u = _4FIELD_AT(gfield, ix, mu);
+            suNg *u = _4FIELD_AT(suNg_field, ix, mu);
             suNg v;
             _suNg_times_suNg_dagger(v, *u, *_FIELD_AT(gtransf, iy));
             _suNg_times_suNg(*u, *_FIELD_AT(gtransf, ix), v);
         }
     }
 
-    start_sendrecv_gfield(gfield);
-    complete_sendrecv_gfield(gfield);
+    start_sendrecv_suNg_field(suNg_field);
+    complete_sendrecv_suNg_field(suNg_field);
 }
 
 int main(int argc, char *argv[]) {
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 
     suNg_field *u_gauge_1;
     suNg_field *u_gauge_2;
-    suNg_field *g;
+    gtransf *g;
 
     double norm, tmp;
     double weight[3] = { 0.6, 0.4, 0.3 };
@@ -59,15 +59,15 @@ int main(int argc, char *argv[]) {
 
     /* alloc additional global gauge fields */
 
-    u_gauge_1 = alloc_gfield(&glattice);
-    u_gauge_2 = alloc_gfield(&glattice);
+    u_gauge_1 = alloc_suNg_field(&glattice);
+    u_gauge_2 = alloc_suNg_field(&glattice);
     g = alloc_gtransf(&glattice);
 
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     fflush(stdout);
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
     lprintf("MAIN", 0, "done.\n");
 
     lprintf("MAIN", 0, "Generating a random gauge transf... ");
@@ -101,10 +101,10 @@ int main(int argc, char *argv[]) {
         printf("Test failed ?\n");
         return_value += 1;
     }
-    free_gfield(u_gauge);
-    free_gfield(u_gauge_1);
-    free_gfield(u_gauge_2);
-    free_gfield(g);
+    free_suNg_field(u_gauge);
+    free_suNg_field(u_gauge_1);
+    free_suNg_field(u_gauge_2);
+    free_gtransf(g);
 
     finalize_process();
     return return_value;

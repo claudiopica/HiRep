@@ -298,7 +298,7 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile) {
         break;
     }
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
 
     apply_BCs_on_fundamental_gauge_field();
 

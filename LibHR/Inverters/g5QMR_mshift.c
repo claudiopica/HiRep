@@ -67,7 +67,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
     /* implementation note: to minimize the number of malloc calls
   * objects of the same type are allocated together
   */
-    memall = alloc_spinor_field_f(2 * (par->n) + 3, in->type);
+    memall = alloc_spinor_field(2 * (par->n) + 3, in->type);
     q1 = (spinor_field **)malloc(sizeof(spinor_field *) * par->n);
     q2 = (spinor_field **)malloc(sizeof(spinor_field *) * par->n);
     for (int i = 0; i < par->n; i++) {
@@ -227,7 +227,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
     }
 
     /* free memory */
-    free_spinor_field_f(memall);
+    free_spinor_field(memall);
     free(q1);
     free(q2);
     free(r);
@@ -261,7 +261,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
     /* implementation note: to minimize the number of malloc calls
   * objects of the same type are allocated together
   */
-    memall = alloc_spinor_field_f_flt(2 + 3, in->type);
+    memall = alloc_spinor_field_flt(2 + 3, in->type);
     q1 = memall;
     q2 = q1 + 1;
     p1 = q2 + 1;
@@ -269,7 +269,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
     Mp = p2 + 1;
 
 #ifndef NDEBUG
-    spinor_field_flt *sdbg = alloc_spinor_field_f_flt(1, in->type);
+    spinor_field_flt *sdbg = alloc_spinor_field_flt(1, in->type);
 #endif
 
     /* init recursion */
@@ -411,10 +411,10 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
     }
 
     /* free memory */
-    free_spinor_field_f_flt(memall);
+    free_spinor_field_flt(memall);
 
 #ifndef NDEBUG
-    free_spinor_field_f_flt(sdbg);
+    free_spinor_field_flt(sdbg);
 #endif
 
     /* return number of cg iter */
@@ -507,8 +507,8 @@ int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M
     spinor_field *res;
     double err2, innorm2;
 
-    res = alloc_spinor_field_f(1, in->type);
-    in_flt = alloc_spinor_field_f_flt(3, in->type);
+    res = alloc_spinor_field(1, in->type);
+    in_flt = alloc_spinor_field_flt(3, in->type);
     out_flt = in_flt + 1;
     res_flt = out_flt + 1;
     innorm2 = spinor_field_sqnorm_f(in);
@@ -571,8 +571,8 @@ int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M
     lprintf("INVERTER", 10, "g5QMR_fltacc: cgiter (g5QMR_flt,g5QMR,MINRES) = %d ; %d ; %d\n", cgiter_flt, cgiter,
             cgiter_minres);
 
-    free_spinor_field_f(res);
-    free_spinor_field_f_flt(in_flt);
+    free_spinor_field(res);
+    free_spinor_field_flt(in_flt);
 
     return cgiter_flt + cgiter_minres;
 }

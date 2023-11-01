@@ -27,10 +27,10 @@ int main(int argc, char *argv[]) {
     setup_random_gauge_fields();
     setup_clover();
 
-    spinor_field_flt *in = alloc_spinor_field_f_flt(ninputs + noutputs, &glattice);
+    spinor_field_flt *in = alloc_spinor_field_flt(ninputs + noutputs, &glattice);
     setup_random_fields_flt(ninputs + noutputs, in);
 
-    u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
+    u_gauge_f_flt = alloc_suNf_field_flt(&glattice);
 
     lprintf("LA TEST", 0, "Speedtesting application of single precision clover-improved dirac operator\n");
     int flopsite = flops_per_site(CPHI_FLT);
@@ -53,9 +53,9 @@ int main(int argc, char *argv[]) {
     _WARMUP_SPEEDTEST(clock, n_warmup, time_target, n_reps, __cphi_inv_);
     _RUN_SPEEDTEST(clock, n_warmup, time_target, n_reps, flopsite, bytesite, __cphi_inv_);
 
-    free_spinor_field_f_flt(in);
-    free_gfield_f_flt(u_gauge_f_flt);
-    free_gfield_flt(u_gauge_flt);
+    free_spinor_field_flt(in);
+    free_suNf_field_flt(u_gauge_f_flt);
+    free_suNg_field_flt(u_gauge_flt);
     finalize_process();
     return 0;
 }

@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     setup_random_gauge_fields();
     setup_clover();
 
-    spinor_field *in = alloc_spinor_field_f(ninputs + noutputs, &glattice);
+    spinor_field *in = alloc_spinor_field(ninputs + noutputs, &glattice);
     setup_random_fields(ninputs + noutputs, in);
 
     lprintf("LA TEST", 0, "Speedtesting application of clover-improved dirac operator\n");
@@ -53,7 +53,7 @@ int main(int argc, char *argv[]) {
     //measure timer resolution
     evaluate_timer_resolution(clock);
 
-    free_spinor_field_f(in);
+    free_spinor_field(in);
     finalize_process();
     return 0;
 }

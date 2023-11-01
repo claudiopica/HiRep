@@ -7,7 +7,7 @@
 #include "libhr.h"
 
 static double hmass = 0.1;
-static suNg_field *g;
+static gtransf *g;
 
 static void loc_D(spinor_field *out, spinor_field *in) {
     Dphi(hmass, out, in);
@@ -29,10 +29,10 @@ static void random_g(void) {
 
 static void transform_u(void) {
 #ifdef WITH_GPU
-    copy_from_gpu_gfield(u_gauge);
+    copy_from_gpu_suNg_field(u_gauge);
     copy_from_gpu_gtransf(g);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
     start_sendrecv_gtransf(g);
     complete_sendrecv_gtransf(g);
 #endif
@@ -52,18 +52,18 @@ static void transform_u(void) {
     }
 
 #ifdef WITH_GPU
-    copy_to_gpu_gfield(u_gauge);
+    copy_to_gpu_suNg_field(u_gauge);
     copy_to_gpu_gtransf(g);
 #endif
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
     smear_gauge_field();
 }
 
 static void transform_s(spinor_field *out, spinor_field *in) {
 #ifdef WITH_GPU
-    copy_from_gpu_spinor_field_f(in);
+    copy_from_gpu_spinor_field(in);
 #endif
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(&glattice, ix) {
@@ -84,7 +84,7 @@ static void transform_s(spinor_field *out, spinor_field *in) {
     }
 
 #ifdef WITH_GPU
-    copy_to_gpu_spinor_field_f(out);
+    copy_to_gpu_spinor_field(out);
 #endif
 }
 
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 
     /* allocate additional memory */
     g = alloc_gtransf(&glattice);
-    s0 = alloc_spinor_field_f(4, &glattice);
+    s0 = alloc_spinor_field(4, &glattice);
     s1 = s0 + 1;
     s2 = s1 + 1;
     s3 = s2 + 1;
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]) {
 
     if (sqrt(sig) < 10.e-14) { return_value = 0; }
 
-    free_spinor_field_f(s0);
+    free_spinor_field(s0);
 
     free_gtransf(g);
 

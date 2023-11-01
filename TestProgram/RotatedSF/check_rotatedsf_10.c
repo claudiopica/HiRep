@@ -62,10 +62,10 @@ int main(int argc, char *argv[]) {
 
     lprintf("MAIN", 0, "This test implements a comparison with a working code of Stefan Sint\n");
 
-    u_gauge = alloc_gfield(&glattice);
-    u_gauge_f = alloc_gfield_f(&glattice);
+    u_gauge = alloc_suNg_field(&glattice);
+    u_gauge_f = alloc_suNf_field(&glattice);
 
-    read_gauge_field_nocheck("gfield_sint_2.dat");
+    read_gauge_field_nocheck("suNg_field_sint_2.dat");
 
     apply_BCs_on_fundamental_gauge_field();
 
@@ -78,8 +78,8 @@ int main(int argc, char *argv[]) {
 
     SF_PCAC_wall_corr(mass, acc, NULL);
 
-    free_gfield(u_gauge);
-    free_gfield_f(u_gauge_f);
+    free_suNg_field(u_gauge);
+    free_suNf_field(u_gauge_f);
 
     free_BCs();
     finalize_process();

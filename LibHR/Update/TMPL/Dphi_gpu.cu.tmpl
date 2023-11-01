@@ -21,9 +21,6 @@
 #if !defined(_FIELD_TYPE)
 #error Missing _FIELD_TYPE in Dphi_gpu.cu
 #endif
-#if !defined(_FIELD_NAME)
-#error Missing _FIELD_NAME in Dphi_gpu.cu
-#endif
 #if !defined(_SPINOR_TYPE)
 #error Missing _SPINOR_TYPE in Dphi_gpu.cu
 #endif
@@ -111,15 +108,15 @@ _DECLARE(void, resetMVM, ()) {
  */
 _DECLARE(static void, free_mem, ()) {
     if (_VAR(gtmp, _SUFFIX) != NULL) {
-        _F_NAME(free_, _FIELD_NAME)(_VAR(gtmp, _SUFFIX));
+        _F_NAME(free_, _FIELD_TYPE)(_VAR(gtmp, _SUFFIX));
         _VAR(etmp, _SUFFIX) = NULL;
     }
     if (_VAR(etmp, _SUFFIX) != NULL) {
-        _F_NAME(free_, _FIELD_NAME)(_VAR(etmp, _SUFFIX));
+        _F_NAME(free_, _FIELD_TYPE)(_VAR(etmp, _SUFFIX));
         _VAR(etmp, _SUFFIX) = NULL;
     }
     if (_VAR(otmp, _SUFFIX) != NULL) {
-        _F_NAME(free_, _FIELD_NAME)(_VAR(otmp, _SUFFIX));
+        _F_NAME(free_, _FIELD_TYPE)(_VAR(otmp, _SUFFIX));
         _VAR(otmp, _SUFFIX) = NULL;
     }
     _VAR(init, _SUFFIX) = 1;
@@ -140,9 +137,9 @@ _DECLARE(static void, init_Dirac, ()) {
         std_comm_t = GPU_COMM;
         alloc_mem_t = GPU_MEM;
 
-        _VAR(gtmp, _SUFFIX) = _F_NAME(alloc_, _FIELD_NAME)(1, &glattice);
-        _VAR(etmp, _SUFFIX) = _F_NAME(alloc_, _FIELD_NAME)(1, &glat_even);
-        _VAR(otmp, _SUFFIX) = _F_NAME(alloc_, _FIELD_NAME)(1, &glat_odd);
+        _VAR(gtmp, _SUFFIX) = _F_NAME(alloc_, _FIELD_TYPE)(1, &glattice);
+        _VAR(etmp, _SUFFIX) = _F_NAME(alloc_, _FIELD_TYPE)(1, &glat_even);
+        _VAR(otmp, _SUFFIX) = _F_NAME(alloc_, _FIELD_TYPE)(1, &glat_odd);
 
         // Reset standard communication and allocation mode
         alloc_mem_t = std_mem_t;
@@ -252,15 +249,15 @@ void _GPU_F_NAME_(Dphi, _SUFFIX)(_FIELD_TYPE *out, _FIELD_TYPE *in) {
     //init_bc_gpu();
     if (_VAR(init, _SUFFIX)) { _GPU_F_NAME(init_Dirac, _SUFFIX)(); }
 
-    _F_NAME(sync_reduced_init_, _FIELD_NAME)(in);
+    _F_NAME(sync_reduced_init_, _FIELD_TYPE)(in);
     _GPU_F_NAME(Dphi_inner_init, _SUFFIX)(out, in);
 
 #ifdef WITH_MPI
-    _F_NAME(start_sendrecv_reduced_, _FIELD_NAME)(in);
+    _F_NAME(start_sendrecv_reduced_, _FIELD_TYPE)(in);
 #endif
     _GPU_F_NAME(Dphi_inner, _SUFFIX)(out, in);
 #ifdef WITH_MPI
-    _F_NAME(complete_sendrecv_reduced_, _FIELD_NAME)(in);
+    _F_NAME(complete_sendrecv_reduced_, _FIELD_TYPE)(in);
     _GPU_F_NAME(Dphi_boundary, _SUFFIX)(out, in);
 #endif
     cudaDeviceSynchronize();
@@ -283,11 +280,11 @@ void _GPU_F_NAME_(Cphi_inv, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE
     mass = (4. + mass);
     compute_ldl_decomp(mass);
 
-    _F_NAME(start_sendrecv_, _FIELD_NAME)(sptr);
-    _F_NAME(complete_sendrecv_, _FIELD_NAME)(sptr);
+    _F_NAME(start_sendrecv_, _FIELD_TYPE)(sptr);
+    _F_NAME(complete_sendrecv_, _FIELD_TYPE)(sptr);
 
-    start_sendrecv_clover_ldl(cl_ldl);
-    complete_sendrecv_clover_ldl(cl_ldl);
+    start_sendrecv_ldl_field(cl_ldl);
+    complete_sendrecv_ldl_field(cl_ldl);
 
     _PIECE_FOR(sptr->type, ixp) {
         const int N = sptr->type->master_end[ixp] - sptr->type->master_start[ixp] + 1;
@@ -513,7 +510,6 @@ _ALIAS_INNER_(void, Cphi, _SUFFIX, (double mass, _FIELD_TYPE *, _FIELD_TYPE *, i
 #undef _COMPLEX
 #undef _GAUGE_TYPE
 #undef _SUFFIX
-#undef _FIELD_NAME
 #undef _REP_SUFFIX
 #undef _REAL
 #undef _SUNFC

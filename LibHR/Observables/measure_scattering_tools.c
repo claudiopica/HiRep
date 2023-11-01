@@ -180,9 +180,9 @@ void free_mo(meson_observable *mo) {
  */
 void init_src_common_point(struct src_common *src, int tau) {
     // Malloc and initialise
-    src->src_0 = alloc_spinor_field_f(4, &glattice);
-    src->src_0_eta = alloc_spinor_field_f(4, &glattice);
-    src->src_0_0 = alloc_spinor_field_f(4, &glattice);
+    src->src_0 = alloc_spinor_field(4, &glattice);
+    src->src_0_eta = alloc_spinor_field(4, &glattice);
+    src->src_0_0 = alloc_spinor_field(4, &glattice);
     for (int i = 0; i < 4; i++) {
         spinor_field_zero_f(&(src->src_0[i]));
         spinor_field_zero_f(&(src->src_0_eta[i]));
@@ -201,9 +201,9 @@ void init_src_common_point(struct src_common *src, int tau) {
  */
 void init_src_common(struct src_common *src, int tau) {
     // Malloc and initialise
-    src->src_0 = alloc_spinor_field_f(4, &glattice);
-    src->src_0_eta = alloc_spinor_field_f(4, &glattice);
-    src->src_0_0 = alloc_spinor_field_f(4, &glattice);
+    src->src_0 = alloc_spinor_field(4, &glattice);
+    src->src_0_eta = alloc_spinor_field(4, &glattice);
+    src->src_0_0 = alloc_spinor_field(4, &glattice);
     for (int i = 0; i < 4; i++) {
         spinor_field_zero_f(&(src->src_0[i]));
         spinor_field_zero_f(&(src->src_0_eta[i]));
@@ -228,12 +228,12 @@ void init_src_p(struct src_p *srcp, struct src_common *src0, int px, int py, int
     srcp->p[1] = py;
     srcp->p[2] = pz;
 
-    srcp->src_p = alloc_spinor_field_f(4, &glattice);
-    srcp->src_mp = alloc_spinor_field_f(4, &glattice);
-    srcp->src_0_p = alloc_spinor_field_f(4, &glattice);
-    srcp->src_p_0 = alloc_spinor_field_f(4, &glattice);
-    srcp->src_0_mp = alloc_spinor_field_f(4, &glattice);
-    srcp->src_mp_0 = alloc_spinor_field_f(4, &glattice);
+    srcp->src_p = alloc_spinor_field(4, &glattice);
+    srcp->src_mp = alloc_spinor_field(4, &glattice);
+    srcp->src_0_p = alloc_spinor_field(4, &glattice);
+    srcp->src_p_0 = alloc_spinor_field(4, &glattice);
+    srcp->src_0_mp = alloc_spinor_field(4, &glattice);
+    srcp->src_mp_0 = alloc_spinor_field(4, &glattice);
 
     for (int i = 0; i < 4; i++) {
         spinor_field_zero_f(&(srcp->src_p[i]));
@@ -253,21 +253,21 @@ void init_src_p(struct src_p *srcp, struct src_common *src0, int px, int py, int
  * @brief Frees memory allocated by to src_common
  */
 void free_src_common(struct src_common *src) {
-    free_spinor_field_f(src->src_0);
-    free_spinor_field_f(src->src_0_eta);
-    free_spinor_field_f(src->src_0_0);
+    free_spinor_field(src->src_0);
+    free_spinor_field(src->src_0_eta);
+    free_spinor_field(src->src_0_0);
     lprintf("free_src_common", 0, "Freed memory\n");
 }
 /**
  * @brief Frees memory allocated by to src_p
  */
 void free_src_p(struct src_p *src) {
-    free_spinor_field_f(src->src_p);
-    free_spinor_field_f(src->src_mp);
-    free_spinor_field_f(src->src_p_0);
-    free_spinor_field_f(src->src_mp_0);
-    free_spinor_field_f(src->src_0_p);
-    free_spinor_field_f(src->src_0_mp);
+    free_spinor_field(src->src_p);
+    free_spinor_field(src->src_mp);
+    free_spinor_field(src->src_p_0);
+    free_spinor_field(src->src_mp_0);
+    free_spinor_field(src->src_0_p);
+    free_spinor_field(src->src_0_mp);
     lprintf("free_src_p", 0, "Freed memory\n");
 }
 
@@ -292,7 +292,7 @@ void make_propagator_P(spinor_field *prop, spinor_field *src, int ndilute, int t
  * @param tau origin time slice
  */
 void make_propagator_PA(spinor_field *prop, spinor_field *src, int ndilute, int tau) {
-    spinor_field *proptmp = alloc_spinor_field_f(4, &glattice);
+    spinor_field *proptmp = alloc_spinor_field(4, &glattice);
 
     calc_propagator(prop, src, ndilute);
     flip_T_bc(tau);
@@ -303,7 +303,7 @@ void make_propagator_PA(spinor_field *prop, spinor_field *src, int ndilute, int 
         spinor_field_mul_f(&prop[l], 0.5, &prop[l]);
     }
 
-    free_spinor_field_f(proptmp);
+    free_spinor_field(proptmp);
 }
 
 /**
@@ -324,12 +324,12 @@ void make_prop_common(struct prop_common *prop, struct src_common *src0, int ndi
         fun = &make_propagator_P;
     }
 
-    spinor_field *tmp = alloc_spinor_field_f(4, &glattice);
+    spinor_field *tmp = alloc_spinor_field(4, &glattice);
 
-    prop->Q_0 = alloc_spinor_field_f(4, &glattice);
-    prop->Q_0_eta = alloc_spinor_field_f(4, &glattice);
+    prop->Q_0 = alloc_spinor_field(4, &glattice);
+    prop->Q_0_eta = alloc_spinor_field(4, &glattice);
     prop->W_0_0 = (spinor_field **)malloc(GLB_T * sizeof(spinor_field *));
-    prop->W_0_0[0] = alloc_spinor_field_f(4 * GLB_T, &glattice);
+    prop->W_0_0[0] = alloc_spinor_field(4 * GLB_T, &glattice);
     for (int t = 1; t < GLB_T; t++) {
         prop->W_0_0[t] = prop->W_0_0[0] + 4 * t;
     }
@@ -349,7 +349,7 @@ void make_prop_common(struct prop_common *prop, struct src_common *src0, int ndi
         fun(prop->W_0_0[t], tmp, 4, tau);
     }
 
-    free_spinor_field_f(tmp);
+    free_spinor_field(tmp);
     create_sequential_source_stoch(src0->src_0_0, tau, prop->Q_0);
     lprintf("MAIN", 0, "Propagator with momentum 0 inverted\n");
 }
@@ -381,7 +381,7 @@ void make_prop_p(struct prop_p *prop, struct src_p *srcp, struct src_common *src
     X(W_p_0)     \
     X(W_mp_0)
 #define X(NAME)                                      \
-    prop->NAME = alloc_spinor_field_f(4, &glattice); \
+    prop->NAME = alloc_spinor_field(4, &glattice); \
     for (int i = 0; i < 4; i++)                      \
         spinor_field_zero_f(prop->NAME + i);
     PROPLIST
@@ -412,9 +412,9 @@ void make_prop_p(struct prop_p *prop, struct src_p *srcp, struct src_common *src
  * @brief Frees memory associated with zero-momentum propagator bundle
  */
 void free_prop_common(struct prop_common *prop) {
-    free_spinor_field_f(prop->Q_0);
-    free_spinor_field_f(prop->Q_0_eta);
-    free_spinor_field_f(prop->W_0_0[0]);
+    free_spinor_field(prop->Q_0);
+    free_spinor_field(prop->Q_0_eta);
+    free_spinor_field(prop->W_0_0[0]);
     free(prop->W_0_0);
     lprintf("free_prop_common", 0, "Freed memory\n");
 }
@@ -423,12 +423,12 @@ void free_prop_common(struct prop_common *prop) {
  * @brief Frees memory associated with momentum-p propagator bundle
  */
 void free_prop_p(struct prop_p *prop) {
-    free_spinor_field_f(prop->Q_p);
-    free_spinor_field_f(prop->Q_mp);
-    free_spinor_field_f(prop->W_0_p);
-    free_spinor_field_f(prop->W_0_mp);
-    free_spinor_field_f(prop->W_p_0);
-    free_spinor_field_f(prop->W_mp_0);
+    free_spinor_field(prop->Q_p);
+    free_spinor_field(prop->Q_mp);
+    free_spinor_field(prop->W_0_p);
+    free_spinor_field(prop->W_0_mp);
+    free_spinor_field(prop->W_p_0);
+    free_spinor_field(prop->W_mp_0);
     lprintf("free_prop_p", 0, "Freed memory\n");
 }
 
@@ -998,12 +998,12 @@ void measure_pion_scattering_I2(double *m, int numsources, double precision, cha
     meson_observable *pi1, *pi2;
     meson_observable *AD;
     meson_observable *BC;
-    spinor_field *source_ts1 = alloc_spinor_field_f(4, &glattice);
-    spinor_field *source_ts2 = alloc_spinor_field_f(4, &glattice);
+    spinor_field *source_ts1 = alloc_spinor_field(4, &glattice);
+    spinor_field *source_ts2 = alloc_spinor_field(4, &glattice);
     char auxname[256];
 
-    spinor_field *prop_ts1 = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop_ts2 = alloc_spinor_field_f(4, &glattice);
+    spinor_field *prop_ts1 = alloc_spinor_field(4, &glattice);
+    spinor_field *prop_ts2 = alloc_spinor_field(4, &glattice);
 
     pi1 = (meson_observable *)malloc(sizeof(meson_observable));
     pi2 = (meson_observable *)malloc(sizeof(meson_observable));
@@ -1114,10 +1114,10 @@ void measure_pion_scattering_I2(double *m, int numsources, double precision, cha
 
     //free memory
     free_propagator_eo();
-    free_spinor_field_f(source_ts1);
-    free_spinor_field_f(source_ts2);
-    free_spinor_field_f(prop_ts1);
-    free_spinor_field_f(prop_ts2);
+    free_spinor_field(source_ts1);
+    free_spinor_field(source_ts2);
+    free_spinor_field(prop_ts1);
+    free_spinor_field(prop_ts2);
     free_mo(pi1);
     free_mo(pi2);
     free_mo(AD);
@@ -1172,9 +1172,9 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
     meson_observable *V;
     meson_observable *disc;
     spinor_field **source_ts1;
-    spinor_field *source_ts2 = alloc_spinor_field_f(4, &glattice);
+    spinor_field *source_ts2 = alloc_spinor_field(4, &glattice);
     spinor_field ***prop_ts1;
-    spinor_field *prop_ts2 = alloc_spinor_field_f(4, &glattice);
+    spinor_field *prop_ts2 = alloc_spinor_field(4, &glattice);
     spinor_field *seq_0 = NULL;
     spinor_field *seq_t = NULL;
     spinor_field *seq_source = NULL;
@@ -1195,13 +1195,13 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 
     source_ts1 = (spinor_field **)malloc(sizeof(spinor_field *) * GLB_T);
     for (int t = 0; t < GLB_T; t++) {
-        source_ts1[t] = alloc_spinor_field_f(4, &glattice);
+        source_ts1[t] = alloc_spinor_field(4, &glattice);
     }
 
     if (seq_prop) { // if seq_prop==1
-        seq_0 = alloc_spinor_field_f(4, &glattice);
-        seq_t = alloc_spinor_field_f(4, &glattice);
-        seq_source = alloc_spinor_field_f(4, &glattice);
+        seq_0 = alloc_spinor_field(4, &glattice);
+        seq_t = alloc_spinor_field(4, &glattice);
+        seq_source = alloc_spinor_field(4, &glattice);
     }
 
     prop_ts1 = (spinor_field ***)malloc(sizeof(spinor_field **) * numsources);
@@ -1210,7 +1210,7 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
     }
     for (int src = 0; src < numsources; src++) {
         for (int t = 0; t < GLB_T; t++) {
-            prop_ts1[src][t] = alloc_spinor_field_f(4, &glattice);
+            prop_ts1[src][t] = alloc_spinor_field(4, &glattice);
         }
     }
 
@@ -1418,17 +1418,17 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
     //free memory
     free_propagator_eo();
     for (int t = 0; t < GLB_T; ++t) {
-        free_spinor_field_f(source_ts1[t]);
+        free_spinor_field(source_ts1[t]);
         for (int src = 0; src < numsources; ++src) {
-            free_spinor_field_f(prop_ts1[src][t]);
+            free_spinor_field(prop_ts1[src][t]);
         }
     }
-    free_spinor_field_f(source_ts2);
-    free_spinor_field_f(prop_ts2);
+    free_spinor_field(source_ts2);
+    free_spinor_field(prop_ts2);
     if (seq_prop) {
-        free_spinor_field_f(seq_0);
-        free_spinor_field_f(seq_t);
-        free_spinor_field_f(seq_source);
+        free_spinor_field(seq_0);
+        free_spinor_field(seq_t);
+        free_spinor_field(seq_source);
     }
 
     free_mo(pi1);
@@ -1452,13 +1452,13 @@ void measure_pion_scattering_I0_TS(double *m, int numsources, double precision, 
     int ts = 0;
     meson_observable *sigmaconn, *sigmadisc, *Tr;
 
-    spinor_field *source_disc = alloc_spinor_field_f(4, &glattice);
-    spinor_field *source_tri = alloc_spinor_field_f(4, &glattice);
-    spinor_field *source_seq = alloc_spinor_field_f(4, &glattice);
+    spinor_field *source_disc = alloc_spinor_field(4, &glattice);
+    spinor_field *source_tri = alloc_spinor_field(4, &glattice);
+    spinor_field *source_seq = alloc_spinor_field(4, &glattice);
 
-    spinor_field *prop_disc = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop_tri = alloc_spinor_field_f(4, &glattice);
-    spinor_field *seq_0 = alloc_spinor_field_f(4, &glattice);
+    spinor_field *prop_disc = alloc_spinor_field(4, &glattice);
+    spinor_field *prop_tri = alloc_spinor_field(4, &glattice);
+    spinor_field *seq_0 = alloc_spinor_field(4, &glattice);
 
     sigmaconn = (meson_observable *)malloc(sizeof(meson_observable));
     sigmadisc = (meson_observable *)malloc(sizeof(meson_observable));
@@ -1526,12 +1526,12 @@ void measure_pion_scattering_I0_TS(double *m, int numsources, double precision, 
     }
 
     //free memory
-    free_spinor_field_f(source_disc);
-    free_spinor_field_f(source_tri);
-    free_spinor_field_f(source_seq);
-    free_spinor_field_f(prop_disc);
-    free_spinor_field_f(prop_tri);
-    free_spinor_field_f(seq_0);
+    free_spinor_field(source_disc);
+    free_spinor_field(source_tri);
+    free_spinor_field(source_seq);
+    free_spinor_field(prop_disc);
+    free_spinor_field(prop_tri);
+    free_spinor_field(seq_0);
 
     free_mo(sigmaconn);
     free_mo(sigmadisc);

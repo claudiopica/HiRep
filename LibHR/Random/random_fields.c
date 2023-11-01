@@ -33,10 +33,10 @@ void random_u(suNg_field *gf) {
     }
 
 #ifdef WITH_GPU
-    copy_to_gpu_gfield(gf);
+    copy_to_gpu_suNg_field(gf);
 #endif
 
-    start_sendrecv_gfield(gf);
+    start_sendrecv_suNg_field(gf);
 }
 
 void random_u_f(suNf_field *gf) {
@@ -56,10 +56,10 @@ void random_u_f(suNf_field *gf) {
     }
 
 #ifdef WITH_GPU
-    copy_to_gpu_gfield_f(gf);
+    copy_to_gpu_suNf_field(gf);
 #endif
 
-    start_sendrecv_gfield_f(gf);
+    start_sendrecv_suNf_field(gf);
 }
 
 void unit_u(suNg_field *gf) {
@@ -84,10 +84,10 @@ void unit_u(suNg_field *gf) {
     }
 
 #ifdef WITH_GPU
-    copy_to_gpu_gfield(gf);
+    copy_to_gpu_suNg_field(gf);
 #endif
 
-    start_sendrecv_gfield(gf);
+    start_sendrecv_suNg_field(gf);
 }
 
 void random_s(suNg_scalar_field *sf) {

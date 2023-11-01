@@ -14,8 +14,8 @@
 void measure_baryons(double *m, int conf_num, double precision, storage_switch swc, data_storage_array **ret) {
     // declare point sources and props
     spinor_field *source =
-        alloc_spinor_field_f(4 * NF, &glattice); //This isn't glat_even so that the odd sites will be set to zero explicitly
-    spinor_field *prop = alloc_spinor_field_f(4 * NF, &glattice);
+        alloc_spinor_field(4 * NF, &glattice); //This isn't glat_even so that the odd sites will be set to zero explicitly
+    spinor_field *prop = alloc_spinor_field(4 * NF, &glattice);
     int nm = 1;
     int tau = 0;
 
@@ -47,7 +47,7 @@ void measure_baryons(double *m, int conf_num, double precision, storage_switch s
 
     // free
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
+    free_spinor_field(source);
+    free_spinor_field(prop);
 }
 #endif

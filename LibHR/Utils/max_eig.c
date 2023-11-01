@@ -16,11 +16,11 @@ int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
     spinor_field *s1, *s2, *s3;
     int count;
 
-    s1 = alloc_spinor_field_f(3, type);
+    s1 = alloc_spinor_field(3, type);
     /* #ifdef UPDATE_EO */
-    /*  s1=alloc_spinor_field_f(3,&glat_even); */
+    /*  s1=alloc_spinor_field(3,&glat_even); */
     /* #else */
-    /*   s1=alloc_spinor_field_f(3,&glattice); */
+    /*   s1=alloc_spinor_field(3,&glattice); */
     /* #endif */
     s2 = s1 + 1;
     s3 = s2 + 1;
@@ -54,7 +54,7 @@ int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
 
     lprintf("MaxH", 10, "Max_eig = %1.8e [MVM = %d]\n", *max, count);
 
-    free_spinor_field_f(s1);
+    free_spinor_field(s1);
 
     return count;
 }

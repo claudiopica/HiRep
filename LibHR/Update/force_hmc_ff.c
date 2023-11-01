@@ -148,7 +148,7 @@ void force_hmc_ff(double dt, void *vpar) {
         mpar.shift[0] = 0;
 
         double rho = 4. + mass;
-        spinor_field *tmp_spinor_field = alloc_spinor_field_f(1, &glattice);
+        spinor_field *tmp_spinor_field = alloc_spinor_field(1, &glattice);
 
         /* Y_e = (D^ D)^{-1} pf[k]  */
         Ye = *Ys;
@@ -203,7 +203,7 @@ void force_hmc_ff(double dt, void *vpar) {
         //from the derivative of the Dirac operator.
         force_hmc_auxfields_fermion(dt, vpar, ff_sigma_mom, ff_pi_mom, Xs, Ys, par->hasenbusch);
 
-        free_spinor_field_f(tmp_spinor_field);
+        free_spinor_field(tmp_spinor_field);
 
 #endif
 
@@ -214,8 +214,8 @@ void force_hmc_ff(double dt, void *vpar) {
 
         if (gauge_field_active) {
             /* reset force stat counters */
-            start_sendrecv_spinor_field_f(Xs);
-            start_sendrecv_spinor_field_f(Ys);
+            start_sendrecv_spinor_field(Xs);
+            start_sendrecv_spinor_field(Ys);
 
             _PIECE_FOR(&glattice, xp) {
                 suNg_algebra_vector f;
@@ -225,8 +225,8 @@ void force_hmc_ff(double dt, void *vpar) {
 
                 if (xp == glattice.inner_master_pieces) {
                     _OMP_PRAGMA(master) {
-                        complete_sendrecv_spinor_field_f(Xs);
-                        complete_sendrecv_spinor_field_f(Ys);
+                        complete_sendrecv_spinor_field(Xs);
+                        complete_sendrecv_spinor_field(Ys);
                     }
                     _OMP_PRAGMA(barrier)
                 }

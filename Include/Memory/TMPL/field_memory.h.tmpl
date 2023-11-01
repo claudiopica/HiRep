@@ -8,9 +8,6 @@
 #if !defined _FIELD_NAME_READABLE
 #error Missing _FIELD_NAME_READABLE in field_memory.h
 #endif
-#if !defined _FIELD_NAME
-#error Missing _FIELD_NAME in field_memory.h
-#endif
 #if !defined _FIELD_TYPE
 #error Missing _FIELD_TYPE in field_memory.h
 #endif
@@ -18,7 +15,7 @@
 #error Missing _IS_SPINOR_LIKE in field_memory.h
 #endif
 
-#define _F_ARGS(_name, _args) _FIELD_TYPE *_F_NAME(_name, _FIELD_NAME) _args
+#define _F_ARGS(_name, _args) _FIELD_TYPE *_F_NAME(_name, _FIELD_TYPE) _args
 
 #if _IS_SPINOR_LIKE == 0
 #define _n 1
@@ -34,7 +31,7 @@
  *
  * @param _FIELD_TYPE*	    Field to be copied
  */
-void _F_NAME(copy_to_gpu_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(copy_to_gpu_, _FIELD_TYPE)(_FIELD_TYPE *);
 
 /**
  * @brief Copy _FIELD_NAME_READABLE from the device to the host by synchronizing the CPU 
@@ -42,7 +39,7 @@ void _F_NAME(copy_to_gpu_, _FIELD_NAME)(_FIELD_TYPE *);
  * 
  *  @param _FIELD_TYPE*     Field to be copied
 */
-void _F_NAME(copy_from_gpu_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(copy_from_gpu_, _FIELD_TYPE)(_FIELD_TYPE *);
 
 /**
  * @brief Convert _FIELD_NAME_READABLE field data host geometry layout to the device
@@ -53,7 +50,7 @@ void _F_NAME(copy_from_gpu_, _FIELD_NAME)(_FIELD_TYPE *);
  *                          field data.
  * @param _FIELD_TYPE*      _FIELD_NAME_READABLE that contains the initial field data
 */
-void _F_NAME(to_gpu_format_, _FIELD_NAME)(_FIELD_TYPE *, _FIELD_TYPE *);
+void _F_NAME(to_gpu_format_, _FIELD_TYPE)(_FIELD_TYPE *, _FIELD_TYPE *);
 
 /**
  * @brief Convert _FIELD_NAME_READABLE field data device geometry layout to host geometry
@@ -64,14 +61,14 @@ void _F_NAME(to_gpu_format_, _FIELD_NAME)(_FIELD_TYPE *, _FIELD_TYPE *);
  *                          field data
  * @brief _FIELD_TYPE*      _FIELD_NAME_READABLE that contains the initial field data
 */
-void _F_NAME(to_cpu_format_, _FIELD_NAME)(_FIELD_TYPE *, _FIELD_TYPE *);
+void _F_NAME(to_cpu_format_, _FIELD_TYPE)(_FIELD_TYPE *, _FIELD_TYPE *);
 
 /**
  * @brief Free field data, other struct fields and struct pointer of field struct.
  * 
  * @param _FIELD_TYPE*      Field to be freed.
 */
-void _F_NAME(free_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(free_, _FIELD_TYPE)(_FIELD_TYPE *);
 
 /**
  * @brief Allocate field struct pointer
@@ -81,7 +78,6 @@ void _F_NAME(free_, _FIELD_NAME)(_FIELD_TYPE *);
 _ALLOCATE;
 
 #undef _FIELD_NAME_READABLE
-#undef _FIELD_NAME
 #undef _FIELD_TYPE
 #undef _IS_SPINOR_LIKE
 
