@@ -23,12 +23,12 @@ int checkNorm(char *name, double norm_diff) {
 }
 
 #define checkForErrors(_LABEL)                                                                                                 \
-    start_sendrecv_spinor_field(in);                                                                                         \
-    complete_sendrecv_spinor_field(in);                                                                                      \
-    start_sendrecv_spinor_field(even);                                                                                       \
-    complete_sendrecv_spinor_field(even);                                                                                    \
-    start_sendrecv_spinor_field(odd);                                                                                        \
-    complete_sendrecv_spinor_field(odd);                                                                                     \
+    start_sendrecv_spinor_field(in);                                                                                           \
+    complete_sendrecv_spinor_field(in);                                                                                        \
+    start_sendrecv_spinor_field(even);                                                                                         \
+    complete_sendrecv_spinor_field(even);                                                                                      \
+    start_sendrecv_spinor_field(odd);                                                                                          \
+    complete_sendrecv_spinor_field(odd);                                                                                       \
     in_diff = spinor_field_sqnorm_f(in) - in_norm;                                                                             \
     even_diff = spinor_field_sqnorm_f(even) - even_norm;                                                                       \
     odd_diff = spinor_field_sqnorm_f(odd) - odd_norm;                                                                          \

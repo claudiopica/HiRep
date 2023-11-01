@@ -228,7 +228,8 @@ int test_bijectivity_suNg_field_flt() {
 
     copy_suNg_field_flt_cpu(in_copy, in);
     lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_suNg_field_flt_cpu(in));
-    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_suNg_field_flt_cpu(in_copy));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n",
+            sqnorm_suNg_field_flt_cpu(in_copy));
 
     copy_to_gpu_suNg_field_flt(in);
     zero_suNg_field_flt_cpu(in);
@@ -256,7 +257,8 @@ int test_bijectivity_suNf_field_flt() {
 
     copy_suNf_field_flt_cpu(in_copy, in);
     lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_suNf_field_flt_cpu(in));
-    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_suNf_field_flt_cpu(in_copy));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n",
+            sqnorm_suNf_field_flt_cpu(in_copy));
 
     copy_to_gpu_suNf_field_flt(in);
     zero_suNf_field_flt_cpu(in);
@@ -313,7 +315,8 @@ int test_bijectivity_suNg_av_field() {
 
     copy_suNg_av_field_cpu(in_copy, in);
     lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_suNg_av_field_cpu(in));
-    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_suNg_av_field_cpu(in_copy));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n",
+            sqnorm_suNg_av_field_cpu(in_copy));
 
     copy_to_gpu_suNg_av_field(in);
     zero_suNg_av_field_cpu(in);

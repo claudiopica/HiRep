@@ -380,9 +380,9 @@ void make_prop_p(struct prop_p *prop, struct src_p *srcp, struct src_common *src
     X(W_0_mp)    \
     X(W_p_0)     \
     X(W_mp_0)
-#define X(NAME)                                      \
+#define X(NAME)                                    \
     prop->NAME = alloc_spinor_field(4, &glattice); \
-    for (int i = 0; i < 4; i++)                      \
+    for (int i = 0; i < 4; i++)                    \
         spinor_field_zero_f(prop->NAME + i);
     PROPLIST
 #undef X

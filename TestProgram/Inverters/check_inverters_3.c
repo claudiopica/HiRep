@@ -42,9 +42,9 @@ int main(int argc, char *argv[]) {
     par.max_iter = 0;
     res = alloc_spinor_field(par.n + 2,
 #ifdef UPDATE_EO
-                               &glat_even
+                             &glat_even
 #else
-                               &glattice
+                             &glattice
 #endif
     );
     s1 = res + par.n;
