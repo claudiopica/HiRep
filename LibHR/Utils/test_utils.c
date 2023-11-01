@@ -31,7 +31,7 @@ float spinor_max_flt(suNf_spinor_flt *s) {
     return max;
 }
 
-double spinor_fieldindmax_f(spinor_field *in) {
+double spinor_field_findmax_f(spinor_field *in) {
     double max = 0.;
     _ONE_SPINOR_FOR(in) {
         suNf_spinor c = *_SPINOR_PTR(in);
@@ -44,7 +44,7 @@ double spinor_fieldindmax_f(spinor_field *in) {
     return max;
 }
 
-float spinor_fieldindmax_f_flt(spinor_field_flt *in) {
+float spinor_field_findmax_f_flt(spinor_field_flt *in) {
     float max = 0.;
     _ONE_SPINOR_FOR(in) {
         suNf_spinor_flt c = *_SPINOR_PTR(in);
@@ -83,7 +83,7 @@ void compare_cpu_gpu(int errors, spinor_field *out, spinor_field *diff) {
     spinor_field_copy_f_gpu(diff, out);
     copy_from_gpu_spinor_field(diff);
     spinor_field_sub_assign_f_cpu(diff, out);
-    double res = spinor_fieldindmax_f(diff);
+    double res = spinor_field_findmax_f(diff);
     double norm2 = spinor_field_sqnorm_f_cpu(diff);
     const char *msg = (res > EPSILON) ? ++errors, "[FAIL]" : "[ OK ]";
     lprintf("GPU TEST", 2, "%s MAX norm=%.10e L2 norm=%.10e\n", msg, res, sqrt(norm2));
@@ -96,7 +96,7 @@ void compare_cpu_gpu_flt(int errors, spinor_field_flt *out, spinor_field_flt *di
     spinor_field_copy_f_flt_gpu(diff, out);
     copy_from_gpu_spinor_field_flt(diff);
     spinor_field_sub_assign_f_flt_cpu(diff, out);
-    float res = spinor_fieldindmax_f_flt(diff);
+    float res = spinor_field_findmax_f_flt(diff);
     float norm2 = spinor_field_sqnorm_f_flt_cpu(diff);
     const char *msg = (res > EPSILON_FLT) ? ++errors, "[FAIL]" : "[ OK ]";
     lprintf("GPU TEST", 2, "%s MAX norm=%.10e L2 norm=%.10e\n", msg, res, sqrt(norm2));

@@ -94,8 +94,8 @@ extern "C" {
 
 double spinor_max(suNf_spinor *s);
 float spinor_max_flt(suNf_spinor_flt *s);
-double spinor_fieldindmax_f(spinor_field *in);
-float spinor_fieldindmax_f_flt(spinor_field_flt *in);
+double spinor_field_findmax_f(spinor_field *in);
+float spinor_field_findmax_f_flt(spinor_field_flt *in);
 void compare_diff(int errors, double abs1, double abs2);
 void compare_diff_flt(int errors, float abs1, float abs2);
 void compare_cpu_gpu(int errors, spinor_field *out, spinor_field *diff);
