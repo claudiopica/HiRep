@@ -218,7 +218,8 @@ int update_ghmc() {
                 scalar_field_copy(ff_sigma, ff_sigma_old);
                 scalar_field_copy(ff_pi, ff_pi_old);
             }
-            start_sendrecv_suNg_field(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
+            start_sendrecv_suNg_field(
+                u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
             if (u_scalar != NULL) {
                 start_sendrecv_suNg_scalar_field(
                     u_scalar); /* this may not be needed if we always guarantee that we copy also the buffers */
