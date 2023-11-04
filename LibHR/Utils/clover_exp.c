@@ -199,7 +199,7 @@ visible static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus, int NN) {
     p[0] = p[3] * p[3] / 2 + p[4] * p[2] + (p[4] * p[4] * p[4] - p[0]) / 6;
     p[1] = -p[1] / 5 + p[4] * p[3];
 
-    p[2] += +p[4] * p[4] / 2;
+    p[2] += p[4] * p[4] / 2;
 
     double q[2 * NF];
     for (i = 0; i < 2 * NF; i++) {

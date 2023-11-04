@@ -225,4 +225,8 @@
 #error Multi-GPU version does not work with old geometry. Please use new geometry.
 #endif
 
+#if defined(WITH_GPU) && defined(GAUGE_SON)
+#error SO(N) gauge groups not yet implemented on GPU
+#endif
+
 #endif /* CHECK_OPTIONS_H */
