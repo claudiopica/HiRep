@@ -370,7 +370,12 @@ visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
     p[4] = -p[4] / 2;
 
     int i, j, k;
-    double q[2 * NF], q2[NNexp + 1][2 * NF], qlast;
+    double q[2 * NF], qlast;
+
+    double **q2 = (double **)malloc((NNexp + 1) * sizeof(double *));
+    for (int l = 0; l < NNexp + 1; ++l) {
+        q2[l] = (double *)malloc((2 * NF) * sizeof(double));
+    }
 
     //  for(i=0; i<2*NF-1;i++)printf("p[%d] = %2.20e\n", i, creal(p[i]));
 
