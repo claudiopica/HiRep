@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     clover_exp_taylor(test2, exptest2);
 
     lprintf("MAIN", 0, "Evaluating the clover exp via Cayley Hamilton repr\n");
-    clover_exp(test, exptest);
+    clover_exp(test, exptest, get_NN());
 
     lprintf("MAIN", 0, "Comparing the results\n");
 

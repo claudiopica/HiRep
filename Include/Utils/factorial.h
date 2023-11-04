@@ -8,19 +8,13 @@
 
 #include "libhr_core.h"
 
-#define MAX_FACTORIAL 100
-// To match with clover exp
-// But for the exp in the field update
-// we need only 30
+#define MAX_FACTORIAL 30 // This can be at most 50
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void init_factorial(void);
-void finalize_factorial(void);
-double inverse_factorial(int);
-deviceonly double inverse_factorial_gpu(int);
+visible double inverse_fact(int);
 
 #ifdef __cplusplus
 }

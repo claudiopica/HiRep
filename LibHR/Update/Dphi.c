@@ -1629,8 +1629,6 @@ void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, 
         mass = 1 / mass;
     }
 
-    init_clover_exp();
-
     // Loop over local sites
     _MASTER_FOR(dptr->type, ix) {
         suNfc Aplus[4];
@@ -1666,8 +1664,8 @@ void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, 
 
         // Exponentiate Aplus Aminus
 
-        clover_exp(Aplus, expAplus);
-        clover_exp(Aminus, expAminus);
+        clover_exp(Aplus, expAplus, get_NN());
+        clover_exp(Aminus, expAminus, get_NN());
 
         // Correct factor (4+m)
 
