@@ -344,7 +344,7 @@ visible void clover_exp(suNfc *Aplus, suNfc *expAplus, int NN) {
 
 #if (NF == 3)
 
-visible static void doublehornerNF3(double *C, suNfc *A, NNexp) {
+visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
     suNfc A2[4], A3[4];
     hr_complex p[2 * NF - 1];
 

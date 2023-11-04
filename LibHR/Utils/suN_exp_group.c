@@ -14,7 +14,7 @@
  */
 #if (NG >= 3) && (NG <= 6)
 
-static double *inverse_fact = NULL;
+static double *inverse_factorial = NULL;
 static double factorial(int N) {
     int i;
     double fact = 1.;
@@ -34,11 +34,11 @@ static void suNg_Exp_NG3(suNg *u, suNg *Xin) {
     hr_complex p[NG - 1];
     suNg X0, X2, X3;
 
-    if (inverse_fact == NULL) {
+    if (inverse_factorial == NULL) {
         _OMP_PRAGMA(single) {
-            inverse_fact = malloc(sizeof(double) * (NN + 1));
+            inverse_factorial = malloc(sizeof(double) * (NN + 1));
             for (i = 0; i < NN + 1; i++) {
-                inverse_fact[i] = 1. / factorial(i);
+                inverse_factorial[i] = 1. / factorial(i);
             }
         }
     }
@@ -59,7 +59,7 @@ static void suNg_Exp_NG3(suNg *u, suNg *Xin) {
     }
 
     hr_complex qlast;
-    q[0] = inverse_fact[NN];
+    q[0] = inverse_factorial[NN];
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -67,7 +67,7 @@ static void suNg_Exp_NG3(suNg *u, suNg *Xin) {
         for (j = NG - 2; j > 0; j--) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
-        q[0] = inverse_fact[i] - p[0] * qlast;
+        q[0] = inverse_factorial[i] - p[0] * qlast;
     }
 
     _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
@@ -82,11 +82,11 @@ static void suNg_Exp_NG4(suNg *u, suNg *Xin) {
 
     hr_complex p[NG - 1];
 
-    if (inverse_fact == NULL) {
+    if (inverse_factorial == NULL) {
         _OMP_PRAGMA(single) {
-            inverse_fact = malloc(sizeof(double) * (NN + 1));
+            inverse_factorial = malloc(sizeof(double) * (NN + 1));
             for (i = 0; i < NN + 1; i++) {
-                inverse_fact[i] = 1. / factorial(i);
+                inverse_factorial[i] = 1. / factorial(i);
             }
         }
     }
@@ -112,7 +112,7 @@ static void suNg_Exp_NG4(suNg *u, suNg *Xin) {
     }
 
     hr_complex qlast;
-    q[0] = inverse_fact[NN];
+    q[0] = inverse_factorial[NN];
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -120,7 +120,7 @@ static void suNg_Exp_NG4(suNg *u, suNg *Xin) {
         for (j = NG - 2; j > 0; j--) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
-        q[0] = inverse_fact[i] - p[0] * qlast;
+        q[0] = inverse_factorial[i] - p[0] * qlast;
     }
 
     _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
@@ -136,11 +136,11 @@ static void suNg_Exp_NG5(suNg *u, suNg *Xin) {
     int NN = 30, i = 0, j = 0;
     hr_complex p[NG - 1];
 
-    if (inverse_fact == NULL) {
+    if (inverse_factorial == NULL) {
         _OMP_PRAGMA(single) {
-            inverse_fact = malloc(sizeof(double) * (NN + 1));
+            inverse_factorial = malloc(sizeof(double) * (NN + 1));
             for (i = 0; i < NN + 1; i++) {
-                inverse_fact[i] = 1. / factorial(i);
+                inverse_factorial[i] = 1. / factorial(i);
             }
         }
     }
@@ -169,7 +169,7 @@ static void suNg_Exp_NG5(suNg *u, suNg *Xin) {
     }
 
     hr_complex qlast;
-    q[0] = inverse_fact[NN];
+    q[0] = inverse_factorial[NN];
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -177,7 +177,7 @@ static void suNg_Exp_NG5(suNg *u, suNg *Xin) {
         for (j = NG - 2; j > 0; j--) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
-        q[0] = inverse_fact[i] - p[0] * qlast;
+        q[0] = inverse_factorial[i] - p[0] * qlast;
     }
 
     _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
@@ -196,11 +196,11 @@ static void suNg_Exp_NG6(suNg *u, suNg *Xin) {
 
     hr_complex p[NG - 1];
 
-    if (inverse_fact == NULL) {
+    if (inverse_factorial == NULL) {
         _OMP_PRAGMA(single) {
-            inverse_fact = malloc(sizeof(double) * (NN + 1));
+            inverse_factorial = malloc(sizeof(double) * (NN + 1));
             for (i = 0; i < NN + 1; i++) {
-                inverse_fact[i] = 1. / factorial(i);
+                inverse_factorial[i] = 1. / factorial(i);
             }
         }
     }
@@ -232,7 +232,7 @@ static void suNg_Exp_NG6(suNg *u, suNg *Xin) {
     }
 
     hr_complex qlast;
-    q[0] = inverse_fact[NN];
+    q[0] = inverse_factorial[NN];
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -240,7 +240,7 @@ static void suNg_Exp_NG6(suNg *u, suNg *Xin) {
         for (j = NG - 2; j > 0; j--) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
-        q[0] = inverse_fact[i] - p[0] * qlast;
+        q[0] = inverse_factorial[i] - p[0] * qlast;
     }
 
     _suNg_mul_add(*u, q[0], X0, q[1], *Xin);

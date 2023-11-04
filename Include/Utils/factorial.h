@@ -8,7 +8,7 @@
 
 #include "libhr_core.h"
 
-#define MAX_FACTORIAL 30 // This can be at most 50
+#define MAX_FACTORIAL 50 // This can be at most 100
 
 #ifdef __cplusplus
 extern "C" {
