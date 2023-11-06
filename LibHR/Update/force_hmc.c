@@ -159,7 +159,7 @@ void force_hmc(double dt, void *vpar) {
 #ifdef WITH_CLOVER_EO
 
     if (par->logdet) {
-        force_clover_logdet(par->mass, 2.); // 2 = # of flavors
+        compute_force_logdet(par->mass, 2.); // 2 = # of flavors
     }
 
 #endif

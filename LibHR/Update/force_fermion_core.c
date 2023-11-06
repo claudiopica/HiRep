@@ -230,11 +230,14 @@ static suNf fmat_create(suNf_spinor *a_lhs, suNf_spinor *a_rhs, suNf_spinor *b_l
     return fmat;
 }
 
-static void force_clover_core(double dt) {
+void force_clover_core_cpu(double dt) {
     double coeff = dt * (_REPR_NORM2 / _FUND_NORM2) * (1. / 8.) * get_csw();
 
     // Communicate forces
     start_sendrecv_clover_force(cl_force);
+#ifdef WITH_NEW_GEOMETRY
+    complete_sendrecv_clover_force(cl_force);
+#endif
 
     // Loop over lattice
     _PIECE_FOR(&glattice, xp) {
@@ -321,7 +324,7 @@ static void force_clover_core(double dt) {
 #endif
 
 #if defined(WITH_CLOVER)
-static void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue) {
+void force_clover_fermion_cpu(spinor_field *Xs, spinor_field *Ys, double residue) {
     // Construct force matrices
     _MASTER_FOR(&glattice, ix) {
         suNf_spinor tmp_lhs, tmp_rhs;
@@ -416,7 +419,7 @@ static void A_times_spinor(suNf_spinor *out, suNfc *Aplus, suNfc *Aminus, suNf_s
 }
 
 // EXP CSW FORCE TERM
-void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue) {
+void force_clover_fermion_cpu(spinor_field *Xs, spinor_field *Ys, double residue) {
     double invexpmass = get_dirac_mass();
 
     evaluate_sw_order(&invexpmass);
@@ -687,19 +690,11 @@ void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double resi
 }
 #endif
 
-#if defined(WITH_CLOVER)
-void force_clover_logdet(double mass, double residue) {
-    // Compute force matrices
-    compute_force_logdet(mass, residue);
-}
-
-#endif //#ifdef WITH_CLOVER
-
 /* ------------------------------------ */
 /* CALCULATE FORCE OF THE HOPPING TERM  */
 /* ------------------------------------ */
 #ifdef WITH_NEW_GEOMETRY
-void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue) {
+void force_fermion_core_cpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue) {
     double coeff;
     spinor_field Xtmp, Ytmp;
 
@@ -726,11 +721,26 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
         Yo.type = &glat_odd;
         Yo.ptr = Ys->ptr + glat_odd.master_shift;
 
-        Dphi_(&Xo, &Xe);
-        Dphi_(&Yo, &Ye);
+        Dphi_cpu_(&Xo, &Xe);
+        Dphi_cpu_(&Yo, &Ye);
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+#ifndef WITH_GPU
         Cphi_diag_inv(get_dirac_mass(), &Xo, &Xo);
         Cphi_diag_inv(get_dirac_mass(), &Yo, &Yo);
+#else
+        // Workaround for unit testing this function for CPU against GPU
+        apply_BCs_on_spinor_field(&Xo);
+        apply_BCs_on_spinor_field(&Yo);
+#ifdef WITH_CLOVER
+        Cphi_inv_cpu_(get_dirac_mass(), &Xo, &Xo, 0);
+        Cphi_inv_cpu_(get_dirac_mass(), &Yo, &Yo, 0);
+#else
+        Cphi_cpu_(get_dirac_mass(), &Xo, &Xo, 0, 1);
+        Cphi_cpu_(get_dirac_mass(), &Yo, &Yo, 0, 1);
+#endif
+        apply_BCs_on_spinor_field(&Xo);
+        apply_BCs_on_spinor_field(&Yo);
+#endif
 #endif
     }
 
@@ -746,12 +756,12 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 
     // HERE!!!!!
 #if defined(WITH_CLOVER)
-    force_clover_fermion(Xs, Ys, residue);
+    force_clover_fermion_cpu(Xs, Ys, residue);
 #endif
 #if defined(WITH_EXPCLOVER)
 #if (NF == 3 || NF == 2)
     //	force_clover_fermion_taylor(Xs, Ys, residue);
-    force_clover_fermion(Xs, Ys, residue);
+    force_clover_fermion_cpu(Xs, Ys, residue);
 #else
     force_clover_fermion_taylor(Xs, Ys, residue);
 #endif
@@ -823,11 +833,9 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
     // Reset spinor geometry
     Xs->type = Xtmp.type;
     Ys->type = Ytmp.type;
-
-    //lprintf("Check", 0, "step spinor in force on a point %.14e %.14e\n", creal((*_FIELD_AT(Xs, ipt(1, 1, 1, 1))).c[0].c[0]), creal((*_FIELD_AT(Ys, ipt(1, 1, 1, 1))).c[0].c[0]));
 }
 #else
-void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue) {
+void force_fermion_core_cpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue) {
     double coeff;
     spinor_field Xtmp, Ytmp;
 
@@ -970,7 +978,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 #undef _F_DIR2
 #undef _F_DIR3
 
-void fermion_force_begin() {
+void fermion_force_begin_cpu() {
     if (force_sum == NULL) { force_sum = alloc_avfield(&glattice); }
 
     // Clear force field
@@ -991,11 +999,11 @@ void fermion_force_begin() {
 #endif
 }
 
-void fermion_force_end(double dt, suNg_av_field *force) {
+void fermion_force_end_cpu(double dt, suNg_av_field *force) {
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 
     // Evaluate derivative of clover term
-    force_clover_core(dt);
+    force_clover_core_cpu(dt);
 
 #endif
 
@@ -1018,3 +1026,13 @@ void fermion_force_end(double dt, suNg_av_field *force) {
     // Boundary conditions
     apply_BCs_on_momentum_field(force);
 }
+
+#ifndef WITH_GPU
+void (*force_fermion_core)(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt,
+                           double residue) = force_fermion_core_cpu;
+void (*fermion_force_begin)(void) = fermion_force_begin_cpu;
+void (*fermion_force_end)(double dt, suNg_av_field *) = fermion_force_end_cpu;
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+void (*force_clover_fermion)(spinor_field *Xs, spinor_field *Ys, double residue) = force_clover_fermion_cpu;
+#endif
+#endif

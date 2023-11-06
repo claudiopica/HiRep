@@ -93,7 +93,7 @@ void force_rhmc(double dt, void *vpar) {
 
 #ifdef WITH_CLOVER_EO
     double nf = (-2.0 * ratio->n) / ratio->d;
-    force_clover_logdet(par->mass, nf);
+    compute_force_logdet(par->mass, nf);
 #endif
 
     fermion_force_end(dt, force);
