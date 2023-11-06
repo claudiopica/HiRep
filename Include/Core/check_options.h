@@ -229,4 +229,8 @@
 #error SO(N) gauge groups not yet implemented on GPU
 #endif
 
+#if NF > 3 && WITH_EXPCLOVER
+#error "Exponential clover not implemented for NF>3"
+#endif
+
 #endif /* CHECK_OPTIONS_H */

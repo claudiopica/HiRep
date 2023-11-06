@@ -28,6 +28,8 @@ int main(int argc, char *argv[]) {
     suNfc_field *cl_term_tmp = alloc_clover_term(&glattice);
     suNf_field *cl_force_tmp = alloc_clover_force(&glattice);
     ldl_field *cl_ldl_tmp = alloc_clover_ldl(&glattice);
+    random_clover_ldl_cpu(cl_ldl);
+    copy_to_gpu_clover_ldl(cl_ldl);
 #endif
 
     gaussian_spinor_field(X);
@@ -52,7 +54,6 @@ int main(int argc, char *argv[]) {
 #endif
 
     suNg_av_field *force = alloc_avfield(&glattice);
-    suNg_av_field *force_tmp = alloc_avfield(&glattice);
     random_avfield_cpu(force);
     copy_to_gpu_avfield(force);
 
@@ -104,32 +105,32 @@ int main(int argc, char *argv[]) {
     lprintf("SANITY", 0, "Clover term GPU: %0.2e\n", sqrt(sqnorm_clover_term_cpu(cl_term_tmp)));
     sub_assign_clover_term_cpu(cl_term, cl_term_tmp);
     sqnorm = sqrt(sqnorm_clover_term_cpu(cl_term));
-    return_val += check_diff_norm(sqnorm, 1e-12);
+    return_val += check_diff_norm(sqnorm, 1e-14);
 
     lprintf("TEST", 0, "Checking clover force\n");
     lprintf("SANITY", 0, "Clover force CPU: %0.2e\n", sqrt(sqnorm_clover_force_cpu(cl_force)));
     lprintf("SANITY", 0, "Clover force GPU: %0.2e\n", sqrt(sqnorm_clover_force_cpu(cl_force_tmp)));
     sub_assign_clover_force_cpu(cl_force, cl_force_tmp);
     sqnorm = sqrt(sqnorm_clover_force_cpu(cl_force));
-    return_val += check_diff_norm(sqnorm, 1e-12);
+    return_val += check_diff_norm(sqnorm, 1e-14);
 
     lprintf("TEST", 0, "Checking clover ldl\n");
     lprintf("SANITY", 0, "Clover ldl CPU: %0.2e\n", sqrt(sqnorm_clover_ldl_cpu(cl_ldl)));
     lprintf("SANITY", 0, "Clover ldl GPU: %0.2e\n", sqrt(sqnorm_clover_ldl_cpu(cl_ldl_tmp)));
     sub_assign_clover_ldl_cpu(cl_ldl, cl_ldl_tmp);
     sqnorm = sqrt(sqnorm_clover_ldl_cpu(cl_ldl));
-    return_val += check_diff_norm(sqnorm, 1e-12);
+    return_val += check_diff_norm(sqnorm, 1e-14);
 #endif
 
     lprintf("TEST", 0, "Checking X\n");
     spinor_field_sub_assign_f_cpu(X, X_tmp);
     sqnorm = sqrt(spinor_field_sqnorm_f_cpu(X));
-    return_val += check_diff_norm(sqnorm, 1e-12);
+    return_val += check_diff_norm(sqnorm, 1e-14);
 
     lprintf("TEST", 0, "Checking Y\n");
     spinor_field_sub_assign_f_cpu(Y, Y_tmp);
     sqnorm = sqrt(spinor_field_sqnorm_f_cpu(Y));
-    return_val += check_diff_norm(sqnorm, 1e-12);
+    return_val += check_diff_norm(sqnorm, 1e-14);
 
     lprintf("TEST", 0, "Checking gauge field\n");
     sub_assign_gfield_cpu(u_gauge, gfield_tmp);

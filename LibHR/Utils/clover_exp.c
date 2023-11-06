@@ -497,7 +497,10 @@ visible void doublehorner(double *C, suNfc *A, int NNexp) {
 #elif (NF == 2)
     doublehornerNF2(C, A, NNexp);
 #else
-    error(0, 1, "doublehorner " __FILE__, "Force only implemented for NF=2 and NF=3");
+    // TODO: this does not work because error is not a host
+    // device function. There is now a compile time
+    // check that forbids NF > 3 to compile WITH_EXPCLOVER
+    //error(0, 1, "doublehorner " __FILE__, "Force only implemented for NF=2 and NF=3");
 #endif
 }
 
@@ -507,7 +510,7 @@ visible void factorialCoef(double *C, int NNexp) {
     for (j = 0; j < NNexp; j++) {
         for (i = 0; i < NNexp; i++) {
             if (i + j <= NNexp) {
-                C[(NNexp)*i + j] = inverse_fact(i + j + 1);
+                //C[(NNexp)*i + j] = inverse_fact(i + j + 1);
             } else {
                 C[(NNexp)*i + j] = 0.;
             }

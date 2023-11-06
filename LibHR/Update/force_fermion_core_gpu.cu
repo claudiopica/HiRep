@@ -458,7 +458,7 @@ visible static void A_times_spinor(suNf_spinor *out, suNfc *Aplus, suNfc *Aminus
 
 // EXP CSW FORCE TERM
 __global__ void _force_clover_fermion(double invexpmass, suNf *cl_force, suNfc *cl_term, suNf_spinor *Xs, suNf_spinor *Ys,
-                                      double residue, int N, int block_start) {
+                                      double residue, int NNexp, int N, int block_start) {
     for (int ix = blockIdx.x * blockDim.x + threadIdx.x; ix < N; ix += gridDim.x * blockDim.x) {
         // Construct force matrices
         suNf_spinor tmp_lhs, tmp_rhs;
@@ -495,8 +495,8 @@ __global__ void _force_clover_fermion(double invexpmass, suNf *cl_force, suNfc *
         _suNf_mul(Aminus[3], -invexpmass, s2);
 
         // double horner scheme
-        doublehorner(Cplus, Aplus);
-        doublehorner(Cminus, Aminus);
+        doublehorner(Cplus, Aplus, NNexp);
+        doublehorner(Cminus, Aminus, NNexp);
 
         // Remember rhs = eta, lhs  = xi
         read_gpu<double>(0, &rhs, Xs, ix, 0, 1);
@@ -595,7 +595,7 @@ __global__ void _force_clover_fermion(double invexpmass, suNf *cl_force, suNfc *
 }
 
 __global__ static void _force_clover_fermion_taylor(double invexpmass, suNf *cl_force, suNfc *cl_term, suNf_spinor *Xs,
-                                                    suNf_spinor *Ys, double residue, int NNexp, int block_start, int N) {
+                                                    suNf_spinor *Ys, double residue, int NNexp, int N, int block_start) {
     for (int ix = blockIdx.x * blockDim.x + threadIdx.x; ix < N; ix += gridDim.x * blockDim.x) {
         double *Coef = (double *)malloc(NNexp * NNexp * sizeof(double));
 
@@ -612,7 +612,7 @@ __global__ static void _force_clover_fermion_taylor(double invexpmass, suNf *cl_
         suNfc Aplus[4];
         suNfc Aminus[4];
         suNfc s0, s1, s2, s3;
-        factorialCoef(Coef, get_NN(), get_NNexp());
+        factorialCoef(Coef, NNexp);
 
         // Construct force matrices
         // Create matrix Aplus, Aminus
@@ -742,7 +742,7 @@ void force_clover_fermion_gpu(spinor_field *Xs, spinor_field *Ys, double residue
         suNf *cl_force_gpu = cl_force->gpu_ptr + 6 * block_start;
         suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start;
         _force_clover_fermion<<<grid, BLOCK_SIZE>>>(invexpmass, cl_force_gpu, cl_term_gpu, _GPU_FIELD_BLK(Xs, ixp),
-                                                    _GPU_FIELD_BLK(Ys, ixp), residue, N, block_start);
+                                                    _GPU_FIELD_BLK(Ys, ixp), residue, get_NNexp(), N, block_start);
     }
 #endif
 
@@ -761,9 +761,7 @@ void force_clover_fermion_gpu(spinor_field *Xs, spinor_field *Ys, double residue
 #ifdef WITH_EXPCLOVER
 void force_clover_fermion_taylor_gpu(spinor_field *Xs, spinor_field *Ys, double residue) {
     double invexpmass = get_dirac_mass();
-
     evaluate_sw_order(&invexpmass);
-
     invexpmass = 1.0 / (4.0 + invexpmass);
     int NNexp = get_NNexp();
 

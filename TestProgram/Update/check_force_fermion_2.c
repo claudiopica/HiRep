@@ -16,7 +16,10 @@ int main(int argc, char *argv[]) {
 
     setup_random_gauge_fields();
     suNg_field *gfield_tmp = alloc_gfield(&glattice);
+
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
     suNf_field *gfield_f_tmp = alloc_gfield_f(&glattice);
+#endif
 
     spinor_field *X = alloc_spinor_field_f(1, &glattice);
     spinor_field *X_tmp = alloc_spinor_field_f(1, &glattice);
@@ -27,6 +30,8 @@ int main(int argc, char *argv[]) {
     suNfc_field *cl_term_tmp = alloc_clover_term(&glattice);
     suNf_field *cl_force_tmp = alloc_clover_force(&glattice);
     ldl_field *cl_ldl_tmp = alloc_clover_ldl(&glattice);
+    random_clover_ldl_cpu(cl_ldl);
+    copy_to_gpu_clover_ldl(cl_ldl);
 #endif
 
     gaussian_spinor_field(X);
