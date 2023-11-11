@@ -44,40 +44,6 @@ _DECLARE(void, spinor_field_copy, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *
     cudaMemcpy(s1->gpu_ptr, s2->gpu_ptr, s1->type->gsize_spinor * sizeof(_SPINOR_TYPE), cudaMemcpyDeviceToDevice);
 }
 
-/* auxillary functions for GPU reductions */
-#ifndef ALLOC_AUX_GPU
-#define ALLOC_AUX_GPU
-
-static double *alloc_double_sum_field(int n) {
-    static double *res = NULL;
-    static int n_size = 0;
-    if (n > n_size && res != NULL) {
-        cudaFree(res);
-        res = NULL;
-    }
-
-    if (res == NULL) {
-        cudaMalloc((void **)&res, n * sizeof(double));
-        n_size = n;
-    }
-    return res;
-}
-
-static hr_complex *alloc_complex_sum_field(int n) {
-    static hr_complex *res = NULL;
-    static int n_size = 0;
-    if (n > n_size && res != NULL) {
-        cudaFree(res);
-        res = NULL;
-    }
-    if (res == NULL) {
-        cudaMalloc((void **)&res, n * sizeof(hr_complex));
-        n_size = n;
-    }
-    return res;
-}
-#endif
-
 /**
 * @brief Sums across GPU nodes after finding the local sum (generics)
 *

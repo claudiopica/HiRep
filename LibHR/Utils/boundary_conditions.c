@@ -164,6 +164,14 @@ void init_BCs(BCs_pars_t *pars) {
 #ifdef GAUGE_SPATIAL_TWIST
     init_plaq_twisted_BCs();
 #endif
+
+#if defined(PLAQ_WEIGHTS) && defined(WITH_GPU)
+    cudaError_t error_id = cudaMalloc((void **)&plaq_weight_gpu, 16 * glattice.gsize_gauge * sizeof(double));
+    error(error_id != cudaSuccess, 1, __func__, cudaGetErrorString(error_id));
+
+    error_id = cudaMemcpy(plaq_weight_gpu, plaq_weight, 16 * glattice.gsize_gauge * sizeof(double), cudaMemcpyHostToDevice);
+    error(error_id != cudaSuccess, 1, __func__, cudaGetErrorString(error_id));
+#endif
 }
 
 void free_BCs(void) {

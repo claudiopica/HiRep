@@ -158,6 +158,7 @@ my @libs = ("libhrobservables.a", "libhr.a"); #order is important
     "speed_test_diracoperator_flt" =>  [ "speed_test_diracoperator_flt.c", ],
     "speed_test_clover" => [ "speed_test_clover.c", ],
     "speed_test_clover_flt" => [ "speed_test_clover_flt.c", ],
+    "speed_test_reduction" => [ "speed_test_reduction.c", ],
     #"speed_test_linear_algebra" => [ "speed_test_linear_algebra.c", ],
     #"speed_test_linear_algebra_flt" => [ "speed_test_linear_algebra_flt.c", ],
     "speed_test_random" => [ "speed_test_random.c", ],
