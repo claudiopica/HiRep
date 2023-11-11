@@ -347,7 +347,7 @@ hr_complex avr_plaquette_wrk() {
 }
 
 #ifndef WITH_GPU
-double(avr_plaquette *)(void) = avr_plaquette_cpu;
-void(full_plaquette *)(void) = full_plaquette_cpu;
-void(avr_plaquette_time *)(void) = avr_plaquette_time_cpu;
+double (*avr_plaquette)(void) = avr_plaquette_cpu;
+void (*full_plaquette)(void) = full_plaquette_cpu;
+void (*avr_plaquette_time)(double *plaqt, double *plaqs) = avr_plaquette_time_cpu;
 #endif
