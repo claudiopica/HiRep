@@ -214,8 +214,6 @@ void full_plaquette_cpu() {
         }
     }
 
-    //printf("cpu: %0.15e\n", creal(r0));
-
     _OMP_PRAGMA(single) {
         pa[0] = r0;
         pa[1] = r1;

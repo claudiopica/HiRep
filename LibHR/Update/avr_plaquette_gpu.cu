@@ -126,7 +126,7 @@ __device__ static double local_plaq_dev(int ix, suNg *gauge, int *iup_gpu PLAQ_W
 __global__ void _avr_plaquette(suNg *u, double *resField, int *iup_gpu, int N, int block_start PLAQ_WEIGHT_ARG_DEF) {
     for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < N; id += blockDim.x * gridDim.x) {
         const int ix = id + block_start;
-        resField[id] = plaq_dev(ix, 1, 0, u, iup_gpu PLAQ_WEIGHT_ARG); // TODO: here we need to pass the gauge field
+        resField[id] = plaq_dev(ix, 1, 0, u, iup_gpu PLAQ_WEIGHT_ARG);
         resField[id] += plaq_dev(ix, 2, 0, u, iup_gpu PLAQ_WEIGHT_ARG);
         resField[id] += plaq_dev(ix, 2, 1, u, iup_gpu PLAQ_WEIGHT_ARG);
         resField[id] += plaq_dev(ix, 3, 0, u, iup_gpu PLAQ_WEIGHT_ARG);
