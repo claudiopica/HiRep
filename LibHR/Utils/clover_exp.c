@@ -510,7 +510,7 @@ visible void factorialCoef(double *C, int NNexp) {
     for (j = 0; j < NNexp; j++) {
         for (i = 0; i < NNexp; i++) {
             if (i + j <= NNexp) {
-                //C[(NNexp)*i + j] = inverse_fact(i + j + 1);
+                C[(NNexp)*i + j] = inverse_fact(i + j + 1);
             } else {
                 C[(NNexp)*i + j] = 0.;
             }
