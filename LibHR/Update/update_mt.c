@@ -127,8 +127,6 @@ int update_ghmc() {
     /* generate new momenta */
     lprintf("HMC", 30, "Generating gaussian momenta and pseudofermions...\n");
 
-    Timer clock;
-    timer_set(&clock);
     gaussian_momenta(suN_momenta);
     if (u_scalar != NULL) { gaussian_scalar_momenta(scalar_momenta); }
 
