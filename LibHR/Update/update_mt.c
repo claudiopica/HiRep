@@ -126,6 +126,9 @@ int update_ghmc() {
 
     /* generate new momenta */
     lprintf("HMC", 30, "Generating gaussian momenta and pseudofermions...\n");
+
+    Timer clock;
+    timer_set(&clock);
     gaussian_momenta(suN_momenta);
     if (u_scalar != NULL) { gaussian_scalar_momenta(scalar_momenta); }
 
@@ -137,6 +140,7 @@ int update_ghmc() {
 
     /* compute starting action */
     lprintf("HMC", 30, "Computing action density...\n");
+
     local_hmc_action(NEW, la, suN_momenta, scalar_momenta);
 
     /* correct pseudofermion distribution */
@@ -159,15 +163,21 @@ int update_ghmc() {
         monomial const *m = mon_n(i);
         m->correct_la_pf(m);
     }
+
     local_hmc_action(DELTA, la, suN_momenta, scalar_momenta);
 
     /* Metropolis test */
+#ifndef WITH_GPU
     _OMP_PRAGMA(single) {
         deltaH = 0.0;
     }
     _MASTER_FOR_SUM(la->type, i, deltaH) {
         deltaH += *_FIELD_AT(la, i);
     }
+#else
+    deltaH = 0.0;
+    global_sum_gpu_double(la->gpu_ptr, la->type->gsize_spinor);
+#endif
 
     global_sum(&deltaH, 1);
     lprintf("HMC", 10, "[DeltaS = %1.8e][exp(-DS) = %1.8e]\n", deltaH, exp(-deltaH));
@@ -212,6 +222,7 @@ int update_ghmc() {
                 start_sendrecv_suNg_scalar_field(
                     u_scalar); /* this may not be needed if we always guarantee that we copy also the buffers */
             }
+
             represent_gauge_field();
             return 0;
         }
@@ -282,12 +293,17 @@ int reverse_update_ghmc() {
     local_hmc_action(DELTA, la, suN_momenta, scalar_momenta);
 
     /* Metropolis test */
+#ifndef WITH_GPU
     _OMP_PRAGMA(single) {
         deltaH = 0.0;
     }
     _MASTER_FOR_SUM(la->type, i, deltaH) {
         deltaH += *_FIELD_AT(la, i);
     }
+#else
+    deltaH = 0.0;
+    deltaH = global_sum_gpu_double(la->gpu_ptr, la->type->gsize_spinor);
+#endif
 
     global_sum(&deltaH, 1);
     lprintf("HMC", 10, "[DeltaS = %1.8e][exp(-DS) = %1.8e]\n", deltaH, exp(-deltaH));
