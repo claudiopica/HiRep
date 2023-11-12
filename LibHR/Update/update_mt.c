@@ -174,7 +174,10 @@ int update_ghmc() {
     }
 #else
     deltaH = 0.0;
-    global_sum_gpu_double(la->gpu_ptr, la->type->gsize_spinor);
+    _PIECE_FOR(la->type, ixp) {
+        const int block_size = la->type->master_end[ixp] - la->type->master_start[ixp] + 1;
+        deltaH += global_sum_gpu_double(_GPU_FIELD_BLK(la, ixp), block_size);
+    }
 #endif
 
     global_sum(&deltaH, 1);
@@ -300,7 +303,10 @@ int reverse_update_ghmc() {
     }
 #else
     deltaH = 0.0;
-    deltaH = global_sum_gpu_double(la->gpu_ptr, la->type->gsize_spinor);
+    _PIECE_FOR(la->type, ixp) {
+        const int block_size = la->type->master_end[ixp] - la->type->master_start[ixp] + 1;
+        deltaH += global_sum_gpu_double(_GPU_FIELD_BLK(la, ixp), block_size);
+    }
 #endif
 
     global_sum(&deltaH, 1);
