@@ -28,7 +28,8 @@ build_rules($rootdir);
   );
 
   my %gpu_c_device_code = (
-    Utils => [ "clover_exp.c", "factorial.c" ],
+    Utils => [ "clover_exp.c", "factorial.c", "suN_exp_group.c", "suN_utils.c", "det_Cmplx_Ng.c", "inv_Cmplx_Ng.c" ],
+    Inverters => [ "jacobi.c", ],
 	  Update => [ "group_represent.c", ],
   );
 

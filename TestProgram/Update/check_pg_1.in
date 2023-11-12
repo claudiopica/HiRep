@@ -1,0 +1,36 @@
+// Global variables 
+GLB_T = 8 
+GLB_X = 6
+GLB_Y = 6
+GLB_Z = 6
+NP_T = 2
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+N_REP = 1
+
+rlx_level = 1  
+rlx_seed = 60718  
+rlx_start = new
+rlx_state = rlx_state
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+// Monomials
+monomial {
+	id = 0
+	type = gauge
+	beta = 12.0
+	level = 0 
+}
+
+// Integrators
+integrator {
+        level = 0
+        type = o2mn
+        steps = 4 
+}

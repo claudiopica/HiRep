@@ -25,12 +25,16 @@
 static int *dyn_gauge = NULL;
 
 void project_gauge_field(void) {
+#ifdef WITH_GPU
+    exec_project();
+#else
     _MASTER_FOR(&glattice, ix) {
         project_to_suNg(pu_gauge(ix, 0));
         project_to_suNg(pu_gauge(ix, 1));
         project_to_suNg(pu_gauge(ix, 2));
         project_to_suNg(pu_gauge(ix, 3));
     }
+#endif
 
     start_sendrecv_gfield(u_gauge);
 }

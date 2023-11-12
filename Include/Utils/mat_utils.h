@@ -9,18 +9,20 @@
 extern "C" {
 #endif
 
+#include "Core/gpu.h"
+
 //inv_Cmplx_Ng.c
 #ifndef GAUGE_SON
-void ludcmp(hr_complex *a, int *indx, double *d, int N);
-void lubksb(hr_complex *a, int *indx, hr_complex *b, int N);
-void inv_Cmplx_Ng(suNg *a);
+visible void ludcmp(hr_complex *a, int *indx, double *d, int N);
+visible void lubksb(hr_complex *a, int *indx, hr_complex *b, int N);
+visible void inv_Cmplx_Ng(suNg *a);
 #endif
 
 //det_Cmplx_Ng.c
 #ifndef GAUGE_SON
-void det_Cmplx_Ng(hr_complex *res, suNg *a);
+visible void det_Cmplx_Ng(hr_complex *res, suNg *a);
 #else
-void det_Cmplx_Ng(double *res, suNg *a);
+visible void det_Cmplx_Ng(double *res, suNg *a);
 #endif
 
 //diag_hmat.c

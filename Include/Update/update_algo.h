@@ -16,6 +16,7 @@ extern "C" {
 //update_hb.c
 void project_gauge_field(void);
 void update(double *beta, int nhb, int nor);
+void exec_project(void); // GPU helper
 
 //update_hb_multilevel.c
 void init_hb_multilevel(int lev, double lbeta, int lnhb, int lnor, int *lml_up, int *lml_skip, int lnblockingstart,

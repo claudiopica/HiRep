@@ -11,12 +11,17 @@
  *
  *******************************************************************************/
 
-#include "utils.h"
 #include "libhr_core.h"
 #include "error.h"
 #include "IO/logger.h"
+#include "Utils/mat_utils.h"
+#include "inverters.h"
 
-void vector_star(suNg_vector *v1, suNg_vector *v2) {
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+visible void vector_star(suNg_vector *v1, suNg_vector *v2) {
     for (int i = 0; i < NG; i++) {
         _complex_star(v1->c[i], v2->c[i]);
     }
@@ -46,13 +51,13 @@ static void normalize_flt(float *v) {
     }
 }
 #elif !defined(WITH_QUATERNIONS)
-static void normalize(suNg_vector *v) {
+visible static void normalize(suNg_vector *v) {
     double fact;
     _vector_prod_re_g(fact, *v, *v);
     fact = 1.0 / sqrt(fact);
     _vector_mul_g(*v, fact, *v);
 }
-static void normalize_flt(suNg_vector_flt *v) {
+visible static void normalize_flt(suNg_vector_flt *v) {
     float fact;
     _vector_prod_re_g(fact, *v, *v);
     fact = 1.0f / sqrtf(fact);
@@ -60,7 +65,7 @@ static void normalize_flt(suNg_vector_flt *v) {
 }
 #endif
 
-void project_to_suNg(suNg *u) {
+visible void project_to_suNg(suNg *u) {
 #ifdef GAUGE_SON
     hr_complex norm;
     _suNg_sqnorm(norm, *u);
@@ -113,6 +118,12 @@ void project_to_suNg(suNg *u) {
             ++v1;
         }
         normalize(v2);
+#ifdef WITH_GPU
+        // This did not work before without this absolutely cryptic line
+        // the compiler now shoes me an error. Might this now
+        // work without?
+        memcpy(u->c + NG * i, v2, sizeof(suNg_vector));
+#endif
         ++v2;
         v1 = (suNg_vector *)(u);
     }
@@ -196,7 +207,7 @@ void project_to_suNg_flt(suNg_flt *u) {
 }
 
 #ifndef GAUGE_SON
-void project_cooling_to_suNg(suNg *g_out, suNg *g_in, int cooling) {
+visible void project_cooling_to_suNg(suNg *g_out, suNg *g_in, int cooling) {
 #ifdef WITH_QUATERNIONS
     error(1, 1, "project_cooling_to_suNg " __FILE__, "not implemented with quaternions");
 #else
@@ -320,7 +331,7 @@ int project_to_suNg_real(suNg *out, suNg *in) {
 }
 #endif
 
-void covariant_project_to_suNg(suNg *u) {
+visible void covariant_project_to_suNg(suNg *u) {
     int i, j, k;
     suNg tmp, tmp1;
     double eval[NG];
@@ -366,3 +377,7 @@ void covariant_project_to_suNg(suNg *u) {
 
     _suNg_times_suNg(*u, tmp1, tmp);
 }
+
+#ifdef __cplusplus
+}
+#endif
