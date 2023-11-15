@@ -82,6 +82,18 @@ int flops_per_site(operator_type type) {
         break;
 #endif
 
+    case CUDA_REDUCTION:
+        flopsite = 1;
+        break;
+
+    case SF_SQNORM:
+        flopsite = 5 * NF + 1;
+        break;
+
+    case PLAQUETTE:
+        flopsite = 6 * (2 * NG * NG * (2 * NG - 1) + NG);
+        break;
+
     default:
         error(1, 0, __func__, "Invalid operator or FLOP count not implemented.\n");
     }
@@ -123,6 +135,18 @@ int bytes_per_site(operator_type type) {
 
     case CPHI_INV_FLT:
         bytesite = 3 * sizeof(suNf_spinor_flt) + sizeof(ldl_t);
+        break;
+
+    case CUDA_REDUCTION:
+        bytesite = sizeof(double);
+        break;
+
+    case SF_SQNORM:
+        bytesite = sizeof(suNf_spinor);
+        break;
+
+    case PLAQUETTE:
+        bytesite = 6 * 4 * sizeof(suNg);
         break;
     }
 

@@ -11,7 +11,10 @@ typedef enum {
     CPHI_CORE = 4,
     CPHI_FLT_CORE = 5,
     CPHI_INV = 6,
-    CPHI_INV_FLT = 7
+    CPHI_INV_FLT = 7,
+    CUDA_REDUCTION = 8,
+    SF_SQNORM = 9,
+    PLAQUETTE = 10
 } operator_type;
 
 int flops_per_site(operator_type);

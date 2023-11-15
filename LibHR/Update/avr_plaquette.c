@@ -76,12 +76,29 @@ void cplaq(hr_complex *ret, int ix, int mu, int nu) {
 #endif
 }
 
-double avr_plaquette() {
+double local_plaq(int ix) {
+    double pa;
+
+    pa = plaq(ix, 1, 0);
+    pa += plaq(ix, 2, 0);
+    pa += plaq(ix, 2, 1);
+    pa += plaq(ix, 3, 0);
+    pa += plaq(ix, 3, 1);
+    pa += plaq(ix, 3, 2);
+
+    return pa;
+}
+
+double avr_plaquette_cpu() {
     static double pa = 0.;
 
     _OMP_PRAGMA(single) {
         pa = 0.;
     }
+
+#ifdef WITH_NEW_GEOMETRY
+    complete_sendrecv_gfield(u_gauge);
+#endif
 
     _PIECE_FOR(&glattice, ixp) {
         if (ixp == glattice.inner_master_pieces) {
@@ -113,7 +130,7 @@ double avr_plaquette() {
     return pa;
 }
 
-void avr_plaquette_time(double *plaqt, double *plaqs) {
+void avr_plaquette_time_cpu(double *plaqt, double *plaqs) {
     int ix;
     int tc;
     for (int nt = 0; nt < GLB_T; nt++) {
@@ -145,7 +162,7 @@ void avr_plaquette_time(double *plaqt, double *plaqs) {
     }
 }
 
-void full_plaquette() {
+void full_plaquette_cpu() {
     static hr_complex pa[6];
     static hr_complex r0;
     static hr_complex r1;
@@ -163,6 +180,9 @@ void full_plaquette() {
         r5 = 0.;
     }
 
+#ifdef WITH_NEW_GEOMETRY
+    complete_sendrecv_gfield(u_gauge);
+#endif
     _PIECE_FOR(&glattice, ixp) {
         if (ixp == glattice.inner_master_pieces) {
             _OMP_PRAGMA(master)
@@ -191,24 +211,6 @@ void full_plaquette() {
 
             cplaq(&tmp, ix, 3, 2);
             r5 += tmp;
-
-            /*if(twbc_plaq[ix*16+2*4+1]==-1 &&
-		    twbc_plaq[ix*16+3*4+1]==-1 &&
-		    twbc_plaq[ix*16+3*4+2]==-1) {
-		  cplaq(&tmp,ix,1,0);
-		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,1,0,tmp.re,tmp.im);
-		  cplaq(&tmp,ix,2,0);
-		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,2,0,tmp.re,tmp.im);
-		  cplaq(&tmp,ix,2,1);
-		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,2,1,tmp.re,tmp.im);
-		  cplaq(&tmp,ix,3,0);
-		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,3,0,tmp.re,tmp.im);
-		  cplaq(&tmp,ix,3,1);
-		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,3,1,tmp.re,tmp.im);
-		  cplaq(&tmp,ix,3,2);
-		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,3,2,tmp.re,tmp.im);
-		  t++;
-		    } */
         }
     }
 
@@ -237,45 +239,6 @@ void full_plaquette() {
     lprintf("PLAQ", 0, "Plaq(%d,%d) = ( %f , %f )\n", 3, 0, creal(pa[3]), cimag(pa[3]));
     lprintf("PLAQ", 0, "Plaq(%d,%d) = ( %f , %f )\n", 3, 1, creal(pa[4]), cimag(pa[4]));
     lprintf("PLAQ", 0, "Plaq(%d,%d) = ( %f , %f )\n", 3, 2, creal(pa[5]), cimag(pa[5]));
-}
-
-/*void avr_ts_plaquette()
-{
-  int ix;
-  static double pt = 0., ps = 0.;
-  for (int nt = 0; nt < T; nt++)
-  {
-    for (int nx = 0; nx < X; nx++)
-      for (int ny = 0; ny < Y; ny++)
-        for (int nz = 0; nz < Z; nz++)
-        {
-          ix = ipt(nt, nx, ny, nz);
-          pt += plaq(ix, 1, 0);
-          pt += plaq(ix, 2, 0);
-          ps += plaq(ix, 2, 1);
-          pt += plaq(ix, 3, 0);
-          ps += plaq(ix, 3, 1);
-          ps += plaq(ix, 3, 2);
-        }
-    pt /= 3.0 * NG * GLB_VOL3;
-    ps /= 3.0 * NG * GLB_VOL3;
-    printf("%d %.10e %.10e\n",nt+zerocoord[0],pt,ps);
-
-    pt=ps=0;
-  }
-}*/
-
-double local_plaq(int ix) {
-    double pa;
-
-    pa = plaq(ix, 1, 0);
-    pa += plaq(ix, 2, 0);
-    pa += plaq(ix, 2, 1);
-    pa += plaq(ix, 3, 0);
-    pa += plaq(ix, 3, 1);
-    pa += plaq(ix, 3, 2);
-
-    return pa;
 }
 
 void full_momenta(suNg_av_field *momenta) {
@@ -341,6 +304,9 @@ hr_complex avr_plaquette_wrk() {
     static hr_complex pa, tmp;
     suNg_field *_u = u_gauge_wrk();
     start_sendrecv_gfield(_u);
+#ifdef WITH_NEW_GEOMETRY
+    complete_sendrecv_gfield(_u);
+#endif
 
     _OMP_PRAGMA(single) {
         pa = tmp = 0.;
@@ -379,3 +345,9 @@ hr_complex avr_plaquette_wrk() {
 
     return pa;
 }
+
+#ifndef WITH_GPU
+double (*avr_plaquette)(void) = avr_plaquette_cpu;
+void (*full_plaquette)(void) = full_plaquette_cpu;
+void (*avr_plaquette_time)(double *plaqt, double *plaqs) = avr_plaquette_time_cpu;
+#endif
