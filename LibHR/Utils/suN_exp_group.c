@@ -129,6 +129,7 @@ visible static void suNg_Exp_NG5(suNg *u, suNg *Xin) {
 
     hr_complex qlast;
     q[0] = inverse_fact(NN);
+    q[0] = inverse_factorial(NN);
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
