@@ -518,8 +518,8 @@ __global__ void Cphi_gpu_kernel_(SITE_TYPE *dptr, SITE_TYPE *sptr, suNfc *cl_ter
         _suNfc_dagger(Aminus[2], Aminus[1]);
         _suNfc_mul(Aminus[3], -invexpmass, s2);
 
-        clover_exp_gpu(Aplus, expAplus, NN_loc, NNexp_loc);
-        clover_exp_gpu(Aminus, expAminus, NN_loc, NNexp_loc);
+        clover_exp(Aplus, expAplus, NN_loc);
+        clover_exp(Aminus, expAminus, NN_loc);
 
         _suNfc_mul_assign(expAplus[0], mass);
         _suNfc_mul_assign(expAplus[1], mass);

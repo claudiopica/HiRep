@@ -333,10 +333,6 @@ void clover_init_cpu(double csw) {
     sigma = 0xF00F;
     csw_value = csw;
     lprintf("CLOVER", 10, "Initial Coefficient: csw = %1.6f\n", csw_value);
-
-#if defined(WITH_EXPCLOVER)
-    init_clover_exp();
-#endif
 }
 
 #ifndef WITH_GPU

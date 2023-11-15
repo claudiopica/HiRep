@@ -17,24 +17,15 @@ visible void _su2Nfc_times_su2Nfc_trace(hr_complex *trace, suNfc *B, suNfc *A);
 visible void _su2Nfc_times_su2Nfc_trace_herm_sq(hr_complex *trace, suNfc *B);
 visible void _su2Nfc_unit(suNfc *A);
 visible void _su2Nfc_trace(hr_complex *p, suNfc *A);
-void factorialCoef(double *C, int NN, int NNexp);
+visible void factorialCoef(double *C, int NNexp);
 
-#if !(NF == 2) && !(NF == 3)
-#define clover_exp clover_exp_taylor
-#else
-void clover_exp(suNfc *Aplus, suNfc *expAplus);
-#endif
-void clover_exp_taylor(suNfc *Aplus, suNfc *expAplus);
+visible void clover_exp(suNfc *Aplus, suNfc *expAplus, int NN);
+visible void clover_exp_taylor(suNfc *Aplus, suNfc *expAplus);
+visible void doublehorner(double *C, suNfc *A, int NNexp);
+
 void evaluate_sw_order(double *mass);
-void doublehorner(double *C, suNfc *A);
-
-void init_clover_exp();
 int get_NNexp();
 int get_NN();
-
-#ifdef WITH_GPU
-deviceonly void clover_exp_gpu(suNfc *Aplus, suNfc *expAplus, int NN, int NNexp);
-#endif
 
 #ifdef __cplusplus
 }
