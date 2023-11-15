@@ -15,8 +15,9 @@ typedef enum { NEW = 1, DELTA = 2 } local_action_type;
  * compute the local action at every site for the HMC
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
-void local_hmc_action(local_action_type type, scalar_field *loc_action, suNg_av_field *momenta, suNg_scalar_field *momenta_s);
-void pf_local_action(scalar_field *loc_action, spinor_field *pf);
+extern void (*local_hmc_action)(local_action_type type, scalar_field *loc_action, suNg_av_field *momenta,
+                                suNg_scalar_field *momenta_s);
+extern void (*pf_local_action)(scalar_field *loc_action, spinor_field *pf);
 
 #ifdef __cplusplus
 }
