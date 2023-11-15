@@ -497,7 +497,10 @@ visible void doublehorner(double *C, suNfc *A, int NNexp) {
 #elif (NF == 2)
     doublehornerNF2(C, A, NNexp);
 #else
-    error(0, 1, "doublehorner " __FILE__, "Force only implemented for NF=2 and NF=3");
+    // TODO: this does not work because error is not a host
+    // device function. There is now a compile time
+    // check that forbids NF > 3 to compile WITH_EXPCLOVER
+    //error(0, 1, "doublehorner " __FILE__, "Force only implemented for NF=2 and NF=3");
 #endif
 }
 
