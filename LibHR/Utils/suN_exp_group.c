@@ -1,8 +1,12 @@
 /* Exponential of a SU(N) matrix using the Caley Hamilton or Taylor representation */
 /* arXiv:1006.4518 [hep-lat] */
 
-#include "utils.h"
 #include "libhr_core.h"
+#include "Utils/factorial.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
@@ -37,6 +41,7 @@ visible static void suNg_Exp_NG3(suNg *u, suNg *Xin) {
 
     hr_complex qlast;
     q[0] = inverse_fact(NN);
+    q[0] = inverse_fact(NN);
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -44,6 +49,7 @@ visible static void suNg_Exp_NG3(suNg *u, suNg *Xin) {
         for (j = NG - 2; j > 0; j--) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
+        q[0] = inverse_fact(i) - p[0] * qlast;
         q[0] = inverse_fact(i) - p[0] * qlast;
     }
 
@@ -81,6 +87,7 @@ visible static void suNg_Exp_NG4(suNg *u, suNg *Xin) {
 
     hr_complex qlast;
     q[0] = inverse_fact(NN);
+    q[0] = inverse_factorial(NN);
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -89,6 +96,7 @@ visible static void suNg_Exp_NG4(suNg *u, suNg *Xin) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
         q[0] = inverse_fact(i) - p[0] * qlast;
+        q[0] = inverse_factorial(i) - p[0] * qlast;
     }
 
     _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
@@ -130,6 +138,7 @@ visible static void suNg_Exp_NG5(suNg *u, suNg *Xin) {
     hr_complex qlast;
     q[0] = inverse_fact(NN);
     q[0] = inverse_factorial(NN);
+    q[0] = inverse_factorial(NN);
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -138,6 +147,7 @@ visible static void suNg_Exp_NG5(suNg *u, suNg *Xin) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
         q[0] = inverse_fact(i) - p[0] * qlast;
+        q[0] = inverse_factorial(i) - p[0] * qlast;
     }
 
     _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
@@ -184,6 +194,7 @@ visible static void suNg_Exp_NG6(suNg *u, suNg *Xin) {
 
     hr_complex qlast;
     q[0] = inverse_fact(NN);
+    q[0] = inverse_factorial(NN);
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -192,6 +203,7 @@ visible static void suNg_Exp_NG6(suNg *u, suNg *Xin) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
         q[0] = inverse_fact(i) - p[0] * qlast;
+        q[0] = inverse_factorial(i) - p[0] * qlast;
     }
 
     _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
@@ -254,24 +266,27 @@ visible void suNg_Exp_Taylor(suNg *u, suNg *Xin) {
     }
 }
 
-visible void (*suNg_Exp)(suNg *u, suNg *Xin) =
+visible void suNg_Exp(suNg *u, suNg *Xin) {
 #if (NG == 2)
-    suNg_Exp_NG2;
+    suNg_Exp_NG2(u, Xin);
 #elif (NG == 3)
-    suNg_Exp_NG3;
+    suNg_Exp_NG3(u, Xin);
 #elif (NG == 4)
-    suNg_Exp_NG4;
+    suNg_Exp_NG4(u, Xin);
 #elif (NG == 5)
-    suNg_Exp_NG5;
+    suNg_Exp_NG5(u, Xin);
 #elif (NG == 6)
-    suNg_Exp_NG6;
+    suNg_Exp_NG6(u, Xin);
 #else
-    suNg_Exp_Taylor;
+    suNg_Exp_Taylor(u, Xin);
 #endif
+}
 
 #ifdef GAUGE_SON
-void ExpX(double dt, suNg_algebra_vector *h, suNg *r) {
+visible void ExpX(double dt, suNg_algebra_vector *h, suNg *r) {
+#ifndef WITH_GPU
     error(0 == 0, 1, "ExpX [suN_epx.c]", "This function has yet not been implementd for SON");
+#endif
 }
 #else
 visible void ExpX(double dt, suNg_algebra_vector *h, suNg *u) {
@@ -293,5 +308,9 @@ visible void ExpX(double dt, suNg_algebra_vector *h, suNg *u) {
     _suNg_times_suNg(*u, tmp2, tmp1);
 
 #endif //WITH_QUATERNIONS
+}
+#endif
+
+#ifdef __cplusplus
 }
 #endif

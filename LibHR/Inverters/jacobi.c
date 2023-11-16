@@ -38,12 +38,17 @@
 
 #include "inverters.h"
 #include "error.h"
+#include "Core/gpu.h"
 #include <math.h>
 #include <float.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define MAX_SWEEP 100
 
-static void sort1(int n, double d[], double v[]) {
+visible static void sort1(int n, double d[], double v[]) {
     int i, j, k;
     double p;
 
@@ -71,7 +76,7 @@ static void sort1(int n, double d[], double v[]) {
     }
 }
 
-static void sort2(int n, double d[], hr_complex v[]) {
+visible static void sort2(int n, double d[], hr_complex v[]) {
     int i, j, k;
     double p;
     hr_complex q;
@@ -100,7 +105,7 @@ static void sort2(int n, double d[], hr_complex v[]) {
     }
 }
 
-void jacobi1(int n, double a[], double d[], double v[]) {
+visible void jacobi1(int n, double a[], double d[], double v[]) {
     int k, l, j, sweep;
     double tol, abs_sum, thresh_factor, sd_factor, thresh;
     double r1, r2, r3, r4;
@@ -126,7 +131,9 @@ void jacobi1(int n, double a[], double d[], double v[]) {
             v[n * k + l] = xd0;
             v[n * l + k] = xd0;
 
+#ifndef WITH_GPU
             error(a[n * k + l] != a[n * l + k], 1, "jacobi1 [jacobi.c]", "Matrix is not symmetric");
+#endif
 
             abs_sum += fabs(a[n * k + l]);
         }
@@ -211,7 +218,9 @@ void jacobi1(int n, double a[], double d[], double v[]) {
         }
     }
 
+#ifndef WITH_GPU
     error(sweep >= MAX_SWEEP, 1, "jacobi1 [jacobi.c]", "Maximum number of sweeps exceeded");
+#endif
 
     for (k = 0; k < n - 1; k++) {
         for (l = k + 1; l < n; l++) {
@@ -222,7 +231,7 @@ void jacobi1(int n, double a[], double d[], double v[]) {
     sort1(n, d, v);
 }
 
-void jacobi2(int n, hr_complex a[], double d[], hr_complex v[]) {
+visible void jacobi2(int n, hr_complex a[], double d[], hr_complex v[]) {
     int k, l, j, sweep;
     double tol, abs_sum, thresh_factor, sd_factor, thresh;
     double r1, r2, r3, r4;
@@ -372,7 +381,9 @@ void jacobi2(int n, hr_complex a[], double d[], hr_complex v[]) {
         }
     }
 
+#ifndef WITH_GPU
     error(sweep >= MAX_SWEEP, 1, "jacobi2 [jacobi.c]", "Maximum number of sweeps exceeded");
+#endif
 
     for (k = 0; k < n - 1; k++) {
         for (l = k + 1; l < n; l++) {
@@ -384,3 +395,7 @@ void jacobi2(int n, hr_complex a[], double d[], hr_complex v[]) {
 
     sort2(n, d, v);
 }
+
+#ifdef __cplusplus
+}
+#endif

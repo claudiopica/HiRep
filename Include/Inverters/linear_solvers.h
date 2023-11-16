@@ -8,6 +8,7 @@
 
 #include "hr_complex.h"
 #include "spinor_field.h"
+#include "Core/gpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -75,8 +76,8 @@ int eva(int nev, int nevt, int init, int kmax, int imax, double ubnd, double ome
 int eva_tuned(int nev, int nevt, int init, int kmax, int imax, double lbnd, double ubnd, double omega1, double omega2,
               spinor_operator Op, spinor_field *ev, double d[], int *status);
 
-void jacobi1(int n, double a[], double d[], double v[]);
-void jacobi2(int n, hr_complex a[], double d[], hr_complex v[]);
+visible void jacobi1(int n, double a[], double d[], double v[]);
+visible void jacobi2(int n, hr_complex a[], double d[], hr_complex v[]);
 
 #ifdef __cplusplus
 }

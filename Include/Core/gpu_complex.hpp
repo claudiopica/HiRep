@@ -10,6 +10,8 @@
 
 #ifndef GPU_COMPLEX_H
 #define GPU_COMPLEX_H
+
+#include "Core/gpu.h"
 /*******************************************************************************
 *
 * Definitions of type complex
@@ -1288,5 +1290,8 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt &hr_com
 * a+=z1*c1+z2*c2 (a,z1,c1,z2,c2 complex)
 */
 #define _complex_clc_assign(a, z1, c1, z2, c2) (a) += (z1) * (c1) + (z2) * (c2)
+
+visible double carg(hr_complex c);
+visible hr_complex cpow(hr_complex c, double pow);
 
 #endif

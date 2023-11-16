@@ -9,14 +9,18 @@
 *
 *******************************************************************************/
 
-#include "utils.h"
 #include "libhr_core.h"
 #include "io.h"
+#include "Utils/mat_utils.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef GAUGE_SON
 
 #ifdef WITH_QUATERNIONS
-void inv_Cmplx_Ng(suNg *a) {
+visible void inv_Cmplx_Ng(suNg *a) {
     suNg b;
     double norm;
 
@@ -29,7 +33,7 @@ void inv_Cmplx_Ng(suNg *a) {
 }
 
 #else
-void inv_Cmplx_Ng(suNg *a) {
+visible void inv_Cmplx_Ng(suNg *a) {
     suNg b;
     hr_complex col[NG];
     int indx[NG];
@@ -51,11 +55,11 @@ void inv_Cmplx_Ng(suNg *a) {
 
 #endif
 
-void ludcmp(hr_complex *a, int *indx, double *d, int N) {
+visible void ludcmp(hr_complex *a, int *indx, double *d, int N) {
     const double tiny = 1.0e-20;
     int i, j, k, imax;
     double big, tmp, dum;
-    double vv[N];
+    double *vv = (double *)malloc(N * sizeof(double));
     hr_complex ctmp, csum;
     *d = 1;
     for (j = 0; j < N; ++j) {
@@ -64,7 +68,9 @@ void ludcmp(hr_complex *a, int *indx, double *d, int N) {
             tmp = _complex_prod_re(a[j * N + i], a[j * N + i]);
             if (tmp > big) { big = tmp; }
         }
+#ifndef WITH_GPU
         error(big == 0.0, 1, "ludcmp", "Singular matrix");
+#endif
         vv[j] = 1 / sqrt(big);
     }
     imax = 0;
@@ -117,7 +123,7 @@ void ludcmp(hr_complex *a, int *indx, double *d, int N) {
     }
 }
 
-void lubksb(hr_complex *a, int *indx, hr_complex *b, int N) {
+visible void lubksb(hr_complex *a, int *indx, hr_complex *b, int N) {
     int i, ii, ip, j;
     hr_complex csum, ctmp;
     double tmp;
@@ -149,4 +155,8 @@ void lubksb(hr_complex *a, int *indx, hr_complex *b, int N) {
 
 #else
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif

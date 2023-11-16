@@ -9,14 +9,18 @@
 *
 *******************************************************************************/
 
-#include "utils.h"
 #include "libhr_core.h"
 #include "io.h"
+#include "Utils/mat_utils.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef GAUGE_SON
 
 #ifdef WITH_QUATERNIONS
-void det_Cmplx_Ng(hr_complex *res, suNg *a) {
+visible void det_Cmplx_Ng(hr_complex *res, suNg *a) {
     suNg b;
     double det;
 
@@ -27,7 +31,7 @@ void det_Cmplx_Ng(hr_complex *res, suNg *a) {
 
 #else
 
-void det_Cmplx_Ng(hr_complex *res, suNg *a) {
+visible void det_Cmplx_Ng(hr_complex *res, suNg *a) {
     suNg b;
     int indx[NG];
     double d;
@@ -48,7 +52,7 @@ void det_Cmplx_Ng(hr_complex *res, suNg *a) {
 
 /* The incoming matrix will be destroyed */
 
-void det_Cmplx_Ng(double *res, suNg *a) {
+visible void det_Cmplx_Ng(double *res, suNg *a) {
     double vv[NG];
     double csum, ctmp, cdum;
     double big, dum, tmp;
@@ -117,5 +121,9 @@ void det_Cmplx_Ng(double *res, suNg *a) {
         csum = ctmp;
     }
     *res = csum;
+}
+#endif
+
+#ifdef __cplusplus
 }
 #endif

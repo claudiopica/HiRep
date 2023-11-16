@@ -7,6 +7,8 @@
 #include "libhr_core.h"
 #include "utils.h"
 #include "geometry.h"
+#include "memory.h"
+#include <stdio.h>
 
 // Project gauge field every 2^_PROJ_BIT changes
 static unsigned int count = 0;
@@ -28,12 +30,16 @@ void update_gauge_field(double dt, void *vpar) {
     suNg_field *gfield = *par->field;
     suNg_av_field *force = *par->momenta;
 
+#ifdef WITH_GPU
+    exec_field_update(gfield, force, dt);
+#else
     _MASTER_FOR(&glattice, ix) {
         ExpX(dt, _4FIELD_AT(force, ix, 0), _4FIELD_AT(gfield, ix, 0));
         ExpX(dt, _4FIELD_AT(force, ix, 1), _4FIELD_AT(gfield, ix, 1));
         ExpX(dt, _4FIELD_AT(force, ix, 2), _4FIELD_AT(gfield, ix, 2));
         ExpX(dt, _4FIELD_AT(force, ix, 3), _4FIELD_AT(gfield, ix, 3));
     }
+#endif
 
     if (count & _PROJ_BIT) {
         count = 0;
