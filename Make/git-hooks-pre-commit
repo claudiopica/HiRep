@@ -60,7 +60,7 @@ my $format_ok = 0;
 foreach my $file ( @files_changed ) {
   next if ( $file !~ /\.([ch](pp)?|c[uc])(\.tmpl)?$/ );
   print "Checking $file  ";
-  my $output = `$clangformat --dry-run -Werror --ferror-limit=1 --style=file:$formatfile $file 2> /dev/null`;
+  my $output = `$clangformat --dry-run -Werror --ferror-limit=1 --style=file:$formatfile $file`;
   #system("$clangformat --style=file -i $file 2> /dev/null");
   if ($? != 0) {
     $format_ok = $format_ok || 1;
