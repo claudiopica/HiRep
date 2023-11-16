@@ -23,13 +23,11 @@ jobs:
           fetch-depth: 2
 
       - name: Install dependencies
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: clang-format-15
-          version: 1.0
+        run: ./github/actions/install_llvm.sh 17
+
 
       - name: Check format with clang-format
         env: 
-          CLANG_FORMAT: "clang-format-15"
+          CLANG_FORMAT: "clang-format-17"
         run: ./Make/git-hooks-pre-commit -a
 
