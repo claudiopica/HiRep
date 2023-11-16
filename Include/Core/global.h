@@ -112,10 +112,10 @@ GLB_VAR(geometry_descriptor, glat_red, = { 0 });
 GLB_VAR(geometry_descriptor, glat_black, = { 0 });
 
 // new geometry structure
-GLB_VAR(box_t *, geometryBoxes);
-GLB_VAR(box_t *, geometryBoxes_gpu);
-GLB_VAR(coord4 *, icoord_gpu);
-GLB_VAR(coord4 *, sb_icoord_gpu);
+GLB_VAR(box_t *, geometryBoxes, );
+GLB_VAR(box_t *, geometryBoxes_gpu, );
+GLB_VAR(coord4 *, icoord_gpu, );
+GLB_VAR(coord4 *, sb_icoord_gpu, );
 
 #ifdef UPDATE_EO
 #define glat_default glat_even

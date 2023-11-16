@@ -301,7 +301,7 @@ static box_t *makeBorderBox(char mask) {
         if (mask==0) return NULL;
 
         box_t *b=makeLocalBox(); 
-        b->mask=mask; b->type = 4;
+        b->mask=mask; b->type = INNER; //INNER = 4
         // clang-format off
         if (mask & T_UP_MASK) { b->l[0] = T+T_BORDER; b->h[0] = T_EXT;    b->type--;} else     
         if (mask & T_DN_MASK) { b->l[0] = 0;          b->h[0] = T_BORDER; b->type--;}     
@@ -434,8 +434,8 @@ static void enumerate_lattice() {
     // const int borders[4] = { T_BORDER, X_BORDER, Y_BORDER, Z_BORDER };
     // const int ext_size[4] = { T_EXT, X_EXT, Y_EXT, Z_EXT };
     // const int ext_vol = T_EXT*X_EXT*Y_EXT*Z_EXT;
-    const char up_masks[4] = { T_UP_MASK, X_UP_MASK, Y_UP_MASK, Z_UP_MASK };
-    const char dn_masks[4] = { T_DN_MASK, X_DN_MASK, Y_DN_MASK, Z_DN_MASK };
+    const enum MaskState up_masks[4] = { T_UP_MASK, X_UP_MASK, Y_UP_MASK, Z_UP_MASK };
+    const enum MaskState dn_masks[4] = { T_DN_MASK, X_DN_MASK, Y_DN_MASK, Z_DN_MASK };
 
     int n_parallel[4] = { -1 }; //the list of parallel directions
     int par_dirs = 0;
