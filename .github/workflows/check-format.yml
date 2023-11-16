@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 2
 
       - name: Install dependencies
-        run: ./github/actions/install_llvm.sh 17
+        run: ./.github/actions/install_llvm.sh 17
 
 
       - name: Check format with clang-format
