@@ -27,6 +27,11 @@ extern "C" {
 // They are parametrized over the input types for double/single precision
 // The template is in TMPL/linear_algebra.h.tmpl
 
+#ifdef WITH_GPU
+double *alloc_double_sum_field(int n);
+hr_complex *alloc_complex_sum_field(int n);
+#endif
+
 // double precision
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _SPINOR_TYPE suNf_spinor

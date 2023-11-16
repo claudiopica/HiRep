@@ -6,6 +6,7 @@
 
 #if defined(GAUGE_SUN) && (defined(BC_T_SF) || defined(BC_T_SF_ROTATED))
 
+#include "Inverters/global_sum.h"
 #include "observables.h"
 #include "libhr_core.h"
 

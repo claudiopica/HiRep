@@ -15,14 +15,22 @@ extern "C" {
 //avr_plaquette.h
 double plaq(int ix, int mu, int nu);
 void cplaq(hr_complex *ret, int ix, int mu, int nu);
-double avr_plaquette(void);
-void avr_plaquette_time(double *plaqt, double *plaqs);
-double local_plaq(int ix);
-void full_plaquette(void);
-void avr_ts_plaquette(void);
 
+extern double (*avr_plaquette)(void);
+extern void (*avr_plaquette_time)(double *plaqt, double *plaqs);
+extern void (*full_plaquette)(void);
+double local_plaq(int ix);
+void avr_ts_plaquette(void);
 void cplaq_wrk(hr_complex *ret, int ix, int mu, int nu);
 hr_complex avr_plaquette_wrk(void);
+
+// Mostly necessary for testing
+double avr_plaquette_gpu(void);
+double avr_plaquette_cpu(void);
+void avr_plaquette_time_cpu(double *plaqt, double *plaqs);
+void avr_plaquette_time_gpu(double *plaqt, double *plaqs);
+void full_plaquette_gpu(void);
+void full_plaquette_cpu(void);
 
 //TODO: not defined?
 // double rect_1x2(int ix, int mu, int nu);

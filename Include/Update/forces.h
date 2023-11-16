@@ -44,16 +44,27 @@ void calculate_stfld(int comm);
 double lw_action_density(int ix, double beta, double c0, double c1);
 
 //fermion_force_core.c
-#ifdef WITH_CLOVER
-void force_clover_logdet(double mass, double residue); //TODO: this simply forwards to compute_force_logdet. can we remove it?
-#endif
+extern void (*force_fermion_core)(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue);
+extern void (*fermion_force_begin)(void);
+extern void (*fermion_force_end)(double dt, suNg_av_field *force);
 #ifdef WITH_EXPCLOVER
-void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue);
+extern void (*force_clover_fermion)(spinor_field *Xs, spinor_field *Ys, double residue);
 void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double residue);
 #endif
-void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue);
-void fermion_force_begin(void);
-void fermion_force_end(double dt, suNg_av_field *force);
+
+void force_fermion_core_gpu(spinor_field *, spinor_field *, int, double, double);
+void fermion_force_begin_gpu(void);
+void fermion_force_end_gpu(double, suNg_av_field *);
+
+void force_fermion_core_cpu(spinor_field *, spinor_field *, int, double, double);
+void fermion_force_begin_cpu(void);
+void fermion_force_end_cpu(double, suNg_av_field *);
+
+#ifdef WITH_GPU
+void call_fermion_kernel(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force_sum, double coeff);
+void exec_calculate_stfld(suNg_field *stfld[], int comm);
+void exec_lw_force(suNg_field **stfld, suNg_av_field *force, double dt, double beta, double c0, double c1);
+#endif
 
 //force_hmc.c
 typedef struct force_hmc_par {

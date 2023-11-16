@@ -4,6 +4,7 @@
 \***************************************************************************/
 
 #include "update.h"
+#include "memory.h"
 #include "libhr_core.h"
 #include "io.h"
 
@@ -11,7 +12,8 @@
  * compute the local action at every site for the HMC
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
-void local_hmc_action(local_action_type type, scalar_field *loc_action, suNg_av_field *momenta, suNg_scalar_field *momenta_s) {
+void local_hmc_action_cpu(local_action_type type, scalar_field *loc_action, suNg_av_field *momenta,
+                          suNg_scalar_field *momenta_s) {
     /* check input types */
     _TWO_SPINORS_MATCHING(u_gauge, loc_action); /* check that action is defined on the global lattice */
     _TWO_SPINORS_MATCHING(loc_action, momenta);
@@ -51,13 +53,12 @@ void local_hmc_action(local_action_type type, scalar_field *loc_action, suNg_av_
     int nmon = num_mon();
     for (int i = 0; i < nmon; ++i) {
         monomial const *m = mon_n(i);
-
         m->add_local_action(m, loc_action);
     }
 }
 
 /* add the square of the pf field to the local action */
-void pf_local_action(scalar_field *loc_action, spinor_field *pf) {
+void pf_local_action_cpu(scalar_field *loc_action, spinor_field *pf) {
     if (pf != NULL) {
         _MASTER_FOR(pf->type, i) {
             double a = 0.;
@@ -67,3 +68,8 @@ void pf_local_action(scalar_field *loc_action, spinor_field *pf) {
         }
     }
 }
+
+#ifndef WITH_GPU
+void (*local_hmc_action)(local_action_type, scalar_field *, suNg_av_field *, suNg_scalar_field *) = local_hmc_action_cpu;
+void (*pf_local_action)(scalar_field *, spinor_field *) = pf_local_action_cpu;
+#endif
