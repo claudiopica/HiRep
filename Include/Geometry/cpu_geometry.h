@@ -51,7 +51,7 @@ inline static int safe_mod_fast(int x, int y) {
 /* NB: it is assumed in the code that different directions are contiguous in memory */
 #define coord_to_index(ix, mu) (((ix) << 2) | (mu))
 #define index_to_coord(i, ix, mu) \
-    (mu) = ((i)&3);               \
+    (mu) = ((i) & 3);             \
     (ix) = ((i) >> 2)
 
 //compute field element at position i, mu

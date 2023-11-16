@@ -27,7 +27,7 @@
 
 //#error "Wilson loop must be fixed, The zerocoord global location must be added"
 
-#define _WL_4VOL_INDEX(t, x, y, z) ((t) + (x)*T + (y)*T * X + (z)*T * X * Y)
+#define _WL_4VOL_INDEX(t, x, y, z) ((t) + (x) * T + (y) * T * X + (z) * T * X * Y)
 
 static suNg_field *ws_gtf[2]; /* gtf = gauge transformation field */
 static suNg *buf_gtf[3];

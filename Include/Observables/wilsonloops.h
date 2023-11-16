@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 //wilsonloops.c
-#define _WL_3VOL_INDEX(x, y, z) ((x) + (y)*X + (z)*X * Y)
+#define _WL_3VOL_INDEX(x, y, z) ((x) + (y) * X + (z) * X * Y)
 
 void WL_initialize();
 void WL_free();

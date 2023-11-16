@@ -7,7 +7,7 @@
 #include "libhr_core.h"
 #include "inverters.h"
 
-#define _INDEX_(i, s) ((s)*NF + (i))
+#define _INDEX_(i, s) ((s) * NF + (i))
 
 #define _spinor_c_(r, i) (*((suNf_vector *)(&r) + (i)))
 
@@ -15,13 +15,13 @@
     {                                                            \
         double _ptmp;                                            \
         _vector_prod_re_f(_ptmp, _spinor_c_(r, _C0_), (s).c[0]); \
-        (k) = (_S0_)*_ptmp;                                      \
+        (k) = (_S0_) * _ptmp;                                    \
         _vector_prod_re_f(_ptmp, _spinor_c_(r, _C1_), (s).c[1]); \
-        (k) += (_S1_)*_ptmp;                                     \
+        (k) += (_S1_) * _ptmp;                                   \
         _vector_prod_re_f(_ptmp, _spinor_c_(r, _C2_), (s).c[2]); \
-        (k) += (_S2_)*_ptmp;                                     \
+        (k) += (_S2_) * _ptmp;                                   \
         _vector_prod_re_f(_ptmp, _spinor_c_(r, _C3_), (s).c[3]); \
-        (k) += (_S3_)*_ptmp;                                     \
+        (k) += (_S3_) * _ptmp;                                   \
     }                                                            \
     while (0)
 
@@ -29,13 +29,13 @@
     {                                                            \
         double _ptmp;                                            \
         _vector_prod_im_f(_ptmp, _spinor_c_(r, _C0_), (s).c[0]); \
-        (k) = (_S0_)*_ptmp;                                      \
+        (k) = (_S0_) * _ptmp;                                    \
         _vector_prod_im_f(_ptmp, _spinor_c_(r, _C1_), (s).c[1]); \
-        (k) += (_S1_)*_ptmp;                                     \
+        (k) += (_S1_) * _ptmp;                                   \
         _vector_prod_im_f(_ptmp, _spinor_c_(r, _C2_), (s).c[2]); \
-        (k) += (_S2_)*_ptmp;                                     \
+        (k) += (_S2_) * _ptmp;                                   \
         _vector_prod_im_f(_ptmp, _spinor_c_(r, _C3_), (s).c[3]); \
-        (k) += (_S3_)*_ptmp;                                     \
+        (k) += (_S3_) * _ptmp;                                   \
     }                                                            \
     while (0)
 
@@ -51,40 +51,40 @@ out[t] = 1/L^3 \sum_x \sum_{a,b,i}
 
 \***************************************************************************/
 
-#define MESON_DEFINITION(name)                                                      \
-    void name##_correlator(double *out, int t0, spinor_field *qp) {                 \
-        int t, x, y, z, i;                                                          \
-        suNf_spinor *s1;                                                            \
-        suNf_spinor *s2;                                                            \
-        for (t = 0; t < GLB_T; t++)                                                 \
-            out[t] = 0.;                                                            \
-        for (t = 0; t < T; t++) {                                                   \
-            double _tmp, hc = 0.;                                                   \
-            for (x = 0; x < X; x++)                                                 \
-                for (y = 0; y < Y; y++)                                             \
-                    for (z = 0; z < Z; z++) {                                       \
-                        for (i = 0; i < NF; ++i) {                                  \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 0)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C0_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
-                            hc += (_S0_)*_tmp;                                      \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 1)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C1_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
-                            hc += (_S1_)*_tmp;                                      \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 2)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C2_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
-                            hc += (_S2_)*_tmp;                                      \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 3)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C3_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
-                            hc += (_S3_)*_tmp;                                      \
-                        }                                                           \
-                    }                                                               \
-            out[(zerocoord[0] + t + GLB_T - t0) % GLB_T] = (_SIGN_)*hc / GLB_VOL3;  \
-        }                                                                           \
-        global_sum(out, GLB_T);                                                     \
+#define MESON_DEFINITION(name)                                                       \
+    void name##_correlator(double *out, int t0, spinor_field *qp) {                  \
+        int t, x, y, z, i;                                                           \
+        suNf_spinor *s1;                                                             \
+        suNf_spinor *s2;                                                             \
+        for (t = 0; t < GLB_T; t++)                                                  \
+            out[t] = 0.;                                                             \
+        for (t = 0; t < T; t++) {                                                    \
+            double _tmp, hc = 0.;                                                    \
+            for (x = 0; x < X; x++)                                                  \
+                for (y = 0; y < Y; y++)                                              \
+                    for (z = 0; z < Z; z++) {                                        \
+                        for (i = 0; i < NF; ++i) {                                   \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 0)], ipt(t, x, y, z));     \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C0_)], ipt(t, x, y, z));  \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                    \
+                            hc += (_S0_) * _tmp;                                     \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 1)], ipt(t, x, y, z));     \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C1_)], ipt(t, x, y, z));  \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                    \
+                            hc += (_S1_) * _tmp;                                     \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 2)], ipt(t, x, y, z));     \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C2_)], ipt(t, x, y, z));  \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                    \
+                            hc += (_S2_) * _tmp;                                     \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 3)], ipt(t, x, y, z));     \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _C3_)], ipt(t, x, y, z));  \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                    \
+                            hc += (_S3_) * _tmp;                                     \
+                        }                                                            \
+                    }                                                                \
+            out[(zerocoord[0] + t + GLB_T - t0) % GLB_T] = (_SIGN_) * hc / GLB_VOL3; \
+        }                                                                            \
+        global_sum(out, GLB_T);                                                      \
     }
 
 /***************************************************************************\
@@ -101,40 +101,40 @@ out[t] = Re{
 
 \***************************************************************************/
 
-#define MESON_DEFINITION_TWO_RE(name)                                               \
-    void name##_re_correlator(double *out, int t0, spinor_field *qp) {              \
-        int t, x, y, z, i;                                                          \
-        suNf_spinor *s1;                                                            \
-        suNf_spinor *s2;                                                            \
-        for (t = 0; t < GLB_T; t++)                                                 \
-            out[t] = 0.;                                                            \
-        for (t = 0; t < T; t++) {                                                   \
-            double _tmp, hc = 0.;                                                   \
-            for (x = 0; x < X; x++)                                                 \
-                for (y = 0; y < Y; y++)                                             \
-                    for (z = 0; z < Z; z++) {                                       \
-                        for (i = 0; i < NF; ++i) {                                  \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 0)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D0_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
-                            hc += (_T0_)*_tmp;                                      \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 1)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D1_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
-                            hc += (_T1_)*_tmp;                                      \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 2)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D2_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
-                            hc += (_T2_)*_tmp;                                      \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 3)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D3_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_re(_tmp, *s1, *s2);                   \
-                            hc += (_T3_)*_tmp;                                      \
-                        }                                                           \
-                    }                                                               \
-            out[(zerocoord[0] + t + GLB_T - t0) % GLB_T] = -(_SIGN_)*hc / GLB_VOL3; \
-        }                                                                           \
-        global_sum(out, GLB_T);                                                     \
+#define MESON_DEFINITION_TWO_RE(name)                                                 \
+    void name##_re_correlator(double *out, int t0, spinor_field *qp) {                \
+        int t, x, y, z, i;                                                            \
+        suNf_spinor *s1;                                                              \
+        suNf_spinor *s2;                                                              \
+        for (t = 0; t < GLB_T; t++)                                                   \
+            out[t] = 0.;                                                              \
+        for (t = 0; t < T; t++) {                                                     \
+            double _tmp, hc = 0.;                                                     \
+            for (x = 0; x < X; x++)                                                   \
+                for (y = 0; y < Y; y++)                                               \
+                    for (z = 0; z < Z; z++) {                                         \
+                        for (i = 0; i < NF; ++i) {                                    \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 0)], ipt(t, x, y, z));      \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D0_)], ipt(t, x, y, z));   \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                     \
+                            hc += (_T0_) * _tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 1)], ipt(t, x, y, z));      \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D1_)], ipt(t, x, y, z));   \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                     \
+                            hc += (_T1_) * _tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 2)], ipt(t, x, y, z));      \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D2_)], ipt(t, x, y, z));   \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                     \
+                            hc += (_T2_) * _tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 3)], ipt(t, x, y, z));      \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D3_)], ipt(t, x, y, z));   \
+                            _spinor_perm_prod_re(_tmp, *s1, *s2);                     \
+                            hc += (_T3_) * _tmp;                                      \
+                        }                                                             \
+                    }                                                                 \
+            out[(zerocoord[0] + t + GLB_T - t0) % GLB_T] = -(_SIGN_) * hc / GLB_VOL3; \
+        }                                                                             \
+        global_sum(out, GLB_T);                                                       \
     }
 
 /***************************************************************************\
@@ -151,40 +151,40 @@ out[t] = Im{
 
 \***************************************************************************/
 
-#define MESON_DEFINITION_TWO_IM(name)                                               \
-    void name##_im_correlator(double *out, int t0, spinor_field *qp) {              \
-        int t, x, y, z, i;                                                          \
-        suNf_spinor *s1;                                                            \
-        suNf_spinor *s2;                                                            \
-        for (t = 0; t < GLB_T; t++)                                                 \
-            out[t] = 0.;                                                            \
-        for (t = 0; t < T; t++) {                                                   \
-            double _tmp, hc = 0.;                                                   \
-            for (x = 0; x < X; x++)                                                 \
-                for (y = 0; y < Y; y++)                                             \
-                    for (z = 0; z < Z; z++) {                                       \
-                        for (i = 0; i < NF; ++i) {                                  \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 0)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D0_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_im(_tmp, *s1, *s2);                   \
-                            hc += (_T0_)*_tmp;                                      \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 1)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D1_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_im(_tmp, *s1, *s2);                   \
-                            hc += (_T1_)*_tmp;                                      \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 2)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D2_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_im(_tmp, *s1, *s2);                   \
-                            hc += (_T2_)*_tmp;                                      \
-                            s1 = _FIELD_AT(&qp[_INDEX_(i, 3)], ipt(t, x, y, z));    \
-                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D3_)], ipt(t, x, y, z)); \
-                            _spinor_perm_prod_im(_tmp, *s1, *s2);                   \
-                            hc += (_T3_)*_tmp;                                      \
-                        }                                                           \
-                    }                                                               \
-            out[(zerocoord[0] + t + GLB_T - t0) % GLB_T] = -(_SIGN_)*hc / GLB_VOL3; \
-        }                                                                           \
-        global_sum(out, GLB_T);                                                     \
+#define MESON_DEFINITION_TWO_IM(name)                                                 \
+    void name##_im_correlator(double *out, int t0, spinor_field *qp) {                \
+        int t, x, y, z, i;                                                            \
+        suNf_spinor *s1;                                                              \
+        suNf_spinor *s2;                                                              \
+        for (t = 0; t < GLB_T; t++)                                                   \
+            out[t] = 0.;                                                              \
+        for (t = 0; t < T; t++) {                                                     \
+            double _tmp, hc = 0.;                                                     \
+            for (x = 0; x < X; x++)                                                   \
+                for (y = 0; y < Y; y++)                                               \
+                    for (z = 0; z < Z; z++) {                                         \
+                        for (i = 0; i < NF; ++i) {                                    \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 0)], ipt(t, x, y, z));      \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D0_)], ipt(t, x, y, z));   \
+                            _spinor_perm_prod_im(_tmp, *s1, *s2);                     \
+                            hc += (_T0_) * _tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 1)], ipt(t, x, y, z));      \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D1_)], ipt(t, x, y, z));   \
+                            _spinor_perm_prod_im(_tmp, *s1, *s2);                     \
+                            hc += (_T1_) * _tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 2)], ipt(t, x, y, z));      \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D2_)], ipt(t, x, y, z));   \
+                            _spinor_perm_prod_im(_tmp, *s1, *s2);                     \
+                            hc += (_T2_) * _tmp;                                      \
+                            s1 = _FIELD_AT(&qp[_INDEX_(i, 3)], ipt(t, x, y, z));      \
+                            s2 = _FIELD_AT(&qp[_INDEX_(i, _D3_)], ipt(t, x, y, z));   \
+                            _spinor_perm_prod_im(_tmp, *s1, *s2);                     \
+                            hc += (_T3_) * _tmp;                                      \
+                        }                                                             \
+                    }                                                                 \
+            out[(zerocoord[0] + t + GLB_T - t0) % GLB_T] = -(_SIGN_) * hc / GLB_VOL3; \
+        }                                                                             \
+        global_sum(out, GLB_T);                                                       \
     }
 
 /***************************************************************************\

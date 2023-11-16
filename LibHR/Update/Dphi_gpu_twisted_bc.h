@@ -15,7 +15,7 @@
 #define _declare_vtmp(s)       \
     register suNf_vector vtmp; \
     register suNf_vector_flt vtmp_flt
-#define _vtmp(s) _Generic((s), suNf_vector : vtmp, suNf_vector_flt : vtmp_flt)
+#define _vtmp(s) _Generic((s), suNf_vector: vtmp, suNf_vector_flt: vtmp_flt)
 #else
 #define _declare_vtmp(s) auto vtmp = (s)
 #define _vtmp(s) vtmp

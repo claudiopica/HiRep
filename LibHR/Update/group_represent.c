@@ -1,7 +1,7 @@
 #include "libhr_core.h"
 
-#define XG(m, a, b) ((m) + (a)*NG + (b))
-#define XF(m, a, b) ((m) + (a)*NF + (b))
+#define XG(m, a, b) ((m) + (a) * NG + (b))
+#define XF(m, a, b) ((m) + (a) * NF + (b))
 
 #ifdef __cplusplus
 extern "C" {

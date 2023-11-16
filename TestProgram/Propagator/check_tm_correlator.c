@@ -25,7 +25,7 @@
 #define BASENAME(filename) (strrchr((filename), '/') ? strrchr((filename), '/') + 1 : filename)
 
 #define corr_ind(px, py, pz, n_mom, tc, nm, cm) \
-    ((px) * (n_mom) * (n_mom)*GLB_T * (nm) + (py) * (n_mom)*GLB_T * (nm) + (pz)*GLB_T * (nm) + ((cm)*GLB_T) + (tc))
+    ((px) * (n_mom) * (n_mom) * GLB_T * (nm) + (py) * (n_mom) * GLB_T * (nm) + (pz) * GLB_T * (nm) + ((cm) * GLB_T) + (tc))
 /// \endcond
 
 /// \cond

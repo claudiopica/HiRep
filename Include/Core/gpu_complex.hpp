@@ -1247,17 +1247,17 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt &hr_com
 /*
 * a=b*(c^+) (a,b,c complex)
 */
-#define _complex_mul_star(a, b, c) (a) = (b)*conj(c)
+#define _complex_mul_star(a, b, c) (a) = (b) * conj(c)
 
 /*
 * a+=b*(c^+) (a,b,c complex)
 */
-#define _complex_mul_star_assign(a, b, c) (a) += (b)*conj(c)
+#define _complex_mul_star_assign(a, b, c) (a) += (b) * conj(c)
 
 /*
 * a+=Re[ b*(c^+) ] (a real ;b,c complex)
 */
-#define _complex_mul_star_assign_re(a, b, c) (a) += creal((b)*conj(c))
+#define _complex_mul_star_assign_re(a, b, c) (a) += creal((b) * conj(c))
 
 /*
 * a-=b*c (a,b,c complex)

@@ -28,7 +28,7 @@ extern "C" {
 #endif
 
 //used in mesons.c and trunc_hairpin.c
-#define SPIN_2D_INDEX(i, j) ((i)*4 + (j))
+#define SPIN_2D_INDEX(i, j) ((i) * 4 + (j))
 
 //meson_measurements.c
 void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,

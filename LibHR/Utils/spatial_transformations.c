@@ -120,7 +120,7 @@ static void slice_spatial_blocking(int t, suNg_field *g_in, int *iup_in, int *id
                     u = gauge_field_pointer(g_out, mid, mu);
                     v = gauge_field_pointer(g_in, mid, mu);
                     midn = iup_in[4 * mid + mu];
-                    iup_out[(mid)*4 + (mu)] = iup_in[midn * 4 + mu];
+                    iup_out[(mid) * 4 + (mu)] = iup_in[midn * 4 + mu];
                     w = gauge_field_pointer(g_in, midn, mu);
 
                     _suNg_times_suNg(*u, *v, *w);

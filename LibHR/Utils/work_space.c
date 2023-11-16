@@ -58,11 +58,11 @@ static int n_alloc = 0;
 static int n_reserved = 0;
 
 int iup_wrk(int site, int dir) {
-    return _iup[(site)*4 + (dir)];
+    return _iup[(site) * 4 + (dir)];
 }
 
 int idn_wrk(int site, int dir) {
-    return _idn[(site)*4 + (dir)];
+    return _idn[(site) * 4 + (dir)];
 }
 
 suNg *pu_gauge_wrk(int site, int dir) {

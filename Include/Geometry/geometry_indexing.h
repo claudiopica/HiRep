@@ -13,7 +13,7 @@
 #define imask(ix) imask[ix]
 
 #define ipt_4d(t, x) ipt_4d[(t) * (VOL3) + (x)]
-#define iup(site, dir) iup[(site)*4 + (dir)]
-#define idn(site, dir) idn[(site)*4 + (dir)]
+#define iup(site, dir) iup[(site) * 4 + (dir)]
+#define idn(site, dir) idn[(site) * 4 + (dir)]
 
 #endif
