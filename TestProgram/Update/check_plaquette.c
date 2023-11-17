@@ -18,9 +18,9 @@ int main(int argc, char *argv[]) {
     setup_random_gauge_fields();
 
     /* Average plaquette */
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     double plaq_cpu = avr_plaquette_cpu();
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     double plaq_gpu = avr_plaquette_gpu();
     compare_diff(errors, plaq_cpu, plaq_gpu);
 

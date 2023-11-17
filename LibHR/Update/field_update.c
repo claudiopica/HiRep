@@ -31,7 +31,7 @@ void update_gauge_field(double dt, void *vpar) {
     suNg_av_field *force = *par->momenta;
 
 #ifdef WITH_GPU
-    exec_field_update(gfield, force, dt);
+    exec_field_update(suNg_field, force, dt);
 #else
     _MASTER_FOR(&glattice, ix) {
         ExpX(dt, _4FIELD_AT(force, ix, 0), _4FIELD_AT(suNg_field, ix, 0));

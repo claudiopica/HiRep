@@ -20,7 +20,7 @@ typedef struct {
 //update_field.c
 void update_gauge_field(double, void *);
 void update_scalar_field(double, void *);
-void exec_field_update(suNg_field *gfield, suNg_av_field *force, double dt); // on the GPU
+void exec_field_update(suNg_field *suNg_field, suNg_av_field *force, double dt); // on the GPU
 
 #ifdef __cplusplus
 }

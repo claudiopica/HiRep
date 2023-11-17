@@ -1527,7 +1527,7 @@ void Cphi_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr) {
     //TODO: CPU implementation
 
 #ifndef WITH_GPU
-    error(1, __func__, "Single precision clover-improved dirac operator not implemented for CPU\n");
+    error(1, 1, __func__, "Single precision clover-improved dirac operator not implemented for CPU\n");
 #else
     Dphi_flt_(dptr, sptr);
     Cphi_flt_(mass, dptr, sptr, 1);

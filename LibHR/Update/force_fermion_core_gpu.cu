@@ -190,7 +190,7 @@ __device__ static suNf fmat_create(suNf_spinor *a_lhs, suNf_spinor *a_rhs, suNf_
 }
 
 // TODO: put in Lina improvement
-__global__ void add_assign_avfield(suNg_algebra_vector *v1, suNg_algebra_vector *v2, int N, int block_start) {
+__global__ void add_assign_suNg_av_field(suNg_algebra_vector *v1, suNg_algebra_vector *v2, int N, int block_start) {
     for (int id = blockDim.x * blockIdx.x + threadIdx.x; id < N; id += gridDim.x * blockDim.x) {
         const int ix = id + block_start;
         suNg_algebra_vector t1, t2;
@@ -834,10 +834,10 @@ void force_fermion_core_gpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_od
 #endif
 
     // TODO: comms while calculating clover force
-    start_sendrecv_spinor_field_f(Xs);
-    complete_sendrecv_spinor_field_f(Xs);
-    start_sendrecv_spinor_field_f(Ys);
-    complete_sendrecv_spinor_field_f(Ys);
+    start_sendrecv_spinor_field(Xs);
+    complete_sendrecv_spinor_field(Xs);
+    start_sendrecv_spinor_field(Ys);
+    complete_sendrecv_spinor_field(Ys);
 
 #if defined(WITH_CLOVER)
     force_clover_fermion_gpu(Xs, Ys, residue);
@@ -864,7 +864,7 @@ void force_fermion_core_gpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_od
 }
 
 void fermion_force_begin_gpu() {
-    if (force_sum == NULL) { force_sum = alloc_avfield(&glattice); }
+    if (force_sum == NULL) { force_sum = alloc_suNg_av_field(&glattice); }
 
     cudaMemset(force_sum->gpu_ptr, 0, force_sum->type->gsize_gauge * 4 * sizeof(suNg_algebra_vector));
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
@@ -885,7 +885,7 @@ void fermion_force_end_gpu(double dt, suNg_av_field *force) {
         const int N = glattice.master_end[ixp] - glattice.master_start[ixp] + 1;
         const int block_start = glattice.master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
-        add_assign_avfield<<<grid, BLOCK_SIZE>>>(force->gpu_ptr, force_sum->gpu_ptr, N, block_start);
+        add_assign_suNg_av_field<<<grid, BLOCK_SIZE>>>(force->gpu_ptr, force_sum->gpu_ptr, N, block_start);
     }
 #endif
 

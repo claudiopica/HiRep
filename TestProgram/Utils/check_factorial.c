@@ -19,7 +19,6 @@ int main(int argc, char *argv[]) {
     for (int k = 0; k <= MAX_FACTORIAL; ++k) {
         if (k > 0) { inv_fact_test = inv_fact_test / k; }
         inv_fact_imp = inverse_fact(k);
-        double diff = inv_fact_test - inv_fact_imp;
         CHECK_DIFF(errors, inv_fact_imp, inv_fact_test, k);
     }
 

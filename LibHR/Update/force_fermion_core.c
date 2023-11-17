@@ -880,14 +880,14 @@ void force_fermion_core_cpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_od
 
     // HERE!!!!!
 #if defined(WITH_CLOVER)
-    force_clover_fermion(Xs, Ys, residue);
+    force_clover_fermion_cpu(Xs, Ys, residue);
 #endif
 #if defined(WITH_EXPCLOVER)
 #if (NF == 3 || NF == 2)
     //	force_clover_fermion_taylor(Xs, Ys, residue);
-    force_clover_fermion(Xs, Ys, residue);
+    force_clover_fermion_cpu(Xs, Ys, residue);
 #else
-    force_clover_fermion_taylor(Xs, Ys, residue);
+    force_clover_fermion_taylor_cpu(Xs, Ys, residue);
 #endif
 
 #endif
@@ -979,7 +979,7 @@ void force_fermion_core_cpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_od
 #undef _F_DIR3
 
 void fermion_force_begin_cpu() {
-    if (force_sum == NULL) { force_sum = alloc_avfield(&glattice); }
+    if (force_sum == NULL) { force_sum = alloc_suNg_av_field(&glattice); }
 
     // Clear force field
     _MASTER_FOR(&glattice, ix) {
