@@ -232,7 +232,7 @@ _DECLARE_FIELD_STRUCT(suNg_av_field, suNg_algebra_vector);
  * 				geometry_descriptor that contains geometry information, 
  * 				for example pertaining the block decomposition
  * @var scalar_field::gpu_ptr			
- * 				Only active for WITH_GPU. Contains field daa in GPU memory
+ * 				Only active for WITH_GPU. Contains field data in GPU memory
  * @var scalar_field::comm_req		
  * 				Only active for WITH_MPI
  */
@@ -240,83 +240,153 @@ _DECLARE_FIELD_STRUCT(scalar_field, double);
 
 /**
  * @struct ldl_field
- * @brief FIXME: Add docs
+ * @brief LDL decomposition field needed for clover improvement
+ *
+ * @var scalar_field::ptr	Array of ldl_t, that contains the field
+ * 				data for the local lattice (in host memory)
+ * @var scalar_field::type	
+ * 				geometry_descriptor that contains geometry information, 
+ * 				for example pertaining the block decomposition
+ * @var scalar_field::gpu_ptr			
+ * 				Only active for WITH_GPU. Contains field data in GPU memory
+ * @var scalar_field::comm_req		
+ * 				Only active for WITH_MPI
  */
 _DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
 
 /**
  * @struct suNfc_field
- * @brief FIXME: Add docs
+ * @brief Complexified su(N_f) field field 
+ *
+ * @var scalar_field::ptr	Array of suNfc, that contains the field
+ * 				data for the local lattice (in host memory)
+ * @var scalar_field::type	
+ * 				geometry_descriptor that contains geometry information, 
+ * 				for example pertaining the block decomposition
+ * @var scalar_field::gpu_ptr			
+ * 				Only active for WITH_GPU. Contains field data in GPU memory
+ * @var scalar_field::comm_req		
+ * 				Only active for WITH_MPI
  */
 _DECLARE_FIELD_STRUCT(suNfc_field, suNfc);
 
-#define _FIELD_NAME spinor_field_f
+/**
+ * @struct clover_term
+ * @brief Clover term 
+ *
+ * @var scalar_field::ptr	Array of suNfc, that contains the field
+ * 				data for the local lattice (in host memory)
+ * @var scalar_field::type	
+ * 				geometry_descriptor that contains geometry information, 
+ * 				for example pertaining the block decomposition
+ * @var scalar_field::gpu_ptr			
+ * 				Only active for WITH_GPU. Contains field data in GPU memory
+ * @var scalar_field::comm_req		
+ * 				Only active for WITH_MPI
+ */
+_DECLARE_FIELD_STRUCT(clover_term, suNfc);
+
+/**
+ * @struct clover_force
+ * @brief Clover Force
+ *
+ * @var scalar_field::ptr	Array of suNf, that contains the field
+ * 				data for the local lattice (in host memory)
+ * @var scalar_field::type	
+ * 				geometry_descriptor that contains geometry information, 
+ * 				for example pertaining the block decomposition
+ * @var scalar_field::gpu_ptr			
+ * 				Only active for WITH_GPU. Contains field data in GPU memory
+ * @var scalar_field::comm_req		
+ * 				Only active for WITH_MPI
+ */
+_DECLARE_FIELD_STRUCT(clover_force, suNf);
+
+/**
+ * @struct staple_field
+ * @brief Staple field for Luescher-Weisz  
+ *
+ * @var scalar_field::ptr	Array of suNg, that contains the field
+ * 				data for the local lattice (in host memory)
+ * @var scalar_field::type	
+ * 				geometry_descriptor that contains geometry information, 
+ * 				for example pertaining the block decomposition
+ * @var scalar_field::gpu_ptr			
+ * 				Only active for WITH_GPU. Contains field data in GPU memory
+ * @var scalar_field::comm_req		
+ * 				Only active for WITH_MPI
+ */
+_DECLARE_FIELD_STRUCT(staple_field, suNg);
+
+/**
+ * @struct gtransf
+ * @brief Gauge transformation
+ *
+ * @var scalar_field::ptr	Array of suNg, that contains the field
+ * 				data for the local lattice (in host memory)
+ * @var scalar_field::type	
+ * 				geometry_descriptor that contains geometry information, 
+ * 				for example pertaining the block decomposition
+ * @var scalar_field::gpu_ptr			
+ * 				Only active for WITH_GPU. Contains field data in GPU memory
+ * @var scalar_field::comm_req		
+ * 				Only active for WITH_MPI
+ */
+_DECLARE_FIELD_STRUCT(gtransf, suNg);
+
 #define _FIELD_TYPE spinor_field
 #define _FIELD_DIM 1
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME spinor_field_f_flt
 #define _FIELD_TYPE spinor_field_flt
 #define _FIELD_DIM 1
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME sfield
 #define _FIELD_TYPE scalar_field
 #define _FIELD_DIM 1
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME gfield
 #define _FIELD_TYPE suNg_field
 #define _FIELD_DIM 4
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME gfield_flt
 #define _FIELD_TYPE suNg_field_flt
 #define _FIELD_DIM 4
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME gfield_f
 #define _FIELD_TYPE suNf_field
 #define _FIELD_DIM 4
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME gfield_f_flt
 #define _FIELD_TYPE suNf_field_flt
 #define _FIELD_DIM 4
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME suNg_scalar_field
 #define _FIELD_TYPE suNg_scalar_field
 #define _FIELD_DIM 1
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME avfield
 #define _FIELD_TYPE suNg_av_field
 #define _FIELD_DIM 4
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME gtransf
-#define _FIELD_TYPE suNg_field
+#define _FIELD_TYPE gtransf
 #define _FIELD_DIM 1
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME clover_ldl
 #define _FIELD_TYPE ldl_field
 #define _FIELD_DIM 1
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME clover_term
-#define _FIELD_TYPE suNfc_field
+#define _FIELD_TYPE clover_term
 #define _FIELD_DIM 4
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME clover_force
-#define _FIELD_TYPE suNf_field
+#define _FIELD_TYPE clover_force
 #define _FIELD_DIM 6
 #include "TMPL/spinor_field.h.tmpl"
 
-#define _FIELD_NAME staple_field
-#define _FIELD_TYPE suNg_field
+#define _FIELD_TYPE staple_field
 #define _FIELD_DIM 3
 #include "TMPL/spinor_field.h.tmpl"
 

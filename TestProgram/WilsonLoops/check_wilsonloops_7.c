@@ -7,7 +7,7 @@
 
 #include "libhr.h"
 
-static void random_g(suNg_field *g) {
+static void random_g(gtransf *g) {
     //   _DECLARE_INT_ITERATOR(ix);
 
     _MASTER_FOR(g->type, ix) {
@@ -15,7 +15,7 @@ static void random_g(suNg_field *g) {
     }
 }
 
-static void transform_u(suNg_field *out, suNg_field *in, suNg_field *g) {
+static void transform_u(suNg_field *out, suNg_field *in, gtransf *g) {
     //_DECLARE_INT_ITERATOR(ix);
     int iy, mu;
     suNg v;
@@ -37,17 +37,17 @@ int main(int argc, char *argv[]) {
     setup_gauge_fields();
 
     suNg_field *u[5];
-    u[0] = alloc_gfield(&glattice);
-    u[1] = alloc_gfield(&glattice);
-    u[2] = alloc_gfield(&glattice);
-    u[3] = alloc_gfield(&glattice);
-    u[4] = alloc_gfield(&glattice);
+    u[0] = alloc_suNg_field(&glattice);
+    u[1] = alloc_suNg_field(&glattice);
+    u[2] = alloc_suNg_field(&glattice);
+    u[3] = alloc_suNg_field(&glattice);
+    u[4] = alloc_suNg_field(&glattice);
 
-    suNg_field *g = alloc_gtransf(&glattice);
+    gtransf *g = alloc_gtransf(&glattice);
 
     random_u(u[0]);
-    start_sendrecv_gfield(u[0]);
-    complete_sendrecv_gfield(u[0]);
+    start_sendrecv_suNg_field(u[0]);
+    complete_sendrecv_suNg_field(u[0]);
 
     random_g(g);
     start_sendrecv_gtransf(g);
@@ -56,13 +56,13 @@ int main(int argc, char *argv[]) {
     double HYP_weight[3] = { 1., 1., 1. };
 
     transform_u(u[1], u[0], g);
-    start_sendrecv_gfield(u[1]);
-    complete_sendrecv_gfield(u[1]);
+    start_sendrecv_suNg_field(u[1]);
+    complete_sendrecv_suNg_field(u[1]);
     HYP_smearing(u[2], u[1], HYP_weight);
 
     HYP_smearing(u[3], u[0], HYP_weight);
-    start_sendrecv_gfield(u[3]);
-    complete_sendrecv_gfield(u[3]);
+    start_sendrecv_suNg_field(u[3]);
+    complete_sendrecv_suNg_field(u[3]);
     transform_u(u[4], u[3], g);
 
     double err = 0.;
@@ -113,11 +113,11 @@ int main(int argc, char *argv[]) {
 
     WL_free();
 
-    free_gfield(u[0]);
-    free_gfield(u[1]);
-    free_gfield(u[2]);
-    free_gfield(u[3]);
-    free_gfield(u[4]);
+    free_suNg_field(u[0]);
+    free_suNg_field(u[1]);
+    free_suNg_field(u[2]);
+    free_suNg_field(u[3]);
+    free_suNg_field(u[4]);
     free_gtransf(g);
 
     finalize_process();

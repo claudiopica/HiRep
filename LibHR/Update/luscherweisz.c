@@ -45,7 +45,7 @@ mu = (nu+i+1)&0x3;
 stfld[2*nu+0]->ptr[3*ix+i] = ix -> ix-nu -> ix-nu+mu -> ix+mu
 stfld[2*nu+1]->ptr[3*ix+i] = ix -> ix+nu -> ix+nu+mu -> ix+mu
 *********************************************************************/
-static suNg_field *stfld[8] = { NULL };
+static staple_field *stfld[8] = { NULL };
 
 void calculate_stfld(int comm) {
     suNg wu1;

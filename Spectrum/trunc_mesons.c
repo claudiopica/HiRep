@@ -254,9 +254,9 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "Dilution: %d\n", ata_qprop_var.pars.dilution);
 
     /* alloc global gauge fields */
-    u_gauge = alloc_gfield(&glattice);
+    u_gauge = alloc_suNg_field(&glattice);
 #ifndef REPR_FUNDAMENTAL
-    u_gauge_f = alloc_gfield_f(&glattice);
+    u_gauge_f = alloc_suNf_field(&glattice);
 #endif
 
     ata_qprop_init(&(ata_qprop_var.pars));
@@ -434,9 +434,9 @@ int main(int argc, char *argv[]) {
     free(ctmp[1]);
     free(ctmp[2]);
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 #ifndef REPR_FUNDAMENTAL
-    free_gfield_f(u_gauge_f);
+    free_suNf_field(u_gauge_f);
 #endif
 
     lprintf("MAIN", 0, "Execution time    = %f hours\n", (clock() - start_time) * 1.0 / CLOCKS_PER_SEC / 3600);

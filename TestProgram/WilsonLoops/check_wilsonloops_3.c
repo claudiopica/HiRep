@@ -7,7 +7,7 @@
 #include "libhr.h"
 
 void polyakov_test(suNg *poly, suNg_field *gf) {
-    suNg_field *sh = alloc_gtransf(&glattice);
+    gtransf *sh = alloc_gtransf(&glattice);
     suNg tmp;
 
     for (int x = 0; x < X; x++) {
@@ -66,8 +66,8 @@ int main(int argc, char *argv[]) {
     setup_gauge_fields();
 
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     suNg *poly[2];
     poly[0] = amalloc(sizeof(suNg) * X * Y * Z, ALIGN);
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
     }
     WL_free();
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
     afree(poly[0]);
     afree(poly[1]);
 

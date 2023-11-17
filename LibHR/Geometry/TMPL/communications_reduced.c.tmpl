@@ -12,9 +12,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-#if !defined _FIELD_NAME
-#error Missing _FIELD_NAME in communications_reduced.c
-#endif
 #if !defined _FIELD_TYPE
 #error Missing _FIELD_TYPE in communications_reduced.c
 #endif
@@ -34,23 +31,23 @@
 #error Missing _REAL in communications_reduced.c
 #endif
 
-#define _DECLARE(_name, _args) _FUNC(void, _name, _FIELD_NAME, _args)
-#define _GPU_DECLARE(_name, _args) _GPU_FUNC(void, _name, _FIELD_NAME, _args)
+#define _DECLARE(_name, _args) _FUNC(void, _name, _FIELD_TYPE, _args)
+#define _GPU_DECLARE(_name, _args) _GPU_FUNC(void, _name, _FIELD_TYPE, _args)
 #define roundUp(_val, _mod) ((((_val - 1) / (_mod)) + 1) * (_mod))
 
 _GPU_DECLARE(sync_reduced_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
-    _BUFFER_BOX_FOR(L, _F_NAME(sync_box_to_buffer_gpu_reduced_, _FIELD_NAME)(f->type, L->sendBox, f, f->sendbuf_gpu_ptr, i,
+    _BUFFER_BOX_FOR(L, _F_NAME(sync_box_to_buffer_gpu_reduced_, _FIELD_TYPE)(f->type, L->sendBox, f, f->sendbuf_gpu_ptr, i,
                                                                              L->mask);)
 #endif
 }
 
 _DECLARE(sync_reduced_init_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
-    _BUFFER_BOX_FOR(L, _F_NAME(sync_box_reduced_init_, _FIELD_NAME)(f->type, L->sendBox, f, f->sendbuf_gpu_ptr, i);)
-    _F_NAME(check_sendrecv_guard_, _FIELD_NAME)(f);
-    _F_NAME(lock_communications_, _FIELD_NAME)(f);
-    _GPU_F_NAME(sync_reduced_, _FIELD_NAME)(f);
+    _BUFFER_BOX_FOR(L, _F_NAME(sync_box_reduced_init_, _FIELD_TYPE)(f->type, L->sendBox, f, f->sendbuf_gpu_ptr, i);)
+    _F_NAME(check_sendrecv_guard_, _FIELD_TYPE)(f);
+    _F_NAME(lock_communications_, _FIELD_TYPE)(f);
+    _GPU_F_NAME(sync_reduced_, _FIELD_TYPE)(f);
 #endif
 }
 
@@ -67,7 +64,7 @@ _DECLARE(start_sendrecv_reduced_, (_FIELD_TYPE * f)) {
 _DECLARE(complete_sendrecv_reduced_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
     int nreq = 2 * _NUMBER_OF_BUFFERS(f->type, _GEOM_TYPE);
-    _F_NAME(release_communications_, _FIELD_NAME)(f);
+    _F_NAME(release_communications_, _FIELD_TYPE)(f);
     hr_sendrecv_complete(nreq, f->comm_req);
 #endif
 }
@@ -76,7 +73,6 @@ _DECLARE(complete_sendrecv_reduced_, (_FIELD_TYPE * f)) {
 
 #undef _DECLARE
 #undef _GPU_DECLARE
-#undef _FIELD_NAME
 #undef _FIELD_TYPE
 #undef _SITE_TYPE
 #undef _FIELD_DIM

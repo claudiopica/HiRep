@@ -29,9 +29,9 @@ int test_herm(spinor_operator S, char *name) {
     double tau;
     int return_val = 0;
 #ifdef UPDATE_EO
-    s1 = alloc_spinor_field_f(4, &glat_even);
+    s1 = alloc_spinor_field(4, &glat_even);
 #else
-    s1 = alloc_spinor_field_f(4, &glattice);
+    s1 = alloc_spinor_field(4, &glattice);
 #endif
     s2 = s1 + 1;
     s3 = s2 + 1;
@@ -60,7 +60,7 @@ int test_herm(spinor_operator S, char *name) {
     }
     lprintf("RESULT", 0, "[norm = %e]\n", tau);
 
-    free_spinor_field_f(s1);
+    free_spinor_field(s1);
     return return_val;
 }
 
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
     random_u(u_gauge);
     lprintf("MAIN", 0, "done.\n");
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
     return_value = test_herm(&MM, "M");
 

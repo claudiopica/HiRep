@@ -77,7 +77,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
     /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
-    memall = alloc_spinor_field_f(2 * (par->n) + 3, in->type);
+    memall = alloc_spinor_field(2 * (par->n) + 3, in->type);
     q1 = (spinor_field **)malloc(sizeof(spinor_field *) * par->n);
     q2 = (spinor_field **)malloc(sizeof(spinor_field *) * par->n);
     for (i = 0; i < par->n; i++) {
@@ -254,7 +254,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
     }
 
     /* free memory */
-    free_spinor_field_f(memall);
+    free_spinor_field(memall);
     free(q1);
     free(q2);
     free(r);

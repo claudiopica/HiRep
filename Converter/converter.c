@@ -498,7 +498,7 @@ int main(int argc, char *argv[]) {
         output_format->write(output_filename);
     }
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 
     return 0;
 }

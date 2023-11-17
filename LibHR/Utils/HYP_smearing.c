@@ -83,8 +83,8 @@ void spatialHYP_smearing(suNg_field* out, suNg_field* in, double weight[3]) {
 
   lprintf("HYP",30,"Spatial HYP smearing with weights %f %f %f\n",weight[0],weight[1],weight[2]);
 
-  for(i=0;i<6;i++) Vbar[i]=alloc_gfield(&glattice);
-  for(i=0;i<4;i++) Vtilde[i]=alloc_gfield(&glattice);
+  for(i=0;i<6;i++) Vbar[i]=alloc_suNg_field(&glattice);
+  for(i=0;i<4;i++) Vtilde[i]=alloc_suNg_field(&glattice);
 
 
   for(nu=1;nu<4;nu++)
@@ -201,15 +201,15 @@ void spatialHYP_smearing(suNg_field* out, suNg_field* in, double weight[3]) {
   }
 
 
-  for(i=0;i<6;i++) free_gfield(Vbar[i]);
-  for(i=0;i<4;i++) free_gfield(Vtilde[i]);
+  for(i=0;i<6;i++) free_suNg_field(Vbar[i]);
+  for(i=0;i<4;i++) free_suNg_field(Vtilde[i]);
 
 }
 */
 
 void HYP_smearing(suNg_field *out, suNg_field *in, double weight[3]) {
-    suNg_field *Vbar[24];
-    suNg_field *Vtilde[12];
+    gtransf *Vbar[24];
+    gtransf *Vtilde[12];
 
     error(out->type != &glattice, 1, "HYP_smearing.c", "'out' in HYP_core must be defined on the whole lattice");
     error(in->type != &glattice, 1, "HYP_smearing.c", "'in' in HYP_core must be defined on the whole lattice");
@@ -235,12 +235,12 @@ U{x,eta} U{x+eta,mu} U{x+mu,eta}^\dag
 
 */
 
-    start_sendrecv_gfield(in);
+    start_sendrecv_suNg_field(in);
 
     _PIECE_FOR(&glattice, ixp) {
         if (ixp == glattice.inner_master_pieces) {
             _OMP_PRAGMA(master)
-            complete_sendrecv_gfield(in);
+            complete_sendrecv_suNg_field(in);
             _OMP_PRAGMA(barrier)
         }
         suNg tmp[3];
@@ -428,7 +428,7 @@ void HYP_span_parameters(double mtp[6859]) {
     double w[3];
     suNg_field *sg;
 
-    sg = alloc_gfield(&glattice);
+    sg = alloc_suNg_field(&glattice);
 
     for (i = 0; i < 19; i++) {
         w[0] = .05 * (i + 1);

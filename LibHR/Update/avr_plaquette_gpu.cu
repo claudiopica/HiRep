@@ -139,7 +139,7 @@ double avr_plaquette_gpu() {
     double res = 0.0;
     double *resPiece;
 
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     _CUDA_FOR(u_gauge, ixp, resPiece = alloc_double_sum_field(N); (_avr_plaquette<<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
         u_gauge->gpu_ptr, resPiece, iup_gpu, N, u_gauge->type->master_start[ixp] PLAQ_WEIGHT_ARG));
@@ -207,8 +207,8 @@ void avr_plaquette_time_gpu(double *plaqt, double *plaqs) {
         init = 1;
     }
 
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     _CUDA_FOR(
         u_gauge, ixp, resPiece = alloc_double_sum_field(N * GLB_T * 2); cudaMemset(resPiece, 0, N * GLB_T * 2 * sizeof(double));
@@ -255,8 +255,8 @@ __global__ void _full_plaquette(suNg *u, hr_complex *resPiece, int *iup_gpu, int
 }
 
 void full_plaquette_gpu(void) {
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     hr_complex pa[6];
 

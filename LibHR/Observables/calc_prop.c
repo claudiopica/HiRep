@@ -88,7 +88,7 @@ enum { _g5QMR = 0, _MINRES, _CG, _CG_4F };
 static void init_eva(int nevt) {
     if (init_eig == 0) {
         eva_val = malloc(sizeof(double) * nevt);
-        eva_vec = alloc_spinor_field_f(nevt + 1, &glat_even);
+        eva_vec = alloc_spinor_field(nevt + 1, &glat_even);
         tmp_sf = eva_vec + nevt;
         init_eig = 1;
     }
@@ -114,13 +114,13 @@ void init_propagator_eo(int nm, double *m, double acc) {
         QMR_par.err2 = .5 * acc;
         QMR_par.max_iter = 0;
 
-        resd_even = alloc_spinor_field_f(QMR_par.n, &glat_even);
-        tmp_even = alloc_spinor_field_f(1, &glat_even);
-        tmp_even2 = alloc_spinor_field_f(1, &glat_even);
-        tmp_odd = alloc_spinor_field_f(1, &glat_odd);
+        resd_even = alloc_spinor_field(QMR_par.n, &glat_even);
+        tmp_even = alloc_spinor_field(1, &glat_even);
+        tmp_even2 = alloc_spinor_field(1, &glat_even);
+        tmp_odd = alloc_spinor_field(1, &glat_odd);
 
 #ifdef GAUSSIAN_NOISE
-        QMR_noise = alloc_spinor_field_f(nm + 1, &glat_even);
+        QMR_noise = alloc_spinor_field(nm + 1, &glat_even);
         QMR_resdn = QMR_noise + 1;
         /* noisy background */
         gaussian_spinor_field(QMR_noise);
@@ -146,23 +146,23 @@ void free_propagator_eo() {
     free(mass);
 
 #ifdef GAUSSIAN_NOISE
-    free_spinor_field_f(QMR_noise);
+    free_spinor_field(QMR_noise);
 #endif
     if (tmp_even != NULL) {
-        free_spinor_field_f(tmp_even);
+        free_spinor_field(tmp_even);
         tmp_even = NULL;
     }
     if (resd_even != NULL) {
-        free_spinor_field_f(resd_even);
+        free_spinor_field(resd_even);
         resd_even = NULL;
     }
     if (tmp_odd != NULL) {
-        free_spinor_field_f(tmp_odd);
+        free_spinor_field(tmp_odd);
         tmp_odd = NULL;
     }
     if (init_eig) {
         free(eva_val);
-        free_spinor_field_f(eva_vec);
+        free_spinor_field(eva_vec);
         init_eig = 0;
     }
     init = 0;
@@ -236,8 +236,8 @@ static void calc_propagator_eo_core(spinor_field *psi, spinor_field *eta, int so
         spinor_field_minus_f(&qprop_mask, &qprop_mask);
         if (i & 1) { ++cgiter; /* count only half of calls. works because the number of sources is even */ }
     }
-    start_sendrecv_spinor_field_f(psi);
-    complete_sendrecv_spinor_field_f(psi);
+    start_sendrecv_spinor_field(psi);
+    complete_sendrecv_spinor_field(psi);
     lprintf("CALC_PROP", 10, "QMR_eo MVM = %d\n", cgiter);
 }
 #endif
@@ -248,8 +248,8 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solve
     error(eta->type != &glattice, 1, "calc_propagator_core [calc_prop.c]", "eta type must be glattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-    start_sendrecv_spinor_field_f(eta);
-    complete_sendrecv_spinor_field_f(eta);
+    start_sendrecv_spinor_field(eta);
+    complete_sendrecv_spinor_field(eta);
 
     spinor_field qprop_mask_eta;
     spinor_field qprop_mask_psi;
@@ -330,8 +330,8 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solve
     ++cgiter; /* One whole call*/
     lprintf("CALC_PROP_CORE", 10, "QMR_eo MVM = %d\n", cgiter);
 
-    start_sendrecv_spinor_field_f(psi);
-    complete_sendrecv_spinor_field_f(psi);
+    start_sendrecv_spinor_field(psi);
+    complete_sendrecv_spinor_field(psi);
 }
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 
@@ -357,9 +357,9 @@ static void calc_propagator_clover(spinor_field *dptr, spinor_field *sptr) {
 
     // Allocate temporary fields
     if (local_init == 0) {
-        etmp = alloc_spinor_field_f(1, &glat_even);
-        otmp = alloc_spinor_field_f(1, &glat_odd);
-        stmp = alloc_spinor_field_f(1, &glattice);
+        etmp = alloc_spinor_field(1, &glat_even);
+        otmp = alloc_spinor_field(1, &glat_odd);
+        stmp = alloc_spinor_field(1, &glattice);
         local_init = 1;
     }
 
@@ -617,8 +617,8 @@ static void calc_propagator_eo_tw_core(spinor_field *psi, spinor_field *eta, int
     ++cgiter; /* One whole call*/
     lprintf("CALC_PROPAGATOR_EO_TW_CORE", 0, "QMR_eo MVM = %d\n", cgiter);
 
-    start_sendrecv_spinor_field_f(psi);
-    complete_sendrecv_spinor_field_f(psi);
+    start_sendrecv_spinor_field(psi);
+    complete_sendrecv_spinor_field(psi);
 
 #ifndef CHECK_SPINOR_MATCHING
     error(psi->type == &glattice, 1, "calc_propagator_eo_tw_core [calc_prop.c]", "incorrect type for the input (psi) spinor");
@@ -648,8 +648,8 @@ void calc_propagator_tw(double *lmass, double mu, spinor_field *psi, spinor_fiel
 #endif
 
     for (beta = 0; beta < ndilute; ++beta) {
-        start_sendrecv_spinor_field_f(eta + beta);
-        complete_sendrecv_spinor_field_f(eta + beta);
+        start_sendrecv_spinor_field(eta + beta);
+        complete_sendrecv_spinor_field(eta + beta);
         for (i = 0; i < n_masses; ++i) {
             lprintf("CALC_PROPAGATOR_TW", 10, "n masses=%d, mass = %g\n", n_masses, m[i]);
             hmass_pre = m[i];

@@ -97,14 +97,14 @@ double avr_plaquette_cpu() {
     }
 
 #ifdef WITH_NEW_GEOMETRY
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 #endif
 
     _PIECE_FOR(&glattice, ixp) {
         if (ixp == glattice.inner_master_pieces) {
             _OMP_PRAGMA(master)
             /* wait for gauge field to be transfered */
-            complete_sendrecv_gfield(u_gauge);
+            complete_sendrecv_suNg_field(u_gauge);
             _OMP_PRAGMA(barrier)
         }
         _SITE_FOR_SUM(&glattice, ixp, ix, pa) {
@@ -181,13 +181,13 @@ void full_plaquette_cpu() {
     }
 
 #ifdef WITH_NEW_GEOMETRY
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 #endif
     _PIECE_FOR(&glattice, ixp) {
         if (ixp == glattice.inner_master_pieces) {
             _OMP_PRAGMA(master)
             /* wait for gauge field to be transfered */
-            complete_sendrecv_gfield(u_gauge);
+            complete_sendrecv_suNg_field(u_gauge);
             _OMP_PRAGMA(barrier)
         }
 
@@ -242,7 +242,7 @@ void full_plaquette_cpu() {
 }
 
 void full_momenta(suNg_av_field *momenta) {
-    scalar_field *la = alloc_sfield(1, &glattice);
+    scalar_field *la = alloc_scalar_field(1, &glattice);
 #ifdef WITH_FUSE_MASTER_FOR
     _FUSE_MASTER_FOR(&glattice, i) {
         _FUSE_IDX(&glattice, i);
@@ -267,7 +267,7 @@ void full_momenta(suNg_av_field *momenta) {
         mom += *_FIELD_AT(la, i);
     }
     lprintf("MOMENTA", 0, "%1.8g\n", mom);
-    free_sfield(la);
+    free_scalar_field(la);
 }
 
 void cplaq_wrk(hr_complex *ret, int ix, int mu, int nu) {
@@ -303,9 +303,9 @@ void cplaq_wrk(hr_complex *ret, int ix, int mu, int nu) {
 hr_complex avr_plaquette_wrk() {
     static hr_complex pa, tmp;
     suNg_field *_u = u_gauge_wrk();
-    start_sendrecv_gfield(_u);
+    start_sendrecv_suNg_field(_u);
 #ifdef WITH_NEW_GEOMETRY
-    complete_sendrecv_gfield(_u);
+    complete_sendrecv_suNg_field(_u);
 #endif
 
     _OMP_PRAGMA(single) {
@@ -316,7 +316,7 @@ hr_complex avr_plaquette_wrk() {
         if (ixp == glattice.inner_master_pieces) {
             _OMP_PRAGMA(master)
             /* wait for gauge field to be transfered */
-            complete_sendrecv_gfield(_u);
+            complete_sendrecv_suNg_field(_u);
             _OMP_PRAGMA(barrier)
         }
         _SITE_FOR_SUM(&glattice, ixp, ix, pa) {

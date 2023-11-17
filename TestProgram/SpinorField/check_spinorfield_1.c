@@ -126,8 +126,8 @@ int main(int argc, char *argv[]) {
     lprintf("LA TEST", 0, "Consistency of the programs in the module linalg\n");
     lprintf("LA TEST", 0, "------------------------------------------------\n");
 
-    tmp = alloc_spinor_field_f(1, &glattice);
-    ws = alloc_spinor_field_f(10, &glattice);
+    tmp = alloc_spinor_field(1, &glattice);
+    ws = alloc_spinor_field(10, &glattice);
 
     for (i = 0; i < 10; i++) {
         gaussian_spinor_field(&ws[i]);

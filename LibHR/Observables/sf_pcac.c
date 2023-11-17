@@ -51,7 +51,7 @@ int SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double
 
     static mshift_par inv_par;
     static spinor_field *chi = NULL;
-    if (chi == NULL) { chi = alloc_spinor_field_f(1, &glattice); }
+    if (chi == NULL) { chi = alloc_spinor_field(1, &glattice); }
     hmass = mass;
 
     inv_par.n = 1;
@@ -90,8 +90,8 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
     suNf_spinor *sbord;
     sbord = malloc(4 * NF * sizeof(suNf_spinor));
     suNf *uptr;
-    prop = alloc_spinor_field_f(4 * NF, &glattice);
-    source = alloc_spinor_field_f(4 * NF, &glattice);
+    prop = alloc_spinor_field(4 * NF, &glattice);
+    source = alloc_spinor_field(4 * NF, &glattice);
 
     if (swh == STORE) {
         ret = allocate_data_storage_array(3);
@@ -301,8 +301,8 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
         }
     }
 
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
+    free_spinor_field(source);
+    free_spinor_field(prop);
 
     free(stmp);
     free(sbord);
@@ -319,9 +319,9 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
     int i, j, ix1, ix2, ix3, s1;
 
     if (source == NULL) {
-        source = alloc_spinor_field_f(4 * NF, &glattice);
-        prop_uu = alloc_spinor_field_f(4 * NF, &glattice);
-        prop_dd = alloc_spinor_field_f(4 * NF, &glattice);
+        source = alloc_spinor_field(4 * NF, &glattice);
+        prop_uu = alloc_spinor_field(4 * NF, &glattice);
+        prop_dd = alloc_spinor_field(4 * NF, &glattice);
     }
 
     static chisf_mem *corr_mem = NULL;

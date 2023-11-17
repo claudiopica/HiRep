@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     init_BCs(NULL);
 
     /* alloc fields */
-    sp = alloc_spinor_field_f(1, &glattice);
+    sp = alloc_spinor_field(1, &glattice);
     gaussian_spinor_field(sp);
     apply_BCs_on_spinor_field(sp);
 
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
 
     free_BCs();
 
-    free_spinor_field_f(sp);
+    free_spinor_field(sp);
 
     return 0;
 }

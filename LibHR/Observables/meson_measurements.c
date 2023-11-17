@@ -77,8 +77,8 @@ static void flip_T_bc(int tau) {
 
 void measure_spectrum_pt(int tau, int nm, double *m, int n_mom, int conf_num, double precision, storage_switch swc,
                          data_storage_array **ret) {
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm * NF, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm * NF, &glattice);
     for (int i = 0; i < 4 * nm * NF; i++) {
         spinor_field_zero_f(prop + i);
     }
@@ -148,15 +148,15 @@ void measure_spectrum_pt(int tau, int nm, double *m, int n_mom, int conf_num, do
     print_mesons(cvc_correlators, 1., conf_num, nm, m, GLB_T, n_mom, "DEFAULT_POINT");
 
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
+    free_spinor_field(source);
+    free_spinor_field(prop);
 }
 
 void measure_spectrum_pt_ext(int tau, int nm, double *m, int n_mom, int conf_num, double precision, storage_switch swc,
                              data_storage_array **ret) {
     int k, l;
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop_p = alloc_spinor_field_f(8 * nm, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop_p = alloc_spinor_field(8 * nm, &glattice);
     spinor_field *prop_a = prop_p + 4 * nm;
 
     for (int i = 0; i < 8 * nm; i++) {
@@ -196,17 +196,17 @@ void measure_spectrum_pt_ext(int tau, int nm, double *m, int n_mom, int conf_num
     }
     print_mesons(meson_correlators, 1., conf_num, nm, m, 3 * GLB_T, n_mom, "EXTENDED_POINT");
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop_p);
-    free_spinor_field_f(prop_a);
+    free_spinor_field(source);
+    free_spinor_field(prop_p);
+    free_spinor_field(prop_a);
 }
 
 void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double *m, int n_mom, int conf_num, double precision,
                                  storage_switch swc, data_storage_array **ret) {
     int k;
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
-    suNf_field *u_gauge_old = alloc_gfield_f(&glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
+    suNf_field *u_gauge_old = alloc_suNf_field(&glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
         spinor_field_zero_f(prop + i);
@@ -228,9 +228,9 @@ void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double *m, int n_mom, 
     sprintf(label, "DIRICHLET_POINT dt=%d", dt);
     print_mesons(meson_correlators, 1., conf_num, nm, m, GLB_T, n_mom, label);
     suNf_field_copy(u_gauge_f, u_gauge_old);
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
-    free_gfield_f(u_gauge_old);
+    free_spinor_field(source);
+    free_spinor_field(prop);
+    free_suNf_field(u_gauge_old);
     free_propagator_eo();
 }
 
@@ -240,9 +240,9 @@ void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double *m, int n_mom, 
 
 void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_num, double precision, double Q, int n,
                                         storage_switch swc, data_storage_array **ret) {
-    spinor_field *source = alloc_spinor_field_f(4, &glat_even);
-    spinor_field *prop_u = alloc_spinor_field_f(4 * nm, &glattice);
-    spinor_field *prop_d = alloc_spinor_field_f(4 * nm, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glat_even);
+    spinor_field *prop_u = alloc_spinor_field(4 * nm, &glattice);
+    spinor_field *prop_d = alloc_spinor_field(4 * nm, &glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
         spinor_field_zero_f(prop_u + i);
@@ -252,7 +252,7 @@ void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_n
     }
 
     int tau, k;
-    suNg_field *u_gauge_old = alloc_gfield(&glattice);
+    suNg_field *u_gauge_old = alloc_suNg_field(&glattice);
     suNg_field_copy(u_gauge_old, u_gauge);
 
     error(nm != 1, 1, "measure_diquark_semwall_background", "nm cannot be different from 1 !\n");
@@ -280,16 +280,16 @@ void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_n
     print_mesons(meson_correlators, nhits * GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, "DEFAULT_DIQUARK_SEMWALL_BACKGROUND");
 
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop_u);
-    free_spinor_field_f(prop_d);
-    free_gfield(u_gauge_old);
+    free_spinor_field(source);
+    free_spinor_field(prop_u);
+    free_spinor_field(prop_d);
+    free_suNg_field(u_gauge_old);
 }
 
 void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
                               data_storage_array **ret) {
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
 
     // init data storage here
     if (swc == STORE) {
@@ -343,15 +343,15 @@ void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double
 
     print_mesons(meson_correlators, nhits * GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, "DEFAULT_SEMWALL");
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
+    free_spinor_field(source);
+    free_spinor_field(prop);
 }
 
 void measure_spectrum_semwall_ext(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
                                   data_storage_array **ret) {
     int k, l, tau;
-    spinor_field *source = alloc_spinor_field_f(4, &glat_even);
-    spinor_field *prop_p = alloc_spinor_field_f(8 * nm, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glat_even);
+    spinor_field *prop_p = alloc_spinor_field(8 * nm, &glattice);
     spinor_field *prop_a = prop_p + 4 * nm;
 
     for (int i = 0; i < 8 * nm; i++) {
@@ -380,16 +380,16 @@ void measure_spectrum_semwall_ext(int nm, double *m, int nhits, int conf_num, do
     }
     print_mesons(meson_correlators, 1. * nhits * GLB_VOL3 / 2., conf_num, nm, m, 3 * GLB_T, 1, "EXTENDED_SEMWALL");
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop_p);
+    free_spinor_field(source);
+    free_spinor_field(prop_p);
 }
 
 void measure_spectrum_semwall_fixedbc(int dt, int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
                                       data_storage_array **ret) {
     int tau, k;
-    spinor_field *source = alloc_spinor_field_f(4, &glat_even);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
-    suNf_field *u_gauge_old = alloc_gfield_f(&glattice);
+    spinor_field *source = alloc_spinor_field(4, &glat_even);
+    spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
+    suNf_field *u_gauge_old = alloc_suNf_field(&glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
         spinor_field_zero_f(prop + i);
@@ -407,9 +407,9 @@ void measure_spectrum_semwall_fixedbc(int dt, int nm, double *m, int nhits, int 
     }
     sprintf(label, "DIRICHLET_SEMWALL dt=%d", dt);
     print_mesons(meson_correlators, nhits * GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, label);
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
-    free_gfield_f(u_gauge_old);
+    free_spinor_field(source);
+    free_spinor_field(prop);
+    free_suNf_field(u_gauge_old);
     free_propagator_eo();
 }
 
@@ -417,9 +417,9 @@ void measure_spectrum_semwall_fixedbc(int dt, int nm, double *m, int nhits, int 
  *	Gauge Fixed Wall Sources	*
  *****************************************/
 void measure_spectrum_gfwall(int nm, double *m, int conf_num, double precision, storage_switch swc, data_storage_array **ret) {
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
-    suNg_field *u_gauge_old = alloc_gfield(&glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
+    suNg_field *u_gauge_old = alloc_suNg_field(&glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
         spinor_field_zero_f(prop + i);
@@ -452,16 +452,16 @@ void measure_spectrum_gfwall(int nm, double *m, int conf_num, double precision, 
     represent_gauge_field();
 
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
-    free_gfield(u_gauge_old);
+    free_spinor_field(source);
+    free_spinor_field(prop);
+    free_suNg_field(u_gauge_old);
 }
 
 void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, double precision, storage_switch swc,
                                      data_storage_array **ret) {
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
-    suNg_field *u_gauge_old = alloc_gfield(&glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
+    suNg_field *u_gauge_old = alloc_suNg_field(&glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
         spinor_field_zero_f(prop + i);
@@ -497,9 +497,9 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, do
     represent_gauge_field();
 
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
-    free_gfield(u_gauge_old);
+    free_spinor_field(source);
+    free_spinor_field(prop);
+    free_suNg_field(u_gauge_old);
 }
 
 /****************************************
@@ -508,8 +508,8 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, do
 
 void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
                                      data_storage_array **ret) {
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
         spinor_field_zero_f(prop + i);
@@ -532,15 +532,15 @@ void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num,
     }
     // print_mesons(discon_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"DISCON_SEMWALL");
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
+    free_spinor_field(source);
+    free_spinor_field(prop);
 }
 
 void measure_spectrum_discon_gfwall(int nm, double *m, int conf_num, double precision, storage_switch swc,
                                     data_storage_array **ret) {
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
-    suNg_field *u_gauge_old = alloc_gfield(&glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
+    suNg_field *u_gauge_old = alloc_suNg_field(&glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
         spinor_field_zero_f(prop + i);
@@ -578,16 +578,16 @@ void measure_spectrum_discon_gfwall(int nm, double *m, int conf_num, double prec
     represent_gauge_field();
 
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
-    free_gfield(u_gauge_old);
+    free_spinor_field(source);
+    free_spinor_field(prop);
+    free_suNg_field(u_gauge_old);
 }
 
 void measure_spectrum_discon_volume(int nm, double *m, int conf_num, double precision, int dil, storage_switch swc,
                                     data_storage_array **ret) {
     // Spin diluted
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
         spinor_field_zero_f(prop + i);
@@ -603,8 +603,8 @@ void measure_spectrum_discon_volume(int nm, double *m, int conf_num, double prec
     print_mesons(discon_correlators, 1., conf_num, nm, m, GLB_T, 1, "DISCON_VOLUME");
 
     free_propagator_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
+    free_spinor_field(source);
+    free_spinor_field(prop);
 }
 
 /****************************************
@@ -618,10 +618,10 @@ void measure_formfactor_pt(int ti, int tf, int nm, double *m, int n_mom, int con
     spinor_field *prop_seq;
     int k;
 
-    source = alloc_spinor_field_f(4, &glattice);
-    prop_i = alloc_spinor_field_f(4 * NF, &glattice);
-    prop_seq = alloc_spinor_field_f(4 * NF, &glattice);
-    source_seq = alloc_spinor_field_f(4 * NF, &glattice);
+    source = alloc_spinor_field(4, &glattice);
+    prop_i = alloc_spinor_field(4 * NF, &glattice);
+    prop_seq = alloc_spinor_field(4 * NF, &glattice);
+    source_seq = alloc_spinor_field(4 * NF, &glattice);
 
     for (int i = 0; i < 4 * NF; i++) {
         spinor_field_zero_f(prop_i + i);
@@ -642,10 +642,10 @@ void measure_formfactor_pt(int ti, int tf, int nm, double *m, int n_mom, int con
 
     measure_formfactors(prop_seq, prop_i, source_seq, nm, ti, tf, n_mom, pt); // eats two propagators
     print_formfactor(conf_num, nm, m, n_mom, "DEFAULT_FF_POINT", tf - ti);
-    free_spinor_field_f(source);
-    free_spinor_field_f(source_seq);
-    free_spinor_field_f(prop_i);
-    free_spinor_field_f(prop_seq);
+    free_spinor_field(source);
+    free_spinor_field(source_seq);
+    free_spinor_field(prop_i);
+    free_spinor_field(prop_seq);
     free_propagator_eo();
 }
 
@@ -658,7 +658,7 @@ void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_m
 
     int k;
     char label[100];
-    suNf_field *u_gauge_old = alloc_gfield_f(&glattice);
+    suNf_field *u_gauge_old = alloc_suNf_field(&glattice);
     suNf_field_copy(u_gauge_old, u_gauge_f); // Save the gaugefield
 
     double p = avr_plaquette();
@@ -667,10 +667,10 @@ void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_m
     p = avr_plaquette();
     lprintf("MESON_MEASUREMENTS", 0, "<P> = %g\n", p);
 
-    source = alloc_spinor_field_f(4, &glattice);
-    source_seq = alloc_spinor_field_f(4 * NF, &glattice);
-    prop_i = alloc_spinor_field_f(4 * NF, &glattice);
-    prop_seq = alloc_spinor_field_f(4 * NF, &glattice);
+    source = alloc_spinor_field(4, &glattice);
+    source_seq = alloc_spinor_field(4 * NF, &glattice);
+    prop_i = alloc_spinor_field(4 * NF, &glattice);
+    prop_seq = alloc_spinor_field(4 * NF, &glattice);
 
     for (int i = 0; i < 4 * NF; i++) {
         spinor_field_zero_f(prop_i + i);
@@ -696,11 +696,11 @@ void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_m
     print_formfactor(conf_num, nm, m, n_mom, label, tf - ti);
     suNf_field_copy(u_gauge_f, u_gauge_old); // Restore the gaugefield
 
-    free_spinor_field_f(source);
-    free_spinor_field_f(source_seq);
-    free_spinor_field_f(prop_i);
-    free_spinor_field_f(prop_seq);
+    free_spinor_field(source);
+    free_spinor_field(source_seq);
+    free_spinor_field(prop_i);
+    free_spinor_field(prop_seq);
 
-    free_gfield_f(u_gauge_old);
+    free_suNf_field(u_gauge_old);
     free_propagator_eo();
 }

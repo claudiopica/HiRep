@@ -198,9 +198,9 @@ void tm_invert(spinor_field *out, spinor_field *in, mshift_par *mpar) {
     static spinor_field *tmp = NULL;
     if (tmp == NULL) {
 #ifndef UPDATE_EO
-        tmp = alloc_spinor_field_f(1, &glattice);
+        tmp = alloc_spinor_field(1, &glattice);
 #else
-        tmp = alloc_spinor_field_f(1, &glat_even);
+        tmp = alloc_spinor_field(1, &glat_even);
 #endif
     }
     lprintf("tm_invert", 50, "mu: %g, m: %g\n", static_mu, static_mass);
@@ -214,9 +214,9 @@ void tm_invert_alt(spinor_field *out, spinor_field *in, mshift_par *mpar) {
     static spinor_field *tmp = NULL;
     if (tmp == NULL) {
 #ifndef UPDATE_EO
-        tmp = alloc_spinor_field_f(1, &glattice);
+        tmp = alloc_spinor_field(1, &glattice);
 #else
-        tmp = alloc_spinor_field_f(1, &glat_even);
+        tmp = alloc_spinor_field(1, &glat_even);
 #endif
     }
     lprintf("tm_invert_alt", 50, "mu: %g, m: %g\n", static_mu, static_mass);

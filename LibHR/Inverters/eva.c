@@ -414,7 +414,7 @@ int eva(int nev, int nevt, int init, int kmax, int imax, double ubnd, double ome
 
     if (alloc_aux(nevt) != 0) { return -3; }
 
-    ws = alloc_spinor_field_f(2, ev->type);
+    ws = alloc_spinor_field(2, ev->type);
 
     init_subsp(nev, nupd, init, ev);
     ritz_subsp(nlock, nupd, Op, ws, ev, d);
@@ -455,14 +455,14 @@ int eva(int nev, int nevt, int init, int kmax, int imax, double ubnd, double ome
 
         if (nlock == nev) {
             lprintf("EVA", 10, "Computation succeded. MVM = %d\n", *status);
-            free_spinor_field_f(ws);
+            free_spinor_field(ws);
             return 0;
         }
     }
 
     lprintf("EVA", 10, "Unable to reach required precision. MVM = %d\n", *status);
 
-    free_spinor_field_f(ws);
+    free_spinor_field(ws);
 
     return -1;
 }
@@ -486,7 +486,7 @@ int eva_tuned(int nev, int nevt, int init, int kmax, int imax, double lbnd, doub
 
     if (alloc_aux(nevt) != 0) { return -3; }
 
-    ws = alloc_spinor_field_f(2, ev->type);
+    ws = alloc_spinor_field(2, ev->type);
 
     init_subsp(nev, nupd, init, ev);
     ritz_subsp(nlock, nupd, Op, ws, ev, d);
@@ -529,14 +529,14 @@ int eva_tuned(int nev, int nevt, int init, int kmax, int imax, double lbnd, doub
 
         if (nlock == nev) {
             lprintf("EVA", 10, "Computation succeded. MVM = %d\n", *status);
-            free_spinor_field_f(ws);
+            free_spinor_field(ws);
             return 0;
         }
     }
 
     lprintf("EVA", 10, "Unable to reach required precision. MVM = %d\n", *status);
 
-    free_spinor_field_f(ws);
+    free_spinor_field(ws);
 
     return -1;
 }

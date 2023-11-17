@@ -62,13 +62,13 @@ static double calc_plaq_diff(suNg_field *V, suNg_field *W) {
     return E / (6. * NG) / GLB_VOLUME;
 }
 
-static void random_g(suNg_field *g) {
+static void random_g(gtransf *g) {
     _MASTER_FOR(g->type, ix) {
         random_suNg(_FIELD_AT(g, ix));
     }
 }
 
-static void transform_u(suNg_field *out, suNg_field *in, suNg_field *g) {
+static void transform_u(suNg_field *out, suNg_field *in, gtransf *g) {
     int iy, mu;
     suNg v;
 
@@ -92,14 +92,14 @@ int main(int argc, char *argv[]) {
 
     setup_gauge_fields();
 
-    suNg_field *g = alloc_gtransf(&glattice);
-    suNg_field *fixed_gauge = alloc_gfield(&glattice);
+    gtransf *g = alloc_gtransf(&glattice);
+    suNg_field *fixed_gauge = alloc_suNg_field(&glattice);
 
     // initialise random gauge field
     lprintf("TEST", 0, "Perform test gauge invariance of the gauge fixing with a random gauge field\n");
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     // the gauge transformation
     random_g(g);
@@ -110,8 +110,8 @@ int main(int argc, char *argv[]) {
     lprintf("TEST", 0, "original gauge plaq %1.14f\n", p1);
 
     transform_u(fixed_gauge, u_gauge, g);
-    start_sendrecv_gfield(fixed_gauge);
-    complete_sendrecv_gfield(fixed_gauge);
+    start_sendrecv_suNg_field(fixed_gauge);
+    complete_sendrecv_suNg_field(fixed_gauge);
 
     p2 = calc_plaq(fixed_gauge);
     lprintf("TEST", 0, "plaq after random gauge tranforamtion %1.14f\n", p2);
@@ -140,8 +140,8 @@ int main(int argc, char *argv[]) {
     lprintf("TEST", 0, "Perform test gauge invariance of the gauge fixing with a unit gauge field\n");
     // initialise unit gauge field
     unit_gauge(u_gauge);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     // the gauge transformation
     random_g(g);
@@ -152,8 +152,8 @@ int main(int argc, char *argv[]) {
     lprintf("TEST", 0, "original gauge plaq %1.14f\n", p1);
 
     transform_u(fixed_gauge, u_gauge, g);
-    start_sendrecv_gfield(fixed_gauge);
-    complete_sendrecv_gfield(fixed_gauge);
+    start_sendrecv_suNg_field(fixed_gauge);
+    complete_sendrecv_suNg_field(fixed_gauge);
 
     p2 = calc_plaq(fixed_gauge);
     lprintf("TEST", 0, "plaq after random gauge tranforamtion %1.14f\n", p2);

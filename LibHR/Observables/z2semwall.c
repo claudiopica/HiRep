@@ -132,19 +132,19 @@ static void z2semwall_qprop_init(int nm, double *m, double acc) {
         QMR_par.err2 = .5 * acc;
         QMR_par.max_iter = 0;
 
-        QMR_noise = alloc_spinor_field_f(nm + 1, &glat_even);
+        QMR_noise = alloc_spinor_field(nm + 1, &glat_even);
         QMR_resdn = QMR_noise + 1;
 
 #ifndef NDEBUG
-        test = alloc_spinor_field_f(2, &glattice);
-        test_e = alloc_spinor_field_f(1, &glat_even);
+        test = alloc_spinor_field(2, &glattice);
+        test_e = alloc_spinor_field(1, &glat_even);
 #endif
 
-        eta2 = alloc_spinor_field_f(QMR_par.n + 1, &glat_even);
+        eta2 = alloc_spinor_field(QMR_par.n + 1, &glat_even);
         resd = eta2 + 1;
 
-        eta = alloc_spinor_field_f(4, &glat_even);
-        psi0 = alloc_spinor_field_f(5 * nm, &glattice);
+        eta = alloc_spinor_field(4, &glat_even);
+        psi0 = alloc_spinor_field(5 * nm, &glattice);
         psi = psi0 + 4 * nm;
 
         /* noisy background */
@@ -180,19 +180,19 @@ void z2semwall_qprop_free() {
     error(init == 0, 1, "z2semwall.c", "z2semwall method not initialized!");
 
 #ifndef NDEBUG
-    free_spinor_field_f(test_e);
-    free_spinor_field_f(test);
+    free_spinor_field(test_e);
+    free_spinor_field(test);
 #endif /* NDEBUG */
 
-    free_spinor_field_f(eta2);
+    free_spinor_field(eta2);
 
-    free_spinor_field_f(eta);
-    free_spinor_field_f(psi0);
+    free_spinor_field(eta);
+    free_spinor_field(psi0);
 
     free(shift);
     free(mass);
 
-    free_spinor_field_f(QMR_noise);
+    free_spinor_field(QMR_noise);
     init = 0;
 }
 

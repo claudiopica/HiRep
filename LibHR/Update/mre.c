@@ -152,15 +152,15 @@ void mre_init(mre_par *par, int max, double prec) {
         par->init = 1;
     }
 
-    par->s[0] = alloc_spinor_field_f(par->max, &glat_default);
-    par->s[1] = alloc_spinor_field_f(par->max, &glat_default);
+    par->s[0] = alloc_spinor_field(par->max, &glat_default);
+    par->s[1] = alloc_spinor_field(par->max, &glat_default);
     par->num[0] = 0;
     par->num[1] = 0;
 
-    if (num_init == 0) { Dv = alloc_spinor_field_f(1, &glat_default); }
+    if (num_init == 0) { Dv = alloc_spinor_field(1, &glat_default); }
 
     for (int i = num_init; i < par->max; i++) {
-        v[i] = alloc_spinor_field_f(1, &glat_default);
+        v[i] = alloc_spinor_field(1, &glat_default);
         num_init++;
     }
 

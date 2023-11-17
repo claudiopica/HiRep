@@ -235,9 +235,9 @@ int main(int argc, char *argv[]) {
     init_BCs(NULL);
 
     /* alloc global gauge fields */
-    u_gauge = alloc_gfield(&glattice);
+    u_gauge = alloc_suNg_field(&glattice);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    u_gauge_f = alloc_gfield_f(&glattice);
+    u_gauge_f = alloc_suNf_field(&glattice);
 #endif
 
     init_modenumber(nu_var.mass, nu_var.inverr2, nu_var.nhits, nu_var.approx);
@@ -292,9 +292,9 @@ int main(int argc, char *argv[]) {
 
     free_modenumber();
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_gfield_f(u_gauge_f);
+    free_suNf_field(u_gauge_f);
 #endif
 
     finalize_process();

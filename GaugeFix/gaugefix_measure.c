@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "Gauge Fixing make %s\n", gaugefix_var.make);
 
     suNg_field *fixed_gauge = NULL;
-    fixed_gauge = alloc_gfield(&glattice);
+    fixed_gauge = alloc_suNg_field(&glattice);
 
     list = NULL;
     if (strcmp(list_filename, "") != 0) {

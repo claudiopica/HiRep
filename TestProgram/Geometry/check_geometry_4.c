@@ -26,7 +26,7 @@ void spinor_field_one_f(spinor_field *s1) {
         p[i] = 1.0;
     }
 #ifdef WITH_GPU
-    copy_to_gpu_spinor_field_f(s1);
+    copy_to_gpu_spinor_field(s1);
 #endif
 }
 
@@ -44,20 +44,20 @@ int main(int argc, char *argv[]) {
     print_gd(&glat_odd);
 #endif
 
-    spinor_field *in = alloc_spinor_field_f(1, &glattice);
-    spinor_field *even = alloc_spinor_field_f(1, &glat_even);
-    spinor_field *odd = alloc_spinor_field_f(1, &glat_odd);
+    spinor_field *in = alloc_spinor_field(1, &glattice);
+    spinor_field *even = alloc_spinor_field(1, &glat_even);
+    spinor_field *odd = alloc_spinor_field(1, &glat_odd);
 
     spinor_field_one_f(in);
     spinor_field_one_f(even);
     spinor_field_one_f(odd);
 
-    start_sendrecv_spinor_field_f(in);
-    complete_sendrecv_spinor_field_f(in);
-    start_sendrecv_spinor_field_f(even);
-    complete_sendrecv_spinor_field_f(even);
-    start_sendrecv_spinor_field_f(odd);
-    complete_sendrecv_spinor_field_f(odd);
+    start_sendrecv_spinor_field(in);
+    complete_sendrecv_spinor_field(in);
+    start_sendrecv_spinor_field(even);
+    complete_sendrecv_spinor_field(even);
+    start_sendrecv_spinor_field(odd);
+    complete_sendrecv_spinor_field(odd);
 
     double in_norm = spinor_field_sqnorm_f(in);
     double even_norm = spinor_field_sqnorm_f(even);

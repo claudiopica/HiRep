@@ -8,9 +8,6 @@
 #if !defined _FIELD_NAME_READABLE
 #error Missing _FIELD_NAME_READABLE in communications.h
 #endif
-#if !defined _FIELD_NAME
-#error Missing _FIELD_NAME in communications.h
-#endif
 #if !defined _FIELD_TYPE
 #error Missing _FIELD_TYPE in communications.h
 #endif
@@ -21,14 +18,14 @@
  * @param _FIELD_TYPE*	    _FIELD_NAME_READABLE that needs to be synchronized 
  *                          across nodes
  */
-void _F_NAME(complete_sendrecv_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(complete_sendrecv_, _FIELD_TYPE)(_FIELD_TYPE *);
 /**
  * @brief Fill buffers and start MPI requests to send and receive.
  *
  * @param _FIELD_TYPE*		_FIELD_NAME_READABLE that needs to be synchronized
  *                          across nodes
  */
-void _F_NAME(start_sendrecv_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(start_sendrecv_, _FIELD_TYPE)(_FIELD_TYPE *);
 /**
  * @brief Sync field before communications. This can mean different things
  *    depending on geometry implementation.
@@ -36,9 +33,9 @@ void _F_NAME(start_sendrecv_, _FIELD_NAME)(_FIELD_TYPE *);
  * @param _FIELD_TYPE*      _FIELD_NAME_READABLE that needs to be synchronized
  *                           on the local lattice.
  */
-void _GPU_F_NAME(sync_, _FIELD_NAME)(_FIELD_TYPE *);
-void _F_NAME(fill_buffers_, _FIELD_NAME)(_FIELD_TYPE *);
-void _F_NAME(fill_buffers_with_zeroes_, _FIELD_NAME)(_FIELD_TYPE *);
+void _GPU_F_NAME(sync_, _FIELD_TYPE)(_FIELD_TYPE *);
+void _F_NAME(fill_buffers_, _FIELD_TYPE)(_FIELD_TYPE *);
+void _F_NAME(fill_buffers_with_zeroes_, _FIELD_TYPE)(_FIELD_TYPE *);
 
 /**
  * @brief Check that the communications of _FIELD_TYPE are not locked and if 
@@ -48,7 +45,7 @@ void _F_NAME(fill_buffers_with_zeroes_, _FIELD_NAME)(_FIELD_TYPE *);
  * @param _FIELD_TYPE*      _FIELD_NAME_READABLLE whos communications can
  *                          be locked
 */
-void _F_NAME(check_sendrecv_guard_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(check_sendrecv_guard_, _FIELD_TYPE)(_FIELD_TYPE *);
 
 /**
  * @brief Locks communications. Only protects of simultaneous communications
@@ -57,7 +54,7 @@ void _F_NAME(check_sendrecv_guard_, _FIELD_NAME)(_FIELD_TYPE *);
  * @param _FIELD_TYPE*      _FIELD_NAME_READABLLE whos communications can
  *                          be locked
 */
-void _F_NAME(lock_communications_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(lock_communications_, _FIELD_TYPE)(_FIELD_TYPE *);
 
 /**
  * @brief Releases communications. Only protects of simultaneous communications
@@ -66,8 +63,7 @@ void _F_NAME(lock_communications_, _FIELD_NAME)(_FIELD_TYPE *);
  * @param _FIELD_TYPE*      _FIELD_NAME_READABLLE whos communications can
  *                          be locked
 */
-void _F_NAME(release_communications_, _FIELD_NAME)(_FIELD_TYPE *);
+void _F_NAME(release_communications_, _FIELD_TYPE)(_FIELD_TYPE *);
 
 #undef _FIELD_NAME_READABLE
-#undef _FIELD_NAME
 #undef _FIELD_TYPE

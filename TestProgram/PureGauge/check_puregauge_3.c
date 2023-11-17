@@ -30,7 +30,7 @@ Test functions:
   It tests the LW force against the numerical derivative of the LW action, point by point in the global lattice.
 
 ===  static void random_g(suNg_field* g);
-===  static void transform_gauge(suNg_field* gtransf, suNg_field* gfield);
+===  static void transform_gauge(suNg_field* gtransf, suNg_field* suNg_field);
 ===  static void transform_force(suNg_field* gtransf, suNg_av_field* force);
   Utilities for gauge transformations.
 
@@ -45,10 +45,10 @@ int test_wilson_action_and_force(double beta) {
     ff1 = (suNg_av_field **)malloc(sizeof(suNg_av_field *));
     ff2 = (suNg_av_field **)malloc(sizeof(suNg_av_field *));
 
-    f1 = alloc_avfield(&glattice);
+    f1 = alloc_suNg_av_field(&glattice);
     ff1[0] = f1;
 
-    f2 = alloc_avfield(&glattice);
+    f2 = alloc_suNg_av_field(&glattice);
     ff2[0] = f2;
 
     force_gauge_par par;
@@ -104,8 +104,8 @@ int test_wilson_action_and_force(double beta) {
     lprintf("TEST", 0, "beta=%f :  Deviation from the standard Wilson force = %e\n(Should be 10^-15 or so)\n\n", beta, err);
     if (err > 1.e-14) { ret++; }
 
-    free_avfield(f1);
-    free_avfield(f2);
+    free_suNg_av_field(f1);
+    free_suNg_av_field(f2);
 
     free(ff1);
     free(ff2);
@@ -113,7 +113,7 @@ int test_wilson_action_and_force(double beta) {
     return ret;
 }
 
-static void random_g(suNg_field *g) {
+static void random_g(gtransf *g) {
     _MASTER_FOR(&glattice, ix) {
         random_suNg(_FIELD_AT(g, ix));
     }
@@ -121,7 +121,7 @@ static void random_g(suNg_field *g) {
     complete_sendrecv_gtransf(g);
 }
 
-void loc_unit_gauge(suNg_field *gauge) {
+void loc_unit_gauge(gtransf *gauge) {
     _MASTER_FOR(&glattice, ix) {
         _suNg_unit(*_FIELD_AT(gauge, ix));
     }
@@ -129,21 +129,21 @@ void loc_unit_gauge(suNg_field *gauge) {
     complete_sendrecv_gtransf(gauge);
 }
 
-static void transform_gauge(suNg_field *gtransf, suNg_field *gfield) {
+static void transform_gauge(gtransf *gtransf, suNg_field *suNg_field) {
     _MASTER_FOR(&glattice, ix) {
         for (int mu = 0; mu < 4; mu++) {
             int iy = iup(ix, mu);
-            suNg *u = _4FIELD_AT(gfield, ix, mu);
+            suNg *u = _4FIELD_AT(suNg_field, ix, mu);
             suNg v;
             _suNg_times_suNg_dagger(v, *u, *_FIELD_AT(gtransf, iy));
             _suNg_times_suNg(*u, *_FIELD_AT(gtransf, ix), v);
         }
     }
-    start_sendrecv_gfield(gfield);
-    complete_sendrecv_gfield(gfield);
+    start_sendrecv_suNg_field(suNg_field);
+    complete_sendrecv_suNg_field(suNg_field);
 }
 
-static void transform_force(suNg_field *gtransf, suNg_av_field *force) {
+static void transform_force(gtransf *gtransf, suNg_av_field *force) {
     _MASTER_FOR(&glattice, ix) {
         for (int mu = 0; mu < 4; mu++) {
             suNg v, m;
@@ -156,7 +156,7 @@ static void transform_force(suNg_field *gtransf, suNg_av_field *force) {
 }
 
 int test_ginv_lw_action(double beta, double c0, double c1) {
-    suNg_field *g;
+    gtransf *g;
     double *s;
     double diff = 0., err;
     int ret = 0;
@@ -190,7 +190,7 @@ int test_ginv_lw_action(double beta, double c0, double c1) {
 }
 
 int test_gcov_lw_force(double beta, double c0, double c1) {
-    suNg_field *g;
+    gtransf *g;
     suNg_av_field *f1, *f2, *force;
     suNg_algebra_vector *v1, *v2;
     double diff = 0., err;
@@ -198,7 +198,7 @@ int test_gcov_lw_force(double beta, double c0, double c1) {
 
     int ret = 0;
 
-    force = alloc_avfield(&glattice);
+    force = alloc_suNg_av_field(&glattice);
     momenta[0] = force;
 
     force_gauge_par par;
@@ -208,8 +208,8 @@ int test_gcov_lw_force(double beta, double c0, double c1) {
     par.beta = beta;
 
     g = alloc_gtransf(&glattice);
-    f1 = alloc_avfield(&glattice);
-    f2 = alloc_avfield(&glattice);
+    f1 = alloc_suNg_av_field(&glattice);
+    f2 = alloc_suNg_av_field(&glattice);
     _MASTER_FOR(&glattice, ix) {
         for (int mu = 0; mu < 4; mu++) {
             _algebra_vector_zero_g(*_4FIELD_AT(f1, ix, mu));
@@ -218,12 +218,12 @@ int test_gcov_lw_force(double beta, double c0, double c1) {
         }
     }
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     lw_force(1., &par);
 
-    copy_avfield_cpu(f1, force);
+    copy_suNg_av_field_cpu(f1, force);
 
     random_g(g);
     transform_force(g, f1);
@@ -236,7 +236,7 @@ int test_gcov_lw_force(double beta, double c0, double c1) {
     }
 
     lw_force(1., &par);
-    copy_avfield_cpu(f2, force);
+    copy_suNg_av_field_cpu(f2, force);
 
     err = 0.;
     _MASTER_FOR(&glattice, ix) {
@@ -254,9 +254,9 @@ int test_gcov_lw_force(double beta, double c0, double c1) {
 
     lprintf("TEST", 0, "pars=(%f,%f,%f) :  Gauge covariance LW force = %.10e\n(Should be 10^-15 or so)\n\n", beta, c0, c1, err);
     if (err > 1.e-14) { ret++; }
-    free_avfield(f1);
-    free_avfield(f2);
-    free_avfield(force);
+    free_suNg_av_field(f1);
+    free_suNg_av_field(f2);
+    free_suNg_av_field(force);
     free_gtransf(g);
     return ret;
 }
@@ -274,7 +274,7 @@ int test_lw_force(double beta, double c0, double c1) {
 
     suNg_av_field *momenta[1];
 
-    f = alloc_avfield(&glattice);
+    f = alloc_suNg_av_field(&glattice);
     momenta[0] = f;
 
     force_gauge_par par;
@@ -283,7 +283,7 @@ int test_lw_force(double beta, double c0, double c1) {
     par.c1 = c1;
     par.beta = beta;
 
-    u = alloc_gfield(&glattice);
+    u = alloc_suNg_field(&glattice);
 
     _MASTER_FOR(&glattice, ix) {
         for (int mu = 0; mu < 4; mu++) {
@@ -326,8 +326,8 @@ int test_lw_force(double beta, double c0, double c1) {
                                 gauss((double *)(&mom), NG * NG - 1);
                                 ExpX(eps, &mom, pu_gauge(ix, mu));
                             }
-                            start_sendrecv_gfield(u_gauge);
-                            complete_sendrecv_gfield(u_gauge);
+                            start_sendrecv_suNg_field(u_gauge);
+                            complete_sendrecv_suNg_field(u_gauge);
 
                             double deltaS = 0.;
                             calculate_stfld(NOCOMM);
@@ -348,8 +348,8 @@ int test_lw_force(double beta, double c0, double c1) {
                             if (diff > err) { err = diff; }
 
                             memcpy(u_gauge->ptr, u->ptr, 4 * glattice.gsize_gauge * sizeof(suNg));
-                            start_sendrecv_gfield(u_gauge);
-                            complete_sendrecv_gfield(u_gauge);
+                            start_sendrecv_suNg_field(u_gauge);
+                            complete_sendrecv_suNg_field(u_gauge);
                         }
                     }
                 }
@@ -365,7 +365,7 @@ int test_lw_force(double beta, double c0, double c1) {
         eps *= .1;
     }
 
-    free_gfield(u);
+    free_suNg_field(u);
     free(s);
     return ret;
 }
@@ -378,8 +378,8 @@ int main(int argc, char *argv[]) {
     setup_gauge_fields();
 
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     return_value += test_wilson_action_and_force(1.);
 

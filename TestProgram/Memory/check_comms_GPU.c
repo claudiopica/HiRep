@@ -11,17 +11,17 @@
 #include "libhr.h"
 #include <string.h>
 
-int test_comms_spinor_field_f(geometry_descriptor *);
-int test_comms_spinor_field_f_flt(geometry_descriptor *);
-int test_comms_sfield(geometry_descriptor *);
-int test_comms_gfield();
-int test_comms_gfield_flt();
-int test_comms_gfield_f();
-int test_comms_gfield_f_flt();
+int test_comms_spinor_field(geometry_descriptor *);
+int test_comms_spinor_field_flt(geometry_descriptor *);
+int test_comms_scalar_field(geometry_descriptor *);
+int test_comms_suNg_field();
+int test_comms_suNg_field_flt();
+int test_comms_suNf_field();
+int test_comms_suNf_field_flt();
 int test_comms_suNg_scalar_field();
-int test_comms_avfield();
+int test_comms_suNg_av_field();
 int test_comms_gtransf();
-int test_comms_clover_ldl();
+int test_comms_ldl_field();
 int test_comms_clover_term();
 int test_comms_clover_force();
 int test_comms_staple_field();
@@ -38,55 +38,55 @@ int main(int argc, char *argv[]) {
     // Run tests
     /* Double precision */
     lprintf("INFO", 0, "\n\nFull lattice tests\n\n");
-    return_val += test_comms_spinor_field_f(&glattice);
-    return_val += test_comms_sfield(&glattice);
-    return_val += test_comms_gfield();
-    return_val += test_comms_gfield_f();
+    return_val += test_comms_spinor_field(&glattice);
+    return_val += test_comms_scalar_field(&glattice);
+    return_val += test_comms_suNg_field();
+    return_val += test_comms_suNf_field();
     return_val += test_comms_suNg_scalar_field();
-    return_val += test_comms_avfield();
+    return_val += test_comms_suNg_av_field();
     return_val += test_comms_gtransf();
-    return_val += test_comms_clover_ldl();
+    return_val += test_comms_ldl_field();
     return_val += test_comms_clover_term();
     return_val += test_comms_clover_force();
     return_val += test_comms_staple_field();
 
     /* Single precision */
-    return_val += test_comms_spinor_field_f_flt(&glattice);
-    return_val += test_comms_gfield_flt();
-    return_val += test_comms_gfield_f_flt();
+    return_val += test_comms_spinor_field_flt(&glattice);
+    return_val += test_comms_suNg_field_flt();
+    return_val += test_comms_suNf_field_flt();
 
     lprintf("INFO", 0, "\n\nSpinor tests on even lattice\n\n");
-    return_val += test_comms_spinor_field_f(&glat_even);
-    return_val += test_comms_spinor_field_f_flt(&glat_even);
-    return_val += test_comms_sfield(&glat_even);
+    return_val += test_comms_spinor_field(&glat_even);
+    return_val += test_comms_spinor_field_flt(&glat_even);
+    return_val += test_comms_scalar_field(&glat_even);
 
     lprintf("INFO", 0, "\n\nSpinor tests on odd lattice\n\n");
-    return_val += test_comms_spinor_field_f(&glat_odd);
-    return_val += test_comms_spinor_field_f_flt(&glat_odd);
-    return_val += test_comms_sfield(&glat_odd);
+    return_val += test_comms_spinor_field(&glat_odd);
+    return_val += test_comms_spinor_field_flt(&glat_odd);
+    return_val += test_comms_scalar_field(&glat_odd);
 
     // Finalize and return
     finalize_process();
     return return_val;
 }
 
-int test_comms_spinor_field_f(geometry_descriptor *gd) {
+int test_comms_spinor_field(geometry_descriptor *gd) {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
     lprintf("INFO", 0, "Sqnorm testing\n");
 
     // Setup fields on GPU
     int return_val = 0;
-    spinor_field *f = alloc_spinor_field_f(1, gd);
+    spinor_field *f = alloc_spinor_field(1, gd);
     gaussian_spinor_field(f);
-    copy_to_gpu_spinor_field_f(f);
+    copy_to_gpu_spinor_field(f);
 
     // Evaluate sqnorm in the beginning
     double sqnorm_start = spinor_field_sqnorm_f(f);
     lprintf("SANITY CHECK", 0, "[In field GPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
 
     // Execute communications
-    start_sendrecv_spinor_field_f(f);
-    complete_sendrecv_spinor_field_f(f);
+    start_sendrecv_spinor_field(f);
+    complete_sendrecv_spinor_field(f);
 
     // Evaluate sqnorm after comms
     double sqnorm_end = spinor_field_sqnorm_f(f);
@@ -96,27 +96,27 @@ int test_comms_spinor_field_f(geometry_descriptor *gd) {
     return_val += check_finiteness(sqnorm_end);
     return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end); // TODO: Check diff not diff norm (SAM)
 
-    free_spinor_field_f(f);
+    free_spinor_field(f);
 
     return return_val;
 }
 
-int test_comms_spinor_field_f_flt(geometry_descriptor *gd) {
+int test_comms_spinor_field_flt(geometry_descriptor *gd) {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
 
     // Setup fields on GPU
     int return_val = 0;
-    spinor_field_flt *f = alloc_spinor_field_f_flt(1, gd);
+    spinor_field_flt *f = alloc_spinor_field_flt(1, gd);
     gaussian_spinor_field_flt(f);
-    copy_to_gpu_spinor_field_f_flt(f);
+    copy_to_gpu_spinor_field_flt(f);
 
     // Evaluate sqnorm in the beginning
     double sqnorm_start = spinor_field_sqnorm_f_flt(f);
     lprintf("SANITY CHECK", 0, "[In field GPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
 
     // Execute communications
-    start_sendrecv_spinor_field_f_flt(f);
-    complete_sendrecv_spinor_field_f_flt(f);
+    start_sendrecv_spinor_field_flt(f);
+    complete_sendrecv_spinor_field_flt(f);
 
     // Evaluate sqnorm after comms
     double sqnorm_end = spinor_field_sqnorm_f_flt(f);
@@ -126,162 +126,162 @@ int test_comms_spinor_field_f_flt(geometry_descriptor *gd) {
     return_val += check_finiteness(sqnorm_end);
     return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end); // TODO: Check diff not diff norm (SAM)
 
-    free_spinor_field_f_flt(f);
+    free_spinor_field_flt(f);
 
     return return_val;
 }
 
-int test_comms_sfield(geometry_descriptor *gd) {
+int test_comms_scalar_field(geometry_descriptor *gd) {
     lprintf("INFO", 0, " ======= TEST SFIELD ======= \n");
 
     // Setup fields on GPU
     int return_val = 0;
-    scalar_field *f = alloc_sfield(1, gd);
-    random_sfield_cpu(f);
+    scalar_field *f = alloc_scalar_field(1, gd);
+    random_scalar_field_cpu(f);
 
     // Evaluate sqnorm in the beginning
-    double sqnorm_start = sqnorm_sfield_cpu(f);
+    double sqnorm_start = sqnorm_scalar_field_cpu(f);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
-    copy_to_gpu_sfield(f);
+    copy_to_gpu_scalar_field(f);
 
     // Execute communications
-    start_sendrecv_sfield(f);
-    complete_sendrecv_sfield(f);
+    start_sendrecv_scalar_field(f);
+    complete_sendrecv_scalar_field(f);
 
     // Evaluate sqnorm after comms
-    copy_from_gpu_sfield(f);
-    double sqnorm_end = sqnorm_sfield_cpu(f);
+    copy_from_gpu_scalar_field(f);
+    double sqnorm_end = sqnorm_scalar_field_cpu(f);
     lprintf("SANITY CHECK", 0, "[Out field CPU copy norm unequal zero: %0.2e]\n", sqnorm_end);
 
     return_val += check_finiteness(sqnorm_start);
     return_val += check_finiteness(sqnorm_end);
     return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end);
 
-    free_sfield(f);
+    free_scalar_field(f);
 
     return return_val;
 }
 
-int test_comms_gfield() {
+int test_comms_suNg_field() {
     lprintf("INFO", 0, " ======= TEST GFIELD ======= \n");
 
     // Setup fields on GPU
     int return_val = 0;
-    suNg_field *f = alloc_gfield(&glattice);
-    random_gfield_cpu(f);
+    suNg_field *f = alloc_suNg_field(&glattice);
+    random_suNg_field_cpu(f);
 
     // Evaluate sqnorm in the beginning
-    double sqnorm_start = sqnorm_gfield_cpu(f);
+    double sqnorm_start = sqnorm_suNg_field_cpu(f);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
-    copy_to_gpu_gfield(f);
+    copy_to_gpu_suNg_field(f);
 
     // Execute communications
-    start_sendrecv_gfield(f);
-    complete_sendrecv_gfield(f);
+    start_sendrecv_suNg_field(f);
+    complete_sendrecv_suNg_field(f);
 
     // Evaluate sqnorm after comms
-    copy_from_gpu_gfield(f);
-    double sqnorm_end = sqnorm_gfield_cpu(f);
+    copy_from_gpu_suNg_field(f);
+    double sqnorm_end = sqnorm_suNg_field_cpu(f);
     lprintf("SANITY CHECK", 0, "[Out field CPU copy norm unequal zero: %0.2e]\n", sqnorm_end);
 
     return_val += check_finiteness(sqnorm_start);
     return_val += check_finiteness(sqnorm_end);
     return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end);
 
-    free_gfield(f);
+    free_suNg_field(f);
 
     return return_val;
 }
 
-int test_comms_gfield_flt() {
+int test_comms_suNg_field_flt() {
     lprintf("INFO", 0, " ======= TEST GFIELD SINGLE PRECISION ======= \n");
 
     // Setup fields on GPU
     int return_val = 0;
-    suNg_field_flt *f = alloc_gfield_flt(&glattice);
-    random_gfield_flt_cpu(f);
+    suNg_field_flt *f = alloc_suNg_field_flt(&glattice);
+    random_suNg_field_flt_cpu(f);
 
     // Evaluate sqnorm in the beginning
-    double sqnorm_start = sqnorm_gfield_flt_cpu(f);
+    double sqnorm_start = sqnorm_suNg_field_flt_cpu(f);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
-    copy_to_gpu_gfield_flt(f);
+    copy_to_gpu_suNg_field_flt(f);
 
     // Execute communications
-    start_sendrecv_gfield_flt(f);
-    complete_sendrecv_gfield_flt(f);
+    start_sendrecv_suNg_field_flt(f);
+    complete_sendrecv_suNg_field_flt(f);
 
     // Evaluate sqnorm after comms
-    copy_from_gpu_gfield_flt(f);
-    double sqnorm_end = sqnorm_gfield_flt_cpu(f);
+    copy_from_gpu_suNg_field_flt(f);
+    double sqnorm_end = sqnorm_suNg_field_flt_cpu(f);
     lprintf("SANITY CHECK", 0, "[Out field CPU copy norm unequal zero: %0.2e]\n", sqnorm_end);
 
     return_val += check_finiteness(sqnorm_start);
     return_val += check_finiteness(sqnorm_end);
     return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end);
 
-    free_gfield_flt(f);
+    free_suNg_field_flt(f);
 
     return return_val;
 }
 
-int test_comms_gfield_f() {
+int test_comms_suNf_field() {
     lprintf("INFO", 0, " ======= TEST GFIELD FERMION REP ======= \n");
 
     // Setup fields on GPU
     int return_val = 0;
-    suNf_field *f = alloc_gfield_f(&glattice);
-    random_gfield_f_cpu(f);
+    suNf_field *f = alloc_suNf_field(&glattice);
+    random_suNf_field_cpu(f);
 
     // Evaluate sqnorm in the beginning
-    double sqnorm_start = sqnorm_gfield_f_cpu(f);
+    double sqnorm_start = sqnorm_suNf_field_cpu(f);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
-    copy_to_gpu_gfield_f(f);
+    copy_to_gpu_suNf_field(f);
 
     // Execute communications
-    start_sendrecv_gfield_f(f);
-    complete_sendrecv_gfield_f(f);
+    start_sendrecv_suNf_field(f);
+    complete_sendrecv_suNf_field(f);
 
     // Evaluate sqnorm after comms
-    copy_from_gpu_gfield_f(f);
-    double sqnorm_end = sqnorm_gfield_f_cpu(f);
+    copy_from_gpu_suNf_field(f);
+    double sqnorm_end = sqnorm_suNf_field_cpu(f);
     lprintf("SANITY CHECK", 0, "[Out field CPU copy norm unequal zero: %0.2e]\n", sqnorm_end);
 
     return_val += check_finiteness(sqnorm_start);
     return_val += check_finiteness(sqnorm_end);
     return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end);
 
-    free_gfield_f(f);
+    free_suNf_field(f);
 
     return return_val;
 }
 
-int test_comms_gfield_f_flt() {
+int test_comms_suNf_field_flt() {
     lprintf("INFO", 0, " ======= TEST GFIELD FERMION REP SINGLE PRECISION ======= \n");
 
     // Setup fields on GPU
     int return_val = 0;
-    suNf_field_flt *f = alloc_gfield_f_flt(&glattice);
-    random_gfield_f_flt_cpu(f);
+    suNf_field_flt *f = alloc_suNf_field_flt(&glattice);
+    random_suNf_field_flt_cpu(f);
 
     // Evaluate sqnorm in the beginning
-    double sqnorm_start = sqnorm_gfield_f_flt_cpu(f);
+    double sqnorm_start = sqnorm_suNf_field_flt_cpu(f);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
-    copy_to_gpu_gfield_f_flt(f);
+    copy_to_gpu_suNf_field_flt(f);
 
     // Execute communications
-    start_sendrecv_gfield_f_flt(f);
-    complete_sendrecv_gfield_f_flt(f);
+    start_sendrecv_suNf_field_flt(f);
+    complete_sendrecv_suNf_field_flt(f);
 
     // Evaluate sqnorm after comms
-    copy_from_gpu_gfield_f_flt(f);
-    double sqnorm_end = sqnorm_gfield_f_flt_cpu(f);
+    copy_from_gpu_suNf_field_flt(f);
+    double sqnorm_end = sqnorm_suNf_field_flt_cpu(f);
     lprintf("SANITY CHECK", 0, "[Out field CPU copy norm unequal zero: %0.2e]\n", sqnorm_end);
 
     return_val += check_finiteness(sqnorm_start);
     return_val += check_finiteness(sqnorm_end);
     return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end);
 
-    free_gfield_f_flt(f);
+    free_suNf_field_flt(f);
 
     return return_val;
 }
@@ -317,33 +317,33 @@ int test_comms_suNg_scalar_field() {
     return return_val;
 }
 
-int test_comms_avfield() {
+int test_comms_suNg_av_field() {
     lprintf("INFO", 0, " ======= TEST ALGEBRA VECTOR FIELD ======= \n");
 
     // Setup fields on GPU
     int return_val = 0;
-    suNg_av_field *f = alloc_avfield(&glattice);
-    random_avfield_cpu(f);
+    suNg_av_field *f = alloc_suNg_av_field(&glattice);
+    random_suNg_av_field_cpu(f);
 
     // Evaluate sqnorm in the beginning
-    double sqnorm_start = sqnorm_avfield_cpu(f);
+    double sqnorm_start = sqnorm_suNg_av_field_cpu(f);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
-    copy_to_gpu_avfield(f);
+    copy_to_gpu_suNg_av_field(f);
 
     // Execute communications
-    start_sendrecv_avfield(f);
-    complete_sendrecv_avfield(f);
+    start_sendrecv_suNg_av_field(f);
+    complete_sendrecv_suNg_av_field(f);
 
     // Evaluate sqnorm after comms
-    copy_from_gpu_avfield(f);
-    double sqnorm_end = sqnorm_avfield_cpu(f);
+    copy_from_gpu_suNg_av_field(f);
+    double sqnorm_end = sqnorm_suNg_av_field_cpu(f);
     lprintf("SANITY CHECK", 0, "[Out field CPU copy norm unequal zero: %0.2e]\n", sqnorm_end);
 
     return_val += check_finiteness(sqnorm_start);
     return_val += check_finiteness(sqnorm_end);
     return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end);
 
-    free_avfield(f);
+    free_suNg_av_field(f);
 
     return return_val;
 }
@@ -353,7 +353,7 @@ int test_comms_gtransf() {
 
     // Setup fields on GPU
     int return_val = 0;
-    suNg_field *f = alloc_gtransf(&glattice);
+    gtransf *f = alloc_gtransf(&glattice);
     random_gtransf_cpu(f);
 
     // Evaluate sqnorm in the beginning
@@ -379,33 +379,33 @@ int test_comms_gtransf() {
     return return_val;
 }
 
-int test_comms_clover_ldl() {
+int test_comms_ldl_field() {
     lprintf("INFO", 0, " ======= TEST CLOVER LDL ======= \n");
 
     // Setup fields on GPU
     int return_val = 0;
-    ldl_field *f = alloc_clover_ldl(&glattice);
-    random_clover_ldl_cpu(f);
+    ldl_field *f = alloc_ldl_field(&glattice);
+    random_ldl_field_cpu(f);
 
     // Evaluate sqnorm in the beginning
-    double sqnorm_start = sqnorm_clover_ldl_cpu(f);
+    double sqnorm_start = sqnorm_ldl_field_cpu(f);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
-    copy_to_gpu_clover_ldl(f);
+    copy_to_gpu_ldl_field(f);
 
     // Execute communications
-    start_sendrecv_clover_ldl(f);
-    complete_sendrecv_clover_ldl(f);
+    start_sendrecv_ldl_field(f);
+    complete_sendrecv_ldl_field(f);
 
     // Evaluate sqnorm after comms
-    copy_from_gpu_clover_ldl(f);
-    double sqnorm_end = sqnorm_clover_ldl_cpu(f);
+    copy_from_gpu_ldl_field(f);
+    double sqnorm_end = sqnorm_ldl_field_cpu(f);
     lprintf("SANITY CHECK", 0, "[Out field CPU copy norm unequal zero: %0.2e]\n", sqnorm_end);
 
     return_val += check_finiteness(sqnorm_start);
     return_val += check_finiteness(sqnorm_end);
     return_val += check_diff_norm_zero(sqnorm_start - sqnorm_end);
 
-    free_clover_ldl(f);
+    free_ldl_field(f);
 
     return return_val;
 }
@@ -415,7 +415,7 @@ int test_comms_clover_term() {
 
     // Setup fields on GPU
     int return_val = 0;
-    suNfc_field *f = alloc_clover_term(&glattice);
+    clover_term *f = alloc_clover_term(&glattice);
     random_clover_term_cpu(f);
 
     // Evaluate sqnorm in the beginning
@@ -446,7 +446,7 @@ int test_comms_clover_force() {
 
     // Setup fields on GPU
     int return_val = 0;
-    suNf_field *f = alloc_clover_force(&glattice);
+    clover_force *f = alloc_clover_force(&glattice);
     random_clover_force_cpu(f);
 
     // Evaluate sqnorm in the beginning
@@ -477,7 +477,7 @@ int test_comms_staple_field() {
 
     // Setup fields on GPU
     int return_val = 0;
-    suNg_field *f = alloc_staple_field(&glattice);
+    staple_field *f = alloc_staple_field(&glattice);
     random_staple_field_cpu(f);
 
     // Evaluate sqnorm in the beginning

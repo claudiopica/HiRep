@@ -27,7 +27,7 @@ static int smear_init = 0;
 // Set smearing parameters
 void init_smearing(double s, double t) {
     // Allocate smeared field
-    u_gauge_s = alloc_gfield(&glattice);
+    u_gauge_s = alloc_suNg_field(&glattice);
 
     // Set parameters
     rho_s = -s;
@@ -171,9 +171,9 @@ static void Exp_Taylor(suNg *m, suNg *v, int order) {
 
 static void init_fields() {
     if (smear_init == 0) {
-        Sigma = alloc_gfield(&glattice);
-        L = alloc_gfield(&glattice);
-        Lt = alloc_gfield(&glattice);
+        Sigma = alloc_suNg_field(&glattice);
+        L = alloc_suNg_field(&glattice);
+        Lt = alloc_suNg_field(&glattice);
         smear_init = 1;
     }
 }
@@ -195,8 +195,8 @@ void smear_gauge_field() {
         }
     }
 
-    start_sendrecv_gfield(u_gauge_s);
-    complete_sendrecv_gfield(u_gauge_s);
+    start_sendrecv_suNg_field(u_gauge_s);
+    complete_sendrecv_suNg_field(u_gauge_s);
 
 #endif
 }
@@ -264,8 +264,8 @@ void smeared_gauge_force(suNg_av_field *force, suNg_av_field *momenta) {
     }
 
     // Communicate field
-    start_sendrecv_gfield(Lt);
-    complete_sendrecv_gfield(Lt);
+    start_sendrecv_suNg_field(Lt);
+    complete_sendrecv_suNg_field(Lt);
 
     // Now the derivative of the plaquette
     _MASTER_FOR(&glattice, ix) {

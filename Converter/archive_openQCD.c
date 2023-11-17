@@ -224,7 +224,7 @@ static void write_gauge_field_hirep(char filename[], double subs) {
     double plaq;
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
     apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions
 #endif
 
@@ -301,7 +301,7 @@ static void write_gauge_field_hirep(char filename[], double subs) {
     lprintf("IO", 0, "Configuration [%s] saved [%lf sec]\n", filename, elapsed_sec);
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
     apply_BCs_on_represented_gauge_field(); //Restore the right boundary conditions
 #endif
 }

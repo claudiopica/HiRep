@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
     if (list != NULL) { fclose(list); }
     finalize_process();
     free_BCs();
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
     free_propagator_eo();
 
     return 0;

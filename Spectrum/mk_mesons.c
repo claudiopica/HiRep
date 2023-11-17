@@ -51,7 +51,7 @@ void inline_mk_mesons(double *m, int nm, double prec) {
 
     tricorr = (double *)malloc(GLB_T * sizeof(double));
     pta_qprop = (spinor_field **)malloc(sizeof(spinor_field *) * nm);
-    pta_qprop[0] = alloc_spinor_field_f(4 * NF * nm, &glattice);
+    pta_qprop[0] = alloc_spinor_field(4 * NF * nm, &glattice);
 
     for (k = 0; k < nm; ++k) {
         pta_qprop[k] = pta_qprop[0] + 4 * NF * k;
@@ -100,7 +100,7 @@ void inline_mk_mesons(double *m, int nm, double prec) {
     }
 #undef CORR
 
-    free_spinor_field_f(pta_qprop[0]);
+    free_spinor_field(pta_qprop[0]);
     free(pta_qprop);
     free(tricorr);
 }
@@ -314,9 +314,9 @@ int main(int argc, char *argv[]) {
     init_BCs(NULL);
 
     /* alloc global gauge fields */
-    u_gauge = alloc_gfield(&glattice);
+    u_gauge = alloc_suNg_field(&glattice);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    u_gauge_f = alloc_gfield_f(&glattice);
+    u_gauge_f = alloc_suNf_field(&glattice);
 #endif
 
     lprintf("MAIN", 0, "Inverter precision = %e\n", mes_var.precision);
@@ -327,7 +327,7 @@ int main(int argc, char *argv[]) {
     /*
     tricorr=(double*)malloc(GLB_T*sizeof(double));
     pta_qprop=(spinor_field**)malloc(sizeof(spinor_field*)*nm);
-    pta_qprop[0]=alloc_spinor_field_f(4*NF*nm,&glattice);
+    pta_qprop[0]=alloc_spinor_field(4*NF*nm,&glattice);
     for(k=0;k<nm;++k)
       pta_qprop[k]=pta_qprop[0]+4*NF*k;
   */
@@ -369,16 +369,16 @@ int main(int argc, char *argv[]) {
     finalize_process();
 
     /*
-     free_spinor_field_f(pta_qprop[0]);
+     free_spinor_field(pta_qprop[0]);
      free(pta_qprop);
      free(tricorr);
    */
 
     free_BCs();
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_gfield_f(u_gauge_f);
+    free_suNf_field(u_gauge_f);
 #endif
 
     /* close communications */

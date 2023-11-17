@@ -65,10 +65,10 @@ monomial *ff_create(monomial_data const *data) {
     four_fermion_active = 1;
 
     // Allocate auxiliary field
-    ff_sigma = alloc_sfield(1, &glattice);
-    ff_pi = alloc_sfield(1, &glattice);
-    ff_sigma_mom = alloc_sfield(1, &glattice);
-    ff_pi_mom = alloc_sfield(1, &glattice);
+    ff_sigma = alloc_scalar_field(1, &glattice);
+    ff_pi = alloc_scalar_field(1, &glattice);
+    ff_sigma_mom = alloc_scalar_field(1, &glattice);
+    ff_pi_mom = alloc_scalar_field(1, &glattice);
 
     //Read or set auxiliary field configuration or set cold value
     if (strcmp(par->start_config, "cold") == 0) {

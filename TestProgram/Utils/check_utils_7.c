@@ -8,8 +8,8 @@
 
 int test_bijectivity_spinors();
 int test_add_assign();
-int test_gfield();
-int test_gfield_f();
+int test_suNg_field();
+int test_suNf_field();
 
 int main(int argc, char *argv[]) {
     // Setup
@@ -23,10 +23,10 @@ int main(int argc, char *argv[]) {
     // Test block
     return_val += test_bijectivity_spinors();
     return_val += test_add_assign();
-    return_val += test_gfield();
+    return_val += test_suNg_field();
 
 #ifdef DPHI_FLT
-    return_val += test_gfield_f();
+    return_val += test_suNf_field();
 #endif
 
     // Finalize
@@ -42,10 +42,10 @@ int test_bijectivity_spinors() {
     spinor_field *in, *out;
     spinor_field_flt *in_flt, *out_flt;
 
-    in = alloc_spinor_field_f(1, &glattice);
-    out = alloc_spinor_field_f(1, &glattice);
-    in_flt = alloc_spinor_field_f_flt(1, &glattice);
-    out_flt = alloc_spinor_field_f_flt(1, &glattice);
+    in = alloc_spinor_field(1, &glattice);
+    out = alloc_spinor_field(1, &glattice);
+    in_flt = alloc_spinor_field_flt(1, &glattice);
+    out_flt = alloc_spinor_field_flt(1, &glattice);
 
     gaussian_spinor_field(in);
     gaussian_spinor_field_flt(in_flt);
@@ -85,10 +85,10 @@ int test_bijectivity_spinors() {
     return_val += check_diff_norm(sqnorm_flt - sqnorm, 1.e-4);
 
     // Free fields
-    free_spinor_field_f(in);
-    free_spinor_field_f(out);
-    free_spinor_field_f_flt(in_flt);
-    free_spinor_field_f_flt(out_flt);
+    free_spinor_field(in);
+    free_spinor_field(out);
+    free_spinor_field_flt(in_flt);
+    free_spinor_field_flt(out_flt);
     return return_val;
 }
 
@@ -99,10 +99,10 @@ int test_add_assign() {
     spinor_field *in, *out;
     spinor_field_flt *in_flt, *out_flt;
 
-    in = alloc_spinor_field_f(1, &glattice);
-    out = alloc_spinor_field_f(1, &glattice);
-    in_flt = alloc_spinor_field_f_flt(1, &glattice);
-    out_flt = alloc_spinor_field_f_flt(1, &glattice);
+    in = alloc_spinor_field(1, &glattice);
+    out = alloc_spinor_field(1, &glattice);
+    in_flt = alloc_spinor_field_flt(1, &glattice);
+    out_flt = alloc_spinor_field_flt(1, &glattice);
 
     /*
         First assign to single precision then add assign
@@ -135,20 +135,20 @@ int test_add_assign() {
     return_val += check_diff_norm_zero(spinor_field_sqnorm_f_flt(out_flt));
 
     // Free fields
-    free_spinor_field_f(in);
-    free_spinor_field_f(out);
-    free_spinor_field_f_flt(in_flt);
-    free_spinor_field_f_flt(out_flt);
+    free_spinor_field(in);
+    free_spinor_field(out);
+    free_spinor_field_flt(in_flt);
+    free_spinor_field_flt(out_flt);
 
     return return_val;
 }
 
-int test_gfield() {
+int test_suNg_field() {
     // Setup fields
-    lprintf("TEST", 0, "Testing gfield assign\n");
+    lprintf("TEST", 0, "Testing suNg_field assign\n");
     int return_val = 0;
-    suNg_field *u_gauge_copy = alloc_gfield(&glattice);
-    u_gauge_flt = alloc_gfield_flt(&glattice);
+    suNg_field *u_gauge_copy = alloc_suNg_field(&glattice);
+    u_gauge_flt = alloc_suNg_field_flt(&glattice);
 
     /*
         Create copy of current gauge field, then assign 
@@ -162,30 +162,30 @@ int test_gfield() {
     cudaMemcpy(u_gauge_copy->gpu_ptr, u_gauge->gpu_ptr, 4 * u_gauge->type->gsize_gauge * sizeof(suNg),
                cudaMemcpyDeviceToDevice);
 #else
-    copy_gfield_cpu(u_gauge_copy, u_gauge);
+    copy_suNg_field_cpu(u_gauge_copy, u_gauge);
 #endif
     assign_ud2u();
     assign_u2ud();
 
 #ifdef WITH_GPU
-    copy_from_gpu_gfield(u_gauge);
-    copy_from_gpu_gfield(u_gauge_copy);
+    copy_from_gpu_suNg_field(u_gauge);
+    copy_from_gpu_suNg_field(u_gauge_copy);
 #endif
 
-    sub_assign_gfield_cpu(u_gauge_copy, u_gauge);
-    return_val += check_diff_norm(sqnorm_gfield_cpu(u_gauge_copy), 1.e-10);
+    sub_assign_suNg_field_cpu(u_gauge_copy, u_gauge);
+    return_val += check_diff_norm(sqnorm_suNg_field_cpu(u_gauge_copy), 1.e-10);
 
     // Free fields
-    free_gfield(u_gauge_copy);
-    free_gfield_flt(u_gauge_flt);
+    free_suNg_field(u_gauge_copy);
+    free_suNg_field_flt(u_gauge_flt);
     return return_val;
 }
 
-int test_gfield_f() {
+int test_suNf_field() {
     // Setup fields
-    lprintf("TEST", 0, "Testing gfield_f assign\n");
+    lprintf("TEST", 0, "Testing suNf_field assign\n");
     int return_val = 0;
-    suNf_field *u_gauge_copy = alloc_gfield_f(&glattice);
+    suNf_field *u_gauge_copy = alloc_suNf_field(&glattice);
 
     /*
         Create copy of current gauge field, then assign 
@@ -199,20 +199,20 @@ int test_gfield_f() {
     cudaMemcpy(u_gauge_copy->gpu_ptr, u_gauge_f->gpu_ptr, 4 * u_gauge_f->type->gsize_gauge * sizeof(suNf),
                cudaMemcpyDeviceToDevice);
 #else
-    copy_gfield_f_cpu(u_gauge_copy, u_gauge_f);
+    copy_suNf_field_cpu(u_gauge_copy, u_gauge_f);
 #endif
     assign_ud2u_f();
     assign_u2ud_f();
 
 #ifdef WITH_GPU
-    copy_from_gpu_gfield_f(u_gauge_f);
-    copy_from_gpu_gfield_f(u_gauge_copy);
+    copy_from_gpu_suNf_field(u_gauge_f);
+    copy_from_gpu_suNf_field(u_gauge_copy);
 #endif
 
-    sub_assign_gfield_f_cpu(u_gauge_copy, u_gauge_f);
-    return_val += check_diff_norm(sqnorm_gfield_f_cpu(u_gauge_copy), 1.e-10);
+    sub_assign_suNf_field_cpu(u_gauge_copy, u_gauge_f);
+    return_val += check_diff_norm(sqnorm_suNf_field_cpu(u_gauge_copy), 1.e-10);
 
     // Free fields
-    free_gfield_f(u_gauge_copy);
+    free_suNf_field(u_gauge_copy);
     return return_val;
 }

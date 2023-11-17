@@ -11,7 +11,7 @@
 #define M_PI 3.14159265358979323846264338327950288419716939937510
 #endif
 
-static suNg_field *g;
+static gtransf *g;
 
 static void random_g(void) {
     _MASTER_FOR(&glattice, ix) {
@@ -33,7 +33,7 @@ static void transform_u(void) {
         }
     }
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
 }
 
@@ -56,7 +56,7 @@ static void n_ality_transform(int dir) {
             }
         }
     }
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
 }
 
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n\n");
     hr_complex **polyf;

@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 
     int ninputs = 3;
     spinor_field_flt *in_flt;
-    in_flt = alloc_spinor_field_f_flt(ninputs, &glattice);
+    in_flt = alloc_spinor_field_flt(ninputs, &glattice);
 
     hr_complex c;
     _complex_i_add(c, 1.5, 2.5);
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
         lprintf("LA TEST", 0, "Nominal timer resolution = %lf usec\n", timer_res());
     }
 
-    free_spinor_field_f_flt(in_flt);
+    free_spinor_field_flt(in_flt);
     finalize_process();
     return 0;
 }

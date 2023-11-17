@@ -81,8 +81,8 @@ double apply_operator(double *old, double *new, spinor_field *in) {
     mpar.shift[0] = 0;
 
     // Allocate spinor fields
-    tmp = alloc_spinor_field_f(1, in->type);
-    res = alloc_spinor_field_f(1, in->type);
+    tmp = alloc_spinor_field(1, in->type);
+    res = alloc_spinor_field(1, in->type);
     spinor_field_zero_f(tmp);
 
 // Apply dirac operators
@@ -108,8 +108,8 @@ double apply_operator(double *old, double *new, spinor_field *in) {
 #endif
 
     // Free spinor fields
-    free_spinor_field_f(tmp);
-    free_spinor_field_f(res);
+    free_spinor_field(tmp);
+    free_spinor_field(res);
 
     // Return
     return val;
@@ -123,7 +123,7 @@ void reweight(double steps, double *result) {
     spinor_field *eta;
 
     // Allocate spinor
-    eta = alloc_spinor_field_f(1, &glat_even);
+    eta = alloc_spinor_field(1, &glat_even);
 
     // Perform calculation
     for (int n = 0; n < steps; n++) {
@@ -146,7 +146,7 @@ void reweight(double steps, double *result) {
     }
 
     // Free spinor
-    free_spinor_field_f(eta);
+    free_spinor_field(eta);
 }
 
 void read_cmdline(int argc, char *argv[]) {
@@ -212,8 +212,8 @@ int main(int argc, char *argv[]) {
     geometry_mpi_eo();
 
     // Allocate gauge field
-    u_gauge = alloc_gfield(&glattice);
-    u_gauge_f = alloc_gfield_f(&glattice);
+    u_gauge = alloc_suNg_field(&glattice);
+    u_gauge_f = alloc_suNf_field(&glattice);
     unit_u(u_gauge);
     represent_gauge_field();
 
@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
     // END OF ACTUAL COMPUTATION                                                             //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    free_gfield(u_gauge);
-    free_gfield_f(u_gauge_f);
+    free_suNg_field(u_gauge);
+    free_suNf_field(u_gauge_f);
     finalize_process();
 }

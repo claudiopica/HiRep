@@ -58,7 +58,7 @@ static void transform_u(void) {
         }
     }
 
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
 }
 
@@ -114,8 +114,8 @@ int main(int argc, char *argv[]) {
     _update_par.SF_ds = 3.;
     _update_par.SF_sign = 1;
 
-    u_gauge = alloc_gfield(&glattice);
-    u_gauge_f = alloc_gfield_f(&glattice);
+    u_gauge = alloc_suNg_field(&glattice);
+    u_gauge_f = alloc_suNf_field(&glattice);
     random_u(u_gauge);
     apply_BCs_on_fundamental_gauge_field();
 
@@ -134,8 +134,8 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "Plaquette after the random gauge transf %f\n", avr_plaquette());
     SF_PCAC_wall_corr(mass, acc, NULL);
 
-    free_gfield(u_gauge);
-    free_gfield_f(u_gauge_f);
+    free_suNg_field(u_gauge);
+    free_suNf_field(u_gauge_f);
 
     free_gtransf(g);
 

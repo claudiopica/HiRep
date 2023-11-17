@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     setup_process(&argc, &argv);
 
     setup_gauge_fields();
-    u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
+    u_gauge_f_flt = alloc_suNf_field_flt(&glattice);
 
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     random_u(u_gauge);
@@ -51,12 +51,12 @@ int main(int argc, char *argv[]) {
     par.shift = (double *)malloc(sizeof(double) * (par.n));
     par.err2 = 1.e-20;
     par.max_iter = 0;
-    res = alloc_spinor_field_f(2 * par.n + 3, &glat_even);
+    res = alloc_spinor_field(2 * par.n + 3, &glat_even);
     s1 = res + par.n;
     s2 = s1 + 1;
     tmp = s2 + 1;
     res2 = tmp + 1;
-    tmp_flt = alloc_spinor_field_f_flt(1, &glat_even);
+    tmp_flt = alloc_spinor_field_flt(1, &glat_even);
 
     par.shift[0] = -0.0;
     par.shift[1] = -0.1;
@@ -117,8 +117,8 @@ int main(int argc, char *argv[]) {
         if (tau > 10 * par.err2) { return_value += 1; }
     }
 
-    free_spinor_field_f(res);
-    free_spinor_field_f_flt(tmp_flt);
+    free_spinor_field(res);
+    free_spinor_field_flt(tmp_flt);
     free(par.shift);
 
     finalize_process();

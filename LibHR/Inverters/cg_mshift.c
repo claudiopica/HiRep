@@ -39,7 +39,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 #endif
 
     /* allocate spinors fields and aux real variables */
-    p = alloc_spinor_field_f(3 + par->n, in->type);
+    p = alloc_spinor_field(3 + par->n, in->type);
     k = p + par->n;
     r = k + 1;
     Mk = r + 1;
@@ -135,7 +135,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
     }
 
     /* free memory */
-    free_spinor_field_f(p);
+    free_spinor_field(p);
     free(z1);
     free(z2);
     free(z3);

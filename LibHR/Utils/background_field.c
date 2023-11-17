@@ -23,12 +23,12 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
     hr_complex tmp, tmp2;
     double diff_re, diff_im;
 
-    Vtest_old = alloc_gfield(&glattice);
-    Vtest_new = alloc_gfield(&glattice);
+    Vtest_old = alloc_suNg_field(&glattice);
+    Vtest_new = alloc_suNg_field(&glattice);
     suNg_field_copy(Vtest_old, V);
 
-    start_sendrecv_gfield(Vtest_old);
-    complete_sendrecv_gfield(Vtest_old);
+    start_sendrecv_suNg_field(Vtest_old);
+    complete_sendrecv_suNg_field(Vtest_old);
 #endif
     int index;
     double A = 0;
@@ -62,8 +62,8 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
         }
     }
 
-    start_sendrecv_gfield(V);
-    complete_sendrecv_gfield(V);
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
 
     // test sum of the difference between old and new plaquette for each site. Real and imaginary parts are treated independantly
 #ifdef DEBUG_BACKGROUND
@@ -72,7 +72,7 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
     diff_im = 0.;
 
     suNg_field_copy(Vtest_new, V);
-    complete_sendrecv_gfield(Vtest_new);
+    complete_sendrecv_suNg_field(Vtest_new);
 
     for (c[0] = 0; c[0] < T; c[0]++) {
         for (c[1] = 0; c[1] < X; c[1]++) {
@@ -93,8 +93,8 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
                     // restore old gauge field
                     suNg_field_copy(V, Vtest_old);
 
-                    start_sendrecv_gfield(V);
-                    complete_sendrecv_gfield(V);
+                    start_sendrecv_suNg_field(V);
+                    complete_sendrecv_suNg_field(V);
 
                     cplaq(&tmp, index, 3, 0);
 
@@ -105,8 +105,8 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
                     // restore new gauge field
                     suNg_field_copy(V, Vtest_new);
 
-                    start_sendrecv_gfield(V);
-                    complete_sendrecv_gfield(V);
+                    start_sendrecv_suNg_field(V);
+                    complete_sendrecv_suNg_field(V);
                 }
             }
         }
@@ -114,8 +114,8 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
     global_sum(&diff_re, 1);
     global_sum(&diff_im, 1);
 
-    free_gfield(Vtest_old);
-    free_gfield(Vtest_new);
+    free_suNg_field(Vtest_old);
+    free_suNg_field(Vtest_new);
 
     lprintf("DEBUG", 0,
             " difference of the real and imaginary part of the old and new plaquette summed on the volume: %e %e \n", diff_re,
@@ -123,6 +123,6 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
 
 #endif // DEBUG_BACKGROUND
 
-    free_gfield(V_old);
+    free_suNg_field(V_old);
 #endif //SON or WITH_QUATERNIONS
 }

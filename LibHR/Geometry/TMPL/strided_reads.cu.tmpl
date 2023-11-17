@@ -5,9 +5,6 @@
 
 #include "Utils/generics.h"
 
-#if !defined _FIELD_NAME
-#error Missing _FIELD_NAME in strided_reads.cu
-#endif
 #if !defined _FIELD_TYPE
 #error Missing _FIELD_TYPE in strided_reads.cu
 #endif
@@ -21,23 +18,22 @@
 #error Missing _REAL in strided_reads.cu
 #endif
 
-_GPU_FUNC(void, read_, _FIELD_NAME, (_SITE_TYPE * s, _FIELD_TYPE *in, int ix, int comp)) {
+_GPU_FUNC(void, read_, _FIELD_TYPE, (_SITE_TYPE * s, _FIELD_TYPE *in, int ix, int comp)) {
     read_gpu<_REAL>(0, s, in->ptr, ix - in->type->master_shift, comp, _FIELD_DIM);
 }
 
-_GPU_FUNC(void, write_, _FIELD_NAME, (_SITE_TYPE * s, _FIELD_TYPE *in, int ix, int comp)) {
+_GPU_FUNC(void, write_, _FIELD_TYPE, (_SITE_TYPE * s, _FIELD_TYPE *in, int ix, int comp)) {
     write_gpu<_REAL>(0, s, in->ptr, ix - in->type->master_shift, comp, _FIELD_DIM);
 }
 
-_GPU_FUNC(void, read_strided_, _FIELD_NAME, (_SITE_TYPE * s, _SITE_TYPE *in, int ix, int comp)) {
+_GPU_FUNC(void, read_strided_, _FIELD_TYPE, (_SITE_TYPE * s, _SITE_TYPE *in, int ix, int comp)) {
     read_gpu<_REAL>(0, s, in, ix, comp, _FIELD_DIM);
 }
 
-_GPU_FUNC(void, write_strided_, _FIELD_NAME, (_SITE_TYPE * s, _SITE_TYPE *in, int ix, int comp)) {
+_GPU_FUNC(void, write_strided_, _FIELD_TYPE, (_SITE_TYPE * s, _SITE_TYPE *in, int ix, int comp)) {
     write_gpu<_REAL>(0, s, in, ix, comp, _FIELD_DIM);
 }
 
-#undef _FIELD_NAME
 #undef _FIELD_TYPE
 #undef _SITE_TYPE
 #undef _FIELD_DIM

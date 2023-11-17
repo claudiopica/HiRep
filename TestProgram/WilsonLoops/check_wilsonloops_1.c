@@ -16,14 +16,14 @@ int main(int argc, char *argv[]) {
     setup_gauge_fields();
 
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     WL_initialize();
 
     WL_Hamiltonian_gauge(u_gauge, u_gauge);
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     double dtmp;
 
@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 
     WL_free();
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 
     finalize_process();
     return return_value;

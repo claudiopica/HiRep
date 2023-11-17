@@ -50,15 +50,15 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
     int dd, x0, x1, x2, x3, mu, ipin, ipout;
 
     if (uin != NULL) {
-        ubuf[0] = alloc_gfield(&glattice);
-        ubuf[1] = alloc_gfield(&glattice);
+        ubuf[0] = alloc_suNg_field(&glattice);
+        ubuf[1] = alloc_suNg_field(&glattice);
     } else {
         ubuf[0] = ubuf[1] = NULL;
     }
 
     if (sin != NULL) {
-        sbuf[0] = alloc_spinor_field_f(1, &glattice);
-        sbuf[1] = alloc_spinor_field_f(1, &glattice);
+        sbuf[0] = alloc_spinor_field(1, &glattice);
+        sbuf[1] = alloc_spinor_field(1, &glattice);
         spinor_field_zero_f(sbuf[0]);
         spinor_field_zero_f(sbuf[1]);
     } else {
@@ -72,12 +72,12 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
     stmp[1] = sbuf[1];
 
     if (uin != NULL) {
-        start_sendrecv_gfield(uin);
-        complete_sendrecv_gfield(uin);
+        start_sendrecv_suNg_field(uin);
+        complete_sendrecv_suNg_field(uin);
     }
     if (sin != NULL) {
-        start_sendrecv_spinor_field_f(sin);
-        complete_sendrecv_spinor_field_f(sin);
+        start_sendrecv_spinor_field(sin);
+        complete_sendrecv_spinor_field(sin);
     }
 
     for (int i = 0; i < total_shift; i++) {
@@ -124,12 +124,12 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
         }
 
         if (uin != NULL) {
-            start_sendrecv_gfield(utmp[1]);
-            complete_sendrecv_gfield(utmp[1]);
+            start_sendrecv_suNg_field(utmp[1]);
+            complete_sendrecv_suNg_field(utmp[1]);
         }
         if (sin != NULL) {
-            start_sendrecv_spinor_field_f(stmp[1]);
-            complete_sendrecv_spinor_field_f(stmp[1]);
+            start_sendrecv_spinor_field(stmp[1]);
+            complete_sendrecv_spinor_field(stmp[1]);
         }
 
         if (i % 2 == 0) {
@@ -149,13 +149,13 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
     if (uin != NULL) {
         if (total_shift == 1) { suNg_field_copy(uout, utmp[0]); }
 
-        free_gfield(ubuf[0]);
-        free_gfield(ubuf[1]);
+        free_suNg_field(ubuf[0]);
+        free_suNg_field(ubuf[1]);
     }
     if (sin != NULL) {
         if (total_shift == 1) { spinor_field_copy_f(sout, stmp[0]); }
 
-        free_spinor_field_f(sbuf[0]);
-        free_spinor_field_f(sbuf[1]);
+        free_spinor_field(sbuf[0]);
+        free_spinor_field(sbuf[1]);
     }
 }

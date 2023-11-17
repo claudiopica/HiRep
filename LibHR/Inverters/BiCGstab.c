@@ -28,7 +28,7 @@ int BiCGstab(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field 
     int cgiter = 0;
     int notconverged = 1;
 
-    s = alloc_spinor_field_f(7, in->type);
+    s = alloc_spinor_field(7, in->type);
     r = s + 1;
     r1 = s + 2;
     o = s + 3;
@@ -122,7 +122,7 @@ int BiCGstab(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field 
     }
 
     // Free memory
-    free_spinor_field_f(s);
+    free_spinor_field(s);
 
     // Print log info
     lprintf("INVERTER", 10, "BiCGstab: cgiter = %d\n", cgiter);

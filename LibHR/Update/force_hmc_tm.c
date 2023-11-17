@@ -28,20 +28,20 @@ static void Mee_inv(spinor_field *out, double mass, double mu, spinor_field *in)
 }
 
 static void free_force_hmc_tm() {
-    free_spinor_field_f(Xs);
-    free_spinor_field_f(eta);
-    free_spinor_field_f(xi);
+    free_spinor_field(Xs);
+    free_spinor_field(eta);
+    free_spinor_field(xi);
 }
 
 static void init_force_hmc_tm() {
     static int init = 0;
     if (init == 0) {
-        Xs = alloc_spinor_field_f(2, &glattice);
+        Xs = alloc_spinor_field(2, &glattice);
         Ys = Xs + 1;
         Xs->type = &glat_even;
         Ys->type = &glat_even;
-        eta = alloc_spinor_field_f(1, &glat_even);
-        xi = alloc_spinor_field_f(1, &glat_odd);
+        eta = alloc_spinor_field(1, &glat_even);
+        xi = alloc_spinor_field(1, &glat_odd);
         atexit(&free_force_hmc_tm);
         init = 1;
     }

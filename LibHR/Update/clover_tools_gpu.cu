@@ -370,8 +370,8 @@ void compute_ldl_decomp_gpu(double sigma0) {
 
 void compute_clover_term_gpu() {
     sigma = 0xF00F;
-    start_sendrecv_gfield_f(u_gauge_f);
-    complete_sendrecv_gfield_f(u_gauge_f);
+    start_sendrecv_suNf_field(u_gauge_f);
+    complete_sendrecv_suNf_field(u_gauge_f);
     _CUDA_CALL((&glattice), grid, N, block_start, ixp,
                (_compute_clover_term<<<grid, BLOCK_SIZE>>>(cl_term->gpu_ptr, csw_value, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, N,
                                                            block_start)););
@@ -395,7 +395,7 @@ void compute_force_logdet_gpu(double mass, double coeff) {
 
 void clover_init_gpu(double csw) {
     cl_term = alloc_clover_term(&glattice);
-    cl_ldl = alloc_clover_ldl(&glattice);
+    cl_ldl = alloc_ldl_field(&glattice);
     cl_force = alloc_clover_force(&glattice);
 
     cudaMemset(cl_term->gpu_ptr, 0, 4 * sizeof(suNfc) * glattice.gsize_gauge);

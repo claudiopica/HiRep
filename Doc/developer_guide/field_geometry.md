@@ -105,7 +105,7 @@ Usually, we want to initialize fields either on the full lattice or only with ev
 We are using an enum `gd_type` to evaluate whether the field is `EVEN`, `ODD` or `GLOBAL`. We can check, whether a field is either of that by direct comparison
 
 ```c
-spinor_field_f *s; //Add initialization 
+spinor_field *s; //Add initialization 
 if (s->parity == EVEN) printf("Field is even.\n");
 if (s->parity == ODD) printf("Field is odd.\n");
 if (s->parity == GLOBAL) printf("Field is defined on all sites.\n");
@@ -114,7 +114,7 @@ if (s->parity == GLOBAL) printf("Field is defined on all sites.\n");
 Further, we can use the numerical values saved in the enum definition, to check whether a field is defined on the even sites (`EVEN` or `GLOBAL`) or on the odd sites (`ODD` or `GLOBAL`).
 
 ```c
-spinor_field_f *s; //Add initialization
+spinor_field *s; //Add initialization
 if (s->parity & EVEN) printf("Field is defined on even sites.\n");
 if (s->parity & ODD) printf("Field is defined on odd sites.\n");
 ```
@@ -125,7 +125,7 @@ For the new geometry, we split the lattice into master pieces and receive buffer
 The global geometry descriptors `glattice`, `glat_even` and `glat_odd` are initialized globally on host memory. These can then be used to allocate fields correspondingly. We can then query geometry information by using the type field. For example, checking whether a field is even or odd would work in the following way:
 
 ```c
-spinor_field_f *s; //Add initialization
+spinor_field *s; //Add initialization
 if (s->type == &glattice) printf("Field is even.\n");
 if (s->type == &glat_odd) printf("Field is odd.\n");
 if (s->type == &glat_even) printf("Field is even\n");
@@ -289,7 +289,7 @@ For example, for spinor fields, iterating through the even sites mechanically wo
 int main(void)
 {
     spinor_field *s;
-    s = alloc_spinor_field_f(1, &glattice);
+    s = alloc_spinor_field(1, &glattice);
     int lattice_volume = T*X*Y*Z;
     for (int i = 0; i < lattice_volume/2; ++i)
     {
@@ -466,7 +466,7 @@ int main(void)
     int vol4h = T*X*Y*Z/2;
 /
     spinor_field *s;
-    s = allocate_spinor_field_f(1, &glattice);
+    s = allocate_spinor_field(1, &glattice);
 
     // Piece for is used identically to the CPU
     _PIECE_FOR(s->type, ixp) {
@@ -513,7 +513,7 @@ int main(void)
     int vol4h = T*X*Y*Z/2;
 
     suNf_field *u;
-    u = allocate_gfield_f(&glattice);
+    u = allocate_suNf_field(&glattice);
 
     // Piece for is used identically to the CPU
     _PIECE_FOR(s->type, ixp) {
@@ -583,7 +583,7 @@ At a code level, this is achieved by requesting the start pointer at a given ind
 int void(main)
 {
     spinor_field *field;
-    field = alloc_spinor_field_f(1, &glattice);
+    field = alloc_spinor_field(1, &glattice);
     gaussian_spinor_field(field);
 
     suNf_spinor *s;
@@ -607,7 +607,7 @@ int void(main)
 {
     // Initialize a random spinor field
     spinor_field *field;
-    field = alloc_spinor_field_f(1, &glattice);
+    field = alloc_spinor_field(1, &glattice);
     gaussian_spinor_field(field);
     spinor_field_copy_to_gpu_f(field);
 

@@ -19,13 +19,13 @@ int main(int argc, char *argv[]) {
     setup_process(&argc, &argv);
 
     setup_gauge_fields();
-    ss1 = alloc_spinor_field_f(2, &glattice);
+    ss1 = alloc_spinor_field(2, &glattice);
     ff1 = alloc_suNg_scalar_field(&glattice);
     ff2 = alloc_suNg_scalar_field(&glattice);
 
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     random_u(u_gauge);
-    start_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n\n");
 

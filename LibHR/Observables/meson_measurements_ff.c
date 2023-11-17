@@ -74,8 +74,8 @@ static void flip_T_bc(int tau) {
     ((px) * (n_mom) * (n_mom) * (24) * (nm) + (py) * (n_mom) * (24) * (nm) + (pz) * (24) * (nm) + ((cm) * (24)) + (tc))
 void measure_spectrum_ff_pt(int tau, int nm, double *m, int n_mom, int conf_num, double precision, storage_switch swc,
                             data_storage_array **ret) {
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm * NF, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm * NF, &glattice);
     init_propagator_ff_eo(nm, m, precision);
     int k;
     lprintf("MAIN", 0, "Point Source at (%d,0,0,0) \n", tau);
@@ -104,8 +104,8 @@ void measure_spectrum_ff_pt(int tau, int nm, double *m, int n_mom, int conf_num,
     flip_scalar_field(ff_pi);
 
     free_propagator_ff_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
+    free_spinor_field(source);
+    free_spinor_field(prop);
 }
 
 /********************************
@@ -114,8 +114,8 @@ void measure_spectrum_ff_pt(int tau, int nm, double *m, int n_mom, int conf_num,
 
 void measure_spectrum_ff_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
                                  data_storage_array **ret) {
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
     int tau, k;
     init_propagator_ff_eo(nm, m, precision);
     for (k = 0; k < nhits; ++k) {
@@ -133,15 +133,15 @@ void measure_spectrum_ff_semwall(int nm, double *m, int nhits, int conf_num, dou
     print_mesons(meson_correlators, nhits * GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, "DEFAULT_SEMWALL");
 
     free_propagator_ff_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
+    free_spinor_field(source);
+    free_spinor_field(prop);
 }
 
 void measure_spectrum_semwall_ff_ext(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc,
                                      data_storage_array **ret) {
     int k, l, tau;
-    spinor_field *source = alloc_spinor_field_f(4, &glat_even);
-    spinor_field *prop_p = alloc_spinor_field_f(8 * nm, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glat_even);
+    spinor_field *prop_p = alloc_spinor_field(8 * nm, &glattice);
     spinor_field *prop_a = prop_p + 4 * nm;
 
     int dilution = 4; //4 for spin dilution
@@ -186,8 +186,8 @@ void measure_spectrum_semwall_ff_ext(int nm, double *m, int nhits, int conf_num,
     }
     print_mesons(meson_correlators, 1. * nhits * GLB_VOL3, conf_num, nm, m, 3 * GLB_T, 1, "EXTENDED_SEMWALL");
     free_propagator_ff_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop_p);
+    free_spinor_field(source);
+    free_spinor_field(prop_p);
 }
 
 /****************************************
@@ -196,8 +196,8 @@ void measure_spectrum_semwall_ff_ext(int nm, double *m, int nhits, int conf_num,
 
 void measure_spectrum_discon_ff_semwall(int nm, double *m, int nhits, int degree_hopping, int nhits_hopping, int conf_num,
                                         double precision, storage_switch swc, data_storage_array **ret) {
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
     int k;
     char label[100];
     init_propagator_ff_eo(nm, m, precision);
@@ -290,6 +290,6 @@ void measure_spectrum_discon_ff_semwall(int nm, double *m, int nhits, int degree
     }
     //print_mesons(discon_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"DISCON_SEMWALL");
     free_propagator_ff_eo();
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
+    free_spinor_field(source);
+    free_spinor_field(prop);
 }

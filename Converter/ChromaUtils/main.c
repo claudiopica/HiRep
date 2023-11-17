@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
     /* test_geometry_mpi_eo();*/
 
     /* alloc global gauge fields HiRep*/
-    u_gauge = alloc_gfield(&glattice);
+    u_gauge = alloc_suNg_field(&glattice);
 
     /* start QDP */
     QDP_initialize(&argc, &argv);
@@ -165,7 +165,7 @@ end:
     /* shutdown QDP */
     QDP_finalize();
 
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 
     return status;
 }

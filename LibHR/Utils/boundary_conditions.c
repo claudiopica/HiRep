@@ -231,7 +231,7 @@ static void gf_open_BCs();
 #endif
 
 void apply_BCs_on_fundamental_gauge_field(void) {
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 #if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
     gf_SF_BCs(&BCs_pars.gauge_boundary_dn, &BCs_pars.gauge_boundary_up);
 #endif
@@ -300,7 +300,7 @@ static void cl_open_BCs(suNfc_field *);
 static void cl_SF_BCs(suNfc_field *);
 #endif
 
-void apply_BCs_on_clover_term(suNfc_field *cl) {
+void apply_BCs_on_clover_term(clover_term *cl) {
 #if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && defined(BC_T_OPEN)
     cl_open_BCs(cl);
 #endif

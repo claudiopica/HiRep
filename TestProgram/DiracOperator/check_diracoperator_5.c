@@ -27,16 +27,16 @@ void reset_fields() {
 }
 
 void setup_fields_oe() {
-    in_oe[0] = get_even_part_spinor_field_f(&in[0]);
-    in_oe[1] = get_odd_part_spinor_field_f(&in[1]); // out
-    in_oe[2] = get_odd_part_spinor_field_f(&in[2]); // diff
+    in_oe[0] = get_even_part_spinor_field(&in[0]);
+    in_oe[1] = get_odd_part_spinor_field(&in[1]); // out
+    in_oe[2] = get_odd_part_spinor_field(&in[2]); // diff
 
     tmp = in;
     in = in_oe;
 #ifdef DPHI_FLT
-    in_oe_flt[0] = get_even_part_spinor_field_f_flt(&in_flt[0]);
-    in_oe_flt[1] = get_odd_part_spinor_field_f_flt(&in_flt[1]); // out
-    in_oe_flt[2] = get_odd_part_spinor_field_f_flt(&in_flt[2]); // diff
+    in_oe_flt[0] = get_even_part_spinor_field_flt(&in_flt[0]);
+    in_oe_flt[1] = get_odd_part_spinor_field_flt(&in_flt[1]); // out
+    in_oe_flt[2] = get_odd_part_spinor_field_flt(&in_flt[2]); // diff
 
     tmp_flt = in_flt;
     in_flt = in_oe_flt;
@@ -44,17 +44,17 @@ void setup_fields_oe() {
 }
 
 void setup_fields_eo() {
-    in_eo[0] = get_odd_part_spinor_field_f(&in[0]);
-    in_eo[1] = get_even_part_spinor_field_f(&in[1]); // out
-    in_eo[2] = get_even_part_spinor_field_f(&in[2]); // diff
+    in_eo[0] = get_odd_part_spinor_field(&in[0]);
+    in_eo[1] = get_even_part_spinor_field(&in[1]); // out
+    in_eo[2] = get_even_part_spinor_field(&in[2]); // diff
 
     tmp = in;
     in = in_eo;
 
 #ifdef DPHI_FLT
-    in_eo_flt[0] = get_odd_part_spinor_field_f_flt(&in_flt[0]);
-    in_eo_flt[1] = get_even_part_spinor_field_f_flt(&in_flt[1]); // out
-    in_eo_flt[2] = get_even_part_spinor_field_f_flt(&in_flt[2]); // diff
+    in_eo_flt[0] = get_odd_part_spinor_field_flt(&in_flt[0]);
+    in_eo_flt[1] = get_even_part_spinor_field_flt(&in_flt[1]); // out
+    in_eo_flt[2] = get_even_part_spinor_field_flt(&in_flt[2]); // diff
 
     tmp_flt = in_flt;
     in_flt = in_eo_flt;
@@ -62,17 +62,17 @@ void setup_fields_eo() {
 }
 
 void setup_fields_ee() {
-    in_ee[0] = get_even_part_spinor_field_f(&in[0]);
-    in_ee[1] = get_even_part_spinor_field_f(&in[1]); // out
-    in_ee[2] = get_even_part_spinor_field_f(&in[2]); // diff
+    in_ee[0] = get_even_part_spinor_field(&in[0]);
+    in_ee[1] = get_even_part_spinor_field(&in[1]); // out
+    in_ee[2] = get_even_part_spinor_field(&in[2]); // diff
 
     tmp = in;
     in = in_ee;
 
 #ifdef DPHI_FLT
-    in_ee_flt[0] = get_even_part_spinor_field_f_flt(&in_flt[0]);
-    in_ee_flt[1] = get_even_part_spinor_field_f_flt(&in_flt[1]); // out
-    in_ee_flt[2] = get_even_part_spinor_field_f_flt(&in_flt[2]); // diff
+    in_ee_flt[0] = get_even_part_spinor_field_flt(&in_flt[0]);
+    in_ee_flt[1] = get_even_part_spinor_field_flt(&in_flt[1]); // out
+    in_ee_flt[2] = get_even_part_spinor_field_flt(&in_flt[2]); // diff
 
     tmp_flt = in_flt;
     in_flt = in_ee_flt;
@@ -80,17 +80,17 @@ void setup_fields_ee() {
 }
 
 void setup_fields_oo() {
-    in_oo[0] = get_odd_part_spinor_field_f(&in[0]);
-    in_oo[1] = get_odd_part_spinor_field_f(&in[1]); // out
-    in_oo[2] = get_odd_part_spinor_field_f(&in[2]); // diff
+    in_oo[0] = get_odd_part_spinor_field(&in[0]);
+    in_oo[1] = get_odd_part_spinor_field(&in[1]); // out
+    in_oo[2] = get_odd_part_spinor_field(&in[2]); // diff
 
     tmp = in;
     in = in_oo;
 
 #ifdef DPHI_FLT
-    in_oo_flt[0] = get_odd_part_spinor_field_f_flt(&in_flt[0]);
-    in_oo_flt[1] = get_odd_part_spinor_field_f_flt(&in_flt[1]); // out
-    in_oo_flt[2] = get_odd_part_spinor_field_f_flt(&in_flt[2]); // diff
+    in_oo_flt[0] = get_odd_part_spinor_field_flt(&in_flt[0]);
+    in_oo_flt[1] = get_odd_part_spinor_field_flt(&in_flt[1]); // out
+    in_oo_flt[2] = get_odd_part_spinor_field_flt(&in_flt[2]); // diff
 
     tmp_flt = in_flt;
     in_flt = in_oo_flt;
@@ -103,10 +103,10 @@ int main(int argc, char *argv[]) {
     int ninputs = 1;
     int noutputs = 1;
 
-    in = alloc_spinor_field_f(ninputs + noutputs + 1, &glattice);
+    in = alloc_spinor_field(ninputs + noutputs + 1, &glattice);
 
 #ifdef DPHI_FLT
-    in_flt = alloc_spinor_field_f_flt(ninputs + noutputs + 1, &glattice);
+    in_flt = alloc_spinor_field_flt(ninputs + noutputs + 1, &glattice);
 #endif
 
     setup_random_gauge_fields();

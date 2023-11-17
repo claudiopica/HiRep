@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     setup_process(&argc, &argv);
     setup_random_gauge_fields();
 
-    spinor_field *in = alloc_spinor_field_f(1, &glattice);
+    spinor_field *in = alloc_spinor_field(1, &glattice);
     gaussian_spinor_field(in);
 
     lprintf("REDUCTION BENCHMARKS", 1, "Testing naive CUDA reduction of doubles\n");

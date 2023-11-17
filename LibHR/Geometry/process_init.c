@@ -84,10 +84,10 @@ void setup_gauge_fields() {
         setup_level = 2;
     }
 
-    u_gauge = alloc_gfield(&glattice);
+    u_gauge = alloc_suNg_field(&glattice);
 
 #ifndef REPR_FUNDAMENTAL
-    u_gauge_f = alloc_gfield_f(&glattice);
+    u_gauge_f = alloc_suNf_field(&glattice);
 #endif
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
@@ -95,7 +95,7 @@ void setup_gauge_fields() {
 #endif
 
 #ifdef DPHI_FLT
-    u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
+    u_gauge_f_flt = alloc_suNf_field_flt(&glattice);
 #endif
 
 #ifdef WITH_SMEARING
@@ -247,13 +247,13 @@ void finalize_process() {
     free_wrk_space();
 
     /* free memory */
-    free_gfield(u_gauge);
+    free_suNg_field(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_gfield_f(u_gauge_f);
+    free_suNf_field(u_gauge_f);
 #endif
     if (u_scalar != NULL) { free_suNg_scalar_field(u_scalar); }
 
-    if (u_gauge_f_flt != NULL) { free_gfield_f_flt(u_gauge_f_flt); }
+    if (u_gauge_f_flt != NULL) { free_suNf_field_flt(u_gauge_f_flt); }
 
     // #ifndef WITH_NEW_GEOMETRY
     //   free_geometry_mpi_eo();

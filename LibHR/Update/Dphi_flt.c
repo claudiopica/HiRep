@@ -36,15 +36,15 @@ static spinor_field_flt *otmp = NULL;
 
 static void free_mem() {
     if (gtmp != NULL) {
-        free_spinor_field_f_flt(gtmp);
+        free_spinor_field_flt(gtmp);
         gtmp = NULL;
     }
     if (etmp != NULL) {
-        free_spinor_field_f_flt(etmp);
+        free_spinor_field_flt(etmp);
         etmp = NULL;
     }
     if (otmp != NULL) {
-        free_spinor_field_f_flt(otmp);
+        free_spinor_field_flt(otmp);
         otmp = NULL;
     }
     init = 1;
@@ -52,9 +52,9 @@ static void free_mem() {
 
 static void init_Dirac() {
     if (init) {
-        gtmp = alloc_spinor_field_f_flt(1, &glattice);
-        etmp = alloc_spinor_field_f_flt(1, &glat_even);
-        otmp = alloc_spinor_field_f_flt(1, &glat_odd);
+        gtmp = alloc_spinor_field_flt(1, &glattice);
+        etmp = alloc_spinor_field_flt(1, &glat_even);
+        otmp = alloc_spinor_field_flt(1, &glat_odd);
         atexit(&free_mem);
         init = 0;
     }
@@ -234,7 +234,7 @@ void Dphi_flt_cpu_(spinor_field_flt *restrict out, spinor_field_flt *restrict in
     /************************ loop over all lattice sites *************************/
     /* start communication of input spinor field */
 #ifdef WITH_MPI
-    start_sendrecv_spinor_field_f_flt(in);
+    start_sendrecv_spinor_field_flt(in);
 #endif
 
     for (int repeat = 0; repeat < 2; repeat++) {
@@ -423,7 +423,7 @@ void Dphi_flt_cpu_(spinor_field_flt *restrict out, spinor_field_flt *restrict in
         if (!repeat) {
             // lprintf("MAIN", 0, "Doing complete sendrecv repeat=%d\n",repeat);
             /* wait for spinor to be transfered */
-            complete_sendrecv_spinor_field_f_flt(in);
+            complete_sendrecv_spinor_field_flt(in);
         }
 #endif
     }
@@ -453,13 +453,13 @@ void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in) {
 
     /************************ loop over all lattice sites *************************/
     /* start communication of input spinor field */
-    start_sendrecv_spinor_field_f_flt(in);
+    start_sendrecv_spinor_field_flt(in);
 
     _PIECE_FOR(out->type, ixp) {
         if (ixp == out->type->inner_master_pieces) {
             _OMP_PRAGMA(master)
             /* wait for spinor to be transfered */
-            complete_sendrecv_spinor_field_f_flt(in);
+            complete_sendrecv_spinor_field_flt(in);
             _OMP_PRAGMA(barrier)
         }
         _SITE_FOR(out->type, ixp, ix) {

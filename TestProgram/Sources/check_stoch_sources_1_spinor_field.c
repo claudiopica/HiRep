@@ -106,8 +106,8 @@ int main(int argc, char *argv[]) {
 
     lprintf("CORR", 0, "Testing spinor field volume source (without dilution) .... \n");
     double norm;
-    spinor_field *source = alloc_spinor_field_f(1, &glattice);
-    spinor_field *source_shifted = alloc_spinor_field_f(1, &glattice);
+    spinor_field *source = alloc_spinor_field(1, &glattice);
+    spinor_field *source_shifted = alloc_spinor_field(1, &glattice);
 
     for (int i = 0; i < mes_ip.nhits; i++) {
         create_z2_volume_source(source);
@@ -199,8 +199,8 @@ int main(int argc, char *argv[]) {
 
     } //loop on ll (the number of shifts)
 
-    free_spinor_field_f(source);
-    free_spinor_field_f(source_shifted);
+    free_spinor_field(source);
+    free_spinor_field(source_shifted);
 
     global_sum_int(&return_value, 1);
     lprintf("MAIN", 0, "return_value= %d\n ", return_value);

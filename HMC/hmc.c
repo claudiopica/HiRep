@@ -134,7 +134,7 @@ int main(int argc, char *argv[]) {
     spinor_field *eva_vecs = NULL;
     if (strcmp(eigval_var.make, "true") == 0) {
         eva_vals = malloc(sizeof(double) * eigval_var.nevt);
-        eva_vecs = alloc_spinor_field_f(eigval_var.nevt, &glattice);
+        eva_vecs = alloc_spinor_field(eigval_var.nevt, &glattice);
     }
     rc = acc = 0;
     for (i = flow.start; i < flow.end; ++i) {

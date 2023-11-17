@@ -23,10 +23,10 @@ void WF_initialize() {
 #endif
 
     if (ws_gf == NULL) {
-        ws_gf = alloc_gfield(&glattice);
-        ws_gf_tmp = alloc_gfield(&glattice);
-        Vprime = alloc_gfield(&glattice);
-        Vtmp = alloc_gfield(&glattice);
+        ws_gf = alloc_suNg_field(&glattice);
+        ws_gf_tmp = alloc_suNg_field(&glattice);
+        Vprime = alloc_suNg_field(&glattice);
+        Vtmp = alloc_suNg_field(&glattice);
 
 #if defined(PLAQ_WEIGHTS)
 #ifdef PURE_GAUGE_ANISOTROPY
@@ -74,10 +74,10 @@ void WF_set_bare_anisotropy(double *wf_chi) {
 
 void WF_free() {
     if (ws_gf != NULL) {
-        free_gfield(ws_gf);
-        free_gfield(ws_gf_tmp);
-        free_gfield(Vprime);
-        free_gfield(Vtmp);
+        free_suNg_field(ws_gf);
+        free_suNg_field(ws_gf_tmp);
+        free_suNg_field(Vprime);
+        free_suNg_field(Vtmp);
         if (wf_plaq_weight != NULL) {
 #ifdef PLAQ_WEIGHTS
             if (wf_plaq_weight != plaq_weight) { free(wf_plaq_weight); }
@@ -185,8 +185,8 @@ void WilsonFlow1(suNg_field *V, const double epsilon) {
         }
     }
 
-    start_sendrecv_gfield(V);
-    complete_sendrecv_gfield(V);
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
 #if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
     apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -226,8 +226,8 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
         }
     }
 
-    start_sendrecv_gfield(V);
-    complete_sendrecv_gfield(V);
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
 #if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
     apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -245,8 +245,8 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
         }
     }
 
-    start_sendrecv_gfield(V);
-    complete_sendrecv_gfield(V);
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
 #if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
     apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -267,11 +267,11 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
         }
     }
 
-    start_sendrecv_gfield(V);
-    complete_sendrecv_gfield(V);
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
 
-    start_sendrecv_gfield(Vprime);
-    complete_sendrecv_gfield(Vprime);
+    start_sendrecv_suNg_field(Vprime);
+    complete_sendrecv_suNg_field(Vprime);
 
 #if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
     apply_BCs_on_fundamental_gauge_field();
@@ -288,8 +288,8 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
         }
     }
 
-    start_sendrecv_gfield(V);
-    complete_sendrecv_gfield(V);
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
 #if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
     apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -321,8 +321,8 @@ void WilsonFlow3(suNg_field *V, const double epsilon) {
         }
     }
 
-    start_sendrecv_gfield(V);
-    complete_sendrecv_gfield(V);
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
 #if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
     apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -339,8 +339,8 @@ void WilsonFlow3(suNg_field *V, const double epsilon) {
         }
     }
 
-    start_sendrecv_gfield(V);
-    complete_sendrecv_gfield(V);
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
 #if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
     apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -357,8 +357,8 @@ void WilsonFlow3(suNg_field *V, const double epsilon) {
         }
     }
 
-    start_sendrecv_gfield(V);
-    complete_sendrecv_gfield(V);
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
 #if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
     apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -374,8 +374,8 @@ void WilsonFlow3(suNg_field *V, const double epsilon) {
         }
     }
 
-    start_sendrecv_gfield(V);
-    complete_sendrecv_gfield(V);
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
 #if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
     apply_BCs_on_fundamental_gauge_field();
 #endif

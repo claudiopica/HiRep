@@ -41,7 +41,7 @@ void represent_gauge_field() {
     }
 
     /* wait gauge field transfer */
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     /* loop on the rest of master sites */
     _OMP_PRAGMA(_omp_parallel)
@@ -71,7 +71,7 @@ void represent_gauge_field() {
 #else //ALLOCATE_REPR_GAUGE_FIELD
     static int first_time = 1;
     /* wait gauge field transfer */
-    complete_sendrecv_gfield(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     if (first_time) {
         first_time = 0;

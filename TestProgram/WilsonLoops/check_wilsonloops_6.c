@@ -6,7 +6,7 @@
 
 #include "libhr.h"
 
-static void random_g(suNg_field *g) {
+static void random_g(gtransf *g) {
     //   _DECLARE_INT_ITERATOR(ix);
 
     _MASTER_FOR(g->type, ix) {
@@ -14,7 +14,7 @@ static void random_g(suNg_field *g) {
     }
 }
 
-static void transform_u(suNg_field *out, suNg_field *in, suNg_field *g) {
+static void transform_u(suNg_field *out, suNg_field *in, gtransf *g) {
     //   _DECLARE_INT_ITERATOR(ix);
     int iy, mu;
     suNg v;
@@ -36,26 +36,26 @@ int main(int argc, char *argv[]) {
     setup_gauge_fields();
 
     suNg_field *u[2];
-    u[0] = alloc_gfield(&glattice);
-    u[1] = alloc_gfield(&glattice);
+    u[0] = alloc_suNg_field(&glattice);
+    u[1] = alloc_suNg_field(&glattice);
 
-    suNg_field *g = alloc_gtransf(&glattice);
+    gtransf *g = alloc_gtransf(&glattice);
 
     suNg *poly[2];
     poly[0] = amalloc(sizeof(suNg) * X * Y * Z, ALIGN);
     poly[1] = amalloc(sizeof(suNg) * X * Y * Z, ALIGN);
 
     random_u(u[0]);
-    start_sendrecv_gfield(u[0]);
-    complete_sendrecv_gfield(u[0]);
+    start_sendrecv_suNg_field(u[0]);
+    complete_sendrecv_suNg_field(u[0]);
 
     random_g(g);
     start_sendrecv_gtransf(g);
     complete_sendrecv_gtransf(g);
 
     transform_u(u[1], u[0], g);
-    start_sendrecv_gfield(u[1]);
-    complete_sendrecv_gfield(u[1]);
+    start_sendrecv_suNg_field(u[1]);
+    complete_sendrecv_suNg_field(u[1]);
 
     WL_initialize();
 
@@ -158,8 +158,8 @@ int main(int argc, char *argv[]) {
     afree(tmp);
     afree(WL[0]);
     afree(WL);
-    free_gfield(u[0]);
-    free_gfield(u[1]);
+    free_suNg_field(u[0]);
+    free_suNg_field(u[1]);
     free_gtransf(g);
     afree(poly[0]);
     afree(poly[1]);

@@ -14,15 +14,15 @@ int main(int argc, char *argv[]) {
 
     random_u(u_gauge);
     represent_gauge_field();
-    copy_from_gpu_gfield(u_gauge);
-    copy_from_gpu_gfield_f(u_gauge_f);
+    copy_from_gpu_suNg_field(u_gauge);
+    copy_from_gpu_suNf_field(u_gauge_f);
 
-    start_sendrecv_gfield(u_gauge);
-    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
 
     u_gauge_f->comm_type = ALL_COMMS;
-    start_sendrecv_gfield_f(u_gauge_f);
-    complete_sendrecv_gfield_f(u_gauge_f);
+    start_sendrecv_suNf_field(u_gauge_f);
+    complete_sendrecv_suNf_field(u_gauge_f);
 
     exec_project();
     _MASTER_FOR(&glattice, ix) {
@@ -32,13 +32,13 @@ int main(int argc, char *argv[]) {
         project_to_suNg(pu_gauge(ix, 3));
     }
 
-    suNg_field *tmp = alloc_gfield(&glattice);
+    suNg_field *tmp = alloc_suNg_field(&glattice);
     cudaMemcpy(tmp->gpu_ptr, u_gauge->gpu_ptr, 4 * sizeof(suNg) * glattice.gsize_gauge, cudaMemcpyDeviceToDevice);
-    copy_from_gpu_gfield(tmp);
+    copy_from_gpu_suNg_field(tmp);
 
-    sub_assign_gfield_cpu(u_gauge, tmp);
+    sub_assign_suNg_field_cpu(u_gauge, tmp);
 
-    double sqnorm = sqrt(sqnorm_gfield_cpu(u_gauge));
+    double sqnorm = sqrt(sqnorm_suNg_field_cpu(u_gauge));
     return_val += check_diff_norm(sqnorm, 1e-13);
 
     finalize_process();

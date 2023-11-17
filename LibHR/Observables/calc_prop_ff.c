@@ -51,8 +51,8 @@ void init_propagator_ff_eo(int nm, double *m, double acc) {
 
         set_ff_dirac_mass(mass[0]);
 
-        resd = alloc_spinor_field_f(QMR_par.n, &glat_even);
-        tmp = alloc_spinor_field_f(1, &glat_even);
+        resd = alloc_spinor_field(QMR_par.n, &glat_even);
+        tmp = alloc_spinor_field(1, &glat_even);
 
         init = 1;
     }
@@ -61,14 +61,14 @@ void init_propagator_ff_eo(int nm, double *m, double acc) {
 void free_propagator_ff_eo() {
     error(init == 0, 1, "calc_prop_ff.c", "propagator not initialized!");
 
-    free_spinor_field_f(tmp);
-    free_spinor_field_f(resd);
+    free_spinor_field(tmp);
+    free_spinor_field(resd);
 
     free(shift);
     free(mass);
 
     if (init_odd) {
-        free_spinor_field_f(tmp_odd);
+        free_spinor_field(tmp_odd);
         init_odd = 0;
     }
     init = 0;
@@ -86,7 +86,7 @@ static void calc_propagator_ff_eo_core(spinor_field *psi, spinor_field *eta, int
     error(init == 0, 1, "calc_prop_ff.c", "z2semwall method not initialized!");
 
     if (init_odd == 0) {
-        tmp_odd = alloc_spinor_field_f(1, &glat_odd);
+        tmp_odd = alloc_spinor_field(1, &glat_odd);
         init_odd = 1;
     }
 
@@ -98,10 +98,10 @@ static void calc_propagator_ff_eo_core(spinor_field *psi, spinor_field *eta, int
     }
 
     if (solver == _CG_4F) {
-        spinor_field *etmp = alloc_spinor_field_f(1, &glat_even);
+        spinor_field *etmp = alloc_spinor_field(1, &glat_even);
         Dff_dagger(etmp, tmp);
         cgiter += cg_mshift(&QMR_par, &Dff_sq, etmp, resd);
-        free_spinor_field_f(etmp);
+        free_spinor_field(etmp);
     } else {
         //The fermion matrix is not g5-hermitian, use congrad
         error(1, 1, "calc_prop.c", "Solver undefined in calc_propagator_eo_core");
@@ -120,17 +120,17 @@ static void calc_propagator_ff_eo_core(spinor_field *psi, spinor_field *eta, int
         spinor_sigma_pi_rho_div_assign(&qprop_mask, ff_sigma, ff_pi, (4. + mass[i]), &qprop_mask);
         spinor_field_minus_f(&qprop_mask, &qprop_mask);
 
-        spinor_field *gtmp = alloc_spinor_field_f(1, &glattice);
+        spinor_field *gtmp = alloc_spinor_field(1, &glattice);
         for (int k = 0; k < n_hopping; k++) {
             Dphi_(gtmp, &psi[i]);
             spinor_sigma_pi_rho_div_assign(&psi[i], ff_sigma, ff_pi, (4. + mass[i]), gtmp);
         }
-        free_spinor_field_f(gtmp);
+        free_spinor_field(gtmp);
 
         if (i & 1) { ++cgiter; /* count only half of calls. Works because the number of sources is even */ }
     }
-    start_sendrecv_spinor_field_f(psi);
-    complete_sendrecv_spinor_field_f(psi);
+    start_sendrecv_spinor_field(psi);
+    complete_sendrecv_spinor_field(psi);
     lprintf("CALC_PROP", 10, "QMR_eo MVM = %d\n", cgiter);
 }
 
@@ -141,7 +141,7 @@ static void calc_propagator_ff_oe_core(spinor_field *psi, spinor_field *eta, int
     error(init == 0, 1, "calc_prop_ff.c", "z2semwall method not initialized!");
 
     if (init_odd == 0) {
-        tmp_odd = alloc_spinor_field_f(1, &glat_odd);
+        tmp_odd = alloc_spinor_field(1, &glat_odd);
         init_odd = 1;
     }
 
@@ -150,7 +150,7 @@ static void calc_propagator_ff_oe_core(spinor_field *psi, spinor_field *eta, int
     qprop_mask_eta.type = &glat_odd;
     qprop_mask_eta.ptr = eta[0].ptr + glat_odd.master_shift;
 
-    spinor_field *etmp = alloc_spinor_field_f(1, &glat_even);
+    spinor_field *etmp = alloc_spinor_field(1, &glat_even);
     spinor_sigma_pi_rho_div_assign(tmp_odd, ff_sigma, ff_pi, (4. + mass[0]), &qprop_mask_eta);
     Dphi_(etmp, tmp_odd);
 
@@ -169,7 +169,7 @@ static void calc_propagator_ff_oe_core(spinor_field *psi, spinor_field *eta, int
         //The fermion matrix is not g5-hermitian, use congrad
         error(1, 1, "calc_prop_ff.c", "Solver undefined in calc_propagator_ff_eo_core");
     }
-    free_spinor_field_f(etmp);
+    free_spinor_field(etmp);
 
     for (i = 0; i < QMR_par.n; ++i) {
         /* compute solution */
@@ -184,18 +184,18 @@ static void calc_propagator_ff_oe_core(spinor_field *psi, spinor_field *eta, int
         spinor_sigma_pi_rho_div_assign(&qprop_mask, ff_sigma, ff_pi, (4. + mass[i]), &qprop_mask);
         spinor_field_sub_f(&qprop_mask, tmp_odd, &qprop_mask);
 
-        spinor_field *gtmp = alloc_spinor_field_f(1, &glattice);
+        spinor_field *gtmp = alloc_spinor_field(1, &glattice);
         for (int k = 0; k < n_hopping; k++) {
             Dphi_(gtmp, &psi[i]);
             spinor_sigma_pi_rho_div_assign(&psi[i], ff_sigma, ff_pi, (4. + mass[i]), gtmp);
             spinor_field_minus_f(&psi[i], &psi[i]);
         }
-        free_spinor_field_f(gtmp);
+        free_spinor_field(gtmp);
     }
     cgiter += QMR_par.n * (1 + n_hopping) / 2;
 
-    start_sendrecv_spinor_field_f(psi);
-    complete_sendrecv_spinor_field_f(psi);
+    start_sendrecv_spinor_field(psi);
+    complete_sendrecv_spinor_field(psi);
     lprintf("CALC_PROP", 10, "QMR_eo MVM = %d\n", cgiter);
 }
 
@@ -208,8 +208,8 @@ static void calc_propagator_ff_hopping_series_core(spinor_field *psi, spinor_fie
     }
 
     if (n_hopping > 0) {
-        spinor_field *gtmp = alloc_spinor_field_f(1, &glattice);
-        spinor_field *gtmp2 = alloc_spinor_field_f(1, &glattice);
+        spinor_field *gtmp = alloc_spinor_field(1, &glattice);
+        spinor_field *gtmp2 = alloc_spinor_field(1, &glattice);
 
         for (i = 0; i < QMR_par.n; ++i) {
             spinor_field_zero_f(gtmp);
@@ -228,25 +228,25 @@ static void calc_propagator_ff_hopping_series_core(spinor_field *psi, spinor_fie
         }
         cgiter += QMR_par.n * (n_hopping - 1) / 2;
 
-        free_spinor_field_f(gtmp);
-        free_spinor_field_f(gtmp2);
+        free_spinor_field(gtmp);
+        free_spinor_field(gtmp2);
     }
 
     lprintf("CALC_PROP", 10, " MVM = %d\n", cgiter);
 
-    start_sendrecv_spinor_field_f(psi);
-    complete_sendrecv_spinor_field_f(psi);
+    start_sendrecv_spinor_field(psi);
+    complete_sendrecv_spinor_field(psi);
 }
 
 static void calc_propagator_ff_core(spinor_field *psi, spinor_field *eta, int solver) {
-    start_sendrecv_spinor_field_f(eta);
-    complete_sendrecv_spinor_field_f(eta);
+    start_sendrecv_spinor_field(eta);
+    complete_sendrecv_spinor_field(eta);
 
     spinor_field qprop_mask_eta;
     spinor_field qprop_mask_psi;
     int cgiter = 0;
     if (init_odd == 0) {
-        tmp_odd = alloc_spinor_field_f(1, &glat_odd);
+        tmp_odd = alloc_spinor_field(1, &glat_odd);
         init_odd = 1;
     }
     error(init == 0, 1, "calc_prop.c", "calc_propagator_core method not initialized!");
@@ -273,10 +273,10 @@ static void calc_propagator_ff_core(spinor_field *psi, spinor_field *eta, int so
     }
 
     if (solver == _CG_4F) {
-        spinor_field *etmp = alloc_spinor_field_f(1, &glat_even);
+        spinor_field *etmp = alloc_spinor_field(1, &glat_even);
         Dff_dagger(etmp, tmp);
         cgiter += cg_mshift(&QMR_par, &Dff_sq, etmp, resd);
-        free_spinor_field_f(etmp);
+        free_spinor_field(etmp);
     } else {
         //The fermion matrix is not g5-hermitian, use congrad
         error(1, 1, "calc_prop.c", "Solver undefined in calc_propagator_eo_core (4f)");
@@ -301,8 +301,8 @@ static void calc_propagator_ff_core(spinor_field *psi, spinor_field *eta, int so
     ++cgiter; /* One whole call*/
     lprintf("CALC_PROP_CORE", 10, "QMR_eo MVM = %d\n", cgiter);
 
-    start_sendrecv_spinor_field_f(psi);
-    complete_sendrecv_spinor_field_f(psi);
+    start_sendrecv_spinor_field(psi);
+    complete_sendrecv_spinor_field(psi);
 }
 
 void calc_propagator_ff(spinor_field *psi, spinor_field *eta, int ndilute) {

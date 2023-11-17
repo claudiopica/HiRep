@@ -10,7 +10,7 @@ static spinor_operator H_loc = NULL;
 
 static void free_loc_mem() {
     if (ev != NULL) {
-        free_spinor_field_f(ev);
+        free_spinor_field(ev);
         ev = NULL;
     }
     if (eigval != NULL) {
@@ -33,7 +33,7 @@ static int alloc_loc_mem(unsigned int nevt, geometry_descriptor *type) {
     if (nevt < 1) { return 1; }
     if (nevt != oldnevt || type != oldtype) {
         free_loc_mem();
-        if (ev == NULL) { ev = alloc_spinor_field_f(nevt, type); }
+        if (ev == NULL) { ev = alloc_spinor_field(nevt, type); }
         if (eigval == NULL) { eigval = malloc(sizeof(*eigval) * nevt); }
         /* update old nevt */
         oldnevt = nevt;

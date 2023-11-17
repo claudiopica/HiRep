@@ -145,12 +145,12 @@ int main(int argc, char *argv[]) {
         lprintf("MAIN", 0, "Momentum 2 (%d, %d, %d, %d)\n", mes_var.pt_in, mes_var.px_in, mes_var.py_in, mes_var.pz_in);
     }
 
-    source = alloc_spinor_field_f(4, &glattice);
-    prop_in = alloc_spinor_field_f(4 * nm * NF, &glattice);
-    prop_out = alloc_spinor_field_f(4 * nm * NF, &glattice);
+    source = alloc_spinor_field(4, &glattice);
+    prop_in = alloc_spinor_field(4 * nm * NF, &glattice);
+    prop_out = alloc_spinor_field(4 * nm * NF, &glattice);
 
-    suNf_field *u_gauge_old_f = alloc_gfield_f(&glattice);
-    suNg_field *u_gauge_old = alloc_gfield(&glattice);
+    suNf_field *u_gauge_old_f = alloc_suNf_field(&glattice);
+    suNg_field *u_gauge_old = alloc_suNg_field(&glattice);
 
     struct timeval start, end, etime;
 
@@ -261,19 +261,19 @@ int main(int argc, char *argv[]) {
 
     global_sum_int(&return_value, 1);
 
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop_in);
-    free_spinor_field_f(prop_out);
+    free_spinor_field(source);
+    free_spinor_field(prop_in);
+    free_spinor_field(prop_out);
 
     free_propagator_eo();
 
     free_BCs();
 
-    free_gfield(u_gauge);
-    free_gfield(u_gauge_old);
-    free_gfield_f(u_gauge_old_f);
+    free_suNg_field(u_gauge);
+    free_suNg_field(u_gauge_old);
+    free_suNf_field(u_gauge_old_f);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_gfield_f(u_gauge_f);
+    free_suNf_field(u_gauge_f);
 #endif
 
     finalize_process();

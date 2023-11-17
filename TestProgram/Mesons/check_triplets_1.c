@@ -92,7 +92,7 @@ int main(int argc, char *argv[]) {
     }
 
     pta_qprop = (spinor_field **)malloc(sizeof(spinor_field *));
-    pta_qprop[0] = alloc_spinor_field_f(4 * NF, &glattice);
+    pta_qprop[0] = alloc_spinor_field(4 * NF, &glattice);
 
     /* CALCOLO ESPLICITO */
     free_correlators(ex_triplets);

@@ -231,7 +231,7 @@ void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spi
 #endif
 
     /* allocate cg output vectors */
-    inv_out = alloc_spinor_field_f(coef->order, in->type);
+    inv_out = alloc_spinor_field(coef->order, in->type);
 
     /* set up cg parameters */
     inv_par.n = coef->order;
@@ -254,5 +254,5 @@ void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spi
     }
 
     /* free memory */
-    free_spinor_field_f(inv_out);
+    free_spinor_field(inv_out);
 }

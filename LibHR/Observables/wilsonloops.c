@@ -29,7 +29,7 @@
 
 #define _WL_4VOL_INDEX(t, x, y, z) ((t) + (x) * T + (y) * T * X + (z) * T * X * Y)
 
-static suNg_field *ws_gtf[2]; /* gtf = gauge transformation field */
+static gtransf *ws_gtf[2]; /* gtf = gauge transformation field */
 static suNg *buf_gtf[3];
 static suNg *Polyakov;
 static suNg_field *HYP;
@@ -49,7 +49,7 @@ void WL_initialize() {
     error(NP_X != 1 || NP_Y != 1 || NP_Z != 1, 1, "WL_initialize [wilsonloops.c]",
           "The Wilson loops code does not work with spatial paralelization!");
 
-    HYP = alloc_gfield(&glattice);
+    HYP = alloc_suNg_field(&glattice);
     ws_gtf[0] = alloc_gtransf(&glattice);
     ws_gtf[1] = alloc_gtransf(&glattice);
     buf_gtf[0] = amalloc(sizeof(suNg) * T * X * Y * Z, ALIGN);
@@ -75,7 +75,7 @@ void WL_initialize() {
 void WL_free() {
     if (!WL_init) { return; }
 
-    free_gfield(HYP);
+    free_suNg_field(HYP);
     free_gtransf(ws_gtf[0]);
     free_gtransf(ws_gtf[1]);
     afree(buf_gtf[0]);
@@ -407,8 +407,8 @@ void WL_Hamiltonian_gauge(suNg_field *out, suNg_field *in) {
         } /* SITE_FOR */
     } /* PIECE FOR */
 
-    start_sendrecv_gfield(out);
-    complete_sendrecv_gfield(out);
+    start_sendrecv_suNg_field(out);
+    complete_sendrecv_suNg_field(out);
 }
 
 void WL_broadcast_polyakov(suNg *poly, suNg_field *gf) {

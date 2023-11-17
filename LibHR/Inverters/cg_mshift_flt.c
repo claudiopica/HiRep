@@ -37,7 +37,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
     _ARRAY_SPINOR_MATCHING(out, par->n);
 
     /* allocate spinors fields and aux real variables */
-    p = alloc_spinor_field_f_flt(3 + par->n, in->type);
+    p = alloc_spinor_field_flt(3 + par->n, in->type);
     k = p + par->n;
     r = k + 1;
     Mk = r + 1;
@@ -119,7 +119,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
 
     /* free memory */
 
-    free_spinor_field_f_flt(p);
+    free_spinor_field_flt(p);
     free(z1);
     free(z2);
     free(z3);
@@ -149,9 +149,9 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
     _ARRAY_SPINOR_MATCHING(out, par->n);
 
     /* allocate memory for single-precision solutions and residual vectors */
-    res_flt = alloc_spinor_field_f_flt(1 + par->n, in->type);
+    res_flt = alloc_spinor_field_flt(1 + par->n, in->type);
     out_flt = res_flt + 1;
-    res = alloc_spinor_field_f(3, in->type);
+    res = alloc_spinor_field(3, in->type);
     res2 = res + 1;
     tmp = res2 + 1;
 
@@ -238,8 +238,8 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
         lprintf("INVERTER", 0 * 20, "CG inversion: err2 = %1.8e < %1.8e\n", norm[i], par->err2);
     }
 
-    free_spinor_field_f_flt(res_flt);
-    free_spinor_field_f(res);
+    free_spinor_field_flt(res_flt);
+    free_spinor_field(res);
 
     lprintf("INVERTER", 10, "CG_mshift: MVM = %d (single) - %d (double)\n", siter, diter);
 

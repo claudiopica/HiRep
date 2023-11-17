@@ -124,8 +124,8 @@ int main(int argc, char *argv[]) {
 
     double norm;
 
-    spinor_field *source = alloc_spinor_field_f(4, &glattice);
-    spinor_field *source_shifted = alloc_spinor_field_f(4, &glattice);
+    spinor_field *source = alloc_spinor_field(4, &glattice);
+    spinor_field *source_shifted = alloc_spinor_field(4, &glattice);
 
     lprintf("CORR", 0, "Testing spinorfield timeslice source without dilution .... \n");
 
@@ -387,8 +387,8 @@ int main(int argc, char *argv[]) {
     global_sum_int(&return_value, 1);
     lprintf("MAIN", 0, "return_value= %d\n ", return_value);
 
-    free_spinor_field_f(source);
-    free_spinor_field_f(source_shifted);
+    free_spinor_field(source);
+    free_spinor_field(source_shifted);
 
     finalize_process();
 

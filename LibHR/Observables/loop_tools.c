@@ -264,12 +264,12 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
     suNg_field *u_gauge_old = NULL;
 
     if (source_type == 0) {
-        source = alloc_spinor_field_f(1, &glattice);
-        prop = alloc_spinor_field_f(1, &glattice);
+        source = alloc_spinor_field(1, &glattice);
+        prop = alloc_spinor_field(1, &glattice);
         spinor_field_zero_f(prop);
     } else {
-        source = alloc_spinor_field_f(4, &glattice);
-        prop = alloc_spinor_field_f(4, &glattice);
+        source = alloc_spinor_field(4, &glattice);
+        prop = alloc_spinor_field(4, &glattice);
         for (int i = 0; i < 4; i++) {
             spinor_field_zero_f(prop + i);
         }
@@ -301,7 +301,7 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
         }
     }
     if (source_type == 1) {
-        u_gauge_old = alloc_gfield(&glattice);
+        u_gauge_old = alloc_suNg_field(&glattice);
         suNg_field_copy(u_gauge_old, u_gauge);
         spinor_field_zero_f(prop);
         //Fix the Gauge
@@ -398,10 +398,10 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
     if (u_gauge_old != NULL) {
         suNg_field_copy(u_gauge, u_gauge_old);
         represent_gauge_field();
-        free_gfield(u_gauge_old);
+        free_suNg_field(u_gauge_old);
     }
-    free_spinor_field_f(source);
-    free_spinor_field_f(prop);
+    free_spinor_field(source);
+    free_spinor_field(prop);
     free_propagator_eo();
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);

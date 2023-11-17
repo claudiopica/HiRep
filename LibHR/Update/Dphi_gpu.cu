@@ -16,7 +16,6 @@ extern rhmc_par _update_par;
 
 // double precision
 #define _FIELD_TYPE spinor_field
-#define _FIELD_NAME spinor_field_f
 #define _SPINOR_TYPE suNf_spinor
 #define _HSPINOR_TYPE suNf_hspinor
 #define _VECTOR_TYPE suNf_vector
@@ -29,7 +28,6 @@ extern rhmc_par _update_par;
 
 // single precision
 #define _FIELD_TYPE spinor_field_flt
-#define _FIELD_NAME spinor_field_f_flt
 #define _SPINOR_TYPE suNf_spinor_flt
 #define _HSPINOR_TYPE suNf_hspinor_flt
 #define _VECTOR_TYPE suNf_vector_flt
