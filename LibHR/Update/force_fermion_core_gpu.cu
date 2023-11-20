@@ -724,6 +724,7 @@ __global__ static void _force_clover_fermion_taylor(double invexpmass, suNf *cl_
             _suNf_add_assign(fm, fm_tmp);
             write_gpu<double>(0, &fm, cl_force, ix, 5, 6);
         }
+        free(Coef);
     }
 }
 
