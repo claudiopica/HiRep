@@ -121,6 +121,7 @@ visible void ludcmp(hr_complex *a, int *indx, double *d, int N) {
             }
         }
     }
+    free(vv);
 }
 
 visible void lubksb(hr_complex *a, int *indx, hr_complex *b, int N) {

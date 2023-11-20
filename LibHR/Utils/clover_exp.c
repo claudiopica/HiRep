@@ -419,6 +419,11 @@ visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
             C[2 * NF * j + i] = q[j];
         }
     }
+
+    for (int l = 0; l < NNexp + 1; ++l) {
+        free(q2[l]);
+    }
+    free(q2)
 }
 
 #endif
@@ -488,6 +493,11 @@ visible static void doublehornerNF2(double *C, suNfc *A, int NNexp) {
             C[2 * NF * j + i] = q[j];
         }
     }
+
+    for (int l = 0; l < NNexp + 1; ++l) {
+        free(q2[l]);
+    }
+    free(q2);
 }
 #endif
 
