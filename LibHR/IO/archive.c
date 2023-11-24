@@ -523,16 +523,17 @@ void read_ranlxd_state(char filename[]) {
         error((fp = fopen(filename, "rb")) == NULL, 1, "read_ranlxd_state", "Failed to open file for reading");
         /* read number of states in the file */
         error(fread_BE_int(d, (size_t)(2), fp) != (2), 1, "read_ranlxd_state", "Failed to read header");
-        /* give a warning if hproc != nproc */
+        /* give an error if hproc != nproc */
         hproc = d[0];
         if (hproc != nproc) {
-            lprintf("IO", 10, "WARNING: the number of ranlxd states read [%d] doesn't match the number of processes [%d].\n",
-                    hproc, nproc);
+            lprintf("IO", 10, "the number of ranlxd states read [%d] doesn't match the number of processes [%d].\n", hproc,
+                    nproc);
+            error(1, 1, "read_ranlxd_state " __FILE__, "number of ranlxd states mismatch");
         }
         /* check if ranlxd size is the same as in the header */
         if (rsize != d[1]) {
-            lprintf("WARNING", 0, "Read value of ranlxd size [%d] do not match this code [%d].\n", d[1], rsize);
-            //error(1, 1, "read_ranlxd_state " __FILE__, "ranlxd size mismatch");
+            lprintf("IO", 0, "Read value of ranlxd size [%d] do not match this code [%d].\n", d[1], rsize);
+            error(1, 1, "read_ranlxd_state " __FILE__, "ranlxd size mismatch");
         }
     }
 
