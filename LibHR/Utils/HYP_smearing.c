@@ -236,6 +236,9 @@ U{x,eta} U{x+eta,mu} U{x+mu,eta}^\dag
 */
 
     start_sendrecv_suNg_field(in);
+#ifdef WITH_NEW_GEOMETRY
+    complete_sendrecv_suNg_field(in);
+#endif
 
     _PIECE_FOR(&glattice, ixp) {
         if (ixp == glattice.inner_master_pieces) {
@@ -291,6 +294,12 @@ Vbar{x,rho;nu,mu} Vbar{x+rho,mu;rho,nu} Vbar{x+mu,rho;nu,mu}^\dag
     for (int i = 0; i < 24; i++) {
         start_sendrecv_gtransf(Vbar[i]);
     }
+
+#ifdef WITH_NEW_GEOMETRY
+    for (int i = 0; i < 24; i++) {
+        complete_sendrecv_gtransf(Vbar[i]);
+    }
+#endif
 
     _PIECE_FOR(&glattice, ixp) {
         if (ixp == glattice.inner_master_pieces) {
@@ -349,6 +358,12 @@ Vtilde{x,nu;mu} Vtilde{x+nu,mu;nu} Vtilde{x+mu,nu;mu}^\dag
     for (int i = 0; i < 12; i++) {
         start_sendrecv_gtransf(Vtilde[i]);
     }
+
+#ifdef WITH_NEW_GEOMETRY
+    for (int i = 0; i < 12; i++) {
+        complete_sendrecv_gtransf(Vtilde[i]);
+    }
+#endif
 
     _PIECE_FOR(&glattice, ixp) {
         if (ixp == glattice.inner_master_pieces) {

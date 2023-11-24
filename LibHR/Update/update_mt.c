@@ -151,6 +151,10 @@ int update_ghmc() {
     lprintf("HMC", 30, "MD integration...\n");
     update_par.integrator->integrator(update_par.tlen, update_par.integrator);
 
+#ifdef WITH_GPU
+    copy_from_gpu_suNg_field(u_gauge);
+#endif
+
     /* project and represent gauge field */
     project_gauge_field();
     represent_gauge_field();

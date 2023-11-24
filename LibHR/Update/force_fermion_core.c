@@ -892,6 +892,11 @@ void force_fermion_core_cpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_od
 
 #endif
 
+#ifdef WITH_NEW_GEOMETRY
+    complete_sendrecv_spinor_field(Xs);
+    complete_sendrecv_spinor_field(Ys);
+#endif
+
     // Loop over lattice
     _PIECE_FOR(&glattice, xp) {
         if (xp == glattice.inner_master_pieces) {
