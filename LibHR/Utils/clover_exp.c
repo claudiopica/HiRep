@@ -423,7 +423,7 @@ visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
     for (int l = 0; l < NNexp + 1; ++l) {
         free(q2[l]);
     }
-    free(q2)
+    free(q2);
 }
 
 #endif
