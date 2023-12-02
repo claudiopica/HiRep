@@ -14,7 +14,4 @@ void staples(int ix, int mu, suNg *v);
 }
 #endif
 
-#ifdef __cplusplus
-__device__ void staples_dev(int ix, int mu, suNg *v, suNg *gauge, int *iup_gpu, int *idn_gpu, double *plaq_weight);
-#endif
 #endif //STAPLES_H

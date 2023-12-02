@@ -1,5 +1,6 @@
 #include "libhr_core.h"
 #include "update.h"
+#include "./staples_gpu.hpp"
 
 // TODO: In case of MEASURE_FORCE0 -> have a reduction operation
 // but this also works best after the linear algebra update.

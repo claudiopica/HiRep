@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* File staples_gpu.cu
+* File staples_gpu.hpp
 *
 * Computation of the "staples" (on GPU)
 * port of staples.c
