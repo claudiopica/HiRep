@@ -1,0 +1,51 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica and Agostino Patella                     *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+#include <string.h>
+
+// Error checking
+#if !defined(_FIELD_TYPE)
+#error Missing _FIELD_TYPE in linear_algebra.c
+#endif
+#if !defined(_FIELD_DIM)
+#error Missing _FIELD_DIM in linear_algebra.c
+#endif
+#if !defined(_SITE_TYPE)
+#error Missing _SITE_TYPE in linear_algebra.c
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in linear_algebra.c
+#endif
+#if !defined(_COMPLEX)
+#error Missing _COMPLEX in linear_algebra.c
+#endif
+
+
+/* s1=s2 */
+_DECLARE_LINEAR_ALGEBRA(void, copy, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    _TWO_SPINORS_MATCHING(s1, s2);
+    _PIECE_FOR(s1->type, ixp) {
+        const int block_size = s1->type->master_end[ixp] - s1->type->master_start[ixp] + 1;
+        const int block_offset = s1->type->master_start[ixp];
+        memcpy(_DFIELD_AT(s1, block_offset, 0, _FIELD_DIM), _DFIELD_AT(s2, block_offset, 0, _FIELD_DIM), block_size * _FIELD_DIM * sizeof(_SITE_TYPE));
+    }
+}
+
+/* s1=0 */
+_DECLARE_LINEAR_ALGEBRA(void, zero, (_FIELD_TYPE * s1)) {
+    _PIECE_FOR(s1->type, ixp) {
+        const int block_size = s1->type->master_end[ixp] - s1->type->master_start[ixp] + 1;
+        const int block_offset = s1->type->master_start[ixp];
+        memset(_DFIELD_AT(s1, block_offset, 0, _FIELD_DIM), 0, block_size * _FIELD_DIM * sizeof(_SITE_TYPE));
+    }
+}
+
+//user interface macros
+#undef _FIELD_TYPE
+#undef _SITE_TYPE
+#undef _FIELD_DIM
+#undef _REAL
+#undef _COMPLEX
+#undef _ISREAL

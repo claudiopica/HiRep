@@ -1,0 +1,32 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica and Agostino Patella                     *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+#include "Utils/generics.h"
+
+// Error checking
+#if !defined(_FIELD_TYPE)
+#error Missing _FIELD_TYPE in linear_algebra.h
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in linear_algebra.h
+#endif
+#if !defined(_COMPLEX)
+#error Missing _COMPLEX in linear_algebra.h
+#endif
+
+/* Re <s1,s2> */
+_DECLARE_LINA_HEADER(double, prod_re, (_FIELD_TYPE * s1, _FIELD_TYPE *s2));
+
+/* Im <s1,s2> */
+_DECLARE_LINA_HEADER(double, prod_im, (_FIELD_TYPE * s1, _FIELD_TYPE *s2));
+
+/* <s1,s2> */
+_DECLARE_LINA_HEADER(hr_complex, prod, (_FIELD_TYPE * s1, _FIELD_TYPE *s2));
+
+/* Re <s1,s1> */
+_DECLARE_LINA_HEADER(double, sqnorm, (_FIELD_TYPE * s1));
+
+/* Re <s1,s1> */
+_DECLARE_LINA_HEADER(double, max, (_FIELD_TYPE * s1));

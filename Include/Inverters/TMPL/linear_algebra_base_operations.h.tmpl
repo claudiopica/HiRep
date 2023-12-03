@@ -1,0 +1,44 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica and Agostino Patella                     *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+#include "Utils/generics.h"
+
+// Error checking
+#if !defined(_FIELD_TYPE)
+#error Missing _FIELD_TYPE in linear_algebra.h
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in linear_algebra.h
+#endif
+#if !defined(_COMPLEX)
+#error Missing _COMPLEX in linear_algebra.h
+#endif
+
+/* s1+=r*s2 r real */
+_DECLARE_LINA_HEADER(void, mul_add_assign, (_FIELD_TYPE * s1, _REAL r, _FIELD_TYPE *s2));
+
+/* s1+=c*s2 c complex */
+_DECLARE_LINA_HEADER(void, mulc_add_assign, (_FIELD_TYPE * s1, _COMPLEX c, _FIELD_TYPE *s2));
+
+/* s1=r*s2 */
+_DECLARE_LINA_HEADER(void, mul, (_FIELD_TYPE * s1, _REAL r, _FIELD_TYPE *s2));
+
+/* s1=c*s2 c complex */
+_DECLARE_LINA_HEADER(void, mulc, (_FIELD_TYPE * s1, _COMPLEX c, _FIELD_TYPE *s2));
+
+/* r=s1+s2 */
+_DECLARE_LINA_HEADER(void, add, (_FIELD_TYPE * r, _FIELD_TYPE *s1, _FIELD_TYPE *s2));
+
+/* r=s1-s2 */
+_DECLARE_LINA_HEADER(void, sub, (_FIELD_TYPE * r, _FIELD_TYPE *s1, _FIELD_TYPE *s2));
+
+/* s1+=s2 */
+_DECLARE_LINA_HEADER(void, add_assign, (_FIELD_TYPE * s1, _FIELD_TYPE *s2));
+
+/* s1-=s2 */
+_DECLARE_LINA_HEADER(void, sub_assign, (_FIELD_TYPE * s1, _FIELD_TYPE *s2));
+
+/* s1=-s2 */
+_DECLARE_LINA_HEADER(void, minus, (_FIELD_TYPE * s1, _FIELD_TYPE *s2));

@@ -1,0 +1,92 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica and Agostino Patella                     *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+#include <string.h>
+
+// Error checking
+#if !defined(_FIELD_TYPE)
+#error Missing _FIELD_TYPE in linear_algebra.c
+#endif
+#if !defined(_FIELD_DIM)
+#error Missing _FIELD_DIM in linear_algebra.c
+#endif
+#if !defined(_SITE_TYPE)
+#error Missing _SITE_TYPE in linear_algebra.c
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in linear_algebra.c
+#endif
+#if !defined(_COMPLEX)
+#error Missing _COMPLEX in linear_algebra.c
+#endif
+
+
+/* s1=r1*s2+r2*s3 */
+_DECLARE_LINEAR_ALGEBRA(void, lc, (_FIELD_TYPE * s1, _REAL r1, _FIELD_TYPE *s2, _REAL r2, _FIELD_TYPE *s3)) {
+    _THREE_SITE_FOR(s1, s2, s3) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            lc(_SITE_PTR(s1, mu, _FIELD_DIM), r1, _SITE_PTR(s2, mu, _FIELD_DIM), r2, _SITE_PTR(s3, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1+=r1*s2+r2*s3 */
+_DECLARE_LINEAR_ALGEBRA(void, lc_add_assign, (_FIELD_TYPE * s1, _REAL r1, _FIELD_TYPE *s2, _REAL r2, _FIELD_TYPE *s3)) {
+    _THREE_SITE_FOR(s1, s2, s3) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            lc_add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), r1, _SITE_PTR(s2, mu, _FIELD_DIM), r2,
+                          _SITE_PTR(s3, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1=c1*s2+c2*s3 c1, c2 complex*/
+_DECLARE_LINEAR_ALGEBRA(void, clc, (_FIELD_TYPE * s1, _COMPLEX c1, _FIELD_TYPE *s2, _COMPLEX c2, _FIELD_TYPE *s3)) {
+    _THREE_SITE_FOR(s1, s2, s3) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            clc(_SITE_PTR(s1, mu, _FIELD_DIM), c1, _SITE_PTR(s2, mu, _FIELD_DIM), c2, _SITE_PTR(s3, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1+=c1*s2+c2*s3 c1, c2 complex*/
+_DECLARE_LINEAR_ALGEBRA(void, clc_add_assign, (_FIELD_TYPE * s1, _COMPLEX c1, _FIELD_TYPE *s2, _COMPLEX c2, _FIELD_TYPE *s3)) {
+    _THREE_SITE_FOR(s1, s2, s3) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            clc_add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), c1, _SITE_PTR(s2, mu, _FIELD_DIM), c2,
+                           _SITE_PTR(s3, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* tools per eva.c  */
+_DECLARE_LINEAR_ALGEBRA(void, lc1, (_REAL c1, _FIELD_TYPE *s1, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            mul_add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), c1, _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+_DECLARE_LINEAR_ALGEBRA(void, lc2, (_REAL c1, _REAL c2, _FIELD_TYPE *s1, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            lc(_SITE_PTR(s1, mu, _FIELD_DIM), c1, _SITE_PTR(s1, mu, _FIELD_DIM), c2, _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+_DECLARE_LINEAR_ALGEBRA(void, lc3, (_REAL c1, _REAL c2, _FIELD_TYPE *s1, _FIELD_TYPE *s2, _FIELD_TYPE *s3)) {
+    _REAL cc1 = -c1;
+    _REAL cc2 = -c2;
+    /* c1=-c1; c2=-c2; */
+    _THREE_SITE_FOR(s1, s2, s3) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            lc_add_assign(_SITE_PTR(s3, mu, _FIELD_DIM), cc1, _SITE_PTR(s1, mu, _FIELD_DIM), cc2,
+                          _SITE_PTR(s2, mu, _FIELD_DIM));
+            minus(_SITE_PTR(s3, mu, _FIELD_DIM), _SITE_PTR(s3, mu, _FIELD_DIM));
+        }
+    }
+}

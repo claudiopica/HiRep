@@ -12,6 +12,9 @@
 #include "libhr_core.h"
 #include "Utils/generics.h"
 
+#if !defined _FIELD_NAME
+#error Missing _FIELD_NAME in memory.c
+#endif
 #if !defined _FIELD_TYPE
 #error Missing _FIELD_TYPE in memory.c
 #endif
@@ -25,23 +28,27 @@
 #error Missing _IS_SPINOR_LIKE in memory.c
 #endif
 
-#define _F_ARGS(_name, _args) _FIELD_TYPE *_F_NAME(_name, _FIELD_TYPE) _args
+#define _F_ARGS(_name, _args) _FIELD_TYPE *_F_NAME(_name, _FIELD_NAME) _args
 
 // This is necessary, because spinor-like fields have an additional argument
 // in the allocation function
+
 #if _IS_SPINOR_LIKE == 0
 #define _n 1
 #define _GEOM_TYPE gauge
-#define _ALLOCATE _F_ARGS(alloc_, (geometry_descriptor * type))
+#define _ALLOCATE \
+    _F_ARGS(alloc_, (geometry_descriptor *type)) { return _F_NAME(alloc_n_, _FIELD_NAME) (1, type); } \
+    _F_ARGS(alloc_n_, (unsigned int n, geometry_descriptor *type))
+
 #else
 #define _n n
 #define _GEOM_TYPE spinor
 #define _ALLOCATE _F_ARGS(alloc_, (unsigned int n, geometry_descriptor *type))
 #endif
 
-#define _DECLARE(_name, _args) _FUNC(void, _name, _FIELD_TYPE, _args)
-#define _DECLARE_STATIC(_name, _args) _FUNC(static void, _name, _FIELD_TYPE, _args)
-#define _CALL(_name) _F_NAME(_name, _FIELD_TYPE)
+#define _DECLARE(_name, _args) _FUNC(void, _name, _FIELD_NAME, _args)
+#define _DECLARE_STATIC(_name, _args) _FUNC(static void, _name, _FIELD_NAME, _args)
+#define _CALL(_name) _F_NAME(_name, _FIELD_NAME)
 
 _DECLARE_STATIC(allocate_field_struct_, (unsigned int n, _FIELD_TYPE **f, geometry_descriptor *type)) {
     *f = amalloc(n * sizeof(_FIELD_TYPE), ALIGN);
@@ -77,6 +84,7 @@ _DECLARE_STATIC(assign_comm_type_, (unsigned int n, _FIELD_TYPE *f)) {
 _DECLARE_STATIC(assign_geometry_descriptor_, (unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
     for (int i = 0; i < n; ++i) {
         f[i].type = type;
+        f[i].field_dim = _FIELD_DIM;
     }
 }
 
@@ -166,12 +174,12 @@ _DECLARE(free_, (_FIELD_TYPE * f)) {
 _ALLOCATE {
     _FIELD_TYPE *f;
 
-    _F_NAME(allocate_field_struct_, _FIELD_TYPE)(_n, &f, type);
-    _F_NAME(assign_geometry_descriptor_, _FIELD_TYPE)(_n, f, type);
-    _F_NAME(assign_comm_type_, _FIELD_TYPE)(_n, f);
-    _F_NAME(allocate_cpu_field_data_, _FIELD_TYPE)(_n, f, type);
-    _F_NAME(allocate_gpu_field_data_, _FIELD_TYPE)(_n, f, type);
-    _F_NAME(allocate_mpi_field_data_, _FIELD_TYPE)(_n, f, type);
+    _F_NAME(allocate_field_struct_, _FIELD_NAME)(n, &f, type);
+    _F_NAME(assign_geometry_descriptor_, _FIELD_NAME)(n, f, type);
+    _F_NAME(assign_comm_type_, _FIELD_NAME)(n, f);
+    _F_NAME(allocate_cpu_field_data_, _FIELD_NAME)(n, f, type);
+    _F_NAME(allocate_gpu_field_data_, _FIELD_NAME)(n, f, type);
+    _F_NAME(allocate_mpi_field_data_, _FIELD_NAME)(n, f, type);
     return f;
 }
 
@@ -185,6 +193,7 @@ _ALLOCATE {
 #undef _GEOM_TYPE
 
 // Template paramters
+#undef _FIELD_NAME
 #undef _FIELD_TYPE
 #undef _SITE_TYPE
 #undef _FIELD_DIM

@@ -1,0 +1,159 @@
+/***************************************************************************\
+* Copyright (c) 2008-2023                                                   *
+* Claudio Pica, Ari Hietanen, Ulrik Søndergaard, Sofie Martins              *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+#include "../linear_algebra_gpu_kernels.hpp"
+
+// Error checking
+#if !defined(_FIELD_TYPE)
+#error Missing _FIELD_TYPE in linear_algebra_gpu.cu
+#endif
+#if !defined(_FIELD_DIM)
+#error Missing _FIELD_DIM in linear_algebra_gpu.cu
+#endif
+#if !defined(_SITE_TYPE)
+#error Missing _SITE_TYPE in linear_algebra_gpu.cu
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in linear_algebra_gpu.cu
+#endif
+#if !defined(_COMPLEX)
+#error Missing _COMPLEX in linear_algebra_gpu.cu
+#endif
+#if !defined(_ISREAL)
+#error Missing _ISREAL in linear_algebra_gpu.cu
+#endif
+
+// TODO: these somewhere else
+/* auxillary functions for GPU reductions */
+#ifndef ALLOC_AUX_GPU
+#define ALLOC_AUX_GPU
+
+static double *alloc_double_sum_field(int n) {
+    static double *res = NULL;
+    static int n_size = 0;
+    if (n > n_size && res != NULL) {
+        cudaFree(res);
+        res = NULL;
+    }
+
+    if (res == NULL) {
+        cudaMalloc((void **)&res, n * sizeof(double));
+        n_size = n;
+    }
+    return res;
+}
+
+static hr_complex *alloc_complex_sum_field(int n) {
+    static hr_complex *res = NULL;
+    static int n_size = 0;
+    if (n > n_size && res != NULL) {
+        cudaFree(res);
+        res = NULL;
+    }
+    if (res == NULL) {
+        cudaMalloc((void **)&res, n * sizeof(hr_complex));
+        n_size = n;
+    }
+    return res;
+}
+#endif
+
+/**
+* @brief Sums across GPU nodes after finding the local sum (generics)
+*
+* @param vector		Vector with local results
+* @param size		Size of vector
+*
+* @return T		Result of sum of generic type T.
+*/
+template <class T> T global_sum_gpu(T *vector, int size);
+// This function is defined in global_sum_gpu.cu
+
+// TODO Maxnorm is missing -> I will add this later (SAM)
+
+/* Re <s1,s2> */
+_DECLARE_LINEAR_ALGEBRA_GPU_RED(double, prod_re, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
+    _TWO_SPINORS_MATCHING(s1, s2);
+    double res = 0.0;
+    double *resPiece;
+
+    _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
+              (prod_re_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+                  _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), resPiece, N));
+              res += global_sum_gpu(resPiece, N););
+#ifdef WITH_MPI
+    global_sum(&res, 1);
+#endif
+    return res;
+}
+
+/* Im <s1,s2> */
+_DECLARE_LINEAR_ALGEBRA_GPU_RED(double, prod_im, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
+#if !_ISREAL
+    _TWO_SPINORS_MATCHING(s1, s2);
+    double res = 0.0;
+    double *resPiece;
+
+    _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
+              (prod_im_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+                  _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), resPiece, N));
+              res += global_sum_gpu(resPiece, N););
+#ifdef WITH_MPI
+    global_sum(&res, 1);
+#endif
+    return res;
+#else
+    error(1, 1, __func__, "Calculating imaginary part of real field. This will just be zero. \n");
+    return 0;
+#endif
+}
+
+/* <s1,s2> */
+_DECLARE_LINEAR_ALGEBRA_GPU_RED(hr_complex, prod, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
+    _TWO_SPINORS_MATCHING(s1, s2);
+    hr_complex res = 0.0;
+    hr_complex *resPiece;
+
+    _CUDA_FOR(s1, ixp, resPiece = alloc_complex_sum_field(N);
+              (prod_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+                  _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), resPiece, N));
+              res += global_sum_gpu(resPiece, N););
+#ifdef WITH_MPI
+    global_sum((double *)&res, 2);
+#endif
+    return res;
+}
+
+/* Re <s1,s1> */
+_DECLARE_LINEAR_ALGEBRA_GPU_RED(double, sqnorm, (_FIELD_TYPE * s1), (s1)) {
+    double res = 0.0;
+    double *resPiece;
+
+    _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
+              (sqnorm_gpu<_FIELD_DIM, _REAL>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), resPiece, N));
+              res += global_sum_gpu(resPiece, N););
+#ifdef WITH_MPI
+    global_sum(&res, 1);
+#endif
+    return res;
+}
+
+_DECLARE_LINEAR_ALGEBRA_GPU_RED(double, max, (_FIELD_TYPE * s1), (s1)) {
+    double res = 0.0;
+    double *resPiece;
+
+    error(1, 1, __func__, "Not yet implemented because global max reduction is missing.\n");
+    _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
+              (max_gpu<_FIELD_DIM, _REAL>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), resPiece, N));
+              res = global_sum_gpu(resPiece, N););
+
+#ifdef WITH_MPI
+    global_max(&res, 1);
+#endif
+    return res;
+}

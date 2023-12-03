@@ -1,0 +1,110 @@
+/***************************************************************************\
+* Copyright (c) 2008-2023                                                   *
+* Claudio Pica, Ari Hietanen, Ulrik Søndergaard, Sofie Martins              *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+#include "../linear_algebra_gpu_kernels.hpp"
+
+// Error checking
+#if !defined(_FIELD_TYPE)
+#error Missing _FIELD_TYPE in linear_algebra_gpu.cu
+#endif
+#if !defined(_FIELD_DIM)
+#error Missing _FIELD_DIM in linear_algebra_gpu.cu
+#endif
+#if !defined(_SITE_TYPE)
+#error Missing _SITE_TYPE in linear_algebra_gpu.cu
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in linear_algebra_gpu.cu
+#endif
+#if !defined(_COMPLEX)
+#error Missing _COMPLEX in linear_algebra_gpu.cu
+#endif
+#if !defined(_ISREAL)
+#error Missing _ISREAL in linear_algebra_gpu.cu
+#endif
+
+/* Re <g5*s1,s2> */
+_DECLARE_LINEAR_ALGEBRA_GPU_RED(double, g5_prod_re, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
+    _TWO_SPINORS_MATCHING(s1, s2);
+    double res = 0.0;
+    double *resPiece;
+
+    _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
+              (g5_prod_re_gpu<_FIELD_DIM, _REAL>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_FIELD_BLK(s1, ixp), _GPU_FIELD_BLK(s2, ixp), resPiece, N));
+              res += global_sum_gpu(resPiece, N););
+#ifdef WITH_MPI
+    global_sum(&res, 1);
+#endif
+
+    return res;
+}
+
+/* Im <g5*s1,s2> */
+_DECLARE_LINEAR_ALGEBRA_GPU_RED(double, g5_prod_im, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
+    _TWO_SPINORS_MATCHING(s1, s2);
+    double res = 0.0;
+    double *resPiece;
+
+    _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
+              (g5_prod_im_gpu<_FIELD_DIM, _REAL>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_FIELD_BLK(s1, ixp), _GPU_FIELD_BLK(s2, ixp), resPiece, N));
+              res += global_sum_gpu(resPiece, N););
+#ifdef WITH_MPI
+    global_sum(&res, 1);
+#endif
+    return res;
+}
+
+/* s1+=c*g5*s2 c complex */
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, g5_mulc_add_assign, (_FIELD_TYPE * s1, _COMPLEX c, _FIELD_TYPE *s2), (s1, c, s2)) {
+    #if !_ISREAL
+    _TWO_SPINORS_MATCHING(s1, s2);
+    _CUDA_FOR(s1, ixp,
+              (g5_mulc_add_assign_gpu<_FIELD_DIM, _REAL>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_FIELD_BLK(s1, ixp), c, _GPU_FIELD_BLK(s2, ixp), N)));
+    #else
+        error(1, 1, __func__, "Calling complex multiplication for real field.\n");
+    #endif
+}
+
+/* s1=g5*s2  */
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, g5, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
+    _TWO_SPINORS_MATCHING(s1, s2);
+    _CUDA_FOR(s1, ixp,
+              (g5_gpu<_FIELD_DIM, _REAL>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_FIELD_BLK(s1, ixp), _GPU_FIELD_BLK(s2, ixp), N)));
+}
+
+/* s1+=g5*s1  */
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, g5_assign, (_FIELD_TYPE * s1), (s1)) {
+    _CUDA_FOR(s1, ixp,
+              (g5_assign_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_FIELD_BLK(s1, ixp), N)));
+}
+
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, g0, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
+    _CUDA_FOR(s1, ixp,
+              (g0_gpu<_FIELD_DIM, _REAL>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_FIELD_BLK(s1, ixp), _GPU_FIELD_BLK(s2, ixp), N)));
+}
+
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, g1, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
+    _CUDA_FOR(s1, ixp,
+              (g1_gpu<_FIELD_DIM, _REAL>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_FIELD_BLK(s1, ixp), _GPU_FIELD_BLK(s2, ixp), N)));
+}
+
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, g2, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
+    _CUDA_FOR(s1, ixp,
+              (g2_gpu<_FIELD_DIM, _REAL>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_FIELD_BLK(s1, ixp), _GPU_FIELD_BLK(s2, ixp), N)));
+}
+
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, g3, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
+    _CUDA_FOR(s1, ixp,
+              (g3_gpu<_FIELD_DIM, _REAL>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_FIELD_BLK(s1, ixp), _GPU_FIELD_BLK(s2, ixp), N)));
+}

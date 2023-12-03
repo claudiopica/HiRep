@@ -1,0 +1,119 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica and Agostino Patella                     *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+#include <string.h>
+
+// Error checking
+#if !defined(_FIELD_TYPE)
+#error Missing _FIELD_TYPE in linear_algebra.c
+#endif
+#if !defined(_FIELD_DIM)
+#error Missing _FIELD_DIM in linear_algebra.c
+#endif
+#if !defined(_SITE_TYPE)
+#error Missing _SITE_TYPE in linear_algebra.c
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in linear_algebra.c
+#endif
+#if !defined(_COMPLEX)
+#error Missing _COMPLEX in linear_algebra.c
+#endif
+
+// Internal macro for defining generic functions and alias function pointers
+#define _CPU_F_NAME_LINA(_name, _suffix) CONCAT(_name##_, _suffix##_cpu)
+#define _FUNC_INNER_LINA(_type, _name, _suffix, _args) _type _CPU_F_NAME_LINA(_name, _suffix) _args
+#ifdef WITH_GPU
+#define _ALIAS_INNER_LINA(_type, _name, _suffix, _args) _type(*_F_NAME(_name##_, _suffix)) _args = _GPU_F_NAME(_name##_, _suffix)
+#else
+#define _ALIAS_INNER_LINA(_type, _name, _suffix, _args) _type(*_F_NAME(_name##_, _suffix)) _args = _CPU_F_NAME_LINA(_name, _suffix)
+#endif
+
+#define _DECLARE_LINEAR_ALGEBRA(_type, _name, _args) \
+    _ALIAS_INNER_LINA(_type, _name, _FIELD_TYPE, _args); \
+    _FUNC_INNER_LINA(_type, _name, _FIELD_TYPE, _args)
+
+
+
+/* s1+=r*s2 r real */
+_DECLARE_LINEAR_ALGEBRA(void, mul_add_assign, (_FIELD_TYPE * s1, _REAL r, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            mul_add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), r, _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1+=c*s2 c complex */
+_DECLARE_LINEAR_ALGEBRA(void, mulc_add_assign, (_FIELD_TYPE * s1, _COMPLEX c, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            mulc_add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), c, _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1=r*s2 */
+_DECLARE_LINEAR_ALGEBRA(void, mul, (_FIELD_TYPE * s1, _REAL r, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            mul(_SITE_PTR(s1, mu, _FIELD_DIM), r, _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1=c*s2 c complex */
+_DECLARE_LINEAR_ALGEBRA(void, mulc, (_FIELD_TYPE * s1, _COMPLEX c, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            mulc(_SITE_PTR(s1, mu, _FIELD_DIM), c, _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* r=s1+s2 */
+_DECLARE_LINEAR_ALGEBRA(void, add, (_FIELD_TYPE * r, _FIELD_TYPE *s1, _FIELD_TYPE *s2)) {
+    _THREE_SITE_FOR(r, s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            add(_SITE_PTR(r, mu, _FIELD_DIM), _SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* r=s1-s2 */
+_DECLARE_LINEAR_ALGEBRA(void, sub, (_FIELD_TYPE * r, _FIELD_TYPE *s1, _FIELD_TYPE *s2)) {
+    _THREE_SITE_FOR(r, s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            sub(_SITE_PTR(r, mu, _FIELD_DIM), _SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1+=s2 */
+_DECLARE_LINEAR_ALGEBRA(void, add_assign, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1-=s2 */
+_DECLARE_LINEAR_ALGEBRA(void, sub_assign, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            sub_assign(_SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1=-s2 */
+_DECLARE_LINEAR_ALGEBRA(void, minus, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            minus(_SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
