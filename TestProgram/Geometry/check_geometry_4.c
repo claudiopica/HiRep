@@ -59,9 +59,9 @@ int main(int argc, char *argv[]) {
     start_sendrecv_spinor_field(odd);
     complete_sendrecv_spinor_field(odd);
 
-    double in_norm = spinor_field_sqnorm_f(in);
-    double even_norm = spinor_field_sqnorm_f(even);
-    double odd_norm = spinor_field_sqnorm_f(odd);
+    double in_norm = sqnorm_spinor_field(in);
+    double even_norm = sqnorm_spinor_field(even);
+    double odd_norm = sqnorm_spinor_field(odd);
     lprintf("TEST", 1, "[START] Norm^2: global=%lf even=%lf odd=%lf\n", in_norm, even_norm, odd_norm);
     double expected_global = ((double)GLB_VOLUME) * sizeof(suNf_spinor) / sizeof(double);
     double expected_eo = expected_global / 2;

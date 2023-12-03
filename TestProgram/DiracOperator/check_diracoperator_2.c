@@ -215,8 +215,8 @@ int main(int argc, char *argv[]) {
         start_sendrecv_spinor_field(ps1);
         complete_sendrecv_spinor_field(ps1);
 
-        spinor_field_mul_add_assign_f(ps1, -1.0, ps2);
-        sig = spinor_field_sqnorm_f(ps1) / spinor_field_sqnorm_f(ps0);
+        mul_add_assign_spinor_field(ps1, -1.0, ps2);
+        sig = sqnorm_spinor_field(ps1) / sqnorm_spinor_field(ps0);
 
         lprintf("MAIN", 0, "Maximal normalized difference = %.2e at p=(%d,%d,%d,%d)\n", sqrt(sig), np[0], np[1], np[2], np[3]);
         lprintf("MAIN", 0, "should be around 1*10^(-15) or so)\n\n");

@@ -216,7 +216,6 @@ int errors = 0; // count the number of errors during this test unit
 
 #define _TEST
 
-static int n_geometries = 3;
 static geometry_descriptor *geometries[3] = { &glattice, &glat_even, &glat_odd };
 static char *desc[3] = { "glattice", "glat_even", "glat_odd" };
 

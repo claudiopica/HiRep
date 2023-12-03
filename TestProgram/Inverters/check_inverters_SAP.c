@@ -72,33 +72,33 @@ int main(int argc, char *argv[]) {
     /*s1->type = &glat_red;
   s2->type = &glat_red;*/
 
-    /*spinor_field_zero_f(s1);*/
+    /*zero_spinor_field(s1);*/
 
-    lprintf("CGTEST", 0, "spinor_field_sqnorm_f(s1)=%e\n", spinor_field_sqnorm_f(s1)); // ULRIK
+    lprintf("CGTEST", 0, "sqnorm_spinor_field(s1)=%e\n", sqnorm_spinor_field(s1)); // ULRIK
 
     g5Dphi(0.1, s2, s1);
 
-    lprintf("CGTEST", 0, "spinor_field_sqnorm_f(s1)=%e\n", spinor_field_sqnorm_f(s1)); // ULRIK
-    lprintf("CGTEST", 0, "spinor_field_sqnorm_f(s2)=%e\n", spinor_field_sqnorm_f(s2)); // ULRIK
+    lprintf("CGTEST", 0, "sqnorm_spinor_field(s1)=%e\n", sqnorm_spinor_field(s1)); // ULRIK
+    lprintf("CGTEST", 0, "sqnorm_spinor_field(s2)=%e\n", sqnorm_spinor_field(s2)); // ULRIK
 
     s1->type = &glattice;
     s2->type = &glattice;
 
     lprintf("SAP TEST", 0, "Testing SAP\n");
     lprintf("SAP TEST", 0, "---------------------\n");
-    spinor_field_zero_f(res);
+    zero_spinor_field(res);
     cgiters = cg_mshift(&par, &M, s1, res);
     lprintf("SAP TEST", 0, "CG_mshift converged in = %d steps\n", cgiters);
     cgiters = 0;
-    spinor_field_zero_f(res);
+    zero_spinor_field(res);
     SAP_prec(5, &cg_mshift, &par, &M, s1, res);
 
     lprintf("SAP TEST", 0, "Converged in %d iterations\n", cgiters);
     for (i = 0; i < par.n; ++i) {
         M(s2, &res[i]);
-        spinor_field_mul_add_assign_f(s2, -par.shift[i], &res[i]);
-        spinor_field_sub_assign_f(s2, s1);
-        tau = spinor_field_sqnorm_f(s2) / spinor_field_sqnorm_f(s1);
+        mul_add_assign_spinor_field(s2, -par.shift[i], &res[i]);
+        sub_assign_spinor_field(s2, s1);
+        tau = sqnorm_spinor_field(s2) / sqnorm_spinor_field(s1);
         lprintf("SAP TEST", 0, "test SAP = %e (req. %e)\n", tau, par.err2);
     }
 

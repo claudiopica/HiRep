@@ -19,12 +19,12 @@ static double EPSILON = 1.e-12;
 static double normalize(spinor_field *ps) {
     double r;
 
-    r = spinor_field_sqnorm_f(ps);
+    r = sqnorm_spinor_field(ps);
     r = sqrt(r);
     error(r < EPSILON, 1, "normalize [check9.c]", "vector has vanishing norm");
 
     r = 1.0 / r;
-    spinor_field_mul_f(ps, r, ps);
+    mul_spinor_field(ps, r, ps);
 
     return (double)(1.0 / r);
 }
@@ -98,8 +98,8 @@ int main(int argc, char *argv[]) {
         Op1(&ws[0], &ev[i]);
 
         z = -d1[i];
-        spinor_field_mulc_add_assign_f(&ws[0], z, &ev[i]);
-        res = spinor_field_sqnorm_f(&ws[0]);
+        mulc_add_assign_spinor_field(&ws[0], z, &ev[i]);
+        res = sqnorm_spinor_field(&ws[0]);
 
         if (i == nev) { lprintf("MAIN", 0, "\n"); }
 

@@ -59,7 +59,7 @@ int main(int argc, char *argv[]) {
     par.shift[5] = -0.05;
 
     gaussian_spinor_field(s1);
-    tau1 = spinor_field_sqnorm_f(s1);
+    tau1 = sqnorm_spinor_field(s1);
     lprintf("QMR TEST", 0, "Norma iniziale: %e\n", tau1);
 
     /* TEST g5QMR_M */
@@ -74,12 +74,12 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < par.n; ++i) {
         D(s2, &res[i]);
         D(s3, &res_trunc[i]);
-        spinor_field_mul_add_assign_f(s2, -par.shift[i], &res[i]);
-        spinor_field_mul_add_assign_f(s3, -par.shift[i], &res_trunc[i]);
-        spinor_field_sub_assign_f(s2, s1);
-        spinor_field_sub_assign_f(s3, s1);
-        tau1 = spinor_field_sqnorm_f(s2) / spinor_field_sqnorm_f(s1);
-        tau2 = spinor_field_sqnorm_f(s3) / spinor_field_sqnorm_f(s1);
+        mul_add_assign_spinor_field(s2, -par.shift[i], &res[i]);
+        mul_add_assign_spinor_field(s3, -par.shift[i], &res_trunc[i]);
+        sub_assign_spinor_field(s2, s1);
+        sub_assign_spinor_field(s3, s1);
+        tau1 = sqnorm_spinor_field(s2) / sqnorm_spinor_field(s1);
+        tau2 = sqnorm_spinor_field(s3) / sqnorm_spinor_field(s1);
         lprintf("QMR TEST", 0, " g5QMR[%d] = %e, trunc = %e (req. %e)\n", i, tau1, tau2, par.err2);
         if (tau1 > par.err2) { return_value += 1; }
     }

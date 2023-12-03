@@ -291,7 +291,7 @@ int main(int argc, char *argv[]) {
     reset_mo(&mo);
 
     for (int j = 0; j < 4; j++) {
-        spinor_field_zero_f(prop + j);
+        zero_spinor_field(prop + j);
     }
 
     ts = 0 * random_tau();

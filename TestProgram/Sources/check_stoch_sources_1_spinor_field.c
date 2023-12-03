@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
 
     for (int i = 0; i < mes_ip.nhits; i++) {
         create_z2_volume_source(source);
-        norm = spinor_field_sqnorm_f(source);
+        norm = sqnorm_spinor_field(source);
 
         if (fabs(norm / ((double)4 * NF * GLB_X * GLB_Y * GLB_Z * GLB_T) - 1.) > 1e-14) {
             printf("%e %e %e\n", norm, (double)4 * NF * GLB_X * GLB_Y * GLB_Z * GLB_T,

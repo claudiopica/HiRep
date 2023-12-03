@@ -113,11 +113,11 @@ int main(int argc, char *argv[]) {
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n");
 
-    spinor_field_zero_f(s0);
+    zero_spinor_field(s0);
     gaussian_spinor_field(&(s0[0]));
-    tau = 1. / sqrt(spinor_field_sqnorm_f(s0));
-    spinor_field_mul_f(s0, tau, s0);
-    sig = spinor_field_sqnorm_f(s0);
+    tau = 1. / sqrt(sqnorm_spinor_field(s0));
+    mul_spinor_field(s0, tau, s0);
+    sig = sqnorm_spinor_field(s0);
 
     lprintf("MAIN", 0, "Normalized norm = %.2e\n", sig);
 
@@ -134,11 +134,11 @@ int main(int argc, char *argv[]) {
     transform_s(s2, s1);
     transform_s(s3, s0);
     transform_u();
-    spinor_field_zero_f(s1);
+    zero_spinor_field(s1);
     loc_D(s1, s3);
 
-    spinor_field_mul_add_assign_f(s1, -1.0, s2);
-    sig = spinor_field_sqnorm_f(s1);
+    mul_add_assign_spinor_field(s1, -1.0, s2);
+    sig = sqnorm_spinor_field(s1);
 
     lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", sqrt(sig));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");

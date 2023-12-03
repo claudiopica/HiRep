@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     double plaq_cpu = avr_plaquette_cpu();
     start_sendrecv_suNg_field(u_gauge);
     double plaq_gpu = avr_plaquette_gpu();
-    compare_diff(errors, plaq_cpu, plaq_gpu);
+    compare_diff(errors, plaq_cpu, plaq_gpu, "CHECK PLAQUETTE", EPSILON_TEST);
 
     /* full plaquette */
     // Compare output by eye
@@ -38,8 +38,8 @@ int main(int argc, char *argv[]) {
     avr_plaquette_time_gpu(plaqt_gpu, plaqs_gpu);
 
     for (int nt = 0; nt < GLB_T; nt++) {
-        compare_diff(errors, plaqt_cpu[nt], plaqt_gpu[nt]);
-        compare_diff(errors, plaqs_cpu[nt], plaqs_gpu[nt]);
+        compare_diff(errors, plaqt_cpu[nt], plaqt_gpu[nt], "CHECK PLAQUETTE", EPSILON_TEST);
+        compare_diff(errors, plaqs_cpu[nt], plaqs_gpu[nt], "CHECK_PLAQUETTE", EPSILON_TEST);
     }
 
     finalize_process();

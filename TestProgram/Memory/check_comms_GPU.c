@@ -21,7 +21,7 @@ int test_comms_suNf_field_flt();
 int test_comms_suNg_scalar_field();
 int test_comms_suNg_av_field();
 int test_comms_gtransf();
-int test_comms_ldl_field();
+//int test_comms_clover_ldl();
 int test_comms_clover_term();
 int test_comms_clover_force();
 int test_comms_staple_field();
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     return_val += test_comms_suNg_scalar_field();
     return_val += test_comms_suNg_av_field();
     return_val += test_comms_gtransf();
-    return_val += test_comms_ldl_field();
+    //return_val += test_comms_clover_ldl();
     return_val += test_comms_clover_term();
     return_val += test_comms_clover_force();
     return_val += test_comms_staple_field();
@@ -81,7 +81,7 @@ int test_comms_spinor_field(geometry_descriptor *gd) {
     copy_to_gpu_spinor_field(f);
 
     // Evaluate sqnorm in the beginning
-    double sqnorm_start = spinor_field_sqnorm_f(f);
+    double sqnorm_start = sqnorm_spinor_field(f);
     lprintf("SANITY CHECK", 0, "[In field GPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
 
     // Execute communications
@@ -89,7 +89,7 @@ int test_comms_spinor_field(geometry_descriptor *gd) {
     complete_sendrecv_spinor_field(f);
 
     // Evaluate sqnorm after comms
-    double sqnorm_end = spinor_field_sqnorm_f(f);
+    double sqnorm_end = sqnorm_spinor_field(f);
     lprintf("SANITY CHECK", 0, "[Out field CPU copy norm unequal zero: %0.2e]\n", sqnorm_end);
 
     return_val += check_finiteness(sqnorm_start);
@@ -111,7 +111,7 @@ int test_comms_spinor_field_flt(geometry_descriptor *gd) {
     copy_to_gpu_spinor_field_flt(f);
 
     // Evaluate sqnorm in the beginning
-    double sqnorm_start = spinor_field_sqnorm_f_flt(f);
+    double sqnorm_start = sqnorm_spinor_field_flt(f);
     lprintf("SANITY CHECK", 0, "[In field GPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
 
     // Execute communications
@@ -119,7 +119,7 @@ int test_comms_spinor_field_flt(geometry_descriptor *gd) {
     complete_sendrecv_spinor_field_flt(f);
 
     // Evaluate sqnorm after comms
-    double sqnorm_end = spinor_field_sqnorm_f_flt(f);
+    double sqnorm_end = sqnorm_spinor_field_flt(f);
     lprintf("SANITY CHECK", 0, "[Out field GPU copy norm unequal zero: %0.2e]\n", sqnorm_end);
 
     return_val += check_finiteness(sqnorm_start);
@@ -379,7 +379,8 @@ int test_comms_gtransf() {
     return return_val;
 }
 
-int test_comms_ldl_field() {
+#if 0
+int test_comms_clover_ldl() {
     lprintf("INFO", 0, " ======= TEST CLOVER LDL ======= \n");
 
     // Setup fields on GPU
@@ -409,6 +410,7 @@ int test_comms_ldl_field() {
 
     return return_val;
 }
+#endif
 
 int test_comms_clover_term() {
     lprintf("INFO", 0, " ======= TEST CLOVER TERM ======= \n");

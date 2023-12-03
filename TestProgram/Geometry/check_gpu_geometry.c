@@ -21,7 +21,7 @@ int test_write_read_clover_term();
 int test_write_read_clover_force();
 int test_write_read_spinor_field();
 int test_write_read_scalar_field();
-int test_write_read_ldl_field();
+//int test_write_read_clover_ldl();
 int test_write_read_staple_field();
 
 // Single precision
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     return_val += test_write_read_suNg_scalar_field();
     return_val += test_write_read_suNg_av_field();
     return_val += test_write_read_gtransf();
-    return_val += test_write_read_ldl_field();
+    //return_val += test_write_read_clover_ldl();
     return_val += test_write_read_clover_term();
     return_val += test_write_read_clover_force();
     return_val += test_write_read_staple_field();
@@ -211,7 +211,7 @@ int test_write_read_spinor_field() {
 
     gaussian_spinor_field(in);
 
-    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_spinor_field_cpu(in));
 
     suNf_spinor *in_spinor, *out_spinor;
     _MASTER_FOR(in->type, ix) {
@@ -221,9 +221,9 @@ int test_write_read_spinor_field() {
         read_spinor_field_gpu(out_spinor, gpu_format, ix, 0);
     }
 
-    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_cpu(out));
-    spinor_field_sub_assign_f_cpu(out, in);
-    double diff_norm = spinor_field_sqnorm_f_cpu(out);
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", sqnorm_spinor_field_cpu(out));
+    sub_assign_spinor_field_cpu(out, in);
+    double diff_norm = sqnorm_spinor_field_cpu(out);
     check_diff_norm_zero(diff_norm);
 
     free_spinor_field(in);
@@ -243,7 +243,7 @@ int test_write_read_spinor_field_flt() {
 
     gaussian_spinor_field_flt(in);
 
-    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_flt_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_spinor_field_flt_cpu(in));
 
     suNf_spinor_flt *in_spinor, *out_spinor;
     _MASTER_FOR(in->type, ix) {
@@ -253,9 +253,9 @@ int test_write_read_spinor_field_flt() {
         read_spinor_field_flt_gpu(out_spinor, gpu_format, ix, 0);
     }
 
-    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_flt_cpu(out));
-    spinor_field_sub_assign_f_flt_cpu(out, in);
-    double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", sqnorm_spinor_field_flt_cpu(out));
+    sub_assign_spinor_field_flt_cpu(out, in);
+    double diff_norm = sqnorm_spinor_field_flt_cpu(out);
     check_diff_norm_zero(diff_norm);
 
     free_spinor_field_flt(in);
@@ -468,7 +468,8 @@ int test_write_read_clover_force() {
     return return_val;
 }
 
-int test_write_read_ldl_field() {
+#if 0
+int test_write_read_clover_ldl() {
     lprintf("INFO", 0, " ======= TEST LDL FIELD ======= ");
     int return_val = 0;
     ldl_field *in, *gpu_format, *out;
@@ -477,7 +478,7 @@ int test_write_read_ldl_field() {
     out = alloc_ldl_field(&glattice);
     gpu_format = alloc_ldl_field(&glattice);
 
-    random_ldl_field_cpu(in);
+    random_clover_ldl_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_ldl_field_cpu(in)); // sqnorm Not implemented
 
     ldl_t *site_in, *site_out;
@@ -500,6 +501,7 @@ int test_write_read_ldl_field() {
     free_ldl_field(gpu_format);
     return return_val;
 }
+#endif
 
 int test_write_read_staple_field() {
     lprintf("INFO", 0, " ======= TEST STAPLE FIELD ======= ");

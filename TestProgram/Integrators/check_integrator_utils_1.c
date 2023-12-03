@@ -235,7 +235,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
             if (msf != NULL) {
                 if (pf_copy[i] == NULL) { pf_copy[i] = alloc_spinor_field(1, msf->type); }
 
-                spinor_field_copy_f(pf_copy[i], msf);
+                copy_spinor_field(pf_copy[i], msf);
             }
         }
     }
@@ -292,7 +292,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
             error(pf_copy[i] == NULL, 0, "integrate_ghmc",
                   "The pseudo fermion must be allocated to be copied, wrong sequence in regenarate");
 
-            spinor_field_copy_f(msf, pf_copy[i]);
+            copy_spinor_field(msf, pf_copy[i]);
         }
     }
 

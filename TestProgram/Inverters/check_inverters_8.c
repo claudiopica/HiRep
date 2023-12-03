@@ -63,8 +63,8 @@ int main(int argc, char *argv[]) {
     lprintf("QMR TEST", 0, "Converged in %d iterations\n", cgiters);
 
     D(s2, s3);
-    spinor_field_sub_assign_f(s2, s1);
-    tau = spinor_field_sqnorm_f(s2) / spinor_field_sqnorm_f(s1);
+    sub_assign_spinor_field(s2, s1);
+    tau = sqnorm_spinor_field(s2) / sqnorm_spinor_field(s1);
     lprintf("QMR TEST", 0, "Res = %e\n", tau);
 
     if (tau > par.err2) { return_value += 1; }
@@ -79,13 +79,13 @@ int main(int argc, char *argv[]) {
     lprintf("QMR TEST", 0, "Testing g5QMR multishift\n");
     lprintf("QMR TEST", 0, "------------------------\n");
 
-    spinor_field_zero_f(s3);
+    zero_spinor_field(s3);
     cgiters = g5QMR_mshift(&mpar, &D, s1, s3);
     lprintf("QMR TEST", 0, "Converged in %d iterations\n", cgiters);
 
     D(s2, s3);
-    spinor_field_sub_assign_f(s2, s1);
-    tau = spinor_field_sqnorm_f(s2) / spinor_field_sqnorm_f(s1);
+    sub_assign_spinor_field(s2, s1);
+    tau = sqnorm_spinor_field(s2) / sqnorm_spinor_field(s1);
     lprintf("QMR TEST", 0, "Res = %e\n", tau);
 
     if (tau > par.err2) { return_value += 1; }

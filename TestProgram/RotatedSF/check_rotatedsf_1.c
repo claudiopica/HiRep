@@ -122,10 +122,10 @@ int main(int argc, char *argv[]) {
     s2 = s1 + 1;
     s3 = s2 + 1;
 
-    spinor_field_zero_f(s0);
+    zero_spinor_field(s0);
     gaussian_spinor_field(&(s0[0]));
-    tau = 1. / sqrt(spinor_field_sqnorm_f(s0));
-    spinor_field_mul_f(s0, tau, s0);
+    tau = 1. / sqrt(sqnorm_spinor_field(s0));
+    mul_spinor_field(s0, tau, s0);
 
     double mass = 0.0;
     _update_par.SF_zf = 6.;
@@ -151,8 +151,8 @@ int main(int argc, char *argv[]) {
 
     SF_quark_propagator(s2, mass, s1, acc);
 
-    spinor_field_mul_add_assign_f(s1, -1.0, s0);
-    sig = spinor_field_sqnorm_f(s1);
+    mul_add_assign_spinor_field(s1, -1.0, s0);
+    sig = sqnorm_spinor_field(s1);
 
     lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", sqrt(sig));
     lprintf("MAIN", 0, "(should be around 1*10^(-10) or so)\n\n");

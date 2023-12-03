@@ -70,7 +70,7 @@ int test_convert_back_forth_spinor_field() {
     out = alloc_spinor_field(1, &glattice);
     gaussian_spinor_field(in);
 
-    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_cpu(in));
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_spinor_field_cpu(in));
 
     // Convert twice
     to_gpu_format_spinor_field(tmp, in);
@@ -78,11 +78,11 @@ int test_convert_back_forth_spinor_field() {
     to_cpu_format_spinor_field(out, tmp);
 
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n",
-            spinor_field_sqnorm_f_cpu(in), spinor_field_sqnorm_f_cpu(out));
+            sqnorm_spinor_field_cpu(in), sqnorm_spinor_field_cpu(out));
 
     // Assert fields are equal over sqnorm
-    spinor_field_sub_assign_f_cpu(out, in);
-    double diff_norm = spinor_field_sqnorm_f_cpu(out);
+    sub_assign_spinor_field_cpu(out, in);
+    double diff_norm = sqnorm_spinor_field_cpu(out);
 
     // Free and return
     free_spinor_field(in);
@@ -101,7 +101,7 @@ int test_convert_back_forth_spinor_field_flt() {
     out = alloc_spinor_field_flt(1, &glattice);
     gaussian_spinor_field_flt(in);
 
-    double sqnorm = spinor_field_sqnorm_f_flt_cpu(in);
+    double sqnorm = sqnorm_spinor_field_flt_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm);
 
     // Convert twice
@@ -109,11 +109,11 @@ int test_convert_back_forth_spinor_field_flt() {
     fill_buffers_spinor_field_flt(tmp);
     to_cpu_format_spinor_field_flt(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in: %0.2e out: %0.2e]\n",
-            spinor_field_sqnorm_f_flt_cpu(in), spinor_field_sqnorm_f_flt_cpu(out));
+            sqnorm_spinor_field_flt_cpu(in), sqnorm_spinor_field_flt_cpu(out));
 
     // Assert fields are equal over sqnorm
-    spinor_field_sub_assign_f_flt_cpu(out, in);
-    double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);
+    sub_assign_spinor_field_flt_cpu(out, in);
+    double diff_norm = sqnorm_spinor_field_flt_cpu(out);
 
     // Free and return
     free_spinor_field_flt(in);

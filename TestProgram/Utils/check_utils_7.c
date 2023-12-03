@@ -60,11 +60,11 @@ int test_bijectivity_spinors() {
 
     assign_sd2s(out_flt, in);
     assign_s2sd(out, out_flt);
-    spinor_field_sub_assign_f(out, in);
-    return_val += check_diff_norm(spinor_field_sqnorm_f(out), 1.e-10);
+    sub_assign_spinor_field(out, in);
+    return_val += check_diff_norm(sqnorm_spinor_field(out), 1.e-10);
 
-    sqnorm = spinor_field_sqnorm_f(in);
-    sqnorm_flt = spinor_field_sqnorm_f_flt(out_flt);
+    sqnorm = sqnorm_spinor_field(in);
+    sqnorm_flt = sqnorm_spinor_field_flt(out_flt);
     return_val += check_diff_norm(sqnorm_flt - sqnorm, 1.e-4);
 
     /*
@@ -77,11 +77,11 @@ int test_bijectivity_spinors() {
 
     assign_s2sd(out, in_flt);
     assign_sd2s(out_flt, out);
-    spinor_field_sub_assign_f_flt(out_flt, in_flt);
-    return_val += check_diff_norm(spinor_field_sqnorm_f_flt(out_flt), 1.e-10);
+    sub_assign_spinor_field_flt(out_flt, in_flt);
+    return_val += check_diff_norm(sqnorm_spinor_field_flt(out_flt), 1.e-10);
 
-    sqnorm_flt = spinor_field_sqnorm_f_flt(in_flt);
-    sqnorm = spinor_field_sqnorm_f(out);
+    sqnorm_flt = sqnorm_spinor_field_flt(in_flt);
+    sqnorm = sqnorm_spinor_field(out);
     return_val += check_diff_norm(sqnorm_flt - sqnorm, 1.e-4);
 
     // Free fields
@@ -112,12 +112,12 @@ int test_add_assign() {
     */
 
     gaussian_spinor_field(in);
-    spinor_field_mul_f(out, 2.0, in);
+    mul_spinor_field(out, 2.0, in);
 
     assign_sd2s(in_flt, in);
     add_assign_s2sd(in, in_flt);
-    spinor_field_sub_assign_f(out, in);
-    return_val += check_diff_norm(spinor_field_sqnorm_f(out), 1.e-10);
+    sub_assign_spinor_field(out, in);
+    return_val += check_diff_norm(sqnorm_spinor_field(out), 1.e-10);
 
     /*
         Assign random single precision field to double
@@ -127,12 +127,12 @@ int test_add_assign() {
     */
 
     gaussian_spinor_field_flt(in_flt);
-    spinor_field_mul_f_flt(out_flt, 2.0, in_flt);
+    mul_spinor_field_flt(out_flt, 2.0, in_flt);
 
     assign_s2sd(in, in_flt);
     add_assign_sd2s(in_flt, in);
-    spinor_field_sub_assign_f_flt(out_flt, in_flt);
-    return_val += check_diff_norm_zero(spinor_field_sqnorm_f_flt(out_flt));
+    sub_assign_spinor_field_flt(out_flt, in_flt);
+    return_val += check_diff_norm_zero(sqnorm_spinor_field_flt(out_flt));
 
     // Free fields
     free_spinor_field(in);
