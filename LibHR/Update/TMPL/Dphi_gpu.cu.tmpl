@@ -192,7 +192,7 @@ _DECLARE(static void, Dphi_inner_init, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
         gd_t = EVEN;
     }
 
-    const _GAUGE_TYPE *gauge = GFIELD(u_gauge, _REP_SUFFIX)->gpu_ptr;
+    const _GAUGE_TYPE *gauge = GFIELD(u_gauge_f, _REP_SUFFIX)->gpu_ptr;
     _GPU_F_NAME(init_kernel_input, _SUFFIX)(out, in, gauge, geometryBoxes, gd_t);
 }
 
@@ -227,7 +227,7 @@ _DECLARE(static void, Dphi_boundary, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
     if (gd_t == GLOBAL) { nbuffers /= 2; }
 
     while (buffer_box && i <= nbuffers) {
-        const _GAUGE_TYPE *gauge = GFIELD(u_gauge, _REP_SUFFIX)->gpu_ptr;
+        const _GAUGE_TYPE *gauge = GFIELD(u_gauge_f, _REP_SUFFIX)->gpu_ptr;
         int grid = (boxEvenVolume(geometryBoxes) - 1) / BLOCK_SIZE + 1;
         _GPU_F_NAME(init_kernel_input, _SUFFIX)(out, in, gauge, buffer_box, gd_t);
         Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE>>>(_VAR(input_d, _SUFFIX));
@@ -341,7 +341,8 @@ _DECLARE(void, Dphi, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
     double rho = 4. + m0;
     _GPU_F_NAME_(Dphi, _SUFFIX)(out, in);
 
-    _F_NAME(spinor_field_mul_add_assign, _REP_SUFFIX)(out, rho, in);
+    //mul_add_assign(out, (_REAL)rho, in);
+    _F_NAME(mul_add_assign_spinor_field, _REP_SUFFIX)(out, rho, in);
 }
 
 /**
@@ -361,8 +362,8 @@ _DECLARE(void, g5Dphi, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
     // Operation
     double rho = 4. + m0;
     _GPU_F_NAME_(Dphi, _SUFFIX)(out, in);
-    _F_NAME(spinor_field_mul_add_assign, _REP_SUFFIX)(out, rho, in);
-    _F_NAME(spinor_field_g5_assign, _REP_SUFFIX)(out);
+    _F_NAME(mul_add_assign_spinor_field, _REP_SUFFIX)(out, rho, in);
+    _F_NAME(g5_assign_spinor_field, _REP_SUFFIX)(out);
 }
 
 /**
@@ -387,8 +388,8 @@ _DECLARE(void, Dphi_eopre, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
     _GPU_F_NAME_(Dphi, _SUFFIX)(out, _VAR(otmp, _SUFFIX));
     double rho = 4. + m0;
     rho *= -rho; /* this minus sign is taken into account below */
-    _F_NAME(spinor_field_mul_add_assign, _REP_SUFFIX)(out, rho, in);
-    _F_NAME(spinor_field_minus, _REP_SUFFIX)(out, out);
+    _F_NAME(mul_add_assign_spinor_field, _REP_SUFFIX)(out, rho, in);
+    _F_NAME(minus_spinor_field, _REP_SUFFIX)(out, out);
 }
 
 /**
@@ -412,8 +413,8 @@ _DECLARE(void, Dphi_oepre, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
     _GPU_F_NAME_(Dphi, _SUFFIX)(out, _VAR(etmp, _SUFFIX));
     double rho = 4. + m0;
     rho *= -rho; /* this minus sign is taken into account below */
-    _F_NAME(spinor_field_mul_add_assign, _REP_SUFFIX)(out, rho, in);
-    _F_NAME(spinor_field_minus, _REP_SUFFIX)(out, out);
+    _F_NAME(mul_add_assign_spinor_field, _REP_SUFFIX)(out, rho, in);
+    _F_NAME(minus_spinor_field, _REP_SUFFIX)(out, out);
 }
 
 /**
@@ -442,9 +443,9 @@ _DECLARE(void, g5Dphi_eopre, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
     _GPU_F_NAME_(Dphi, _SUFFIX)(out, _VAR(otmp, _SUFFIX));
     double rho = 4. + m0;
     rho *= -rho; /* this minus sign is taken into account below */
-    _F_NAME(spinor_field_mul_add_assign, _REP_SUFFIX)(out, rho, in);
-    _F_NAME(spinor_field_minus, _REP_SUFFIX)(out, out);
-    _F_NAME(spinor_field_g5_assign, _REP_SUFFIX)(out);
+    _F_NAME(mul_add_assign_spinor_field, _REP_SUFFIX)(out, rho, in);
+    _F_NAME(minus_spinor_field, _REP_SUFFIX)(out, out);
+    _F_NAME(g5_assign_spinor_field, _REP_SUFFIX)(out);
 
 #if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
     _F_NAME(SF_spinor_bcs)(out);

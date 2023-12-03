@@ -7,5 +7,6 @@
 #define MEMORY_H
 
 #include "Memory/field_memory.h"
+#include "Memory/memory_generic.h"
 
 #endif

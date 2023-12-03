@@ -31,7 +31,7 @@
 #ifndef ALLOC_AUX_GPU
 #define ALLOC_AUX_GPU
 
-static double *alloc_double_sum_field(int n) {
+double *alloc_double_sum_field(int n) {
     static double *res = NULL;
     static int n_size = 0;
     if (n > n_size && res != NULL) {
@@ -46,7 +46,7 @@ static double *alloc_double_sum_field(int n) {
     return res;
 }
 
-static hr_complex *alloc_complex_sum_field(int n) {
+hr_complex *alloc_complex_sum_field(int n) {
     static hr_complex *res = NULL;
     static int n_size = 0;
     if (n > n_size && res != NULL) {

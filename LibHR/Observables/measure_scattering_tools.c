@@ -184,9 +184,9 @@ void init_src_common_point(struct src_common *src, int tau) {
     src->src_0_eta = alloc_spinor_field(4, &glattice);
     src->src_0_0 = alloc_spinor_field(4, &glattice);
     for (int i = 0; i < 4; i++) {
-        spinor_field_zero_f(&(src->src_0[i]));
-        spinor_field_zero_f(&(src->src_0_eta[i]));
-        spinor_field_zero_f(&(src->src_0_0[i]));
+        zero_spinor_field(&(src->src_0[i]));
+        zero_spinor_field(&(src->src_0_eta[i]));
+        zero_spinor_field(&(src->src_0_0[i]));
     }
 
     // Create point source
@@ -205,9 +205,9 @@ void init_src_common(struct src_common *src, int tau) {
     src->src_0_eta = alloc_spinor_field(4, &glattice);
     src->src_0_0 = alloc_spinor_field(4, &glattice);
     for (int i = 0; i < 4; i++) {
-        spinor_field_zero_f(&(src->src_0[i]));
-        spinor_field_zero_f(&(src->src_0_eta[i]));
-        spinor_field_zero_f(&(src->src_0_0[i]));
+        zero_spinor_field(&(src->src_0[i]));
+        zero_spinor_field(&(src->src_0_eta[i]));
+        zero_spinor_field(&(src->src_0_0[i]));
     }
 
     // Create point source
@@ -236,12 +236,12 @@ void init_src_p(struct src_p *srcp, struct src_common *src0, int px, int py, int
     srcp->src_mp_0 = alloc_spinor_field(4, &glattice);
 
     for (int i = 0; i < 4; i++) {
-        spinor_field_zero_f(&(srcp->src_p[i]));
-        spinor_field_zero_f(&(srcp->src_mp[i]));
-        spinor_field_zero_f(&(srcp->src_p_0[i]));
-        spinor_field_zero_f(&(srcp->src_0_p[i]));
-        spinor_field_zero_f(&(srcp->src_mp_0[i]));
-        spinor_field_zero_f(&(srcp->src_0_mp[i]));
+        zero_spinor_field(&(srcp->src_p[i]));
+        zero_spinor_field(&(srcp->src_mp[i]));
+        zero_spinor_field(&(srcp->src_p_0[i]));
+        zero_spinor_field(&(srcp->src_0_p[i]));
+        zero_spinor_field(&(srcp->src_mp_0[i]));
+        zero_spinor_field(&(srcp->src_0_mp[i]));
     }
 
     add_momentum(srcp->src_p, src0->src_0, px, py, pz);
@@ -299,8 +299,8 @@ void make_propagator_PA(spinor_field *prop, spinor_field *src, int ndilute, int 
     calc_propagator(proptmp, src, ndilute);
     flip_T_bc(tau);
     for (int l = 0; l < 4; ++l) {
-        spinor_field_add_assign_f(&prop[l], &proptmp[l]);
-        spinor_field_mul_f(&prop[l], 0.5, &prop[l]);
+        add_assign_spinor_field(&prop[l], &proptmp[l]);
+        mul_spinor_field(&prop[l], 0.5, &prop[l]);
     }
 
     free_spinor_field(proptmp);
@@ -335,10 +335,10 @@ void make_prop_common(struct prop_common *prop, struct src_common *src0, int ndi
     }
 
     for (int i = 0; i < 4; i++) {
-        spinor_field_zero_f(prop->Q_0 + i);
-        spinor_field_zero_f(prop->Q_0_eta + i);
+        zero_spinor_field(prop->Q_0 + i);
+        zero_spinor_field(prop->Q_0_eta + i);
         for (int t = 0; t < GLB_T; t++) {
-            spinor_field_zero_f(prop->W_0_0[t] + i);
+            zero_spinor_field(prop->W_0_0[t] + i);
         }
     }
 
@@ -383,7 +383,7 @@ void make_prop_p(struct prop_p *prop, struct src_p *srcp, struct src_common *src
 #define X(NAME)                                    \
     prop->NAME = alloc_spinor_field(4, &glattice); \
     for (int i = 0; i < 4; i++)                    \
-        spinor_field_zero_f(prop->NAME + i);
+        zero_spinor_field(prop->NAME + i);
     PROPLIST
 #undef X
 #undef PROPLIST
@@ -1050,8 +1050,8 @@ void measure_pion_scattering_I2(double *m, int numsources, double precision, cha
             }
         }
         for (int i = 0; i < 4; i++) {
-            spinor_field_zero_f(prop_ts1 + i);
-            spinor_field_zero_f(prop_ts2 + i);
+            zero_spinor_field(prop_ts1 + i);
+            zero_spinor_field(prop_ts2 + i);
         }
 
         ts = random_tau();
@@ -1251,11 +1251,11 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
     init_propagator_eo(1, m, precision);
     for (int src = 0; src < numsources; ++src) {
         for (int i = 0; i < 4; i++) {
-            spinor_field_zero_f(prop_ts2 + i);
+            zero_spinor_field(prop_ts2 + i);
         }
         for (int t = 0; t < GLB_T; t++) {
             for (int i = 0; i < 4; i++) {
-                spinor_field_zero_f(prop_ts1[src][t] + i);
+                zero_spinor_field(prop_ts1[src][t] + i);
             }
         }
 
@@ -1482,9 +1482,9 @@ void measure_pion_scattering_I0_TS(double *m, int numsources, double precision, 
         reset_mo(Tr);
 
         for (int i = 0; i < 4; i++) {
-            spinor_field_zero_f(prop_disc + i);
-            spinor_field_zero_f(prop_tri + i);
-            spinor_field_zero_f(seq_0 + i);
+            zero_spinor_field(prop_disc + i);
+            zero_spinor_field(prop_tri + i);
+            zero_spinor_field(seq_0 + i);
         }
 
         init_propagator_eo(1, m, precision);

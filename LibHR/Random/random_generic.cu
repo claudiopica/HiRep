@@ -24,11 +24,11 @@ void random_field(suNf_field *s1) {
 }
 
 void random_field(suNg_field_flt *s1) {
-    random_gfield_flt_cpu(s1);
+    random_suNg_field_flt_cpu(s1);
 }
 
 void random_field(suNf_field_flt *s1) {
-    random_gfield_f_flt_cpu(s1);
+    random_suNf_field_flt_cpu(s1);
 }
 
 void random_field(suNg_scalar_field *s1) {
@@ -36,7 +36,7 @@ void random_field(suNg_scalar_field *s1) {
 }
 
 void random_field(suNg_av_field *s1) {
-    random_avfield_cpu(s1);
+    random_suNg_av_field_cpu(s1);
 }
 
 void random_field(gtransf *s1) {
@@ -44,7 +44,7 @@ void random_field(gtransf *s1) {
 }
 
 void random_field(ldl_field *s1) {
-    random_clover_ldl_cpu(s1);
+    random_ldl_field_cpu(s1);
 }
 
 void random_field(clover_term *s1) {

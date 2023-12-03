@@ -49,27 +49,27 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
     cgiter = 0;
     notconverged = 1;
 
-    spinor_field_copy_f(p2, in);
+    copy_spinor_field(p2, in);
     if (trial != NULL) {
         M(p1, trial);
         ++cgiter;
-        spinor_field_sub_assign_f(p2, p1);
-        if (out != trial) { spinor_field_copy_f(out, trial); }
+        sub_assign_spinor_field(p2, p1);
+        if (out != trial) { copy_spinor_field(out, trial); }
 
     } else {
-        spinor_field_zero_f(out);
+        zero_spinor_field(out);
     }
 
-    innorm2 = spinor_field_sqnorm_f(in);
-    beta = sqrt(spinor_field_sqnorm_f(p2));
-    spinor_field_mul_f(p2, 1. / beta, p2);
-    spinor_field_zero_f(p1);
+    innorm2 = sqnorm_spinor_field(in);
+    beta = sqrt(sqnorm_spinor_field(p2));
+    mul_spinor_field(p2, 1. / beta, p2);
+    zero_spinor_field(p1);
     r = rho2 = beta;
     rho1 = 1.;
     c2 = -1.;
     rp = s1 = s2 = c1 = 0.;
-    spinor_field_zero_f(q1);
-    spinor_field_zero_f(q2);
+    zero_spinor_field(q1);
+    zero_spinor_field(q2);
 
     /* cg recursion */
     do {
@@ -78,11 +78,11 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
         M(Mp, p2);
 
         /* compute alpha */
-        alpha = spinor_field_prod_re_f(Mp, p2);
+        alpha = prod_re_spinor_field(Mp, p2);
 
         /* update p1, p2 */
-        spinor_field_mul_add_assign_f(Mp, -beta, p1);
-        spinor_field_mul_add_assign_f(Mp, -alpha, p2);
+        mul_add_assign_spinor_field(Mp, -beta, p1);
+        mul_add_assign_spinor_field(Mp, -alpha, p2);
         sptmp = p1;
         p1 = p2;
         p2 = Mp;
@@ -90,10 +90,10 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
 
         /* update beta */
         oldbeta = beta;
-        beta = sqrt(spinor_field_sqnorm_f(p2));
+        beta = sqrt(sqnorm_spinor_field(p2));
 
         /* normalize p2 */
-        spinor_field_mul_f(p2, 1. / beta, p2);
+        mul_spinor_field(p2, 1. / beta, p2);
 
         d = (alpha - rp * c1) * s2;
         h = oldbeta * s1;
@@ -104,18 +104,18 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
         s1 = s2;
         s2 = beta / k;
 
-        spinor_field_lc_f(Mp, -h / rho1, q1, -d / rho2, q2);
+        lc_spinor_field(Mp, -h / rho1, q1, -d / rho2, q2);
         sptmp = q1;
         q1 = q2;
         q2 = sptmp; /* swap q1[i]<->q2[i] */
-        spinor_field_add_f(q2, p1, Mp);
+        add_spinor_field(q2, p1, Mp);
 
         /* update rho */
         rho1 = rho2;
         rho2 = k;
 
         /* update solution */
-        spinor_field_mul_add_assign_f(out, r * c2 / k, q2);
+        mul_add_assign_spinor_field(out, r * c2 / k, q2);
 
         /* update residuum */
         r *= s2;
@@ -132,8 +132,8 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
     /* test results */
     M(Mp, out);
     ++cgiter;
-    spinor_field_sub_f(Mp, Mp, in);
-    innorm2 = spinor_field_sqnorm_f(Mp) / innorm2;
+    sub_spinor_field(Mp, Mp, in);
+    innorm2 = sqnorm_spinor_field(Mp) / innorm2;
     *valid = 1;
     if (fabs(innorm2) > par->err2) {
         *valid = 0;
@@ -164,7 +164,7 @@ int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *o
     return iter;
 }
 
-static double spinor_field_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_flt *s2) {
+static double prod_re_spinor_field_f_f2d(spinor_field_flt *s1, spinor_field_flt *s2) {
     static double res;
     _OMP_PRAGMA(single) {
         res = 0.;
@@ -181,7 +181,7 @@ static double spinor_field_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_flt 
     return res;
 }
 
-static double spinor_field_sqnorm_f_f2d(spinor_field_flt *s1) {
+static double sqnorm_spinor_field_f_f2d(spinor_field_flt *s1) {
     static double res;
     _OMP_PRAGMA(single) {
         res = 0.;
@@ -231,27 +231,27 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
     cgiter = 0;
     notconverged = 1;
 
-    spinor_field_copy_f_flt(p2, in);
+    copy_spinor_field_flt(p2, in);
     if (trial != NULL) {
         M(p1, trial);
         ++cgiter;
-        spinor_field_sub_assign_f_flt(p2, p1);
-        if (out != trial) { spinor_field_copy_f_flt(out, trial); }
+        sub_assign_spinor_field_flt(p2, p1);
+        if (out != trial) { copy_spinor_field_flt(out, trial); }
 
     } else {
-        spinor_field_zero_f_flt(out);
+        zero_spinor_field_flt(out);
     }
 
-    innorm2 = spinor_field_sqnorm_f_f2d(in);
-    beta = sqrt(spinor_field_sqnorm_f_f2d(p2));
-    spinor_field_mul_f_flt(p2, (float)(1. / beta), p2);
-    spinor_field_zero_f_flt(p1);
+    innorm2 = sqnorm_spinor_field_f_f2d(in);
+    beta = sqrt(sqnorm_spinor_field_f_f2d(p2));
+    mul_spinor_field_flt(p2, (float)(1. / beta), p2);
+    zero_spinor_field_flt(p1);
     r = rho2 = beta;
     rho1 = 1.;
     c2 = -1.;
     rp = s1 = s2 = c1 = 0.;
-    spinor_field_zero_f_flt(q1);
-    spinor_field_zero_f_flt(q2);
+    zero_spinor_field_flt(q1);
+    zero_spinor_field_flt(q2);
 
     /* cg recursion */
     do {
@@ -260,11 +260,11 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
         M(Mp, p2);
 
         /* compute alpha */
-        alpha = spinor_field_prod_re_f_f2d(Mp, p2);
+        alpha = prod_re_spinor_field_f_f2d(Mp, p2);
 
         /* update p1, p2 */
-        spinor_field_mul_add_assign_f_flt(Mp, -(float)beta, p1);
-        spinor_field_mul_add_assign_f_flt(Mp, -(float)alpha, p2);
+        mul_add_assign_spinor_field_flt(Mp, -(float)beta, p1);
+        mul_add_assign_spinor_field_flt(Mp, -(float)alpha, p2);
         sptmp = p1;
         p1 = p2;
         p2 = Mp;
@@ -272,10 +272,10 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
 
         /* update beta */
         oldbeta = beta;
-        beta = sqrt(spinor_field_sqnorm_f_f2d(p2));
+        beta = sqrt(sqnorm_spinor_field_f_f2d(p2));
 
         /* normalize p2 */
-        spinor_field_mul_f_flt(p2, (float)(1. / beta), p2);
+        mul_spinor_field_flt(p2, (float)(1. / beta), p2);
 
         d = (alpha - rp * c1) * s2;
         h = oldbeta * s1;
@@ -286,18 +286,18 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
         s1 = s2;
         s2 = beta / k;
 
-        spinor_field_lc_f_flt(Mp, (float)(-h / rho1), q1, (float)(-d / rho2), q2);
+        lc_spinor_field_flt(Mp, (float)(-h / rho1), q1, (float)(-d / rho2), q2);
         sptmp = q1;
         q1 = q2;
         q2 = sptmp; /* swap q1[i]<->q2[i] */
-        spinor_field_add_f_flt(q2, p1, Mp);
+        add_spinor_field_flt(q2, p1, Mp);
 
         /* update rho */
         rho1 = rho2;
         rho2 = k;
 
         /* update solution */
-        spinor_field_mul_add_assign_f_flt(out, (float)(r * c2 / k), q2);
+        mul_add_assign_spinor_field_flt(out, (float)(r * c2 / k), q2);
 
         /* update residuum */
         r *= s2;
@@ -314,8 +314,8 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
     /* test results */
     M(Mp, out);
     ++cgiter;
-    spinor_field_sub_f_flt(Mp, Mp, in);
-    innorm2 = spinor_field_sqnorm_f_f2d(Mp) / innorm2;
+    sub_spinor_field_flt(Mp, Mp, in);
+    innorm2 = sqnorm_spinor_field_f_f2d(Mp) / innorm2;
     *valid = 1;
     if (fabs(innorm2) > par->err2) {
         *valid = 0;

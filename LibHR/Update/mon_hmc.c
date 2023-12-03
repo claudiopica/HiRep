@@ -21,7 +21,7 @@ static void hmc_correct_pf(monomial const *m) {
     mon_hmc_par *par = (mon_hmc_par *)(m->data.par);
 
     /* compute H2^{1/2}*pf = H*pf */
-    spinor_field_copy_f(tmp_pf, par->pf);
+    copy_spinor_field(tmp_pf, par->pf);
     set_dirac_mass(par->mass);
     H(par->pf, tmp_pf);
 }
@@ -38,9 +38,9 @@ static void hmc_correct_la_pf(monomial const *m) {
     mpar.shift[0] = 0;
 
     /* compute H2^{-1/2}*pf = H^{-1}*pf */
-    spinor_field_g5_f(tmp_pf, par->pf);
+    g5_spinor_field(tmp_pf, par->pf);
     set_dirac_mass(par->mass);
-    spinor_field_zero_f(par->pf); /* mshift inverter uses this as initial guess for 1 shift */
+    zero_spinor_field(par->pf); /* mshift inverter uses this as initial guess for 1 shift */
     g5QMR_mshift(&mpar, &D, tmp_pf, par->pf);
 }
 

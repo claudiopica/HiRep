@@ -76,27 +76,27 @@ static int MINRES_mshift_core(short int *flags, mshift_par *par, spinor_operator
     notconverged = par->n;
 
     if (par->n == 1) { /* non multishift case */
-        spinor_field_copy_f(p2, in);
+        copy_spinor_field(p2, in);
         M(p1, &out[0]);
-        spinor_field_mul_add_assign_f(p1, -par->shift[0], &out[0]);
+        mul_add_assign_spinor_field(p1, -par->shift[0], &out[0]);
         ++cgiter;
-        spinor_field_sub_assign_f(p2, p1);
+        sub_assign_spinor_field(p2, p1);
         /* use out[0] as trial solution */
     } else {
-        spinor_field_copy_f(p2, in); /* trial solution = 0 */
+        copy_spinor_field(p2, in); /* trial solution = 0 */
     }
-    innorm2 = spinor_field_sqnorm_f(in);
-    beta = sqrt(spinor_field_sqnorm_f(p2));
-    spinor_field_mul_f(p2, 1. / beta, p2);
-    spinor_field_zero_f(p1);
+    innorm2 = sqnorm_spinor_field(in);
+    beta = sqrt(sqnorm_spinor_field(p2));
+    mul_spinor_field(p2, 1. / beta, p2);
+    zero_spinor_field(p1);
     for (i = 0; i < (par->n); ++i) {
         r[i] = rho2[i] = beta;
         rho1[i] = 1.;
         c2[i] = -1.;
         rp[i] = s1[i] = s2[i] = c1[i] = 0.;
-        if (par->n != 1) { spinor_field_zero_f(&out[i]); }
-        spinor_field_zero_f(q1[i]);
-        spinor_field_zero_f(q2[i]);
+        if (par->n != 1) { zero_spinor_field(&out[i]); }
+        zero_spinor_field(q1[i]);
+        zero_spinor_field(q2[i]);
         flags[i] = 1;
     }
 
@@ -105,14 +105,14 @@ static int MINRES_mshift_core(short int *flags, mshift_par *par, spinor_operator
         ++cgiter;
 
         M(Mp, p2);
-        spinor_field_mul_add_assign_f(Mp, -par->shift[0], p2);
+        mul_add_assign_spinor_field(Mp, -par->shift[0], p2);
 
         /* compute alpha */
-        alpha = spinor_field_prod_re_f(Mp, p2);
+        alpha = prod_re_spinor_field(Mp, p2);
 
         /* update p1, p2 */
-        spinor_field_mul_add_assign_f(Mp, -beta, p1);
-        spinor_field_mul_add_assign_f(Mp, -alpha, p2);
+        mul_add_assign_spinor_field(Mp, -beta, p1);
+        mul_add_assign_spinor_field(Mp, -alpha, p2);
         sptmp = p1;
         p1 = p2;
         p2 = Mp;
@@ -120,10 +120,10 @@ static int MINRES_mshift_core(short int *flags, mshift_par *par, spinor_operator
 
         /* update beta */
         oldbeta = beta;
-        beta = sqrt(spinor_field_sqnorm_f(p2));
+        beta = sqrt(sqnorm_spinor_field(p2));
 
         /* normalize p2 */
-        spinor_field_mul_f(p2, 1. / beta, p2);
+        mul_spinor_field(p2, 1. / beta, p2);
 
         for (i = 0; i < (par->n); ++i) { /* update solutions */
             if (flags[i]) {
@@ -138,18 +138,18 @@ static int MINRES_mshift_core(short int *flags, mshift_par *par, spinor_operator
                 s1[i] = s2[i];
                 s2[i] = beta / k;
 
-                spinor_field_lc_f(Mp, -h / rho1[i], q1[i], -d / rho2[i], q2[i]);
+                lc_spinor_field(Mp, -h / rho1[i], q1[i], -d / rho2[i], q2[i]);
                 sptmp = q1[i];
                 q1[i] = q2[i];
                 q2[i] = sptmp; /* swap q1[i]<->q2[i] */
-                spinor_field_add_f(q2[i], p1, Mp);
+                add_spinor_field(q2[i], p1, Mp);
 
                 /* update rho */
                 rho1[i] = rho2[i];
                 rho2[i] = k;
 
                 /* update solution */
-                spinor_field_mul_add_assign_f(&out[i], r[i] * c2[i] / k, q2[i]);
+                mul_add_assign_spinor_field(&out[i], r[i] * c2[i] / k, q2[i]);
 
                 /* update residuum */
                 r[i] *= s2[i];
@@ -169,9 +169,9 @@ static int MINRES_mshift_core(short int *flags, mshift_par *par, spinor_operator
         double norm;
         M(Mp, &out[i]);
         ++cgiter;
-        spinor_field_mul_add_assign_f(Mp, -par->shift[i], &out[i]);
-        spinor_field_sub_f(Mp, Mp, in);
-        norm = spinor_field_sqnorm_f(Mp) / innorm2;
+        mul_add_assign_spinor_field(Mp, -par->shift[i], &out[i]);
+        sub_spinor_field(Mp, Mp, in);
+        norm = sqnorm_spinor_field(Mp) / innorm2;
         flags[i] = 1;
         if (fabs(norm) > par->err2) {
             flags[i] = 0;

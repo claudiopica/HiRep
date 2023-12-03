@@ -650,7 +650,7 @@ void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
     Dphi_flt_cpu_(out, in);
 
     rho = 4.f + (float)(m0);
-    spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
+    mul_add_assign_spinor_field_flt_cpu(out, rho, in);
 
 #ifdef BC_T_SF_ROTATED
     SFrho = (float)(3. * _update_par.SF_ds + _update_par.SF_zf - 4.);
@@ -717,8 +717,8 @@ void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
 
     rho = 4.f + (float)(m0);
 
-    spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
-    spinor_field_g5_assign_f_flt_cpu(out);
+    mul_add_assign_spinor_field_flt_cpu(out, rho, in);
+    g5_assign_spinor_field_flt_cpu(out);
     apply_BCs_on_spinor_field_flt(out);
 }
 
@@ -753,8 +753,8 @@ void Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) 
     rho = 4.f + (float)(m0);
     rho *= -rho; /* this minus sign is taken into account below */
 
-    spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
-    spinor_field_minus_f_flt_cpu(out, out);
+    mul_add_assign_spinor_field_flt_cpu(out, rho, in);
+    minus_spinor_field_flt_cpu(out, out);
     apply_BCs_on_spinor_field_flt(out);
 }
 
@@ -789,8 +789,8 @@ void Dphi_oepre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) 
     rho = 4.f + (float)(m0);
     rho *= -rho; /* this minus sign is taken into account below */
 
-    spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
-    spinor_field_minus_f_flt_cpu(out, out);
+    mul_add_assign_spinor_field_flt_cpu(out, rho, in);
+    minus_spinor_field_flt_cpu(out, out);
     apply_BCs_on_spinor_field_flt(out);
 }
 
@@ -820,9 +820,9 @@ void g5Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in
     rho = 4.f + (float)(m0);
     rho *= -rho; /* this minus sign is taken into account below */
 
-    spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
-    spinor_field_minus_f_flt_cpu(out, out);
-    spinor_field_g5_assign_f_flt_cpu(out);
+    mul_add_assign_spinor_field_flt_cpu(out, rho, in);
+    minus_spinor_field_flt_cpu(out, out);
+    g5_assign_spinor_field_flt_cpu(out);
     apply_BCs_on_spinor_field_flt(out);
 }
 

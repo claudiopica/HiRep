@@ -30,7 +30,7 @@ static void hasen_correct_pf(monomial const *m) {
 
     /* compute H(m)D^{-1}(m+dm)*pf */
     set_dirac_mass(par->mass + par->dm);
-    spinor_field_zero_f(tmp_pf); /* mshift inverter uses this as initial guess for 1 shift */
+    zero_spinor_field(tmp_pf); /* mshift inverter uses this as initial guess for 1 shift */
     g5QMR_mshift(&mpar, &D, par->pf, tmp_pf);
     set_dirac_mass(par->mass);
     H(par->pf, tmp_pf);
@@ -48,9 +48,9 @@ static void hasen_correct_la_pf(monomial const *m) {
     mpar.shift[0] = 0;
 
     /* compute D(m+dm)D^{-1}(m)*g5*pf */
-    spinor_field_g5_assign_f(par->pf);
+    g5_assign_spinor_field(par->pf);
     set_dirac_mass(par->mass);
-    spinor_field_zero_f(tmp_pf);
+    zero_spinor_field(tmp_pf);
     g5QMR_mshift(&mpar, &D, par->pf, tmp_pf);
     set_dirac_mass(par->mass + par->dm);
     D(par->pf, tmp_pf);

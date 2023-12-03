@@ -55,7 +55,7 @@ void force_rhmc(double dt, void *vpar) {
 
     for (int k = 0; k < par->n_pf; k++) {
         /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
-        if (mpar.n == 1) { spinor_field_zero_f(chi); }
+        if (mpar.n == 1) { zero_spinor_field(chi); }
 
 #ifdef TIMING
 #ifdef TIMING_WITH_BARRIERS

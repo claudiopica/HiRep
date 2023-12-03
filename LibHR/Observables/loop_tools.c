@@ -266,12 +266,12 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
     if (source_type == 0) {
         source = alloc_spinor_field(1, &glattice);
         prop = alloc_spinor_field(1, &glattice);
-        spinor_field_zero_f(prop);
+        zero_spinor_field(prop);
     } else {
         source = alloc_spinor_field(4, &glattice);
         prop = alloc_spinor_field(4, &glattice);
         for (int i = 0; i < 4; i++) {
-            spinor_field_zero_f(prop + i);
+            zero_spinor_field(prop + i);
         }
     }
 
@@ -303,7 +303,7 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
     if (source_type == 1) {
         u_gauge_old = alloc_suNg_field(&glattice);
         suNg_field_copy(u_gauge_old, u_gauge);
-        spinor_field_zero_f(prop);
+        zero_spinor_field(prop);
         //Fix the Gauge
         double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
                               1.8, //overrelax

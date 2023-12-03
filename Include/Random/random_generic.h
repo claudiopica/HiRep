@@ -22,10 +22,10 @@
         suNg_field *: random_u((suNg_field *)s1),                                   \
         suNf_field *: random_u_f((suNf_field *)s1),                                 \
         suNfc_field *: random_suNfc_field_cpu((suNfc_field *)s1),                   \
-        suNg_field_flt *: random_gfield_flt_cpu((suNg_field_flt *)s1),              \
-        suNf_field_flt *: random_gfield_f_flt_cpu((suNf_field_flt *)s1),            \
+        suNg_field_flt *: random_suNg_field_flt_cpu((suNg_field_flt *)s1),          \
+        suNf_field_flt *: random_suNf_field_flt_cpu((suNf_field_flt *)s1),          \
         suNg_scalar_field *: random_suNg_scalar_field_cpu((suNg_scalar_field *)s1), \
-        suNg_av_field *: random_avfield_cpu((suNg_av_field *)s1),                   \
+        suNg_av_field *: random_suNg_av_field_cpu((suNg_av_field *)s1),             \
         gtransf *: random_gtransf_cpu((gtransf *)s1),                               \
         clover_term *: random_clover_term_cpu((clover_term *)s1),                   \
         clover_force *: random_clover_force_cpu((clover_force *)s1),                \

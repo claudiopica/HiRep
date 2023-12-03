@@ -133,15 +133,15 @@ int main(int argc, char *argv[]) {
     Timer clock;
     timer_set(&clock);
 
-    _SPEED_TEST_LIN_ALG("Copy spinor field", 1, 1, 0, in, spinor_field_copy_f(&in[0], &in[1]););
+    _SPEED_TEST_LIN_ALG("Copy spinor field", 1, 1, 0, in, copy_spinor_field(&in[0], &in[1]););
 
-    _SPEED_TEST_LIN_ALG("Spinor field product", 1, 1, NF * 4 * 2, in, spinor_field_prod_f(&in[0], &in[1]););
+    _SPEED_TEST_LIN_ALG("Spinor field product", 1, 1, NF * 4 * 2, in, prod_spinor_field(&in[0], &in[1]););
 
-    _SPEED_TEST_LIN_ALG("Square norm", 1, 0, NF * 4 * 2, in, spinor_field_sqnorm_f(&in[0]););
+    _SPEED_TEST_LIN_ALG("Square norm", 1, 0, NF * 4 * 2, in, sqnorm_spinor_field(&in[0]););
 
-    _SPEED_TEST_LIN_ALG("g5 application", 1, 1, NF * 2 * 2, in, spinor_field_g5_f(&in[0], &in[1]););
+    _SPEED_TEST_LIN_ALG("g5 application", 1, 1, NF * 2 * 2, in, g5_spinor_field(&in[0], &in[1]););
 
-    _SPEED_TEST_LIN_ALG("g5 mulc add assign", 1, 1, NF * 6 * 2, in, spinor_field_g5_mulc_add_assign_f(&in[0], c, &in[1]););
+    _SPEED_TEST_LIN_ALG("g5 mulc add assign", 1, 1, NF * 6 * 2, in, g5_mulc_add_assign_spinor_field(&in[0], c, &in[1]););
 
     // Timer resolution
     for (int i = 0; i < 1; ++i) {

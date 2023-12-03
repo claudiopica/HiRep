@@ -6,8 +6,8 @@
 #include "libhr.h"
 #include <string.h>
 
-static double EPSILON = 1.e-14;
-static float EPSILON_FLT = 1.e-4;
+//static double EPSILON = 1.e-14;
+//static float EPSILON_FLT = 1.e-4;
 
 // logger level 10 for a more verbose setting
 
@@ -60,49 +60,11 @@ float spinor_field_findmax_f_flt(spinor_field_flt *in) {
 /// @brief  Check if the two inputs are the same within a given relative precision of EPSILON
 /// @param abs1
 /// @param abs2
-void compare_diff(int errors, double abs1, double abs2) {
+void compare_diff(int errors, double abs1, double abs2, char tag[], double precision) {
     double rel = fabs(abs1 - abs2) / fabs(abs1);
-    const char *msg = (rel > EPSILON) ? ++errors, "[FAIL]" : "[ OK ]";
-    lprintf("GPU TEST", 2, "%s rel=%.10e abs=%.10e diff=%.10e\n", msg, rel, fabs(abs1), fabs(abs1 - abs2));
+    const char *msg = (rel > precision) ? ++errors, "[FAIL]" : "[ OK ]";
+    lprintf(tag, 2, "%s rel=%.10e abs=%.10e diff=%.10e\n", msg, rel, fabs(abs1), fabs(abs1 - abs2));
 }
-
-/// @brief  Check if the two inputs are the same within a given relative precision of EPSILON
-/// @param abs1
-/// @param abs2
-void compare_diff_flt(int errors, float abs1, float abs2) {
-    float rel = fabs(abs1 - abs2) / fabs(abs1);
-    const char *msg = (rel > EPSILON_FLT) ? ++errors, "[FAIL]" : "[ OK ]";
-    lprintf("GPU TEST", 2, "%s rel=%.10e abs=%.10e diff=%.10e\n", msg, rel, fabs(abs1), fabs(abs1 - abs2));
-}
-
-#ifdef WITH_GPU
-/// @brief Compare two spinor fields in the cpu and gpu parts of out by comparing the MAX and L2 norm
-/// @param out Input spinor_field. Th function compare its cpu and gpu parts
-/// @param diff Additional spinor_field used for scratch work space
-void compare_cpu_gpu(int errors, spinor_field *out, spinor_field *diff) {
-    spinor_field_copy_f_gpu(diff, out);
-    copy_from_gpu_spinor_field(diff);
-    spinor_field_sub_assign_f_cpu(diff, out);
-    double res = spinor_field_findmax_f(diff);
-    double norm2 = spinor_field_sqnorm_f_cpu(diff);
-    const char *msg = (res > EPSILON) ? ++errors, "[FAIL]" : "[ OK ]";
-    lprintf("GPU TEST", 2, "%s MAX norm=%.10e L2 norm=%.10e\n", msg, res, sqrt(norm2));
-}
-
-/// @brief Compare two spinor fields in the cpu and gpu parts of out by comparing the MAX and L2 norm
-/// @param out Input spinor_field. Th function compare its cpu and gpu parts
-/// @param diff Additional spinor_field used for scratch work space
-void compare_cpu_gpu_flt(int errors, spinor_field_flt *out, spinor_field_flt *diff) {
-    spinor_field_copy_f_flt_gpu(diff, out);
-    copy_from_gpu_spinor_field_flt(diff);
-    spinor_field_sub_assign_f_flt_cpu(diff, out);
-    float res = spinor_field_findmax_f_flt(diff);
-    float norm2 = spinor_field_sqnorm_f_flt_cpu(diff);
-    const char *msg = (res > EPSILON_FLT) ? ++errors, "[FAIL]" : "[ OK ]";
-    lprintf("GPU TEST", 2, "%s MAX norm=%.10e L2 norm=%.10e\n", msg, res, sqrt(norm2));
-}
-
-#endif
 
 void evaluate_timer_resolution(Timer clock) {
     timer_lap(&clock); //time in microseconds
@@ -199,7 +161,7 @@ void setup_random_fields_flt(int n, spinor_field_flt s[]) {
 void spinor_field_sanity_check(int ninputs, spinor_field *in) {
     for (int i = 0; i < ninputs; i++) {
         spinor_field *s = in + i;
-        double res = spinor_field_sqnorm_f(s);
+        double res = sqnorm_spinor_field(s);
         lprintf("SANITY CHECK", 10, "Input spinor field nr %d square norm: %lf (should be nonzero)\n", i, res);
     }
 }
@@ -207,7 +169,7 @@ void spinor_field_sanity_check(int ninputs, spinor_field *in) {
 void spinor_field_sanity_check_flt(int ninputs, spinor_field_flt *in) {
     for (int i = 0; i < ninputs; i++) {
         spinor_field_flt *s = in + i;
-        double res = spinor_field_sqnorm_f_flt(s);
+        double res = sqnorm_spinor_field_flt(s);
         lprintf("SANITY CHECK", 10, "Input spinor field nr %d square norm: %lf (should be nonzero)\n", i, res);
     }
 }
@@ -284,519 +246,6 @@ void rand_field_flt(float *f, int n) {
     }
 }
 
-void copy_suNg_field_cpu(suNg_field *out, suNg_field *in) {
-    memcpy(out->ptr, in->ptr, 4 * out->type->gsize_gauge * sizeof(suNg));
-}
-
-void copy_suNg_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in) {
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge * sizeof(suNg_vector));
-}
-
-void copy_suNg_field_flt_cpu(suNg_field_flt *out, suNg_field_flt *in) {
-    memcpy(out->ptr, in->ptr, 4 * out->type->gsize_gauge * sizeof(suNg_flt));
-}
-
-void copy_suNf_field_cpu(suNf_field *out, suNf_field *in) {
-    memcpy(out->ptr, in->ptr, 4 * out->type->gsize_gauge * sizeof(suNf));
-}
-
-void copy_suNf_field_flt_cpu(suNf_field_flt *out, suNf_field_flt *in) {
-    memcpy(out->ptr, in->ptr, 4 * out->type->gsize_gauge * sizeof(suNf_flt));
-}
-
-void copy_suNg_av_field_cpu(suNg_av_field *out, suNg_av_field *in) {
-    memcpy(out->ptr, in->ptr, 4 * out->type->gsize_gauge * sizeof(suNg_algebra_vector));
-}
-
-void copy_scalar_field_cpu(scalar_field *out, scalar_field *in) {
-    memcpy(out->ptr, in->ptr, out->type->gsize_spinor * sizeof(double));
-}
-
-void copy_gtransf_cpu(gtransf *out, gtransf *in) {
-    memcpy(out->ptr, in->ptr, out->type->gsize_spinor * sizeof(suNg));
-}
-
-void copy_ldl_field_cpu(ldl_field *out, ldl_field *in) {
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge * sizeof(ldl_t));
-}
-
-void copy_clover_term_cpu(clover_term *out, clover_term *in) {
-    memcpy(out->ptr, in->ptr, 4 * out->type->gsize_gauge * sizeof(suNfc));
-}
-
-void copy_clover_force_cpu(clover_force *out, clover_force *in) {
-    memcpy(out->ptr, in->ptr, 6 * out->type->gsize_gauge * sizeof(suNf));
-}
-
-void copy_staple_field_cpu(staple_field *out, staple_field *in) {
-    memcpy(out->ptr, in->ptr, 3 * out->type->gsize_gauge * sizeof(suNg));
-}
-
-// ** SUB ASSIGN **
-void sub_assign_suNg_field_cpu(suNg_field *out, suNg_field *in) {
-    suNg *site_out, *site_in;
-    _MASTER_FOR(in->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            site_out = _4FIELD_AT(out, ix, comp);
-            site_in = _4FIELD_AT(in, ix, comp);
-            _suNg_sub_assign((*site_out), (*site_in));
-        }
-    }
-}
-
-void sub_assign_suNg_field_flt_cpu(suNg_field_flt *out, suNg_field_flt *in) {
-    suNg_flt *site_out, *site_in;
-    _MASTER_FOR(in->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            site_out = _4FIELD_AT(out, ix, comp);
-            site_in = _4FIELD_AT(in, ix, comp);
-            _suNg_sub_assign((*site_out), (*site_in));
-        }
-    }
-}
-
-void sub_assign_suNf_field_cpu(suNf_field *out, suNf_field *in) {
-    suNf *site_out, *site_in;
-    _MASTER_FOR(in->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            site_out = _4FIELD_AT(out, ix, comp);
-            site_in = _4FIELD_AT(in, ix, comp);
-            _suNf_sub_assign((*site_out), (*site_in));
-        }
-    }
-}
-
-void sub_assign_suNf_field_flt_cpu(suNf_field_flt *out, suNf_field_flt *in) {
-    suNf_flt *site_out, *site_in;
-    _MASTER_FOR(in->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            site_out = _4FIELD_AT(out, ix, comp);
-            site_in = _4FIELD_AT(in, ix, comp);
-            _suNf_sub_assign((*site_out), (*site_in));
-        }
-    }
-}
-
-void sub_assign_suNg_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in) {
-    suNg_vector *site_out, *site_in;
-    _MASTER_FOR(in->type, ix) {
-        site_out = _FIELD_AT(out, ix);
-        site_in = _FIELD_AT(in, ix);
-        _vector_sub_assign_g((*site_out), (*site_in));
-    }
-}
-
-void sub_assign_suNg_av_field_cpu(suNg_av_field *out, suNg_av_field *in) {
-    suNg_algebra_vector *site_in, *site_out;
-    _MASTER_FOR(in->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            site_out = _4FIELD_AT(out, ix, comp);
-            site_in = _4FIELD_AT(in, ix, comp);
-            _algebra_vector_sub_assign_g((*site_out), (*site_in));
-        }
-    }
-}
-
-void sub_assign_scalar_field_cpu(scalar_field *out, scalar_field *in) {
-    double *site_in, *site_out;
-    _MASTER_FOR(in->type, ix) {
-        site_out = _FIELD_AT(out, ix);
-        site_in = _FIELD_AT(in, ix);
-        (*site_out) -= (*site_in);
-    }
-}
-
-void sub_assign_gtransf_cpu(gtransf *out, gtransf *in) {
-    suNg *site_in, *site_out;
-    _MASTER_FOR(in->type, ix) {
-        site_out = _FIELD_AT(out, ix);
-        site_in = _FIELD_AT(in, ix);
-        _suNg_sub_assign((*site_out), (*site_in));
-    }
-}
-
-void sub_assign_ldl_field_cpu(ldl_field *out, ldl_field *in) {
-    ldl_t *site_out, *site_in;
-    _MASTER_FOR(in->type, ix) {
-        site_out = _FIELD_AT(out, ix);
-        site_in = _FIELD_AT(in, ix);
-        for (int i = 0; i < NF * (2 * NF + 1); ++i) {
-            _complex_sub_assign((*site_out).up[i], (*site_in).up[i]);
-            _complex_sub_assign((*site_out).dn[i], (*site_in).dn[i]);
-        }
-    }
-}
-
-void sub_assign_clover_term_cpu(clover_term *out, clover_term *in) {
-    suNfc *site_out, *site_in;
-    _MASTER_FOR(in->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            site_out = _4FIELD_AT(out, ix, comp);
-            site_in = _4FIELD_AT(in, ix, comp);
-            _suNf_sub_assign((*site_out), (*site_in));
-        }
-    }
-}
-
-void sub_assign_clover_force_cpu(clover_force *out, clover_force *in) {
-    suNf *site_out, *site_in;
-    _MASTER_FOR(in->type, ix) {
-        for (int comp = 0; comp < 6; comp++) {
-            site_out = _6FIELD_AT(out, ix, comp);
-            site_in = _6FIELD_AT(in, ix, comp);
-            _suNf_sub_assign((*site_out), (*site_in));
-        }
-    }
-}
-
-void sub_assign_staple_field_cpu(staple_field *out, staple_field *in) {
-    suNg *site_out, *site_in;
-    _MASTER_FOR(in->type, ix) {
-        for (int comp = 0; comp < 3; comp++) {
-            site_out = _3FIELD_AT(out, ix, comp);
-            site_in = _3FIELD_AT(in, ix, comp);
-            _suNg_sub_assign((*site_out), (*site_in));
-        }
-    }
-}
-
-// ** SQNORM **
-double sqnorm_suNg_field_cpu(suNg_field *f) {
-    suNg *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            double tmp;
-            site = _4FIELD_AT(f, ix, comp);
-            _suNg_sqnorm(tmp, (*site));
-            sqnorm += tmp;
-        }
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-float sqnorm_suNg_field_flt_cpu(suNg_field_flt *f) {
-    suNg_flt *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            float tmp;
-            site = _4FIELD_AT(f, ix, comp);
-            _suNg_sqnorm(tmp, (*site));
-            sqnorm += (double)tmp;
-        }
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return (float)sqnorm;
-}
-
-double sqnorm_suNf_field_cpu(suNf_field *f) {
-    suNf *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            double tmp;
-            site = _4FIELD_AT(f, ix, comp);
-            _suNf_sqnorm(tmp, (*site));
-            sqnorm += tmp;
-        }
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-float sqnorm_suNf_field_flt_cpu(suNf_field_flt *f) {
-    suNf_flt *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            float tmp;
-            site = _4FIELD_AT(f, ix, comp);
-            _suNf_sqnorm(tmp, (*site));
-            sqnorm += (double)tmp;
-        }
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return (float)sqnorm;
-}
-
-double sqnorm_suNg_scalar_field_cpu(suNg_scalar_field *f) {
-    suNg_vector *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        site = _FIELD_AT(f, ix);
-        _vector_prod_add_assign_re_g(sqnorm, (*site), (*site));
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-double sqnorm_suNg_av_field_cpu(suNg_av_field *f) {
-    suNg_algebra_vector *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            double tmp;
-            site = _4FIELD_AT(f, ix, comp);
-            _algebra_vector_sqnorm_g(tmp, (*site));
-            sqnorm += tmp;
-        }
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-double sqnorm_scalar_field_cpu(scalar_field *f) {
-    double *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        site = _FIELD_AT(f, ix);
-        sqnorm += (*site) * (*site);
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-double sqnorm_gtransf_cpu(gtransf *f) {
-    suNg *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        double tmp;
-        site = _FIELD_AT(f, ix);
-        _suNg_sqnorm(tmp, (*site));
-        sqnorm += tmp;
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-double sqnorm_ldl_field_cpu(ldl_field *f) {
-    ldl_t *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        site = _FIELD_AT(f, ix);
-        for (int i = 0; i < NF * (2 * NF + 1); ++i) {
-            hr_complex up_comp = (*site).up[i];
-            hr_complex dn_comp = (*site).dn[i];
-            sqnorm += _complex_re(_complex_prod(up_comp, up_comp));
-            sqnorm += _complex_re(_complex_prod(dn_comp, dn_comp));
-        }
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-double sqnorm_clover_term_cpu(clover_term *f) {
-    suNfc *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        for (int comp = 0; comp < 4; comp++) {
-            double tmp = 0.0;
-            site = _4FIELD_AT(f, ix, comp);
-            _suNfc_sqnorm(tmp, (*site));
-            sqnorm += tmp;
-        }
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-double sqnorm_clover_force_cpu(clover_force *f) {
-    suNf *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        for (int comp = 0; comp < 6; comp++) {
-            double tmp;
-            site = _6FIELD_AT(f, ix, comp);
-            _suNf_sqnorm(tmp, (*site));
-            sqnorm += tmp;
-        }
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-double sqnorm_spinor_field_cpu(spinor_field *f) {
-    suNf_spinor *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        site = _FIELD_AT(f, ix);
-        double tmp;
-        _spinor_prod_re_f(tmp, (*site), (*site));
-        sqnorm += tmp;
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-float sqnorm_spinor_field_flt_cpu(spinor_field_flt *f) {
-    suNf_spinor_flt *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        site = _FIELD_AT(f, ix);
-        float tmp;
-        _spinor_prod_re_f(tmp, (*site), (*site));
-        sqnorm += (double)tmp;
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return (float)sqnorm;
-}
-
-double sqnorm_staple_field_cpu(staple_field *f) {
-    suNg *site;
-    double sqnorm = 0.0;
-    _MASTER_FOR(f->type, ix) {
-        for (int comp = 0; comp < 3; comp++) {
-            double tmp;
-            site = _3FIELD_AT(f, ix, comp);
-            _suNg_sqnorm(tmp, (*site));
-            sqnorm += tmp;
-        }
-    }
-
-#ifdef WITH_MPI
-    global_sum(&sqnorm, 1);
-#endif
-    return sqnorm;
-}
-
-// Set field to zero
-void zero_suNg_field_cpu(suNg_field *f) {
-    int len = 4 * f->type->gsize_gauge * sizeof(suNg) / sizeof(double);
-    double *dbl_ptr = (double *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        dbl_ptr[i] = 0.0;
-    }
-}
-
-void zero_scalar_field_cpu(scalar_field *f) {
-    int len = f->type->gsize_gauge;
-    double *dbl_ptr = f->ptr;
-    for (int i = 0; i < len; ++i) {
-        dbl_ptr[i] = 0.0;
-    }
-}
-
-void zero_suNf_field_cpu(suNf_field *f) {
-    int len = 4 * f->type->gsize_gauge * sizeof(suNf) / sizeof(double);
-    double *dbl_ptr = (double *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        dbl_ptr[i] = 0.0;
-    }
-}
-
-void zero_suNg_field_flt_cpu(suNg_field_flt *f) {
-    int len = 4 * f->type->gsize_gauge * sizeof(suNg_flt) / sizeof(float);
-    float *flt_ptr = (float *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        flt_ptr[i] = 0.0f;
-    }
-}
-
-void zero_suNf_field_flt_cpu(suNf_field_flt *f) {
-    int len = 4 * f->type->gsize_gauge * sizeof(suNf_flt) / sizeof(float);
-    float *flt_ptr = (float *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        flt_ptr[i] = 0.0f;
-    }
-}
-
-void zero_suNg_scalar_field_cpu(suNg_scalar_field *f) {
-    int len = f->type->gsize_gauge * sizeof(suNg_vector) / sizeof(double);
-    double *dbl_ptr = (double *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        dbl_ptr[i] = 0.0;
-    }
-}
-
-void zero_suNg_av_field_cpu(suNg_av_field *f) {
-    int len = 4 * f->type->gsize_gauge * sizeof(suNg_algebra_vector) / sizeof(double);
-    double *dbl_ptr = (double *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        dbl_ptr[i] = 0.0;
-    }
-}
-
-void zero_gtransf_cpu(gtransf *f) {
-    int len = f->type->gsize_gauge * sizeof(suNg_field) / sizeof(double);
-    double *dbl_ptr = (double *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        dbl_ptr[i] = 0.0;
-    }
-}
-
-void zero_ldl_field_cpu(ldl_field *f) {
-    int len = f->type->gsize_gauge * sizeof(ldl_t) / sizeof(double);
-    double *dbl_ptr = (double *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        dbl_ptr[i] = 0.0;
-    }
-}
-
-void zero_clover_term_cpu(clover_term *f) {
-    int len = 4 * f->type->gsize_gauge * sizeof(suNfc) / sizeof(double);
-    double *dbl_ptr = (double *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        dbl_ptr[i] = 0.0;
-    }
-}
-
-void zero_clover_force_cpu(clover_force *f) {
-    int len = 6 * f->type->gsize_gauge * sizeof(suNf) / sizeof(double);
-    double *dbl_ptr = (double *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        dbl_ptr[i] = 0.0;
-    }
-}
-
-void zero_staple_field_cpu(staple_field *f) {
-    int len = 3 * f->type->gsize_gauge * sizeof(suNg) / sizeof(double);
-    double *dbl_ptr = (double *)(f->ptr);
-    for (int i = 0; i < len; ++i) {
-        dbl_ptr[i] = 0.0;
-    }
-}
-
 // ** RANDOM FIELDS FOR TESTING **
 void random_spinor_field_cpu(spinor_field *f) {
     int n = f->type->gsize_spinor * sizeof(suNf_spinor) / sizeof(double);
@@ -823,12 +272,22 @@ void random_suNg_field_flt_cpu(suNg_field_flt *f) {
     ranlxs((float *)(f->ptr), n);
 }
 
+void random_suNf_field_flt_cpu(suNf_field_flt *f) {
+    int n = 4 * f->type->gsize_gauge * sizeof(suNf_flt) / sizeof(float);
+    ranlxs((float *)(f->ptr), n);
+}
+
 void random_suNf_field_cpu(suNf_field *f) {
     int n = 4 * f->type->gsize_gauge * sizeof(suNf) / sizeof(double);
     ranlxd((double *)(f->ptr), n);
 }
 
-void random_suNf_field_flt_cpu(suNf_field_flt *f) {
+void random_suNfc_field_cpu(suNfc_field *f) {
+    int n = 4 * f->type->gsize_gauge * sizeof(suNfc) / sizeof(double);
+    ranlxd((double *)(f->ptr), n);
+}
+
+void random_gfield_f_flt_cpu(suNf_field_flt *f) {
     int n = 4 * f->type->gsize_gauge * sizeof(suNf_flt) / sizeof(float);
     ranlxs((float *)(f->ptr), n);
 }

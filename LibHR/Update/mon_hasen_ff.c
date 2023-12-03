@@ -41,13 +41,13 @@ static void hasen_ff_correct_pf(monomial const *m) {
 
     set_ff_dirac_mass(par->mass);
     set_ff_dirac_shift(par->dm);
-    spinor_field_zero_f(tmp_pf);
+    zero_spinor_field(tmp_pf);
     cg_mshift(&cgpar, &Dff_sq, par->pf, tmp_pf);
     Dff(par->pf, tmp_pf);
-    spinor_field_g5_f(tmp_pf, par->pf);
+    g5_spinor_field(tmp_pf, par->pf);
 
     set_ff_dirac_shift(0.);
-    spinor_field_g5_assign_f(tmp_pf);
+    g5_assign_spinor_field(tmp_pf);
     Dff_dagger(par->pf, tmp_pf);
 }
 
@@ -62,15 +62,15 @@ static void hasen_ff_correct_la_pf(monomial const *m) {
     cgpar.max_iter = 0;
     cgpar.err2 = m->data.MT_prec;
 
-    spinor_field_zero_f(tmp_pf);
+    zero_spinor_field(tmp_pf);
     set_ff_dirac_mass(par->mass);
     cg_mshift(&cgpar, &Dff_sq, par->pf, tmp_pf);
     Dff(par->pf, tmp_pf);
-    spinor_field_g5_f(tmp_pf, par->pf);
+    g5_spinor_field(tmp_pf, par->pf);
 
     /* S = | (D+b) D^{-1} g5 psi |^2 */
     set_ff_dirac_shift(par->dm);
-    spinor_field_g5_assign_f(tmp_pf);
+    g5_assign_spinor_field(tmp_pf);
     Dff_dagger(par->pf, tmp_pf);
 
     set_ff_dirac_shift(0.);

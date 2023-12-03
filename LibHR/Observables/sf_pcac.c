@@ -110,7 +110,7 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
 
     /*U' and P+ on source (actually P- since there is a g5 that needs to be commuted through)*/
     for (int s = 0; s < 4 * NF; s++) {
-        spinor_field_zero_f(&source[s]);
+        zero_spinor_field(&source[s]);
         if (COORD[0] == 0) {
             _spinor_zero_f(stmp[0]);
             stmp[0].c[s % 4].c[s / 4] = 1.;
@@ -134,7 +134,7 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
 
     /*get propagator to all points*/
     for (int s = 0; s < 4 * NF; s++) {
-        spinor_field_zero_f(&prop[s]);
+        zero_spinor_field(&prop[s]);
         SF_quark_propagator(&source[s], mass, &prop[s], acc);
     }
 
@@ -229,7 +229,7 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
     /*Create wall source with g5 factor at t=T-2*/
     /*U and P- on source (again actually use P+ to account for commuting with g5 in source)*/
     for (int s = 0; s < 4 * NF; s++) {
-        spinor_field_zero_f(&source[s]);
+        zero_spinor_field(&source[s]);
         if (COORD[0] == NP_T - 1) {
             _spinor_zero_f(stmp[0]);
             stmp[0].c[s % 4].c[s / 4] = 1.;
@@ -253,7 +253,7 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
 
     /*get propagator to all points*/
     for (int s = 0; s < 4 * NF; s++) {
-        spinor_field_zero_f(&prop[s]);
+        zero_spinor_field(&prop[s]);
         SF_quark_propagator(&source[s], mass, &prop[s], acc);
     }
 
@@ -338,7 +338,7 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
     /******** Construction of the 2 sources**************/
 
     for (s1 = 0; s1 < 4 * NF; s1++) {
-        spinor_field_zero_f(&source[s1]);
+        zero_spinor_field(&source[s1]);
         _spinor_zero_f(chi[s1]);
         chi[s1].c[s1 % 4].c[s1 / 4] = 1.;
         if (COORD[0] == 0) {
@@ -364,8 +364,8 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
 
   */
     for (s1 = 0; s1 < 4 * NF; s1++) {
-        spinor_field_zero_f(&prop_uu[s1]);
-        spinor_field_zero_f(&prop_dd[s1]);
+        zero_spinor_field(&prop_uu[s1]);
+        zero_spinor_field(&prop_dd[s1]);
 
         SF_quark_propagator(&source[s1], mass, &prop_uu[s1], acc);
 

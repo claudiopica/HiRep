@@ -45,7 +45,7 @@ static const int _g5_g0g5_re = NCHANNELS - 1;
 
 /*static void create_diluted_source(spinor_field *source, int tau, int beta) {*/
 /*  int c[4];*/
-/*  spinor_field_zero_f(source);*/
+/*  zero_spinor_field(source);*/
 /*  if(COORD[0]==tau/T) {*/
 /*    c[0]=tau%T;*/
 /*    for(c[1]=0; c[1]<X; c[1]++)*/
@@ -57,7 +57,7 @@ static const int _g5_g0g5_re = NCHANNELS - 1;
 
 #ifdef POINT_TO_ALL
 static void create_point_source_even(spinor_field *source, int beta, int b) {
-    spinor_field_zero_f(source);
+    zero_spinor_field(source);
     if (COORD[0] == 0 && COORD[1] == 0 && COORD[2] == 0 && COORD[3] == 0) {
         int ix = ipt(0, 0, 0, 0);
         _FIELD_AT(source, ix)->c[beta].c[b] = 1.;
@@ -66,7 +66,7 @@ static void create_point_source_even(spinor_field *source, int beta, int b) {
 #else
 static void create_diluted_source_even(spinor_field *source, int tau, int beta) {
     int c[4];
-    spinor_field_zero_f(source);
+    zero_spinor_field(source);
     if (COORD[0] == tau / T) {
         c[0] = tau % T;
         for (c[1] = 0; c[1] < X; c[1]++) {
@@ -82,7 +82,7 @@ static void create_diluted_source_even(spinor_field *source, int tau, int beta) 
     }
 
 #ifndef NDEBUG
-    double norm = spinor_field_sqnorm_f(source);
+    double norm = sqnorm_spinor_field(source);
     lprintf("Z2SEMWALL", 0, "Source sqnorm (must be %.0f) = %e\n", (.5 * NF) * GLB_VOL3, norm);
 #endif
 }
@@ -149,13 +149,13 @@ static void z2semwall_qprop_init(int nm, double *m, double acc) {
 
         /* noisy background */
         gaussian_spinor_field(QMR_noise);
-        norm = sqrt(spinor_field_sqnorm_f(QMR_noise));
-        spinor_field_mul_f(QMR_noise, 1. / norm, QMR_noise);
+        norm = sqrt(sqnorm_spinor_field(QMR_noise));
+        mul_spinor_field(QMR_noise, 1. / norm, QMR_noise);
     }
 
     /* invert noise */
     for (i = 0; i < QMR_par.n; ++i) {
-        spinor_field_zero_f(&QMR_resdn[i]);
+        zero_spinor_field(&QMR_resdn[i]);
     }
     cgiter += g5QMR_mshift(&QMR_par, &D_pre, QMR_noise, QMR_resdn);
 
@@ -164,8 +164,8 @@ static void z2semwall_qprop_init(int nm, double *m, double acc) {
         hmass_pre = mass[i];
         D_pre(test_e, &QMR_resdn[i]);
         ++cgiter;
-        spinor_field_sub_assign_f(test_e, QMR_noise);
-        norm = spinor_field_sqnorm_f(test_e);
+        sub_assign_spinor_field(test_e, QMR_noise);
+        norm = sqnorm_spinor_field(test_e);
         lprintf("Z2SEMWALL", 0, "g5QMR_eo residuum of source [%d] = %e\n", i, norm);
         hmass_pre = mass[0];
     }
@@ -221,8 +221,8 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), 
         hmass_pre = mass[i];
         D_pre(test_e, &QMR_resdn[i]);
         ++cgiter;
-        spinor_field_sub_assign_f(test_e, QMR_noise);
-        norm = spinor_field_sqnorm_f(test_e);
+        sub_assign_spinor_field(test_e, QMR_noise);
+        norm = sqnorm_spinor_field(test_e);
         lprintf("Z2SEMWALL", 0, "g5QMR_eo residuum of source QMR_noise [%d] = %e\n", i, norm);
         hmass_pre = mass[0];
 #endif /* NDEBUG */
@@ -238,11 +238,11 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), 
 #endif
         (*Gamma)(_FIELD_AT(eta2, ix), _FIELD_AT(eta_in, ix));
     }
-    spinor_field_add_assign_f(eta2, QMR_noise);
+    add_assign_spinor_field(eta2, QMR_noise);
 
     /* invert source */
     for (i = 0; i < QMR_par.n; ++i) {
-        spinor_field_zero_f(&resd[i]);
+        zero_spinor_field(&resd[i]);
     }
     cgiter += g5QMR_mshift(&QMR_par, &D_pre, eta2, resd);
 
@@ -252,16 +252,16 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), 
         hmass_pre = mass[i];
         D_pre(test_e, &resd[i]);
         ++cgiter;
-        spinor_field_sub_assign_f(test_e, eta2);
-        norm = spinor_field_sqnorm_f(test_e);
+        sub_assign_spinor_field(test_e, eta2);
+        norm = sqnorm_spinor_field(test_e);
         lprintf("Z2SEMWALL", 0, "g5QMR_eo residuum of source Gamma(eta_in)+QMR_noise [%d] = %e\n", i, norm);
         hmass_pre = mass[0];
 #endif /* NDEBUG */
 
         /* substract noise */
-        spinor_field_sub_assign_f(&resd[i], &QMR_resdn[i]);
+        sub_assign_spinor_field(&resd[i], &QMR_resdn[i]);
 #ifndef NDEBUG
-        spinor_field_sub_assign_f(eta2, QMR_noise);
+        sub_assign_spinor_field(eta2, QMR_noise);
 #endif /* NDEBUG */
 
 #ifndef NDEBUG
@@ -269,8 +269,8 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), 
         hmass_pre = mass[i];
         D_pre(test_e, &resd[i]);
         ++cgiter;
-        spinor_field_sub_assign_f(test_e, eta2);
-        norm = spinor_field_sqnorm_f(test_e);
+        sub_assign_spinor_field(test_e, eta2);
+        norm = sqnorm_spinor_field(test_e);
         lprintf("Z2SEMWALL", 0, "g5QMR_eo residuum of source Gamma(eta_in) [%d] = %e\n", i, norm);
         hmass_pre = mass[0];
 #endif /* NDEBUG */
@@ -279,11 +279,11 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), 
         qprop_mask = psi_out[i];
         qprop_mask.type = &glat_even;
         /* qprop_mask.ptr=psi_out[i].ptr+glat_even.master_shift; */
-        spinor_field_mul_f(&qprop_mask, (4. + mass[i]), &resd[i]);
+        mul_spinor_field(&qprop_mask, (4. + mass[i]), &resd[i]);
         qprop_mask.type = &glat_odd;
         qprop_mask.ptr = psi_out[i].ptr + glat_odd.master_shift;
         Dphi_(&qprop_mask, &resd[i]);
-        spinor_field_minus_f(&qprop_mask, &qprop_mask);
+        minus_spinor_field(&qprop_mask, &qprop_mask);
         if (i & 1) { ++cgiter; /* count only half of calls. works because the number of sources is even */ }
 
 #ifndef NDEBUG
@@ -291,7 +291,7 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), 
         hmass = mass[i];
         D(&test[0], &psi_out[i]);
         ++cgiter;
-        spinor_field_zero_f(&test[1]);
+        zero_spinor_field(&test[1]);
 #ifdef WITH_FUSE_MASTER_FOR
         _FUSE_MASTER_FOR(&glat_even, ix) {
             _FUSE_IDX(&glat_even, ix);
@@ -301,8 +301,8 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor *, suNf_spinor *), 
 
             (*Gamma)(_FIELD_AT(&test[1], ix), _FIELD_AT(eta_in, ix));
         }
-        spinor_field_sub_assign_f(&test[0], &test[1]);
-        norm = spinor_field_sqnorm_f(&test[0]);
+        sub_assign_spinor_field(&test[0], &test[1]);
+        norm = sqnorm_spinor_field(&test[0]);
         lprintf("Z2SEMWALL", 0, "g5QMR_eo residuum of source Gamma(eta_in) (2) [%d] = %e\n", i, norm);
         hmass = mass[0];
 #endif /* NDEBUG */

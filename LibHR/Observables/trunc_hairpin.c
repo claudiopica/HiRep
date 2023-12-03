@@ -233,8 +233,8 @@ static int max_H2_ev(double *max) {
     s3 = s2 + 1;
 
     gaussian_spinor_field(s1);
-    norm = sqrt(spinor_field_sqnorm_f(s1));
-    spinor_field_mul_f(s1, 1. / norm, s1);
+    norm = sqrt(sqnorm_spinor_field(s1));
+    mul_spinor_field(s1, 1. / norm, s1);
     norm = 1.;
 
     dt = 1.;
@@ -244,13 +244,13 @@ static int max_H2_ev(double *max) {
     count = 1;
     do {
         ++count;
-        spinor_field_mul_f(s1, dt, s3);
-        norm = sqrt(spinor_field_sqnorm_f(s1));
-        spinor_field_mul_f(s1, 1. / norm, s1);
+        mul_spinor_field(s1, dt, s3);
+        norm = sqrt(sqnorm_spinor_field(s1));
+        mul_spinor_field(s1, 1. / norm, s1);
 
         oldmax = *max;
         locH2(s3, s1);
-        *max = spinor_field_prod_re_f(s1, s3);
+        *max = prod_re_spinor_field(s1, s3);
     } while (fabs((*max - oldmax) / (*max)) > 1.e-3);
 
     *max *= 1.1; /* do not know exact bound */
@@ -295,7 +295,7 @@ static void compute_evs() {
         if (m > 0) {
             init = 2;
             for (p = 0; p < pars.n_eigenvalues; p++) {
-                spinor_field_copy_f(ev[m] + p, ev[m - 1] + p);
+                copy_spinor_field(ev[m] + p, ev[m - 1] + p);
             }
         }
         hmass = pars.mass[m];
@@ -307,16 +307,16 @@ static void compute_evs() {
         int q;
         double dtmp[2];
         for (p = 0; p < pars.n_eigenvalues; p++) {
-            spinor_field_zero_f(test);
+            zero_spinor_field(test);
             locH2(test, &ev[m][p]);
-            spinor_field_mul_add_assign_f(test, -d[p], &ev[m][p]);
+            mul_add_assign_spinor_field(test, -d[p], &ev[m][p]);
             lprintf("COMPUTE_EVS", 0, "Computing |H2*v_%d - lambda_%d*v_%d|^2 for mass=%f (must be about 0) = %e\n", p, p, p,
-                    pars.mass[m], spinor_field_sqnorm_f(test));
+                    pars.mass[m], sqnorm_spinor_field(test));
         }
         for (p = 0; p < pars.n_eigenvalues; p++) {
             for (q = 0; q < pars.n_eigenvalues; q++) {
-                dtmp[0] = spinor_field_prod_re_f(&ev[m][p], &ev[m][q]);
-                dtmp[1] = spinor_field_prod_im_f(&ev[m][p], &ev[m][q]);
+                dtmp[0] = prod_re_spinor_field(&ev[m][p], &ev[m][q]);
+                dtmp[1] = prod_im_spinor_field(&ev[m][p], &ev[m][q]);
                 lprintf("COMPUTE_EVS", 0, "Ortonormality test [%d,%d] = ( %e , %e )\n", p, q, dtmp[0], dtmp[1]);
             }
         }
@@ -345,9 +345,9 @@ static void project_on_higher_evs(spinor_field *sp, int m) {
     hr_complex alpha;
 
     for (a = 0; a < pars.n_eigenvalues; a++) {
-        alpha.re = -spinor_field_prod_re_f(&ev[m][a], sp);
-        alpha.im = -spinor_field_prod_im_f(&ev[m][a], sp);
-        spinor_field_mulc_add_assign_f(sp, alpha, &ev[m][a]);
+        alpha.re = -prod_re_spinor_field(&ev[m][a], sp);
+        alpha.im = -prod_im_spinor_field(&ev[m][a], sp);
+        mulc_add_assign_spinor_field(sp, alpha, &ev[m][a]);
     }
 }
 
@@ -382,7 +382,7 @@ static void ev_propagator(hr_complex **prop) {
     for (m = 0; m < pars.n_masses; m++) {
         for (p = 0; p < pars.n_eigenvalues; p++) {
             hmass = pars.mass[m];
-            spinor_field_g5_f(tmp, ev[m] + p);
+            g5_spinor_field(tmp, ev[m] + p);
             cgiter += g5QMR_mshift(&QMR_par, &D_qmr, tmp, source);
             if (pars.hopping_order < 0) {
                 add_source_sink_contraction(prop[m], source, ev[m] + p, 1.0f);
@@ -441,7 +441,7 @@ static void stoc_propagator(hr_complex **prop, int n_src, int mode) {
             for (m = 0; m < pars.n_masses; m++) {
                 project_on_higher_evs(sinks + m, m);
                 hopping_remainder(tmp, sinks + m, m);
-                spinor_field_copy_f(sinks + m, tmp);
+                copy_spinor_field(sinks + m, tmp);
                 add_source_sink_contraction(prop[m], source, sinks + m, 1.0f / n_src);
             }
         }
@@ -491,12 +491,12 @@ static void hopping_propagator(hr_complex **prop) {
         for (di = 0; di < GLB_X * GLB_Y * GLB_Z * GLB_T * sizeof(suNf_spinor) / sizeof(hr_complex); di++) {
             create_diluted_source(source, di, EXACT);
             for (m = 0; m < pars.n_masses; m++) {
-                spinor_field_g5_f(tmp, source);
-                spinor_field_mul_f(sink, 1.0 / (4.0 + pars.mass[m]), tmp);
+                g5_spinor_field(tmp, source);
+                mul_spinor_field(sink, 1.0 / (4.0 + pars.mass[m]), tmp);
                 for (i = 0; i < pars.hopping_order / 2; i++) {
                     Dphi_(tmp, sink);
                     Dphi_(sink, tmp);
-                    spinor_field_mul_f(sink, 1.0 / ((4.0 + pars.mass[m]) * (4.0 + pars.mass[m])), sink);
+                    mul_spinor_field(sink, 1.0 / ((4.0 + pars.mass[m]) * (4.0 + pars.mass[m])), sink);
 
                     if (i != 0) { add_source_sink_contraction(prop[m], source, sink, 1.0); }
                 }
@@ -505,10 +505,10 @@ static void hopping_propagator(hr_complex **prop) {
 	    
 	    Dphi(-4.0, tmp, sources);
 	    
-	    spinor_field_mul_f(noisy_sinks+m,1.0/(4.0+mass[m]),noisy_sinks+m);
-	    spinor_field_copy_f(tmp_sink+m, noisy_sinks+m);
+	    mul_spinor_field(noisy_sinks+m,1.0/(4.0+mass[m]),noisy_sinks+m);
+	    copy_spinor_field(tmp_sink+m, noisy_sinks+m);
 
-	    spinor_field_g5_f(noisy_sources+m, noisy_sources+m);
+	    g5_spinor_field(noisy_sources+m, noisy_sources+m);
 	      
 	    if ((i%2==1) && (i!=1)) add_source_sink_contraction(prop[m], noisy_sources+m, noisy_sinks+m, 1.0);
 	    }*/
@@ -539,14 +539,14 @@ static void hopping_remainder(spinor_field *out, spinor_field *in, int m) {
     int i;
     spinor_field *tmp = hopping_remainder_ws;
 
-    spinor_field_copy_f(out, in);
+    copy_spinor_field(out, in);
     if (pars.hopping_order < 0) { return; }
 
     for (i = 0; i < pars.hopping_order / 2 + 1; i++) {
         Dphi_(tmp, out);
         Dphi_(out, tmp);
     }
-    spinor_field_mul_f(out, ipow(-1.0 / (4.0 + pars.mass[m]), 2 * (pars.hopping_order / 2 + 1)), out);
+    mul_spinor_field(out, ipow(-1.0 / (4.0 + pars.mass[m]), 2 * (pars.hopping_order / 2 + 1)), out);
 }
 
 /* Not fully tested yet with dilution!=3 !=0 */
@@ -564,7 +564,7 @@ static void create_diluted_source(spinor_field *source, int di, int dilution) {
         }
     } else if (dilution == TIME_DILUTION) {
         int i, x[4];
-        spinor_field_zero_f(source);
+        zero_spinor_field(source);
         x[0] = di;
         for (i = 0; i < GLB_X * GLB_Y * GLB_Z; i++) {
             x[1] = i % GLB_X;
@@ -577,7 +577,7 @@ static void create_diluted_source(spinor_field *source, int di, int dilution) {
         }
     } else if (dilution == TIME_SPIN_DILUTION) {
         int i, x[4];
-        spinor_field_zero_f(source);
+        zero_spinor_field(source);
         x[0] = di / 4;
         for (i = 0; i < GLB_X * GLB_Y * GLB_Z; i++) {
             x[1] = i % GLB_X;
@@ -596,7 +596,7 @@ static void create_diluted_source(spinor_field *source, int di, int dilution) {
         x[1] = (site / GLB_T) % GLB_X;
         x[2] = (site / GLB_T / GLB_X) % GLB_Y;
         x[3] = (site / GLB_T / GLB_X / GLB_Y) % GLB_Z;
-        spinor_field_zero_f(source);
+        zero_spinor_field(source);
         if (COORD[0] == x[0] / T && COORD[1] == x[1] / X && COORD[2] == x[2] / Y && COORD[3] == x[3] / Z) {
             ((hr_complex *)_FIELD_AT(source, ipt(x[0] % T, x[1] % X, x[2] % Y, x[3] % Z)))[component].re = 1.;
         }
@@ -645,13 +645,13 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
     sinktmp = sink_trunc + pars.n_masses;
 
     for (m = 0; m < pars.n_masses; m++) {
-        spinor_field_zero_f(sink + m);
-        spinor_field_zero_f(sink_trunc + m);
+        zero_spinor_field(sink + m);
+        zero_spinor_field(sink_trunc + m);
     }
 
-    spinor_field_add_assign_f(source, QMR2_source);
+    add_assign_spinor_field(source, QMR2_source);
 
-    spinor_field_g5_f(source, source);
+    g5_spinor_field(source, source);
 
 #ifdef EO_PRE
 
@@ -712,27 +712,27 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
              Requires only one non-trivial inversion. */
 
         Dphi_(&b_even, &source_odd);
-        spinor_field_mul_f(&b_even, -1.0 / (4.0 + pars.mass[0]), &b_even);
-        spinor_field_add_assign_f(&b_even, &source_even);
-        /* NOT OK -> spinor_field_copy_f(&b_odd, &source_odd); */
-        /* SLOW?  -> spinor_field_mul_f(&b_odd, 1.0, &source_odd); */
-        spinor_field_zero_f(&b_odd); /* Is this better? */
-        spinor_field_add_assign_f(&b_odd, &source_odd);
+        mul_spinor_field(&b_even, -1.0 / (4.0 + pars.mass[0]), &b_even);
+        add_assign_spinor_field(&b_even, &source_even);
+        /* NOT OK -> copy_spinor_field(&b_odd, &source_odd); */
+        /* SLOW?  -> mul_spinor_field(&b_odd, 1.0, &source_odd); */
+        zero_spinor_field(&b_odd); /* Is this better? */
+        add_assign_spinor_field(&b_odd, &source_odd);
 
         cgiter += g5QMR_mshift_trunc(&QMR_par, pars.n_truncation_steps, &D_qmr_eo, &b_even, sink_trunc_even, sink_even);
 
-        spinor_field_mul_f(sink_even, (4.0 + pars.mass[0]), sink_even);
-        spinor_field_mul_f(sink_odd, 1.0 / (4. + pars.mass[0]), sink_odd);
+        mul_spinor_field(sink_even, (4.0 + pars.mass[0]), sink_even);
+        mul_spinor_field(sink_odd, 1.0 / (4. + pars.mass[0]), sink_odd);
         Dphi_(sink_odd, sink_even);
-        spinor_field_sub_assign_f(sink_odd, &b_odd);
-        spinor_field_mul_f(sink_odd, -1.0 / (4.0 + pars.mass[0]), sink_odd);
+        sub_assign_spinor_field(sink_odd, &b_odd);
+        mul_spinor_field(sink_odd, -1.0 / (4.0 + pars.mass[0]), sink_odd);
 
         if (mode == CORRECTION) {
-            spinor_field_mul_f(sink_trunc_even, (4.0 + pars.mass[0]), sink_trunc_even);
-            spinor_field_mul_f(sink_trunc_odd, 1.0 / (4. + pars.mass[0]), sink_trunc_odd);
+            mul_spinor_field(sink_trunc_even, (4.0 + pars.mass[0]), sink_trunc_even);
+            mul_spinor_field(sink_trunc_odd, 1.0 / (4. + pars.mass[0]), sink_trunc_odd);
             Dphi_(sink_trunc_odd, sink_trunc_even);
-            spinor_field_sub_assign_f(sink_trunc_odd, &b_odd);
-            spinor_field_mul_f(sink_trunc_odd, -1.0 / (4.0 + pars.mass[0]), sink_trunc_odd);
+            sub_assign_spinor_field(sink_trunc_odd, &b_odd);
+            mul_spinor_field(sink_trunc_odd, -1.0 / (4.0 + pars.mass[0]), sink_trunc_odd);
         }
 
     }
@@ -752,22 +752,22 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
         free(shift_eo);
 
         for (m = 0; m < pars.n_masses; m++) {
-            spinor_field_copy_f(b, sink + m);
-            spinor_field_mul_f(sink_even + m, 4.0 + pars.mass[m], &b_even);
+            copy_spinor_field(b, sink + m);
+            mul_spinor_field(sink_even + m, 4.0 + pars.mass[m], &b_even);
             Dphi_(&sinktmp_even, &b_odd);
-            spinor_field_sub_assign_f(sink_even + m, &sinktmp_even);
-            spinor_field_mul_f(sink_odd + m, 4.0 + pars.mass[m], &b_odd);
+            sub_assign_spinor_field(sink_even + m, &sinktmp_even);
+            mul_spinor_field(sink_odd + m, 4.0 + pars.mass[m], &b_odd);
             Dphi_(&sinktmp_odd, &b_even);
-            spinor_field_sub_assign_f(sink_odd + m, &sinktmp_odd);
+            sub_assign_spinor_field(sink_odd + m, &sinktmp_odd);
 
             if (mode == CORRECTION) {
-                spinor_field_copy_f(b, sink_trunc + m);
-                spinor_field_mul_f(sink_trunc_even + m, 4.0 + pars.mass[m], &b_even);
+                copy_spinor_field(b, sink_trunc + m);
+                mul_spinor_field(sink_trunc_even + m, 4.0 + pars.mass[m], &b_even);
                 Dphi_(&sinktmp_even, &b_odd);
-                spinor_field_sub_assign_f(sink_trunc_even + m, &sinktmp_even);
-                spinor_field_mul_f(sink_trunc_odd + m, 4.0 + pars.mass[m], &b_odd);
+                sub_assign_spinor_field(sink_trunc_even + m, &sinktmp_even);
+                mul_spinor_field(sink_trunc_odd + m, 4.0 + pars.mass[m], &b_odd);
                 Dphi_(&sinktmp_odd, &b_even);
-                spinor_field_sub_assign_f(sink_trunc_odd + m, &sinktmp_odd);
+                sub_assign_spinor_field(sink_trunc_odd + m, &sinktmp_odd);
             }
         }
     }
@@ -785,38 +785,38 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
     if (mode != TRUNCATION) {
         for (m = 0; m < pars.n_masses; m++) {
             Dphi(pars.mass[m], test, sink + m);
-            spinor_field_sub_assign_f(test, source);
+            sub_assign_spinor_field(test, source);
             lprintf("GET_SINKS_QMR", 0, "Invesion test (1) for mass=%f (must be about 0) = %e\n", pars.mass[m],
-                    spinor_field_sqnorm_f(test));
+                    sqnorm_spinor_field(test));
         }
     }
 #endif /* NDEBUG */
 
-    spinor_field_g5_f(source, source);
+    g5_spinor_field(source, source);
 
-    spinor_field_sub_assign_f(source, QMR2_source);
+    sub_assign_spinor_field(source, QMR2_source);
 
     for (m = 0; m < pars.n_masses; m++) {
         if (mode == CORRECTION) {
-            spinor_field_sub_assign_f(sink + m, QMR2_sinks + m);
+            sub_assign_spinor_field(sink + m, QMR2_sinks + m);
 #ifndef NDEBUG
             g5Dphi(pars.mass[m], test, sink + m);
-            spinor_field_sub_assign_f(test, source);
+            sub_assign_spinor_field(test, source);
             lprintf("GET_SINKS_QMR", 0, "Invesion test (2) for mass=%f (must be about 0) = %e\n", pars.mass[m],
-                    spinor_field_sqnorm_f(test));
+                    sqnorm_spinor_field(test));
 #endif /* NDEBUG */
-            spinor_field_sub_assign_f(sink_trunc + m, QMR2_sinks_trunc + m);
-            spinor_field_sub_assign_f(sink + m, sink_trunc + m);
+            sub_assign_spinor_field(sink_trunc + m, QMR2_sinks_trunc + m);
+            sub_assign_spinor_field(sink + m, sink_trunc + m);
         } else if (mode == INVERSION) {
-            spinor_field_sub_assign_f(sink + m, QMR2_sinks + m);
+            sub_assign_spinor_field(sink + m, QMR2_sinks + m);
 #ifndef NDEBUG
             g5Dphi(pars.mass[m], test, sink + m);
-            spinor_field_sub_assign_f(test, source);
+            sub_assign_spinor_field(test, source);
             lprintf("GET_SINKS_QMR", 0, "Invesion test (2) for mass=%f (must be about 0) = %e\n", pars.mass[m],
-                    spinor_field_sqnorm_f(test));
+                    sqnorm_spinor_field(test));
 #endif /* NDEBUG */
         } else if (mode == TRUNCATION) {
-            spinor_field_sub_assign_f(sink + m, QMR2_sinks_trunc + m);
+            sub_assign_spinor_field(sink + m, QMR2_sinks_trunc + m);
         }
     }
 
@@ -897,10 +897,10 @@ static void add_source_sink_contraction(hr_complex *out, spinor_field *source, s
     global_sum(&g5trace.re, 1);
     global_sum(&g5trace.im, 1);
 
-    trace.re -= spinor_field_prod_re_f(source, sink);
-    trace.im -= spinor_field_prod_im_f(source, sink);
-    g5trace.re -= spinor_field_g5_prod_re_f(source, sink);
-    g5trace.im -= spinor_field_g5_prod_im_f(source, sink);
+    trace.re -= prod_re_spinor_field(source, sink);
+    trace.im -= prod_im_spinor_field(source, sink);
+    g5trace.re -= g5_prod_re_spinor_field(source, sink);
+    g5trace.im -= g5_prod_im_spinor_field(source, sink);
     norm = sqrt(trace.re * trace.re + trace.im * trace.im);
     lprintf("ADD_SOURCE_SINK_CONTRACTION", 0, "Testing trace (must be about 0) = %e\n", norm);
     norm = sqrt(g5trace.re * g5trace.re + g5trace.im * g5trace.im);
@@ -1062,35 +1062,35 @@ static void QMR_init() {
     QMR_par.max_iter = 0;
 
     for (m = 0; m < pars.n_masses; m++) {
-        spinor_field_zero_f(QMR2_sinks + m);
-        spinor_field_zero_f(QMR2_sinks_trunc + m);
+        zero_spinor_field(QMR2_sinks + m);
+        zero_spinor_field(QMR2_sinks_trunc + m);
     }
 
-    spinor_field_g5_f(QMR2_source, QMR2_source);
+    g5_spinor_field(QMR2_source, QMR2_source);
     cgiter += g5QMR_mshift_trunc(&QMR_par, pars.n_truncation_steps, &D_qmr, QMR2_source, QMR2_sinks_trunc, QMR2_sinks);
     if (pars.n_truncation_steps == 0) {
         for (m = 0; m < pars.n_masses; m++) {
-            spinor_field_copy_f(QMR2_sinks_trunc + m, QMR2_sinks + m);
+            copy_spinor_field(QMR2_sinks_trunc + m, QMR2_sinks + m);
         }
     }
 
 #ifndef NDEBUG
     for (m = 0; m < pars.n_masses; m++) {
         Dphi(pars.mass[m], test, QMR2_sinks + m);
-        spinor_field_sub_assign_f(test, QMR2_source);
+        sub_assign_spinor_field(test, QMR2_source);
         lprintf("QMR_INIT", 0, "Invesion test (1) for mass=%f (must be about 0) = %e\n", pars.mass[m],
-                spinor_field_sqnorm_f(test));
+                sqnorm_spinor_field(test));
     }
 #endif /* NDEBUG */
 
-    spinor_field_g5_f(QMR2_source, QMR2_source);
+    g5_spinor_field(QMR2_source, QMR2_source);
 
 #ifndef NDEBUG
     for (m = 0; m < pars.n_masses; m++) {
         g5Dphi(pars.mass[m], test, QMR2_sinks + m);
-        spinor_field_sub_assign_f(test, QMR2_source);
+        sub_assign_spinor_field(test, QMR2_source);
         lprintf("QMR_INIT", 0, "Invesion test (2) for mass=%f (must be about 0) = %e\n", pars.mass[m],
-                spinor_field_sqnorm_f(test));
+                sqnorm_spinor_field(test));
     }
 #endif /* NDEBUG */
 

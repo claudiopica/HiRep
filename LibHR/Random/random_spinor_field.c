@@ -20,7 +20,7 @@ void gaussian_spinor_field(spinor_field *s) {
         gauss((double *)(r), sizeof(suNf_spinor) / sizeof(double));
     }
     const double c1 = 1. / sqrt(2.);
-    spinor_field_mul_f_cpu(s, c1, s);
+    mul_spinor_field_cpu(s, c1, s);
 
 #ifdef WITH_GPU
     copy_to_gpu_spinor_field(s);
@@ -40,7 +40,7 @@ void gaussian_spinor_field_flt(spinor_field_flt *s) {
         gauss_flt((float *)(r), sizeof(suNf_spinor_flt) / sizeof(float));
     }
     const float c1 = (float)(1. / sqrt(2.));
-    spinor_field_mul_f_flt_cpu(s, c1, s);
+    mul_spinor_field_flt_cpu(s, c1, s);
 
 #ifdef WITH_GPU
     copy_to_gpu_spinor_field_flt(s);
@@ -60,4 +60,8 @@ void z2_spinor_field(spinor_field *s) {
         ranz2((double *)(r), sizeof(suNf_spinor) / sizeof(double));
     }
     apply_BCs_on_spinor_field(s);
+
+#ifdef WITH_GPU
+    copy_to_gpu_spinor_field(s);
+#endif
 }

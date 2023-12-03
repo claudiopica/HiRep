@@ -70,24 +70,24 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
     cgiter = 0;
     notconverged = 1;
     beta[0] = 1.;
-    spinor_field_copy_f(r, in);
+    copy_spinor_field(r, in);
     for (i = 0; i < (par->n); ++i) {
         rho[i] = z1[i] = z2[i] = beta[0];
         alpha[i] = 0.;
-        spinor_field_copy_f(&s[i], in);
-        spinor_field_zero_f(&out[i]);
+        copy_spinor_field(&s[i], in);
+        zero_spinor_field(&out[i]);
         sflags[i] = 1;
     }
     chi[0] = 0;
     /* choose omega so that delta and phi are not zero */
-    /* spinor_field_copy_f(o, in);  omega = in ; this may be changed */
+    /* copy_spinor_field(o, in);  omega = in ; this may be changed */
     /* gaussian_spinor_field(o0); */
-    spinor_field_copy_f(o0, in);
-    spinor_field_copy_f(o, o0);
-    delta = spinor_field_prod_re_f(o, r);
+    copy_spinor_field(o0, in);
+    copy_spinor_field(o, o0);
+    delta = prod_re_spinor_field(o, r);
 
     M(Ms, &s[0]);
-    phi = spinor_field_prod_re_f(o0, Ms) / delta; /* o = in (see above) */
+    phi = prod_re_spinor_field(o0, Ms) / delta; /* o = in (see above) */
 
     /*  _print_par(delta);
   _print_par(phi);
@@ -103,32 +103,32 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
         beta[0] = -1. / phi; /* b=1/phi */
 
         /* compute omega and chi[0] */
-        spinor_field_mul_f(o, beta[0], Ms);
-        spinor_field_add_assign_f(o, r);
+        mul_spinor_field(o, beta[0], Ms);
+        add_assign_spinor_field(o, r);
 
         M(Mo, o);
 
         oldchi = chi[0];
-        chi[0] = spinor_field_prod_re_f(Mo, o) / spinor_field_sqnorm_f(Mo);
+        chi[0] = prod_re_spinor_field(Mo, o) / sqnorm_spinor_field(Mo);
 
         /* compute r1 */
-        spinor_field_mul_f(r1, chi[0], Mo);
-        spinor_field_sub_f(r1, o, r1);
+        mul_spinor_field(r1, chi[0], Mo);
+        sub_spinor_field(r1, o, r1);
 
         /* update delta and alpha[0] */
         oldalpha = alpha[0];
         alpha[0] = -beta[0] / (chi[0] * delta);
-        delta = spinor_field_prod_re_f(o0, r1); /* in = omega al passo zero */
+        delta = prod_re_spinor_field(o0, r1); /* in = omega al passo zero */
         alpha[0] *= delta;
 
         /* compute new out[0] */
         rtmp2 = -beta[0];
-        spinor_field_lc_add_assign_f(&out[0], rtmp2, &s[0], chi[0], o);
+        lc_add_assign_spinor_field(&out[0], rtmp2, &s[0], chi[0], o);
 
         /* compute new s[0] */
         rtmp3 = -alpha[0] * chi[0];
-        spinor_field_lc_f(Mo, alpha[0], &s[0], rtmp3, Ms); /* use Mo as temporary storage */
-        spinor_field_add_f(&s[0], r1, Mo);
+        lc_spinor_field(Mo, alpha[0], &s[0], rtmp3, Ms); /* use Mo as temporary storage */
+        add_spinor_field(&s[0], r1, Mo);
 
         /* assign r<-r1 */
         sptmp = r;
@@ -137,7 +137,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
 
         /* update phi */
         M(Ms, &s[0]);
-        phi = spinor_field_prod_re_f(o0, Ms) / delta;
+        phi = prod_re_spinor_field(o0, Ms) / delta;
 
         /*    _print_par(delta);
     _print_par(phi);
@@ -166,19 +166,19 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
                 /* update solution */
                 rtmp2 = -beta[i];
                 rtmp3 = chi[i] * rho[i] * z3[i];
-                spinor_field_lc_add_assign_f(&out[i], rtmp2, &s[i], rtmp3, o);
+                lc_add_assign_spinor_field(&out[i], rtmp2, &s[i], rtmp3, o);
                 /* update s[i] */
                 rtmp2 = chi[i] / beta[i] * rho[i];
                 rtmp3 = rtmp2 * z2[i];
                 rtmp2 *= -z3[i];
-                spinor_field_lc_add_assign_f(&s[i], rtmp2, o, rtmp3, r1); /* not done yet */
+                lc_add_assign_spinor_field(&s[i], rtmp2, o, rtmp3, r1); /* not done yet */
 
                 rho[i] /= (1. - rho[0] * par->shift[i - 1]); /* update rho */
                 _print_par(rho[i]);
 
                 rtmp2 = z3[i] * rho[i];
-                spinor_field_lc_f(Mo, rtmp2, r, alpha[i], &s[i]); /* use Mo as temporary storage */
-                spinor_field_copy_f(&s[i], Mo);
+                lc_spinor_field(Mo, rtmp2, r, alpha[i], &s[i]); /* use Mo as temporary storage */
+                copy_spinor_field(&s[i], Mo);
 
                 /* change pointers instead */
                 /*
@@ -193,7 +193,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
             }
         }
 
-        rtmp1 = spinor_field_sqnorm_f(r);
+        rtmp1 = sqnorm_spinor_field(r);
 
         if (rtmp1 < par->err2) { notconverged = 0; }
 
@@ -215,9 +215,9 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
     for (i = 0; i < par->n; ++i) {
         double norm;
         M(Ms, &out[i]);
-        if (i != 0) { spinor_field_mul_add_assign_f(Ms, -par->shift[i - 1], &out[i]); }
-        spinor_field_mul_add_assign_f(Ms, -1.0, in);
-        norm = spinor_field_sqnorm_f(Ms);
+        if (i != 0) { mul_add_assign_spinor_field(Ms, -par->shift[i - 1], &out[i]); }
+        mul_add_assign_spinor_field(Ms, -1.0, in);
+        norm = sqnorm_spinor_field(Ms);
         if (fabs(norm) > 5. * par->err2) { printf("BiCGstab Failed: err2[%d] = %e\n", i, norm); }
     }
 #endif

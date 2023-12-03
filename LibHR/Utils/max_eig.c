@@ -27,8 +27,8 @@ int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
 
     /* random spinor */
     gaussian_spinor_field(s1);
-    norm = sqrt(spinor_field_sqnorm_f(s1));
-    spinor_field_mul_f(s1, 1. / norm, s1);
+    norm = sqrt(sqnorm_spinor_field(s1));
+    mul_spinor_field(s1, 1. / norm, s1);
     norm = 1.;
 
     dt = 1.;
@@ -37,15 +37,15 @@ int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
     count = 1;
 
     do {
-        spinor_field_mul_f(s1, dt, s3);
+        mul_spinor_field(s1, dt, s3);
 
-        norm = sqrt(spinor_field_sqnorm_f(s1));
-        spinor_field_mul_f(s1, 1. / norm, s1);
+        norm = sqrt(sqnorm_spinor_field(s1));
+        mul_spinor_field(s1, 1. / norm, s1);
 
         oldmax = *max;
         H(s3, s1);
         ++count;
-        *max = spinor_field_prod_re_f(s1, s3);
+        *max = prod_re_spinor_field(s1, s3);
 
         /* printf("Iter %d: %4.5e\n",count,fabs(oldnorm-norm)); */
     } while (fabs((*max - oldmax) / (*max)) > 1.e-3);

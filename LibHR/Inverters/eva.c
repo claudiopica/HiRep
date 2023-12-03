@@ -187,18 +187,18 @@ static void project(spinor_field *pk, spinor_field *pl) {
     _TWO_SPINORS_MATCHING(pk, pl);
 #endif
 
-    sp = -spinor_field_prod_re_f(pl, pk) - I * spinor_field_prod_im_f(pl, pk);
+    sp = -prod_re_spinor_field(pl, pk) - I * prod_im_spinor_field(pl, pk);
 
-    spinor_field_mulc_add_assign_f(pk, sp, pl);
+    mulc_add_assign_spinor_field(pk, sp, pl);
 }
 
 static double normalize(spinor_field *ps) {
     double r;
 
-    r = sqrt(spinor_field_sqnorm_f(ps));
+    r = sqrt(sqnorm_spinor_field(ps));
     error(r < EPSILON, 1, "normalize [eva.c]", "vector has vanishing norm");
 
-    spinor_field_mul_f(ps, 1. / r, ps);
+    mul_spinor_field(ps, 1. / r, ps);
 
     apply_BCs_on_spinor_field(ps);
 
@@ -235,10 +235,10 @@ static void ritz_subsp(int nlock, int nevt, spinor_operator Op, spinor_field *ws
         Op(&ws[0], &ev[nlock + i]);
         nop += 1;
 
-        aa[neff * i + i] = spinor_field_prod_re_f(&ev[nlock + i], &ws[0]);
+        aa[neff * i + i] = prod_re_spinor_field(&ev[nlock + i], &ws[0]);
 
         for (j = 0; j < i; j++) {
-            z = spinor_field_prod_f(&ws[0], &ev[nlock + j]);
+            z = prod_spinor_field(&ws[0], &ev[nlock + j]);
 
             aa[neff * i + j] = z;
             aa[neff * j + i] = conj(z);
@@ -301,9 +301,9 @@ static int res_subsp(int nlock, int nev, double omega1, double omega2, spinor_op
 
         Op(&ws[0], &ev[ib]);
         nop += 1;
-        spinor_field_lc1_f(-d[ib], &ws[0], &ev[ib]);
+        lc1_spinor_field(-d[ib], &ws[0], &ev[ib]);
 
-        bb[nev * ib + ib] = spinor_field_sqnorm_f(&ws[0]);
+        bb[nev * ib + ib] = sqnorm_spinor_field(&ws[0]);
 
         eps2 = sqrt(creal(bb[nev * ib + ib]));
         absd2 = fabs(d[ib]);
@@ -320,7 +320,7 @@ static int res_subsp(int nlock, int nev, double omega1, double omega2, spinor_op
             nop += 1;
 
             for (i = ia; i < ib; i++) {
-                z = spinor_field_prod_f(&ws[1], &ev[i]);
+                z = prod_spinor_field(&ws[1], &ev[i]);
 
                 bb[nev * ib + i] = z;
                 bb[nev * i + ib] = conj(z);
@@ -378,14 +378,14 @@ static void apply_cheby(int k, double lbnd, double ubnd, spinor_operator Op, spi
     psi2 = &ws[1];
 
     Op(psi1, psi0);
-    spinor_field_lc2_f(c1, c2, psi1, psi0);
+    lc2_spinor_field(c1, c2, psi1, psi0);
 
     c1 *= 2.0f;
     c2 *= 2.0f;
 
     for (j = 1; j < k; j++) {
         Op(psi2, psi1);
-        spinor_field_lc3_f(c1, c2, psi2, psi1, psi0);
+        lc3_spinor_field(c1, c2, psi2, psi1, psi0);
 
         psi3 = psi0;
         psi0 = psi1;
@@ -423,7 +423,7 @@ int eva(int nev, int nevt, int init, int kmax, int imax, double ubnd, double ome
         if (i > 0) {
             lbnd = set_lbnd(nupd, kmax, ubnd, d, &k);
             for (n = nupd; n < nevt; n++) {
-                spinor_field_copy_f(&ev[n], &ev[n + nupd - nevt]);
+                copy_spinor_field(&ev[n], &ev[n + nupd - nevt]);
             }
         } else {
             lbnd = set_lbnd(nupd, 10, ubnd, d, &k);
@@ -496,7 +496,7 @@ int eva_tuned(int nev, int nevt, int init, int kmax, int imax, double lbnd, doub
             //      lbnd=set_lbnd(nupd,kmax,ubnd,d,&k);
             k = kmax;
             for (n = nupd; n < nevt; n++) {
-                spinor_field_copy_f(&ev[n], &ev[n + nupd - nevt]);
+                copy_spinor_field(&ev[n], &ev[n + nupd - nevt]);
             }
         } else {
             //      lbnd=set_lbnd(nupd,10,ubnd,d,&k);

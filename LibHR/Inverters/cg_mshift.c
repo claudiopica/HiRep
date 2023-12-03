@@ -52,54 +52,54 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
     cgiter = 0;
     omega = 1.;
     gamma = 0.;
-    innorm2 = spinor_field_sqnorm_f(in);
+    innorm2 = sqnorm_spinor_field(in);
     if (par->n == 1) { /* non multishift case */
         /* use out[0] as initial guess */
         M(Mk, &out[0]);
         ++cgiter;
-        spinor_field_mul_add_assign_f(Mk, -par->shift[0], &out[0]);
-        spinor_field_sub_f(r, in, Mk);
+        mul_add_assign_spinor_field(Mk, -par->shift[0], &out[0]);
+        sub_spinor_field(r, in, Mk);
 
     } else { /* initial guess = 0 for multishift */
-        spinor_field_copy_f(r, in);
+        copy_spinor_field(r, in);
     }
-    spinor_field_copy_f(k, r);
-    delta = spinor_field_sqnorm_f(r);
+    copy_spinor_field(k, r);
+    delta = sqnorm_spinor_field(r);
     for (i = 0; i < (par->n); ++i) {
         z1[i] = z2[i] = 1.;
-        spinor_field_copy_f(&p[i], r);
-        if (par->n != 1) { spinor_field_zero_f(&out[i]); }
+        copy_spinor_field(&p[i], r);
+        if (par->n != 1) { zero_spinor_field(&out[i]); }
         sflags[i] = 1;
     }
 
     /* cg recursion */
     do {
         M(Mk, k);
-        alpha = spinor_field_prod_re_f(k, Mk);
+        alpha = prod_re_spinor_field(k, Mk);
         oldomega = omega;
         omega = -delta / alpha;
         for (i = 0; i < (par->n); ++i) {
             if (sflags[i]) {
                 z3[i] = oldomega * z1[i] * z2[i] /
                         (omega * gamma * (z1[i] - z2[i]) + z1[i] * oldomega * (1. + par->shift[i] * omega));
-                spinor_field_mul_add_assign_f(&out[i], -omega * z3[i] / z2[i], &p[i]);
+                mul_add_assign_spinor_field(&out[i], -omega * z3[i] / z2[i], &p[i]);
             }
         }
-        spinor_field_mul_add_assign_f(r, omega, Mk);
-        lambda = spinor_field_sqnorm_f(r);
+        mul_add_assign_spinor_field(r, omega, Mk);
+        lambda = sqnorm_spinor_field(r);
         gamma = lambda / delta;
         delta = lambda;
 
-        spinor_field_mul_f(k, gamma, k);
-        spinor_field_add_assign_f(k, r);
+        mul_spinor_field(k, gamma, k);
+        add_assign_spinor_field(k, r);
         notconverged = 0; /* assume that all vectors have converged */
         for (i = 0; i < (par->n); ++i) {
             /* check convergence of vectors */
             if (delta * z3[i] * z3[i] < par->err2 * innorm2) { sflags[i] = 0; }
             if (sflags[i]) {
                 notconverged++;
-                spinor_field_mul_f(&p[i], gamma * z3[i] * z3[i] / (z2[i] * z2[i]), &p[i]);
-                spinor_field_mul_add_assign_f(&p[i], z3[i], r);
+                mul_spinor_field(&p[i], gamma * z3[i] * z3[i] / (z2[i] * z2[i]), &p[i]);
+                mul_add_assign_spinor_field(&p[i], z3[i], r);
                 z1[i] = z2[i];
                 z2[i] = z3[i];
             }
@@ -122,9 +122,9 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
         double norm;
         M(Mk, &out[i]);
         ++cgiter;
-        spinor_field_mul_add_assign_f(Mk, -par->shift[i], &out[i]);
-        spinor_field_sub_f(Mk, Mk, in);
-        norm = spinor_field_sqnorm_f(Mk) / spinor_field_sqnorm_f(in);
+        mul_add_assign_spinor_field(Mk, -par->shift[i], &out[i]);
+        sub_spinor_field(Mk, Mk, in);
+        norm = sqnorm_spinor_field(Mk) / sqnorm_spinor_field(in);
         sflags[i] = 1;
         if (fabs(norm) > par->err2) {
             sflags[i] = 0;
