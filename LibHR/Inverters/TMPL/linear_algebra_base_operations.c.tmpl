@@ -26,16 +26,16 @@
 #define _CPU_F_NAME_LINA(_name, _suffix) CONCAT(_name##_, _suffix##_cpu)
 #define _FUNC_INNER_LINA(_type, _name, _suffix, _args) _type _CPU_F_NAME_LINA(_name, _suffix) _args
 #ifdef WITH_GPU
-#define _ALIAS_INNER_LINA(_type, _name, _suffix, _args) _type(*_F_NAME(_name##_, _suffix)) _args = _GPU_F_NAME(_name##_, _suffix)
+#define _ALIAS_INNER_LINA(_type, _name, _suffix, _args) \
+    _type(*_F_NAME(_name##_, _suffix)) _args = _GPU_F_NAME(_name##_, _suffix)
 #else
-#define _ALIAS_INNER_LINA(_type, _name, _suffix, _args) _type(*_F_NAME(_name##_, _suffix)) _args = _CPU_F_NAME_LINA(_name, _suffix)
+#define _ALIAS_INNER_LINA(_type, _name, _suffix, _args) \
+    _type(*_F_NAME(_name##_, _suffix)) _args = _CPU_F_NAME_LINA(_name, _suffix)
 #endif
 
-#define _DECLARE_LINEAR_ALGEBRA(_type, _name, _args) \
+#define _DECLARE_LINEAR_ALGEBRA(_type, _name, _args)     \
     _ALIAS_INNER_LINA(_type, _name, _FIELD_TYPE, _args); \
     _FUNC_INNER_LINA(_type, _name, _FIELD_TYPE, _args)
-
-
 
 /* s1+=r*s2 r real */
 _DECLARE_LINEAR_ALGEBRA(void, mul_add_assign, (_FIELD_TYPE * s1, _REAL r, _FIELD_TYPE *s2)) {

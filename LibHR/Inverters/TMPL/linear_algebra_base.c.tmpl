@@ -22,14 +22,14 @@
 #error Missing _COMPLEX in linear_algebra.c
 #endif
 
-
 /* s1=s2 */
 _DECLARE_LINEAR_ALGEBRA(void, copy, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _PIECE_FOR(s1->type, ixp) {
         const int block_size = s1->type->master_end[ixp] - s1->type->master_start[ixp] + 1;
         const int block_offset = s1->type->master_start[ixp];
-        memcpy(_DFIELD_AT(s1, block_offset, 0, _FIELD_DIM), _DFIELD_AT(s2, block_offset, 0, _FIELD_DIM), block_size * _FIELD_DIM * sizeof(_SITE_TYPE));
+        memcpy(_DFIELD_AT(s1, block_offset, 0, _FIELD_DIM), _DFIELD_AT(s2, block_offset, 0, _FIELD_DIM),
+               block_size * _FIELD_DIM * sizeof(_SITE_TYPE));
     }
 }
 

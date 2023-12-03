@@ -27,7 +27,8 @@
 #endif
 
 /* s1=r1*s2+r2*s3 */
-_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, lc, (_FIELD_TYPE * s1, _REAL r1, _FIELD_TYPE *s2, _REAL r2, _FIELD_TYPE *s3), (s1, r1, s2, r2, s3)) {
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, lc, (_FIELD_TYPE * s1, _REAL r1, _FIELD_TYPE *s2, _REAL r2, _FIELD_TYPE *s3),
+                               (s1, r1, s2, r2, s3)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _TWO_SPINORS_MATCHING(s1, s3);
     _CUDA_FOR(s1, ixp,
@@ -36,8 +37,8 @@ _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, lc, (_FIELD_TYPE * s1, _REAL r1, _FIELD_TYP
 }
 
 /* s1+=r1*s2+r2*s3 */
-_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, lc_add_assign,
-         (_FIELD_TYPE * s1, _REAL r1, _FIELD_TYPE *s2, _REAL r2, _FIELD_TYPE *s3), (s1, r1, s2, r2, s3)) {
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, lc_add_assign, (_FIELD_TYPE * s1, _REAL r1, _FIELD_TYPE *s2, _REAL r2, _FIELD_TYPE *s3),
+                               (s1, r1, s2, r2, s3)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _TWO_SPINORS_MATCHING(s1, s3);
     _CUDA_FOR(s1, ixp,
@@ -46,49 +47,51 @@ _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, lc_add_assign,
 }
 
 /* s1=c1*s2+c2*s3 c1, c2 complex*/
-_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, clc,
-         (_FIELD_TYPE * s1, _COMPLEX c1, _FIELD_TYPE *s2, _COMPLEX c2, _FIELD_TYPE *s3), (s1, c1, s2, c2, s3)) {
-    #if !_ISREAL
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, clc, (_FIELD_TYPE * s1, _COMPLEX c1, _FIELD_TYPE *s2, _COMPLEX c2, _FIELD_TYPE *s3),
+                               (s1, c1, s2, c2, s3)) {
+#if !_ISREAL
     _TWO_SPINORS_MATCHING(s1, s2);
     _TWO_SPINORS_MATCHING(s1, s3);
     _CUDA_FOR(s1, ixp,
               (clc_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
                   _GPU_FIELD_BLK(s1, ixp), c1, _GPU_FIELD_BLK(s2, ixp), c2, _GPU_FIELD_BLK(s3, ixp), N)););
-    #else
-        error(1, 1, __func__, "Calling complex multiplication for real field\n");
-    #endif
+#else
+    error(1, 1, __func__, "Calling complex multiplication for real field\n");
+#endif
 }
 
 /* s1+=c1*s2+c2*s3 c1, c2 complex*/
 _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, clc_add_assign,
-         (_FIELD_TYPE * s1, _COMPLEX c1, _FIELD_TYPE *s2, _COMPLEX c2, _FIELD_TYPE *s3), (s1, c1, s2, c2, s3)) {
-    #if !_ISREAL
+                               (_FIELD_TYPE * s1, _COMPLEX c1, _FIELD_TYPE *s2, _COMPLEX c2, _FIELD_TYPE *s3),
+                               (s1, c1, s2, c2, s3)) {
+#if !_ISREAL
     _TWO_SPINORS_MATCHING(s1, s2);
     _TWO_SPINORS_MATCHING(s1, s3);
     _CUDA_FOR(s1, ixp,
               (clc_add_assign_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
                   _GPU_FIELD_BLK(s1, ixp), c1, _GPU_FIELD_BLK(s2, ixp), c2, _GPU_FIELD_BLK(s3, ixp), N)););
-    #else 
-        error(1, 1, __func__, "Calling complex multiplication for real field.\n");
-    #endif
+#else
+    error(1, 1, __func__, "Calling complex multiplication for real field.\n");
+#endif
 }
 
 /* tools per eva.c  */
 _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, lc1, (_REAL c1, _FIELD_TYPE *s1, _FIELD_TYPE *s2), (c1, s1, s2)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (lc1_gpu<_FIELD_DIM><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(c1, _GPU_FIELD_BLK(s1, ixp),
-                                                                              _GPU_FIELD_BLK(s2, ixp), N)););
+              (lc1_gpu<_FIELD_DIM>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(c1, _GPU_FIELD_BLK(s1, ixp), _GPU_FIELD_BLK(s2, ixp), N)););
 }
 
 _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, lc2, (_REAL c1, _REAL c2, _FIELD_TYPE *s1, _FIELD_TYPE *s2), (c1, c2, s1, s2)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (lc2_gpu<_FIELD_DIM><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(c1, c2, _GPU_FIELD_BLK(s1, ixp),
-                                                                              _GPU_FIELD_BLK(s2, ixp), N)););
+              (lc2_gpu<_FIELD_DIM>
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(c1, c2, _GPU_FIELD_BLK(s1, ixp), _GPU_FIELD_BLK(s2, ixp), N)););
 }
 
-_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, lc3, (_REAL c1, _REAL c2, _FIELD_TYPE *s1, _FIELD_TYPE *s2, _FIELD_TYPE *s3), (c1, c2, s1, s2, s3)) {
+_DECLARE_LINEAR_ALGEBRA_GPU_OP(void, lc3, (_REAL c1, _REAL c2, _FIELD_TYPE *s1, _FIELD_TYPE *s2, _FIELD_TYPE *s3),
+                               (c1, c2, s1, s2, s3)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     /* c1=-c1; c2=-c2; */
     _REAL cc1 = -c1;

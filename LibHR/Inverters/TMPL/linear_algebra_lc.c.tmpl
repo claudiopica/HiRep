@@ -22,7 +22,6 @@
 #error Missing _COMPLEX in linear_algebra.c
 #endif
 
-
 /* s1=r1*s2+r2*s3 */
 _DECLARE_LINEAR_ALGEBRA(void, lc, (_FIELD_TYPE * s1, _REAL r1, _FIELD_TYPE *s2, _REAL r2, _FIELD_TYPE *s3)) {
     _THREE_SITE_FOR(s1, s2, s3) {
@@ -36,8 +35,7 @@ _DECLARE_LINEAR_ALGEBRA(void, lc, (_FIELD_TYPE * s1, _REAL r1, _FIELD_TYPE *s2, 
 _DECLARE_LINEAR_ALGEBRA(void, lc_add_assign, (_FIELD_TYPE * s1, _REAL r1, _FIELD_TYPE *s2, _REAL r2, _FIELD_TYPE *s3)) {
     _THREE_SITE_FOR(s1, s2, s3) {
         for (int mu = 0; mu < _FIELD_DIM; ++mu) {
-            lc_add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), r1, _SITE_PTR(s2, mu, _FIELD_DIM), r2,
-                          _SITE_PTR(s3, mu, _FIELD_DIM));
+            lc_add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), r1, _SITE_PTR(s2, mu, _FIELD_DIM), r2, _SITE_PTR(s3, mu, _FIELD_DIM));
         }
     }
 }
@@ -55,8 +53,7 @@ _DECLARE_LINEAR_ALGEBRA(void, clc, (_FIELD_TYPE * s1, _COMPLEX c1, _FIELD_TYPE *
 _DECLARE_LINEAR_ALGEBRA(void, clc_add_assign, (_FIELD_TYPE * s1, _COMPLEX c1, _FIELD_TYPE *s2, _COMPLEX c2, _FIELD_TYPE *s3)) {
     _THREE_SITE_FOR(s1, s2, s3) {
         for (int mu = 0; mu < _FIELD_DIM; ++mu) {
-            clc_add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), c1, _SITE_PTR(s2, mu, _FIELD_DIM), c2,
-                           _SITE_PTR(s3, mu, _FIELD_DIM));
+            clc_add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), c1, _SITE_PTR(s2, mu, _FIELD_DIM), c2, _SITE_PTR(s3, mu, _FIELD_DIM));
         }
     }
 }
