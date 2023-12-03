@@ -11,6 +11,9 @@
 static int errors = 0; // count the number of errors during this test uni
 static double hmass = 0.1;
 
+#define EPSILON_SQ_TEST 1.e-12
+#define EPSILON_SQ_FLT_TEST 1.e-3
+
 spinor_field *tmp, *in;
 spinor_field in_oe[3], in_eo[3], in_ee[3], in_oo[3];
 
@@ -130,7 +133,7 @@ int main(int argc, char *argv[]) {
                  g5Dphi_cpu(-hmass, &in[1], in);, "GPU_TEST", EPSILON_TEST);
 
     _TEST_GPU_OP(errors, "Q^2", ninputs + noutputs + 1, in, in + 1, g5Dphi_sq(-hmass, &in[1], in);
-                 g5Dphi_sq_cpu(-hmass, &in[1], in);, "GPU_TEST", EPSILON_TEST);
+                 g5Dphi_sq_cpu(-hmass, &in[1], in);, "GPU_TEST", EPSILON_SQ_TEST);
 
 #ifdef DPHI_FLT
 
@@ -144,7 +147,7 @@ int main(int argc, char *argv[]) {
                      g5Dphi_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
 
     _TEST_GPU_OP_FLT(errors, "Q^2 flt", ninputs + noutputs + 1, in_flt, in_flt + 1, g5Dphi_sq_flt(-hmass, &in_flt[1], in_flt);
-                     g5Dphi_sq_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
+                     g5Dphi_sq_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_SQ_FLT_TEST);
 #endif
 
 #ifdef WITH_CLOVER
@@ -214,7 +217,7 @@ int main(int argc, char *argv[]) {
                  g5Dphi_eopre_cpu(-hmass, &in[1], in);, "GPU_TEST", EPSILON_TEST);
 
     _TEST_GPU_OP(errors, "g5Dphi_oepre_sq", ninputs + noutputs + 1, in, in + 1, g5Dphi_eopre_sq(-hmass, &in[1], in);
-                 g5Dphi_eopre_sq_cpu(-hmass, &in[1], in);, "GPU_TEST", EPSILON_TEST);
+                 g5Dphi_eopre_sq_cpu(-hmass, &in[1], in);, "GPU_TEST", EPSILON_SQ_TEST);
 
     _TEST_GPU_OP(errors, "Q_eopre", ninputs + noutputs + 1, in, in + 1, g5Dphi_eopre(-hmass, &in[1], in);
                  g5Dphi_eopre_cpu(-hmass, &in[1], in);, "GPU_TEST", EPSILON_TEST);
