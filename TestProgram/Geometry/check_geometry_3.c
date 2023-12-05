@@ -29,9 +29,9 @@ int checkNorm(char *name, double norm_diff) {
     complete_sendrecv_spinor_field(even);                                                                                      \
     start_sendrecv_spinor_field(odd);                                                                                          \
     complete_sendrecv_spinor_field(odd);                                                                                       \
-    in_diff = spinor_field_sqnorm_f(in) - in_norm;                                                                             \
-    even_diff = spinor_field_sqnorm_f(even) - even_norm;                                                                       \
-    odd_diff = spinor_field_sqnorm_f(odd) - odd_norm;                                                                          \
+    in_diff = sqnorm_spinor_field(in) - in_norm;                                                                               \
+    even_diff = sqnorm_spinor_field(even) - even_norm;                                                                         \
+    odd_diff = sqnorm_spinor_field(odd) - odd_norm;                                                                            \
     reldiff = in_diff / in_norm;                                                                                               \
     reldiff_even = even_diff / even_norm;                                                                                      \
     reldiff_odd = odd_diff / odd_norm;                                                                                         \
@@ -62,18 +62,18 @@ int main(int argc, char *argv[]) {
     gaussian_spinor_field(in);
 
     in->type = &glat_even;
-    spinor_field_copy_f(even, in);
+    copy_spinor_field(even, in);
 
     in->type = &glat_odd;
     in->ptr += glat_odd.master_shift;
-    spinor_field_copy_f(odd, in);
+    copy_spinor_field(odd, in);
 
     in->type = &glattice;
     in->ptr -= glat_odd.master_shift;
 
-    double in_norm = spinor_field_sqnorm_f(in);
-    double even_norm = spinor_field_sqnorm_f(even);
-    double odd_norm = spinor_field_sqnorm_f(odd);
+    double in_norm = sqnorm_spinor_field(in);
+    double even_norm = sqnorm_spinor_field(even);
+    double odd_norm = sqnorm_spinor_field(odd);
     double diff = (in_norm - (even_norm + odd_norm));
     double reldiff = diff / in_norm;
     lprintf("TEST", 1, "[START] Norm^2: global=%.10e even=%.10e odd=%.10e TEST: relative diff=%.10e  diff=%.10e\n", in_norm,

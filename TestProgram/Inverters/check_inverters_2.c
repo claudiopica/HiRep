@@ -71,9 +71,9 @@ int main(int argc, char *argv[]) {
 
     for (i = 0; i < par.n; ++i) {
         H(s2, &res[i]);
-        spinor_field_mul_add_assign_f(s2, -par.shift[i], &res[i]);
-        spinor_field_sub_assign_f(s2, s1);
-        tau = spinor_field_sqnorm_f(s2) / spinor_field_sqnorm_f(s1);
+        mul_add_assign_spinor_field(s2, -par.shift[i], &res[i]);
+        sub_assign_spinor_field(s2, s1);
+        tau = sqnorm_spinor_field(s2) / sqnorm_spinor_field(s1);
         lprintf("MR TEST", 0, "test MINRES[%d] = %e (req. %e)\n", i, tau, par.err2);
         if (tau > par.err2) { return_value += 1; }
     }
@@ -103,8 +103,8 @@ int main(int argc, char *argv[]) {
         set_dirac_mass(hmass);
 
         H(s2, &res[i]);
-        spinor_field_sub_f(s2, s2, s1);
-        tau = spinor_field_sqnorm_f(s2) / spinor_field_sqnorm_f(s1);
+        sub_spinor_field(s2, s2, s1);
+        tau = sqnorm_spinor_field(s2) / sqnorm_spinor_field(s1);
         lprintf("MR TEST", 0, "test MINRES[%d] = %e (req. %e)\n", i, tau, par.err2);
         if (tau > par.err2) { return_value += 1; }
     }

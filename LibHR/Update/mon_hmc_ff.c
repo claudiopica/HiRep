@@ -25,7 +25,7 @@ static void hmc_ff_correct_pf(monomial const *m) {
     mon_hmc_par *par = (mon_hmc_par *)(m->data.par);
 
     /* compute H2^{1/2}*pf = H*pf */
-    spinor_field_g5_f(tmp_pf, par->pf);
+    g5_spinor_field(tmp_pf, par->pf);
     set_ff_dirac_mass(par->mass);
     Dff_dagger(par->pf, tmp_pf);
 }
@@ -42,10 +42,10 @@ static void hmc_ff_correct_la_pf(monomial const *m) {
     cgpar.err2 = m->data.MT_prec;
 
     set_ff_dirac_mass(par->mass);
-    spinor_field_zero_f(tmp_pf);
+    zero_spinor_field(tmp_pf);
     cg_mshift(&cgpar, &Dff_sq, par->pf, tmp_pf);
     Dff(par->pf, tmp_pf);
-    spinor_field_g5_assign_f(par->pf);
+    g5_assign_spinor_field(par->pf);
 }
 
 static const spinor_field *hmc_ff_pseudofermion(monomial const *m) {

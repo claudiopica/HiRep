@@ -244,13 +244,13 @@ void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spi
     inv_par.max_iter = 0; /* no limit */
 
     /* compute inverse vectors */
-    if (inv_par.n == 1) { spinor_field_zero_f(inv_out); }
+    if (inv_par.n == 1) { zero_spinor_field(inv_out); }
     cg_mshift(&inv_par, Q, in, inv_out);
 
     /* sum all the contributions */
-    spinor_field_mul_f(out, coef->a[0], in);
+    mul_spinor_field(out, coef->a[0], in);
     for (i = 1; i < (coef->order) + 1; ++i) {
-        spinor_field_mul_add_assign_f(out, coef->a[i], &inv_out[i - 1]);
+        mul_add_assign_spinor_field(out, coef->a[i], &inv_out[i - 1]);
     }
 
     /* free memory */

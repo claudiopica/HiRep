@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
         create_diluted_source_equal_atau(source, tau);
 
         for (j = 0; j < 4; ++j) {
-            norm = spinor_field_sqnorm_f(&source[j]);
+            norm = sqnorm_spinor_field(&source[j]);
 
             if (fabs(norm / ((double)NF * GLB_X * GLB_Y * GLB_Z) - 1.) > 1e-14) { return_value += 1; }
         } // loop on j
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
             create_diluted_source_equal_atau_col(source, tau, col);
 
             for (j = 0; j < 4; ++j) {
-                norm = spinor_field_sqnorm_f(&source[j]);
+                norm = sqnorm_spinor_field(&source[j]);
 
                 if (fabs(norm / ((double)GLB_X * GLB_Y * GLB_Z) - 1.) > 1e-14) { return_value += 1; }
             }
@@ -173,7 +173,7 @@ int main(int argc, char *argv[]) {
                 zero_even_or_odd_site_spinorfield(source, 4, eo);
 
                 for (j = 0; j < 4; ++j) {
-                    norm = spinor_field_sqnorm_f(&source[j]);
+                    norm = sqnorm_spinor_field(&source[j]);
                     if (fabs(norm / (0.5 * (double)GLB_X * GLB_Y * GLB_Z) - 1.) > 1e-14) { return_value += 1; }
                 } // loop on j
             } // loop on eo.

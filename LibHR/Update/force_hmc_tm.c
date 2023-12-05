@@ -23,8 +23,8 @@ static void Mee_inv(spinor_field *out, double mass, double mu, spinor_field *in)
     double rho = (4 + mass) / norm;
     hr_complex imu;
     imu = -I * mu / norm;
-    spinor_field_mul_f(out, rho, in);
-    spinor_field_g5_mulc_add_assign_f(out, imu, in);
+    mul_spinor_field(out, rho, in);
+    g5_mulc_add_assign_spinor_field(out, imu, in);
 }
 
 static void free_force_hmc_tm() {
@@ -105,7 +105,7 @@ void force_hmc_tm(double dt, void *vpar) {
         set_twisted_mass(par->mu + par->b);
         Qtm_p(Ys, pf);
         set_twisted_mass(par->mu);
-        spinor_field_zero_f(Xs);
+        zero_spinor_field(Xs);
         mre_guess(&par->mpar, 0, Xs, &QpQm_tm, pf);
         n_iters += 2 * cg_mshift(&mpar, QpQm_tm, Ys, Xs);
         mre_store(&par->mpar, 0, Xs);
@@ -124,7 +124,7 @@ void force_hmc_tm(double dt, void *vpar) {
 
         // Second contribution to force
         //  Ye = pf
-        spinor_field_copy_f(Ys, pf);
+        copy_spinor_field(Ys, pf);
 
         /* Yo = (M_ee^+)^-1 * M_eo pf */
         Dphi_(xi, pf);

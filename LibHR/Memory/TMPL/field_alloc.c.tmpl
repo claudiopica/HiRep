@@ -15,6 +15,9 @@
 #if !defined _FIELD_TYPE
 #error Missing _FIELD_TYPE in memory.c
 #endif
+#if !defined _FIELD_TYPE
+#error Missing _FIELD_TYPE in memory.c
+#endif
 #if !defined _SITE_TYPE
 #error Missing _SITE_TYPE in memory.c
 #endif
@@ -29,10 +32,16 @@
 
 // This is necessary, because spinor-like fields have an additional argument
 // in the allocation function
+
 #if _IS_SPINOR_LIKE == 0
 #define _n 1
 #define _GEOM_TYPE gauge
-#define _ALLOCATE _F_ARGS(alloc_, (geometry_descriptor * type))
+#define _ALLOCATE                                       \
+    _F_ARGS(alloc_, (geometry_descriptor * type)) {     \
+        return _F_NAME(alloc_n_, _FIELD_TYPE)(1, type); \
+    }                                                   \
+    _F_ARGS(alloc_n_, (unsigned int n, geometry_descriptor *type))
+
 #else
 #define _n n
 #define _GEOM_TYPE spinor
@@ -77,6 +86,7 @@ _DECLARE_STATIC(assign_comm_type_, (unsigned int n, _FIELD_TYPE *f)) {
 _DECLARE_STATIC(assign_geometry_descriptor_, (unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
     for (int i = 0; i < n; ++i) {
         f[i].type = type;
+        f[i].field_dim = _FIELD_DIM;
     }
 }
 
@@ -166,12 +176,12 @@ _DECLARE(free_, (_FIELD_TYPE * f)) {
 _ALLOCATE {
     _FIELD_TYPE *f;
 
-    _F_NAME(allocate_field_struct_, _FIELD_TYPE)(_n, &f, type);
-    _F_NAME(assign_geometry_descriptor_, _FIELD_TYPE)(_n, f, type);
-    _F_NAME(assign_comm_type_, _FIELD_TYPE)(_n, f);
-    _F_NAME(allocate_cpu_field_data_, _FIELD_TYPE)(_n, f, type);
-    _F_NAME(allocate_gpu_field_data_, _FIELD_TYPE)(_n, f, type);
-    _F_NAME(allocate_mpi_field_data_, _FIELD_TYPE)(_n, f, type);
+    _F_NAME(allocate_field_struct_, _FIELD_TYPE)(n, &f, type);
+    _F_NAME(assign_geometry_descriptor_, _FIELD_TYPE)(n, f, type);
+    _F_NAME(assign_comm_type_, _FIELD_TYPE)(n, f);
+    _F_NAME(allocate_cpu_field_data_, _FIELD_TYPE)(n, f, type);
+    _F_NAME(allocate_gpu_field_data_, _FIELD_TYPE)(n, f, type);
+    _F_NAME(allocate_mpi_field_data_, _FIELD_TYPE)(n, f, type);
     return f;
 }
 
@@ -185,6 +195,7 @@ _ALLOCATE {
 #undef _GEOM_TYPE
 
 // Template paramters
+#undef _FIELD_TYPE
 #undef _FIELD_TYPE
 #undef _SITE_TYPE
 #undef _FIELD_DIM

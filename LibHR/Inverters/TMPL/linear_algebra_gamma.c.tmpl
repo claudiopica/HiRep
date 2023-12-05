@@ -1,0 +1,131 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica and Agostino Patella                     *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+#include <string.h>
+
+// Error checking
+#if !defined(_FIELD_TYPE)
+#error Missing _FIELD_TYPE in linear_algebra.c
+#endif
+#if !defined(_FIELD_DIM)
+#error Missing _FIELD_DIM in linear_algebra.c
+#endif
+#if !defined(_SITE_TYPE)
+#error Missing _SITE_TYPE in linear_algebra.c
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in linear_algebra.c
+#endif
+#if !defined(_COMPLEX)
+#error Missing _COMPLEX in linear_algebra.c
+#endif
+
+/* Re <g5*s1,s2> */
+_DECLARE_LINEAR_ALGEBRA(double, g5_prod_re, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    double sum;
+    double c; //compensation term
+    sum = 0.;
+    c = 0.;
+
+    _TWO_SITE_FOR_SUM(s1, s2, sum, c) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            double prod;
+            prod = g5_prod_re(_SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+            _2Sum_acc(sum, c, prod);
+        }
+    }
+    sum += c;
+#ifdef WITH_MPI
+    global_sum(&sum, 1);
+#endif
+    return sum;
+}
+
+/* Im <g5*s1,s2> */
+_DECLARE_LINEAR_ALGEBRA(double, g5_prod_im, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    double sum;
+    double c; //compensation term
+    sum = 0.;
+    c = 0.;
+
+    _TWO_SITE_FOR_SUM(s1, s2, sum, c) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            double prod;
+            prod = g5_prod_im(_SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+            _2Sum_acc(sum, c, prod);
+        }
+    }
+    sum += c;
+#ifdef WITH_MPI
+    global_sum(&sum, 1);
+#endif
+    return sum;
+}
+
+/* s1+=c*g5*s2 c complex */
+_DECLARE_LINEAR_ALGEBRA(void, g5_mulc_add_assign, (_FIELD_TYPE * s1, _COMPLEX c, _FIELD_TYPE *s2)) {
+    _SITE_TYPE *tmp;
+    tmp = (_SITE_TYPE *)malloc(sizeof(_SITE_TYPE));
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            g5(tmp, _SITE_PTR(s2, mu, _FIELD_DIM));
+            mulc_add_assign(_SITE_PTR(s1, mu, _FIELD_DIM), c, tmp);
+        }
+    }
+}
+
+/* s1=g5*s2  */
+_DECLARE_LINEAR_ALGEBRA(void, g5, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            g5(_SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1=g5*s1  */
+_DECLARE_LINEAR_ALGEBRA(void, g5_assign, (_FIELD_TYPE * s1)) {
+    _ONE_SITE_FOR(s1) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            g5_assign(_SITE_PTR(s1, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1=g0*s2  */
+_DECLARE_LINEAR_ALGEBRA(void, g0, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            g0(_SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1=g1*s2  */
+_DECLARE_LINEAR_ALGEBRA(void, g1, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            g1(_SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1=g2*s2  */
+_DECLARE_LINEAR_ALGEBRA(void, g2, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            g2(_SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}
+
+/* s1=g3*s2  */
+_DECLARE_LINEAR_ALGEBRA(void, g3, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
+    _TWO_SITE_FOR(s1, s2) {
+        for (int mu = 0; mu < _FIELD_DIM; ++mu) {
+            g3(_SITE_PTR(s1, mu, _FIELD_DIM), _SITE_PTR(s2, mu, _FIELD_DIM));
+        }
+    }
+}

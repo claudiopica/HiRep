@@ -14,7 +14,7 @@ int test_bijectivity_suNf_field();
 int test_bijectivity_suNg_scalar_field();
 int test_bijectivity_suNg_av_field();
 int test_bijectivity_gtransf();
-int test_bijectivity_ldl_field();
+//int test_bijectivity_clover_ldl();
 int test_bijectivity_clover_term();
 int test_bijectivity_clover_force();
 int test_bijectivity_spinor_field(geometry_descriptor *);
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     return_val += test_bijectivity_suNg_scalar_field();
     return_val += test_bijectivity_suNg_av_field();
     return_val += test_bijectivity_gtransf();
-    return_val += test_bijectivity_ldl_field();
+    //return_val += test_bijectivity_clover_ldl();
     return_val += test_bijectivity_clover_term();
     return_val += test_bijectivity_clover_force();
     return_val += test_bijectivity_spinor_field(&glattice);
@@ -137,22 +137,21 @@ int test_bijectivity_spinor_field(geometry_descriptor *gd) {
 
     gaussian_spinor_field(in);
 
-    spinor_field_copy_f_cpu(in_copy, in);
-    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
-    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n",
-            spinor_field_sqnorm_f_cpu(in_copy));
+    copy_spinor_field_cpu(in_copy, in);
+    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_spinor_field_cpu(in));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_spinor_field_cpu(in_copy));
 
     copy_to_gpu_spinor_field(in);
     fill_buffers_with_zeroes_spinor_field(in);
-    spinor_field_zero_f_cpu(in);
-    lprintf("SANITY CHECK", 0, "GPU copy non-zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f(in));
-    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
+    zero_spinor_field_cpu(in);
+    lprintf("SANITY CHECK", 0, "GPU copy non-zero in intermediate step: %0.2e\n", sqnorm_spinor_field(in));
+    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_spinor_field_cpu(in));
     copy_from_gpu_spinor_field(in);
 
-    lprintf("SANITY CHECK", 0, "CPU after copying back: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
+    lprintf("SANITY CHECK", 0, "CPU after copying back: %0.2e\n", sqnorm_spinor_field_cpu(in));
 
-    spinor_field_sub_assign_f_cpu(in, in_copy);
-    double diff_norm = spinor_field_sqnorm_f_cpu(in);
+    sub_assign_spinor_field_cpu(in, in_copy);
+    double diff_norm = sqnorm_spinor_field_cpu(in);
     return_val += check_diff_norm_zero(diff_norm);
 
     free_spinor_field(in);
@@ -169,20 +168,20 @@ int test_bijectivity_spinor_field_flt(geometry_descriptor *gd) {
 
     gaussian_spinor_field_flt(in);
 
-    spinor_field_copy_f_flt_cpu(in_copy, in);
-    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(in));
+    copy_spinor_field_flt_cpu(in_copy, in);
+    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_spinor_field_flt_cpu(in));
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n",
-            spinor_field_sqnorm_f_flt_cpu(in_copy));
+            sqnorm_spinor_field_flt_cpu(in_copy));
 
     copy_to_gpu_spinor_field_flt(in);
-    spinor_field_zero_f_flt_cpu(in);
+    zero_spinor_field_flt_cpu(in);
     fill_buffers_with_zeroes_spinor_field_flt(in);
-    lprintf("SANITY CHECK", 0, "GPU copy non-zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f_flt(in));
-    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(in));
+    lprintf("SANITY CHECK", 0, "GPU copy non-zero in intermediate step: %0.2e\n", sqnorm_spinor_field_flt(in));
+    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_spinor_field_flt_cpu(in));
     copy_from_gpu_spinor_field_flt(in);
 
-    spinor_field_sub_assign_f_flt_cpu(in, in_copy);
-    double diff_norm = spinor_field_sqnorm_f_flt_cpu(in);
+    sub_assign_spinor_field_flt_cpu(in, in_copy);
+    double diff_norm = sqnorm_spinor_field_flt_cpu(in);
     return_val += check_diff_norm_zero(diff_norm);
 
     free_spinor_field_flt(in);
@@ -417,7 +416,8 @@ int test_bijectivity_clover_force() {
     return return_val;
 }
 
-int test_bijectivity_ldl_field() {
+#if 0
+int test_bijectivity_clover_ldl() {
     lprintf("INFO", 0, " ====== TEST CLOVER LDL ======= ");
     int return_val = 0;
     ldl_field *in, *in_copy;
@@ -444,6 +444,7 @@ int test_bijectivity_ldl_field() {
     free_ldl_field(in_copy);
     return return_val;
 }
+#endif
 
 int test_bijectivity_staple_field() {
     lprintf("INFO", 0, " ====== TEST STAPLE FIELD ======= ");

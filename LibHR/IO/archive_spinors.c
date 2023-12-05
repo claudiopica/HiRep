@@ -36,7 +36,7 @@ void write_spinor_field(char filename[], spinor_field *sp) {
 #endif
 #endif
 
-    norm2 = spinor_field_sqnorm_f(sp); /* to use as a checksum in the header */
+    norm2 = sqnorm_spinor_field(sp); /* to use as a checksum in the header */
     if (PID == 0) {
         int d[6] = { NG, NF, GLB_T, GLB_X, GLB_Y, GLB_Z };
         error((fp = fopen(filename, "wb")) == NULL, -1, "write_spinor_field", "Failed to open file for writing");
@@ -288,7 +288,7 @@ void read_spinor_field(char filename[], spinor_field *sp) {
     free(buff);
 
     /* check sq. norm */
-    testnorm2 = spinor_field_sqnorm_f(sp);
+    testnorm2 = sqnorm_spinor_field(sp);
     double relerr = fabs(testnorm2 - norm2) / norm2; //relative error
     if (PID == 0) {
         if (relerr > 1.e-14) {

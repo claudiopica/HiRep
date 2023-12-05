@@ -83,19 +83,19 @@ double apply_operator(double *old, double *new, spinor_field *in) {
     // Allocate spinor fields
     tmp = alloc_spinor_field(1, in->type);
     res = alloc_spinor_field(1, in->type);
-    spinor_field_zero_f(tmp);
+    zero_spinor_field(tmp);
 
 // Apply dirac operators
 #ifdef REWEIGHT_THETA
     set_theta(old);
-    spinor_field_g5_assign_f(in);
+    g5_assign_spinor_field(in);
     g5QMR_mshift(&mpar, &Dirac_operator, in, tmp);
-    spinor_field_g5_assign_f(in);
+    g5_assign_spinor_field(in);
 
     set_theta(new);
     Dirac_operator(res, tmp);
-    spinor_field_g5_assign_f(res);
-    val = spinor_field_prod_re_f(res, res);
+    g5_assign_spinor_field(res);
+    val = prod_re_spinor_field(res, res);
 #endif
 
 #ifdef REWEIGHT_MASS
@@ -104,7 +104,7 @@ double apply_operator(double *old, double *new, spinor_field *in) {
 
     mass = new[0];
     Dirac_operator(res, tmp);
-    val = spinor_field_prod_re_f(res, res);
+    val = prod_re_spinor_field(res, res);
 #endif
 
     // Free spinor fields
@@ -140,7 +140,7 @@ void reweight(double steps, double *result) {
 #endif
 
         gaussian_spinor_field(eta);
-        denominator = spinor_field_prod_re_f(eta, eta);
+        denominator = prod_re_spinor_field(eta, eta);
         numerator = apply_operator(old, new, eta);
         result[n] = (denominator - numerator);
     }

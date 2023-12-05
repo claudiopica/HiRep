@@ -14,8 +14,8 @@ void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spin
     while (nu--) {
         // Compute residue: res = in - M * out
         M(stmp1, out);
-        spinor_field_sub_f(res, in, stmp1);
-        spinor_field_zero_f(stmp1);
+        sub_spinor_field(res, in, stmp1);
+        zero_spinor_field(stmp1);
         empty_buffers(stmp1);
 
         // Invert black: stmp1 = M^-1 * res
@@ -41,11 +41,11 @@ void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spin
 
         // Update residue: res = res - M * stmp1
         M(stmp2, stmp1);
-        spinor_field_sub_assign_f(res, stmp2);
+        sub_assign_spinor_field(res, stmp2);
 
         // Update solution: out = out + stmp1
-        spinor_field_add_assign_f(out, stmp1);
-        spinor_field_zero_f(stmp1);
+        add_assign_spinor_field(out, stmp1);
+        zero_spinor_field(stmp1);
         empty_buffers(stmp1);
 
         // Invert red: stmp1 = M^-1 * res
@@ -70,7 +70,7 @@ void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spin
         }
 
         // Update solution: out = out + stmp1
-        spinor_field_add_assign_f(out, stmp1);
+        add_assign_spinor_field(out, stmp1);
     }
 
     // Free temporary spinors

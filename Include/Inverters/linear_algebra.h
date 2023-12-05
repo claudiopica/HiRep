@@ -33,20 +33,131 @@ hr_complex *alloc_complex_sum_field(int n);
 #endif
 
 // double precision
-#define _SPINOR_FIELD_TYPE spinor_field
-#define _SPINOR_TYPE suNf_spinor
+#define _FIELD_TYPE spinor_field
 #define _REAL double
 #define _COMPLEX hr_complex
-#define _SUFFIX _f
-#include "TMPL/linear_algebra.h.tmpl"
+#include "TMPL/linear_algebra_def.h.tmpl" // This has to go first
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_lc.h.tmpl"
+#include "TMPL/linear_algebra_gamma.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl" // This has to come last
 
 // single precision
-#define _SPINOR_FIELD_TYPE spinor_field_flt
-#define _SPINOR_TYPE suNf_spinor_flt
+#define _FIELD_TYPE spinor_field_flt
 #define _REAL float
 #define _COMPLEX hr_complex_flt
-#define _SUFFIX _f_flt
-#include "TMPL/linear_algebra.h.tmpl"
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_lc.h.tmpl"
+#include "TMPL/linear_algebra_gamma.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+// double precision
+#define _FIELD_TYPE scalar_field
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE suNg_field
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE suNf_field
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE suNfc_field
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE suNg_field_flt
+#define _REAL float
+#define _COMPLEX hr_complex_flt
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE suNf_field_flt
+#define _REAL float
+#define _COMPLEX hr_complex_flt
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE suNg_scalar_field
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE suNg_av_field
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE gtransf
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE ldl_field
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE clover_term
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE clover_force
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#define _FIELD_TYPE staple_field
+#define _REAL double
+#define _COMPLEX hr_complex
+#include "TMPL/linear_algebra_def.h.tmpl"
+#include "TMPL/linear_algebra_reduction.h.tmpl"
+#include "TMPL/linear_algebra_base_operations.h.tmpl"
+#include "TMPL/linear_algebra_base.h.tmpl"
+
+#undef _DECLARE_LINA_HEADER
 
 #ifdef __cplusplus
 }

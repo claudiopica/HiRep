@@ -8,5 +8,10 @@
 
 #include "Random/ranlux.h"
 #include "Random/random_utils.h"
+#ifdef __cplusplus
+#include "Random/random_generic_gpu.hpp"
+#else
+#include "Random/random_generic.h"
+#endif
 
 #endif

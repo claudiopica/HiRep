@@ -55,172 +55,172 @@ int main(int argc, char *argv[]) {
     gaussian_spinor_field(s1);
     gaussian_spinor_field(s0);
 
-    spinor_field_copy_f(s2, s0);
-    spinor_field_copy_f(s3, s1);
+    copy_spinor_field(s2, s0);
+    copy_spinor_field(s3, s1);
 
-    spinor_field_add_assign_f(s3, s0);
+    add_assign_spinor_field(s3, s0);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    spinor_field_add_assign_f(s2, s1);
+    add_assign_spinor_field(s2, s1);
     red = spinors_max_difference(s3, s2);
-    lprintf("MAIN", 0, "Max point difference for spinor_field_add_assign_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
+    lprintf("MAIN", 0, "Max point difference for add_assign_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             red);
     if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    spinor_field_sub_f(s2, s0, s1);
+    sub_spinor_field(s2, s0, s1);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    spinor_field_sub_f(s3, s0, s1);
+    sub_spinor_field(s3, s0, s1);
     red = spinors_max_difference(s3, s2);
-    lprintf("MAIN", 0, "Max point difference for spinor_field_sub_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
+    lprintf("MAIN", 0, "Max point difference for sub_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
     if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    spinor_field_mul_f(s2, rnd[0], s0);
+    mul_spinor_field(s2, rnd[0], s0);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    spinor_field_mul_f(s3, rnd[0], s0);
+    mul_spinor_field(s3, rnd[0], s0);
     red = spinors_max_difference(s3, s2);
-    lprintf("MAIN", 0, "Max point difference for spinor_field_mul_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
+    lprintf("MAIN", 0, "Max point difference for mul_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
     if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    spinor_field_copy_f(s2, s0);
-    spinor_field_copy_f(s3, s0);
-    spinor_field_mul_add_assign_f(s2, rnd[0], s0);
+    copy_spinor_field(s2, s0);
+    copy_spinor_field(s3, s0);
+    mul_add_assign_spinor_field(s2, rnd[0], s0);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    spinor_field_mul_add_assign_f(s3, rnd[0], s0);
+    mul_add_assign_spinor_field(s3, rnd[0], s0);
     red = spinors_max_difference(s3, s2);
-    lprintf("MAIN", 0, "Max point difference for spinor_field_mul_add_assign_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
+    lprintf("MAIN", 0, "Max point difference for mul_add_assign_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             red);
     if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    spinor_field_copy_f(s2, s0);
-    spinor_field_copy_f(s3, s0);
-    spinor_field_mulc_add_assign_f(s2, rnd[0] + I * rnd[1], s0);
+    copy_spinor_field(s2, s0);
+    copy_spinor_field(s3, s0);
+    mulc_add_assign_spinor_field(s2, rnd[0] + I * rnd[1], s0);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    spinor_field_mulc_add_assign_f(s3, rnd[0] + I * rnd[1], s0);
+    mulc_add_assign_spinor_field(s3, rnd[0] + I * rnd[1], s0);
     red = spinors_max_difference(s3, s2);
     lprintf("MAIN", 0,
-            "Max point difference for spinor_field_mulc_add_assign_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
+            "Max point difference for mulc_add_assign_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
     if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    spinor_field_g5_f(s3, s0);
+    g5_spinor_field(s3, s0);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    spinor_field_g5_f(s2, s0);
+    g5_spinor_field(s2, s0);
     red = spinors_max_difference(s3, s2);
-    lprintf("MAIN", 0, "Max point difference for spinor_field_g5_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
+    lprintf("MAIN", 0, "Max point difference for g5_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
     if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    spinor_field_lc_f(s2, rnd[0], s0, rnd[1], s1);
+    lc_spinor_field(s2, rnd[0], s0, rnd[1], s1);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    spinor_field_lc_f(s3, rnd[0], s0, rnd[1], s1);
+    lc_spinor_field(s3, rnd[0], s0, rnd[1], s1);
     red = spinors_max_difference(s3, s2);
-    lprintf("MAIN", 0, "Max point difference for spinor_field_lc_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
+    lprintf("MAIN", 0, "Max point difference for lc_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n", red);
     if (red > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    res[0] = spinor_field_prod_re_f(s0, s1);
+    res[0] = prod_re_spinor_field(s0, s1);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    res[1] = spinor_field_prod_re_f(s0, s1);
+    res[1] = prod_re_spinor_field(s0, s1);
     bcast(res, 2);
-    lprintf("MAIN", 0, "Max difference for spinor_field_prod_re_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
+    lprintf("MAIN", 0, "Max difference for prod_re_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             fabs(res[1] - res[0]) / fabs(res[1]));
     if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    res[0] = spinor_field_prod_im_f(s0, s1);
+    res[0] = prod_im_spinor_field(s0, s1);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    res[1] = spinor_field_prod_im_f(s0, s1);
+    res[1] = prod_im_spinor_field(s0, s1);
     bcast(res, 2);
-    lprintf("MAIN", 0, "Max difference for spinor_field_prod_im_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
+    lprintf("MAIN", 0, "Max difference for prod_im_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             fabs(res[1] - res[0]) / fabs(res[1]));
     if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    cres[0] = spinor_field_prod_f(s0, s1);
+    cres[0] = prod_spinor_field(s0, s1);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    cres[1] = spinor_field_prod_f(s0, s1);
+    cres[1] = prod_spinor_field(s0, s1);
     bcast(res, 2);
-    lprintf("MAIN", 0, "Max difference for spinor_field_prod_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
+    lprintf("MAIN", 0, "Max difference for prod_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             cabs(cres[1] - cres[0]) / cabs(cres[1]));
     if (cabs(cres[1] - cres[0]) / cabs(cres[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    res[0] = spinor_field_sqnorm_f(s0);
+    res[0] = sqnorm_spinor_field(s0);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    res[1] = spinor_field_sqnorm_f(s0);
+    res[1] = sqnorm_spinor_field(s0);
     bcast(res, 2);
-    lprintf("MAIN", 0, "Max difference for spinor_field_sqnorm_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
+    lprintf("MAIN", 0, "Max difference for sqnorm_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             fabs(res[1] - res[0]) / fabs(res[1]));
     if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    res[0] = spinor_field_g5_prod_re_f(s0, s1);
+    res[0] = g5_prod_re_spinor_field(s0, s1);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    res[1] = spinor_field_g5_prod_re_f(s0, s1);
+    res[1] = g5_prod_re_spinor_field(s0, s1);
     bcast(res, 2);
-    lprintf("MAIN", 0, "Max difference for spinor_field_g5_prod_re_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
+    lprintf("MAIN", 0, "Max difference for g5_prod_re_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             fabs(res[1] - res[0]) / fabs(res[1]));
     if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif
 
-    res[0] = spinor_field_g5_prod_im_f(s0, s1);
+    res[0] = g5_prod_im_spinor_field(s0, s1);
 #ifdef _OPENMP
     omp_set_num_threads(1);
 #endif
-    res[1] = spinor_field_g5_prod_im_f(s0, s1);
+    res[1] = g5_prod_im_spinor_field(s0, s1);
     bcast(res, 2);
-    lprintf("MAIN", 0, "Max difference for spinor_field_g5_prod_im_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
+    lprintf("MAIN", 0, "Max difference for g5_prod_im_spinor_field_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
             fabs(res[1] - res[0]) / fabs(res[1]));
     if (fabs(res[1] - res[0]) / fabs(res[1]) > 1.e-14) { retval++; }
 #ifdef _OPENMP

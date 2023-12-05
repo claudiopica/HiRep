@@ -23,7 +23,7 @@ extern rhmc_par _update_par;
 #define _REAL double
 #define _GAUGE_TYPE suNf
 #define _SUFFIX
-#define _REP_SUFFIX _f
+#define _REP_SUFFIX
 #include "TMPL/Dphi_gpu.cu.tmpl"
 
 // single precision
@@ -35,7 +35,7 @@ extern rhmc_par _update_par;
 #define _REAL float
 #define _GAUGE_TYPE suNf_flt
 #define _SUFFIX _flt
-#define _REP_SUFFIX _f_flt
+#define _REP_SUFFIX _flt
 #include "TMPL/Dphi_gpu.cu.tmpl"
 
 #endif

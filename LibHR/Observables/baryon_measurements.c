@@ -37,8 +37,8 @@ void measure_baryons(double *m, int conf_num, double precision, storage_switch s
     // one should run the meson contraction as well here
     //for (k=0;k<NF;++k){
     //	for (beta=0;beta<4;++beta){
-    //		spinor_field_zero_f(&source2[beta]);
-    //		spinor_field_zero_f(&prop2[beta]);
+    //		zero_spinor_field(&source2[beta]);
+    //		zero_spinor_field(&prop2[beta]);
     //	}
 
     //		measure_mesons(prop2, source2, nm, tau);

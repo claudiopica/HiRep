@@ -65,18 +65,18 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Measuring the norms and dot products of the fields... ");
-    sobs[0] = spinor_field_sqnorm_f(ss);
-    sobs[1] = spinor_field_sqnorm_f(ss + 1);
-    sobs[2] = spinor_field_prod_f(ss, ss + 1);
+    sobs[0] = sqnorm_spinor_field(ss);
+    sobs[1] = sqnorm_spinor_field(ss + 1);
+    sobs[2] = prod_spinor_field(ss, ss + 1);
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Applying the random shift to the spinor fields... ");
     shift_fields(shift, ss, NULL, ss, NULL);
-    sobs[3] = spinor_field_sqnorm_f(ss);
-    sobs[4] = spinor_field_prod_f(ss, ss + 1);
+    sobs[3] = sqnorm_spinor_field(ss);
+    sobs[4] = prod_spinor_field(ss, ss + 1);
     shift_fields(shift, ss + 1, NULL, ss + 1, NULL);
-    sobs[5] = spinor_field_sqnorm_f(ss + 1);
-    sobs[6] = spinor_field_prod_f(ss, ss + 1);
+    sobs[5] = sqnorm_spinor_field(ss + 1);
+    sobs[6] = prod_spinor_field(ss, ss + 1);
 
     lprintf("MAIN", 0, "done.\n\n");
 
@@ -106,26 +106,26 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Measuring the norms and dot products field... ");
-    sobs[0] = spinor_field_sqnorm_f(ss_e);
-    sobs[1] = spinor_field_sqnorm_f(ss_e + 1);
-    sobs[2] = spinor_field_prod_f(ss_e, ss_e + 1);
+    sobs[0] = sqnorm_spinor_field(ss_e);
+    sobs[1] = sqnorm_spinor_field(ss_e + 1);
+    sobs[2] = prod_spinor_field(ss_e, ss_e + 1);
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Applying the random shift to the spinor field... ");
     if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0) {
         shift_fields(shift, ss_e, NULL, ss_e, NULL);
-        sobs[3] = spinor_field_sqnorm_f(ss_e);
-        sobs[4] = spinor_field_prod_f(ss_e, ss_e + 1);
+        sobs[3] = sqnorm_spinor_field(ss_e);
+        sobs[4] = prod_spinor_field(ss_e, ss_e + 1);
         shift_fields(shift, ss_e + 1, NULL, ss_e + 1, NULL);
-        sobs[5] = spinor_field_sqnorm_f(ss_e + 1);
-        sobs[6] = spinor_field_prod_f(ss_e, ss_e + 1);
+        sobs[5] = sqnorm_spinor_field(ss_e + 1);
+        sobs[6] = prod_spinor_field(ss_e, ss_e + 1);
     } else {
         shift_fields(shift, ss_e, NULL, ss_e, NULL);
-        sobs[3] = spinor_field_sqnorm_f(ss_e);
-        sobs[4] = spinor_field_prod_f(ss_e, ss_e + 1);
+        sobs[3] = sqnorm_spinor_field(ss_e);
+        sobs[4] = prod_spinor_field(ss_e, ss_e + 1);
         shift_fields(shift, ss_e + 1, NULL, ss_e + 1, NULL);
-        sobs[5] = spinor_field_sqnorm_f(ss_e + 1);
-        sobs[6] = spinor_field_prod_f(ss_e, ss_e + 1);
+        sobs[5] = sqnorm_spinor_field(ss_e + 1);
+        sobs[6] = prod_spinor_field(ss_e, ss_e + 1);
     }
     lprintf("MAIN", 0, "done.\n\n");
 
@@ -154,26 +154,26 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Measuring the norms and dot products field... ");
-    sobs[0] = spinor_field_sqnorm_f(ss_o);
-    sobs[1] = spinor_field_sqnorm_f(ss_o + 1);
-    sobs[2] = spinor_field_prod_f(ss_o, ss_o + 1);
+    sobs[0] = sqnorm_spinor_field(ss_o);
+    sobs[1] = sqnorm_spinor_field(ss_o + 1);
+    sobs[2] = prod_spinor_field(ss_o, ss_o + 1);
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Applying the random shift to the spinor field... ");
     if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0) {
         shift_fields(shift, ss_o, NULL, ss_o, NULL);
-        sobs[3] = spinor_field_sqnorm_f(ss_o);
-        sobs[4] = spinor_field_prod_f(ss_o, ss_o + 1);
+        sobs[3] = sqnorm_spinor_field(ss_o);
+        sobs[4] = prod_spinor_field(ss_o, ss_o + 1);
         shift_fields(shift, ss_o + 1, NULL, ss_o + 1, NULL);
-        sobs[5] = spinor_field_sqnorm_f(ss_o + 1);
-        sobs[6] = spinor_field_prod_f(ss_o, ss_o + 1);
+        sobs[5] = sqnorm_spinor_field(ss_o + 1);
+        sobs[6] = prod_spinor_field(ss_o, ss_o + 1);
     } else {
         shift_fields(shift, ss_o, NULL, ss_o, NULL);
-        sobs[3] = spinor_field_sqnorm_f(ss_o);
-        sobs[4] = spinor_field_prod_f(ss_o, ss_o + 1);
+        sobs[3] = sqnorm_spinor_field(ss_o);
+        sobs[4] = prod_spinor_field(ss_o, ss_o + 1);
         shift_fields(shift, ss_o + 1, NULL, ss_o + 1, NULL);
-        sobs[5] = spinor_field_sqnorm_f(ss_o + 1);
-        sobs[6] = spinor_field_prod_f(ss_o, ss_o + 1);
+        sobs[5] = sqnorm_spinor_field(ss_o + 1);
+        sobs[6] = prod_spinor_field(ss_o, ss_o + 1);
     }
     lprintf("MAIN", 0, "done.\n\n");
 
@@ -230,18 +230,18 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Measuring the norms and dot products of the fields... ");
-    sobs[0] = spinor_field_sqnorm_f(ss);
-    sobs[1] = spinor_field_sqnorm_f(ss + 1);
-    sobs[2] = spinor_field_prod_f(ss, ss + 1);
+    sobs[0] = sqnorm_spinor_field(ss);
+    sobs[1] = sqnorm_spinor_field(ss + 1);
+    sobs[2] = prod_spinor_field(ss, ss + 1);
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Applying the random shift to the spinor fields... ");
     shift_fields(shift, ss, NULL, ss, NULL);
-    sobs[3] = spinor_field_sqnorm_f(ss);
-    sobs[4] = spinor_field_prod_f(ss, ss + 1);
+    sobs[3] = sqnorm_spinor_field(ss);
+    sobs[4] = prod_spinor_field(ss, ss + 1);
     shift_fields(shift, ss + 1, NULL, ss + 1, NULL);
-    sobs[5] = spinor_field_sqnorm_f(ss + 1);
-    sobs[6] = spinor_field_prod_f(ss, ss + 1);
+    sobs[5] = sqnorm_spinor_field(ss + 1);
+    sobs[6] = prod_spinor_field(ss, ss + 1);
 
     lprintf("MAIN", 0, "done.\n\n");
 
@@ -271,26 +271,26 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Measuring the norms and dot products field... ");
-    sobs[0] = spinor_field_sqnorm_f(ss_e);
-    sobs[1] = spinor_field_sqnorm_f(ss_e + 1);
-    sobs[2] = spinor_field_prod_f(ss_e, ss_e + 1);
+    sobs[0] = sqnorm_spinor_field(ss_e);
+    sobs[1] = sqnorm_spinor_field(ss_e + 1);
+    sobs[2] = prod_spinor_field(ss_e, ss_e + 1);
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Applying the random shift to the spinor field... ");
     if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0) {
         shift_fields(shift, ss_e, NULL, ss_e, NULL);
-        sobs[3] = spinor_field_sqnorm_f(ss_e);
-        sobs[4] = spinor_field_prod_f(ss_e, ss_e + 1);
+        sobs[3] = sqnorm_spinor_field(ss_e);
+        sobs[4] = prod_spinor_field(ss_e, ss_e + 1);
         shift_fields(shift, ss_e + 1, NULL, ss_e + 1, NULL);
-        sobs[5] = spinor_field_sqnorm_f(ss_e + 1);
-        sobs[6] = spinor_field_prod_f(ss_e, ss_e + 1);
+        sobs[5] = sqnorm_spinor_field(ss_e + 1);
+        sobs[6] = prod_spinor_field(ss_e, ss_e + 1);
     } else {
         shift_fields(shift, ss_e, NULL, ss_o, NULL);
-        sobs[3] = spinor_field_sqnorm_f(ss_o);
-        sobs[4] = spinor_field_prod_f(ss_o, ss_o + 1);
+        sobs[3] = sqnorm_spinor_field(ss_o);
+        sobs[4] = prod_spinor_field(ss_o, ss_o + 1);
         shift_fields(shift, ss_e + 1, NULL, ss_o + 1, NULL);
-        sobs[5] = spinor_field_sqnorm_f(ss_o + 1);
-        sobs[6] = spinor_field_prod_f(ss_o, ss_o + 1);
+        sobs[5] = sqnorm_spinor_field(ss_o + 1);
+        sobs[6] = prod_spinor_field(ss_o, ss_o + 1);
     }
     lprintf("MAIN", 0, "done.\n\n");
 
@@ -319,26 +319,26 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Measuring the norms and dot products field... ");
-    sobs[0] = spinor_field_sqnorm_f(ss_o);
-    sobs[1] = spinor_field_sqnorm_f(ss_o + 1);
-    sobs[2] = spinor_field_prod_f(ss_o, ss_o + 1);
+    sobs[0] = sqnorm_spinor_field(ss_o);
+    sobs[1] = sqnorm_spinor_field(ss_o + 1);
+    sobs[2] = prod_spinor_field(ss_o, ss_o + 1);
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Applying the random shift to the spinor field... ");
     if ((shift[0] + shift[1] + shift[2] + shift[3]) % 2 == 0) {
         shift_fields(shift, ss_o, NULL, ss_o, NULL);
-        sobs[3] = spinor_field_sqnorm_f(ss_o);
-        sobs[4] = spinor_field_prod_f(ss_o, ss_o + 1);
+        sobs[3] = sqnorm_spinor_field(ss_o);
+        sobs[4] = prod_spinor_field(ss_o, ss_o + 1);
         shift_fields(shift, ss_o + 1, NULL, ss_o + 1, NULL);
-        sobs[5] = spinor_field_sqnorm_f(ss_o + 1);
-        sobs[6] = spinor_field_prod_f(ss_o, ss_o + 1);
+        sobs[5] = sqnorm_spinor_field(ss_o + 1);
+        sobs[6] = prod_spinor_field(ss_o, ss_o + 1);
     } else {
         shift_fields(shift, ss_o, NULL, ss_e, NULL);
-        sobs[3] = spinor_field_sqnorm_f(ss_e);
-        sobs[4] = spinor_field_prod_f(ss_e, ss_e + 1);
+        sobs[3] = sqnorm_spinor_field(ss_e);
+        sobs[4] = prod_spinor_field(ss_e, ss_e + 1);
         shift_fields(shift, ss_o + 1, NULL, ss_e + 1, NULL);
-        sobs[5] = spinor_field_sqnorm_f(ss_e + 1);
-        sobs[6] = spinor_field_prod_f(ss_e, ss_e + 1);
+        sobs[5] = sqnorm_spinor_field(ss_e + 1);
+        sobs[6] = prod_spinor_field(ss_e, ss_e + 1);
     }
     lprintf("MAIN", 0, "done.\n\n");
 

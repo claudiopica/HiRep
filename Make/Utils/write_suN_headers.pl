@@ -298,6 +298,7 @@ if ($suff eq "g") { #algebra operations only for gauge
 	write_algebra_vector_mul_add_assign();
 	write_algebra_vector_mul();
 	write_algebra_vector_zero();
+	write_algebra_vector_prod();
 	write_algebra_vector_sqnorm();
 }
 
@@ -1336,6 +1337,45 @@ sub write_algebra_vector_zero {
 		print "      }\\\n";
 		for(my $i=0;$i<$avr;$i++){
 			print "      (r).$cname\[_i\]=0.; ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+sub write_algebra_vector_prod {
+	print "/* k = <s,r>*/\n";
+	print "#define _algebra_vector_prod_${suff}(k, s, r) \\\n";
+	my $last=$N*$N-1;
+	if ($gauge_group eq "GAUGE_SON"){ #N(N-1)/2 generators
+      	$last=$N*($N-1)/2;
+  	}
+  	if ($N<$Nmax or $last<(4*$unroll+1) ) { #unroll all
+		print "   (k)=";
+		my $n=0;
+		for(my $i=0;$i<$last;$i++){
+			print "((s).$cname\[$i\]*(r).$cname\[$i\])";
+			$n+=$N+1;
+			if($i==$last-1) { print "\n\n"; } else { print "+ \\\n       "; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;\\\n";
+		print "      (k)=0.;\\\n";
+		print "      for (_i=0; _i<$avd; ){\\\n";
+		print "         (k)+=";
+		my $n=2*$unroll;
+		for(my $i=0;$i<2*$unroll;$i++){
+			if ($i==0) { print "((s).$cname\[_i\]*(r).$cname\[_i\])"; }
+			else { print "((s).$cname\[_i+$i\]*(r).$cname\[_i+$i\])"; }
+			if($i==2*$unroll-1) { print ";\\\n"; } else { print "+ \\\n              "; }
+		}
+		print "         _i+=$n;\\\n";
+		print "      }\\\n";
+		print "      (k)+=" unless ($avr==0);
+		for(my $i=0;$i<$avr;$i++){
+			if ($i==0) { print "((s).$cname\[_i\]*(r).$cname\[_i\])"; }
+			else { print "((s).$cname\[_i+$i\]*(r).$cname\[_i+$i\])"; }
+			if($i==$avr-1) { print ";\\\n"; } else { print "+ \\\n           "; }
 		}
 		print "   } while(0) \n\n";
 	}

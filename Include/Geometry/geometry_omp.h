@@ -141,7 +141,7 @@
     for (int ip = 0; ip < type->fuse_gauge_size; ip++)
 
 /**
- * @brief Fuse reduce on the whole local lattice FIXME: more desc
+ * @brief Fuse reduce on the whole local lattice TODO: more desc
  *
  * @param type          geometry_descriptor that contains information on the geometry
  *                      of the local lattice.
@@ -164,13 +164,34 @@
 
 /**
  * @brief Iterate over all sites of the local lattice but not by index in memory
- *        but by spinor, applyin an OpenMP sum reduction to the other variables.
+ *        but by site, applying a OpenMP reduction to the other variables.
+ *        The current site can be found using _SITE_PTR(s). 
+ *
+ * @param s             Input field
+ * @param redop1        Variable to reduce
+ * @param redop2        Variable to reduce
+ */
+#define _ONE_SITE_FOR_RED(s, redop1, redop2) _MASTER_FOR_RED((s)->type, _site_for_is, redop1, redop2)
+
+/**
+ * @brief Iterate over all sites of the local lattice but not by index in memory
+ *        but by spinor, applying an OpenMP sum reduction to the other variables.
  *        The current spinor can be found using _SPINOR_PTR(s).
  *
  * @param s             Input spinor field
  * @param ...           Variables to reduce
  */
 #define _ONE_SPINOR_FOR_SUM(s, ...) _ONE_SPINOR_FOR_RED(s, _omp_sum(__VA_ARGS__), )
+
+/**
+ * @brief Iterate over all sites of the local lattice but not by index in memory
+ *        but by site, applying an OpenMP sum reduction to the other variables.
+ *        The current site can be found using _SITE_PTR(s).
+ *
+ * @param s             Input field
+ * @param ...           Variables to reduce
+ */
+#define _ONE_SITE_FOR_SUM(s, ...) _ONE_SITE_FOR_RED(s, _omp_sum(__VA_ARGS__), )
 
 /**
  * @brief Iterate over two corresponding spinors on the given fields, applying
@@ -187,6 +208,20 @@
     _ONE_SPINOR_FOR_RED(s1, redop1, redop2)
 
 /**
+ * @brief Iterate over two corresponding sites on the given fields, applying
+ *        an OpenMP reduction operation on the other given variables. The current 
+ *        sites can be found using _SITE_PTR(s1) and _SITE_PTR(s2).
+ *
+ * @param s1            First input field
+ * @param s2            Second input field
+ * @param redop1        Variable to reduce
+ * @param redop2        Variable to reduce
+ */
+#define _TWO_SITE_FOR_RED(s1, s2, redop1, redop2) \
+    _CHECK_GEOMETRY_MATCHING(s1, s2);             \
+    _ONE_SITE_FOR_RED(s1, redop1, redop2)
+
+/**
  * @brief Iterate over two corresponding spinors on the given fields, applying
  *        an OpenMP sum reduction on the other given variables. The current
  *        spinors can be found using _SPINOR_PTR(s1) and _SPINOR_PTR(s2).
@@ -196,6 +231,17 @@
  * @param ...           Variables to reduce
  */
 #define _TWO_SPINORS_FOR_SUM(s1, s2, ...) _TWO_SPINORS_FOR_RED(s1, s2, _omp_sum(__VA_ARGS__), )
+
+/**
+ * @brief Iterate over two corresponding sites on the given fields, applying
+ *        an OpenMP sum reduction on the other given variables. The current
+ *        sites can be found using _SITE_PTR(s1) and _SITE_PTR(s2).
+ *
+ * @param s1            First input field
+ * @param s2            Second input field
+ * @param ...           Variables to reduce
+ */
+#define _TWO_SITE_FOR_SUM(s1, s2, ...) _TWO_SITE_FOR_RED(s1, s2, _omp_sum(__VA_ARGS__), )
 
 /**
  * @brief Iterate over three corresponding spinors on the given fields, applying
@@ -213,12 +259,35 @@
     _ONE_SPINOR_FOR_RED(s1, redop1, redop2)
 
 /**
+ * @brief Iterate over three corresponding sites on the given fields, applying
+ *        an OpenMP reduction on the other given variables. The current
+ *        sites can be found using _SITE_PTR(s1) and _SITE_PTR(s2).
+ * 
+ * @param s1            First input field
+ * @param s2            Second input field
+ * @param redop1        Variable to reduce
+ * @param redop2        Variable to reduce
+ */
+#define _THREE_SITE_FOR_RED(s1, s2, s3, redop1, redop2) \
+    _CHECK_GEOMETRY_MATCHING(s1, s2);                   \
+    _CHECK_GEOMETRY_MATCHING(s1, s3);                   \
+    _ONE_SITE_FOR_RED(s1, redop1, redop2)
+
+/**
  * @brief Iterate over all sites of the local lattice but not by index in memory but by
  *        spinor. The current spinor can be found using _SPINOR_PTR(s). 
  *
  * @param s		Input spinor field
  */
 #define _ONE_SPINOR_FOR(s) _ONE_SPINOR_FOR_RED(s, , )
+
+/**
+ * @brief Iterate over all sites of the local lattice but not by index in memory but by
+ *        site. The current site can be found using _SITE_PTR(s). 
+ *
+ * @param s		Input field
+ */
+#define _ONE_SITE_FOR(s) _ONE_SITE_FOR_RED(s, , )
 
 /**
  * @brief Iterate over two corresponding spinors on the given fields. The current spinors 
@@ -228,6 +297,15 @@
  * @param s2		Second input spinor field
  */
 #define _TWO_SPINORS_FOR(s1, s2) _TWO_SPINORS_FOR_RED(s1, s2, , )
+
+/**
+ * @brief Iterate over two corresponding sites on the given fields. The current sites 
+ * 	  can be found using _SITE_PTR(s1) and _SITE_PTR(s2).
+ *
+ * @param s1		First input spinor field
+ * @param s2		Second input spinor field
+ */
+#define _TWO_SITE_FOR(s1, s2) _TWO_SITE_FOR_RED(s1, s2, , )
 
 /**
  * @brief Iterate over all three corresponding spinors on the given fields. The current 
@@ -240,11 +318,29 @@
 #define _THREE_SPINORS_FOR(s1, s2, s3) _THREE_SPINORS_FOR_RED(s1, s2, s3, , )
 
 /**
- * @brief Retrieve current spinor field. This macro only works insite _SPINOR_FOR, 
+ * @brief Iterate over all three corresponding sites on the given fields. The current 
+ * 	  sites can be found using _SITE_PTR(s1), _SITE_PTR(s2), _SITE_PTR(s3).
+ *
+ * @param s1		First input spinor field
+ * @param s2		Second input spinor field
+ * @param s3		Third input spinor field
+ */
+#define _THREE_SITE_FOR(s1, s2, s3) _THREE_SITE_FOR_RED(s1, s2, s3, , )
+
+/**
+ * @brief Retrieve current spinor. This macro only works inside _SPINOR_FOR, 
  * 	  _TWO_SPINORS_FOR or _THREE_SPINORS_FOR.
  *
  * @param s 		Spinor field that is being iterated over.
  */
 #define _SPINOR_PTR(s) _FIELD_AT(s, _spinor_for_is)
+
+/**
+ * @brief Retrieve current site. This macro only works inside _SITE_FOR, 
+ * 	  _TWO_SITE_FOR or _THREE_SITE_FOR.
+ *
+ * @param s 		Field that is being iterated over.
+ */
+#define _SITE_PTR(__s, __mu, __dim) (_DFIELD_AT(__s, _site_for_is, __mu, __dim))
 
 #endif

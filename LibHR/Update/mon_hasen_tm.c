@@ -32,15 +32,15 @@ static void hasen_tm_correct_pf(monomial const *m) {
     /* S = | D^{-1} g5  (g5 D + i mu )  psi |^2 */
     /* D^{-1} g5 ( g5 D + i mu )  psi = A */
     /* psi = ( g5 D + i mu )^{-1}  g5 D  A */
-    spinor_field_copy_f(tmp_pf, par->pf);
+    copy_spinor_field(tmp_pf, par->pf);
     set_dirac_mass(par->mass);
     set_twisted_mass(par->mu);
     Qtm_p(par->pf, tmp_pf);
 
     set_twisted_mass(par->mu + par->dmu);
-    spinor_field_zero_f(tmp_pf);
+    zero_spinor_field(tmp_pf);
     tm_invert(tmp_pf, par->pf, &mpar);
-    spinor_field_copy_f(par->pf, tmp_pf);
+    copy_spinor_field(par->pf, tmp_pf);
 }
 
 static void hasen_tm_correct_la_pf(monomial const *m) {
@@ -58,7 +58,7 @@ static void hasen_tm_correct_la_pf(monomial const *m) {
     set_dirac_mass(par->mass);
     set_twisted_mass(par->mu + par->dmu);
     Qtm_p(tmp_pf, par->pf);
-    spinor_field_zero_f(par->pf);
+    zero_spinor_field(par->pf);
     set_twisted_mass(par->mu);
     tm_invert(par->pf, tmp_pf, &mpar);
 }

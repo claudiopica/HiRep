@@ -33,7 +33,7 @@ static void hasen_tm_alt_correct_pf(monomial const *m) {
     /* psi = g5 D ( g5 D + i mu )^{-1}  A */
     set_dirac_mass(par->mass);
     set_twisted_mass(par->mu + par->dmu);
-    spinor_field_zero_f(tmp_pf);
+    zero_spinor_field(tmp_pf);
     tm_invert_alt(tmp_pf, par->pf, &mpar);
     /*set_twisted_mass(par->mu);*/
     set_twisted_mass(par->mu);
@@ -52,14 +52,14 @@ static void hasen_tm_alt_correct_la_pf(monomial const *m) {
     mpar.shift[0] = 0;
 
     /* S = | (g5 D + i mu ) D^{-1} g5 psi |^2 */
-    spinor_field_copy_f(tmp_pf, par->pf);
-    spinor_field_zero_f(par->pf);
+    copy_spinor_field(tmp_pf, par->pf);
+    zero_spinor_field(par->pf);
     set_dirac_mass(par->mass);
     set_twisted_mass(par->mu);
     tm_invert_alt(par->pf, tmp_pf, &mpar);
     set_twisted_mass(par->mu + par->dmu);
     Qtm_p_alt(tmp_pf, par->pf);
-    spinor_field_copy_f(par->pf, tmp_pf);
+    copy_spinor_field(par->pf, tmp_pf);
 }
 
 static const spinor_field *hasen_tm_alt_pseudofermion(monomial const *m) {

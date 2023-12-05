@@ -66,20 +66,20 @@ static void rotate_ptr(int n, spinor_field *pkk[], hr_complex vl[]) {
 static void project(spinor_field *pk, spinor_field *pl) {
     hr_complex sp;
 
-    sp = -spinor_field_prod_f(pl, pk);
+    sp = -prod_spinor_field(pl, pk);
 
-    spinor_field_mulc_add_assign_f(pk, sp, pl);
+    mulc_add_assign_spinor_field(pk, sp, pl);
 }
 
 static double normalize(spinor_field *ps) {
     double r, ri;
 
-    r = spinor_field_sqnorm_f(ps);
+    r = sqnorm_spinor_field(ps);
     r = sqrt(r);
     error(r < EPSILON, 1, "normalize [eva.c]", "vector has vanishing norm");
 
     ri = 1.0 / r;
-    spinor_field_mul_f(ps, ri, ps);
+    mul_spinor_field(ps, ri, ps);
 
     return (double)(r);
 }
@@ -140,20 +140,20 @@ int main(int argc, char *argv[]) {
         pl = &ws[9 - i];
         w = sp(pk, pl);
 
-        zd = spinor_field_prod_f(pk, pl);
-        rd = spinor_field_sqnorm_f(pk) * spinor_field_sqnorm_f(pl);
+        zd = prod_spinor_field(pk, pl);
+        rd = sqnorm_spinor_field(pk) * sqnorm_spinor_field(pl);
         d = (zd - w) * conj(zd - w);
         /* d=((zd.re-(double)w.re)*(zd.re-(double)w.re)+ */
         /*    (zd.im-(double)w.im)*(zd.im-(double)w.im)); */
         d = sqrt(d / rd);
         if (d > dmax) { dmax = d; }
 
-        rd = spinor_field_prod_re_f(pk, pl);
+        rd = prod_re_spinor_field(pk, pl);
         d = fabs(creal(zd) / rd - 1.0);
         if (d > dmax) { dmax = d; }
 
-        zd = spinor_field_prod_f(pk, pk);
-        rd = spinor_field_sqnorm_f(pk);
+        zd = prod_spinor_field(pk, pk);
+        rd = sqnorm_spinor_field(pk);
 
         d = fabs(cimag(zd) / rd);
         if (d > dmax) { dmax = d; }
@@ -176,12 +176,12 @@ int main(int argc, char *argv[]) {
         pk = &ws[i];
         pl = &ws[i + 1];
 
-        wd = spinor_field_prod_f(pk, pl);
-        rd = spinor_field_sqnorm_f(pk) + zsqd * spinor_field_sqnorm_f(pl) + 2.0 * (creal(zd * wd));
+        wd = prod_spinor_field(pk, pl);
+        rd = sqnorm_spinor_field(pk) + zsqd * sqnorm_spinor_field(pl) + 2.0 * (creal(zd * wd));
 
-        spinor_field_mulc_add_assign_f(pk, zd, pl);
+        mulc_add_assign_spinor_field(pk, zd, pl);
 
-        d = fabs(rd / spinor_field_sqnorm_f(pk) - 1.0);
+        d = fabs(rd / sqnorm_spinor_field(pk) - 1.0);
         if (d > dmax) { dmax = d; }
     }
     lprintf("LA TEST", 0, "Consistency of spinor_prod, norm_square\n");
@@ -202,15 +202,15 @@ int main(int argc, char *argv[]) {
         if (i > 0) {
             pl = &ws[i - 1];
             project(pk, pl);
-            zd = spinor_field_prod_f(pk, pl);
+            zd = prod_spinor_field(pk, pl);
 
-            d = (fabs(creal(zd)) + fabs(cimag(zd))) / sqrt(spinor_field_sqnorm_f(pk));
+            d = (fabs(creal(zd)) + fabs(cimag(zd))) / sqrt(sqnorm_spinor_field(pk));
 
             if (d > dmax) { dmax = d; }
         }
 
         normalize(pk);
-        rd = spinor_field_sqnorm_f(pk);
+        rd = sqnorm_spinor_field(pk);
 
         d = fabs(rd - 1.0f);
         if (d > dmax) { dmax = d; }
@@ -228,7 +228,7 @@ int main(int argc, char *argv[]) {
         pl = &ws[i + 5];
 
         gaussian_spinor_field(pk);
-        spinor_field_copy_f(pl, pk);
+        copy_spinor_field(pl, pk);
 
         for (j = 0; j < 5; j++) {
             v[5 * i + j] =
@@ -248,16 +248,16 @@ int main(int argc, char *argv[]) {
             zd = -v[5 * j + (i - 5)];
 
             pl = &ws[j];
-            spinor_field_mulc_add_assign_f(pk, zd, pl);
+            mulc_add_assign_spinor_field(pk, zd, pl);
         }
 
-        rd = spinor_field_sqnorm_f(pk);
+        rd = sqnorm_spinor_field(pk);
 
         d = fabs(rd);
         if (d > dmax) { dmax = d; }
     }
 
-    dmax /= spinor_field_sqnorm_f(&ws[0]);
+    dmax /= sqnorm_spinor_field(&ws[0]);
     dmax = sqrt(dmax);
 
     lprintf("LA TEST", 0, "Consistency of mulc_spinor_add\n");
@@ -273,28 +273,28 @@ int main(int argc, char *argv[]) {
         pk = &ws[i];
         pl = &ws[9 - i];
         gaussian_spinor_field(pk);
-        spinor_field_copy_f(pl, pk);
-        spinor_field_g5_f(tmp, pk);
-        spinor_field_g5_f(pk, tmp);
+        copy_spinor_field(pl, pk);
+        g5_spinor_field(tmp, pk);
+        g5_spinor_field(pk, tmp);
 
         zd = -1.0;
 
-        spinor_field_mulc_add_assign_f(pl, zd, pk);
-        r = spinor_field_sqnorm_f(pl) / spinor_field_sqnorm_f(pk);
+        mulc_add_assign_spinor_field(pl, zd, pk);
+        r = sqnorm_spinor_field(pl) / sqnorm_spinor_field(pk);
         d = sqrt(r);
         if (d > dmax) { dmax = d; }
 
         gaussian_spinor_field(pl);
-        zd = spinor_field_prod_f(pk, pl);
-        spinor_field_g5_f(pk, pk);
-        spinor_field_g5_f(pl, pl);
-        wd = spinor_field_prod_f(pk, pl);
+        zd = prod_spinor_field(pk, pl);
+        g5_spinor_field(pk, pk);
+        g5_spinor_field(pl, pl);
+        wd = prod_spinor_field(pk, pl);
 
         d = (fabs(creal(zd - wd)) + fabs(cimag(zd - wd))) / (fabs(creal(zd)) + fabs(cimag(zd)));
         if (d > dmax) { dmax = d; }
     }
 
-    lprintf("LA TEST", 0, "Check of spinor_field_g5_f: %.2e\n\n", dmax);
+    lprintf("LA TEST", 0, "Check of g5_spinor_field_f: %.2e\n\n", dmax);
     if (dmax > 1e-30) {
         lprintf("LA TEST", 0, "Test failed ?\n");
         return_value += 1;
@@ -306,13 +306,13 @@ int main(int argc, char *argv[]) {
         pk = &ws[i];
         pl = &ws[9 - i];
         gaussian_spinor_field(pk);
-        spinor_field_copy_f(pl, pk);
+        copy_spinor_field(pl, pk);
         d = -2.5;
-        spinor_field_lc1_f(d, pk, pl);
+        lc1_spinor_field(d, pk, pl);
 
         zd = 1.5;
-        spinor_field_mulc_add_assign_f(pk, zd, pl);
-        d = spinor_field_sqnorm_f(pk) / spinor_field_sqnorm_f(pl);
+        mulc_add_assign_spinor_field(pk, zd, pl);
+        d = sqnorm_spinor_field(pk) / sqnorm_spinor_field(pl);
 
         if (d > dmax) { dmax = d; }
     }
@@ -328,14 +328,14 @@ int main(int argc, char *argv[]) {
         pk = &ws[i];
         pl = &ws[9 - i];
         gaussian_spinor_field(pk);
-        spinor_field_copy_f(pl, pk);
+        copy_spinor_field(pl, pk);
         d = 1.0;
         r = 2.5;
-        spinor_field_lc2_f(d, r, pk, pl);
+        lc2_spinor_field(d, r, pk, pl);
 
         zd = -3.5;
-        spinor_field_mulc_add_assign_f(pk, zd, pl);
-        d = spinor_field_sqnorm_f(pk) / spinor_field_sqnorm_f(pl);
+        mulc_add_assign_spinor_field(pk, zd, pl);
+        d = sqnorm_spinor_field(pk) / sqnorm_spinor_field(pl);
 
         if (d > dmax) { dmax = d; }
     }
@@ -351,15 +351,15 @@ int main(int argc, char *argv[]) {
         pk = &ws[i];
         pl = &ws[9 - i];
         gaussian_spinor_field(pk);
-        spinor_field_copy_f(pl, pk);
+        copy_spinor_field(pl, pk);
         d = 3.5;
         r = -1.5;
-        spinor_field_lc3_f(d, r, pk, pl, pk);
+        lc3_spinor_field(d, r, pk, pl, pk);
 
         zd = -1.0;
 
-        spinor_field_mulc_add_assign_f(pk, zd, pl);
-        d = spinor_field_sqnorm_f(pk) / spinor_field_sqnorm_f(pl);
+        mulc_add_assign_spinor_field(pk, zd, pl);
+        d = sqnorm_spinor_field(pk) / sqnorm_spinor_field(pl);
 
         if (d > dmax) { dmax = d; }
     }

@@ -21,7 +21,7 @@ void tm_alt_correct_pf(monomial const *m) {
     mon_tm_par *par = (mon_tm_par *)(m->data.par);
 
     /* psi =  (g5 D+imu) pf */
-    spinor_field_copy_f(tmp_pf, par->pf);
+    copy_spinor_field(tmp_pf, par->pf);
     set_dirac_mass(par->mass);
     set_twisted_mass(par->mu);
     Qtm_p_alt(par->pf, tmp_pf);
@@ -41,8 +41,8 @@ void tm_alt_correct_la_pf(monomial const *m) {
     /* compute H2^{-1/2}*pf = H^{-1}*pf */
     set_dirac_mass(par->mass);
     set_twisted_mass(par->mu);
-    spinor_field_copy_f(tmp_pf, par->pf);
-    spinor_field_zero_f(par->pf);
+    copy_spinor_field(tmp_pf, par->pf);
+    zero_spinor_field(par->pf);
     tm_invert_alt(par->pf, tmp_pf, &mpar);
 }
 

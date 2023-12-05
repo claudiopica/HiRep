@@ -80,7 +80,7 @@ void measure_spectrum_pt(int tau, int nm, double *m, int n_mom, int conf_num, do
     spinor_field *source = alloc_spinor_field(4, &glattice);
     spinor_field *prop = alloc_spinor_field(4 * nm * NF, &glattice);
     for (int i = 0; i < 4 * nm * NF; i++) {
-        spinor_field_zero_f(prop + i);
+        zero_spinor_field(prop + i);
     }
 
     // init data storage here
@@ -160,7 +160,7 @@ void measure_spectrum_pt_ext(int tau, int nm, double *m, int n_mom, int conf_num
     spinor_field *prop_a = prop_p + 4 * nm;
 
     for (int i = 0; i < 8 * nm; i++) {
-        spinor_field_zero_f(prop_p + i);
+        zero_spinor_field(prop_p + i);
     }
 
     init_propagator_eo(nm, m, precision);
@@ -177,19 +177,19 @@ void measure_spectrum_pt_ext(int tau, int nm, double *m, int n_mom, int conf_num
         calc_propagator(prop_a, source, 4); // 4 for spin components
         flip_T_bc(tau);
         for (l = 0; l < 4 * nm; ++l) {
-            spinor_field_add_assign_f(&prop_p[l], &prop_a[l]);
-            spinor_field_mul_f(&prop_p[l], 0.5, &prop_p[l]);
+            add_assign_spinor_field(&prop_p[l], &prop_a[l]);
+            mul_spinor_field(&prop_p[l], 0.5, &prop_p[l]);
         }
         if (n_mom > 1) {
             measure_point_mesons_momenta_ext(meson_correlators, prop_p, source, nm, tau, n_mom, 1);
             for (l = 0; l < 4 * nm; ++l) {
-                spinor_field_mul_add_assign_f(&prop_p[l], -1., &prop_a[l]);
+                mul_add_assign_spinor_field(&prop_p[l], -1., &prop_a[l]);
             }
             measure_point_mesons_momenta_ext(meson_correlators, prop_p, source, nm, tau, n_mom, 2);
         } else {
             measure_mesons_ext(meson_correlators, prop_p, source, nm, tau, 1);
             for (l = 0; l < 4 * nm; ++l) {
-                spinor_field_mul_add_assign_f(&prop_p[l], -1., &prop_a[l]);
+                mul_add_assign_spinor_field(&prop_p[l], -1., &prop_a[l]);
             }
             measure_mesons_ext(meson_correlators, prop_p, source, nm, tau, 2);
         }
@@ -209,7 +209,7 @@ void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double *m, int n_mom, 
     suNf_field *u_gauge_old = alloc_suNf_field(&glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
-        spinor_field_zero_f(prop + i);
+        zero_spinor_field(prop + i);
     }
     char label[100];
     suNf_field_copy(u_gauge_old, u_gauge_f);
@@ -245,10 +245,10 @@ void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_n
     spinor_field *prop_d = alloc_spinor_field(4 * nm, &glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
-        spinor_field_zero_f(prop_u + i);
+        zero_spinor_field(prop_u + i);
     }
     for (int i = 0; i < 4 * nm; i++) {
-        spinor_field_zero_f(prop_d + i);
+        zero_spinor_field(prop_d + i);
     }
 
     int tau, k;
@@ -299,7 +299,7 @@ void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double
         lprintf("MAIN", 0, "data_storage_element allocated !\n");
     }
     for (int i = 0; i < 4 * nm; i++) {
-        spinor_field_zero_f(prop + i);
+        zero_spinor_field(prop + i);
     }
 
     int tau, k;
@@ -355,7 +355,7 @@ void measure_spectrum_semwall_ext(int nm, double *m, int nhits, int conf_num, do
     spinor_field *prop_a = prop_p + 4 * nm;
 
     for (int i = 0; i < 8 * nm; i++) {
-        spinor_field_zero_f(prop_p + i);
+        zero_spinor_field(prop_p + i);
     }
 
     int dilution = 4; // 4 for spin dilution
@@ -369,12 +369,12 @@ void measure_spectrum_semwall_ext(int nm, double *m, int nhits, int conf_num, do
         calc_propagator_eo(prop_a, source, dilution);
         flip_T_bc(tau);
         for (l = 0; l < dilution * nm; ++l) {
-            spinor_field_add_assign_f(&prop_p[l], &prop_a[l]);
-            spinor_field_mul_f(&prop_p[l], 0.5, &prop_p[l]);
+            add_assign_spinor_field(&prop_p[l], &prop_a[l]);
+            mul_spinor_field(&prop_p[l], 0.5, &prop_p[l]);
         }
         measure_mesons_ext(meson_correlators, prop_p, source, nm, tau, 1);
         for (l = 0; l < dilution * nm; ++l) {
-            spinor_field_sub_assign_f(&prop_p[l], &prop_a[l]);
+            sub_assign_spinor_field(&prop_p[l], &prop_a[l]);
         }
         measure_mesons_ext(meson_correlators, prop_p, source, nm, tau, 2);
     }
@@ -392,7 +392,7 @@ void measure_spectrum_semwall_fixedbc(int dt, int nm, double *m, int nhits, int 
     suNf_field *u_gauge_old = alloc_suNf_field(&glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
-        spinor_field_zero_f(prop + i);
+        zero_spinor_field(prop + i);
     }
 
     char label[100];
@@ -422,7 +422,7 @@ void measure_spectrum_gfwall(int nm, double *m, int conf_num, double precision, 
     suNg_field *u_gauge_old = alloc_suNg_field(&glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
-        spinor_field_zero_f(prop + i);
+        zero_spinor_field(prop + i);
     }
     int tau, k;
     tau = 0;
@@ -464,7 +464,7 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, do
     suNg_field *u_gauge_old = alloc_suNg_field(&glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
-        spinor_field_zero_f(prop + i);
+        zero_spinor_field(prop + i);
     }
     int tau, k;
     tau = 0;
@@ -512,7 +512,7 @@ void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num,
     spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
-        spinor_field_zero_f(prop + i);
+        zero_spinor_field(prop + i);
     }
     int k, beta;
     char label[100];
@@ -543,7 +543,7 @@ void measure_spectrum_discon_gfwall(int nm, double *m, int conf_num, double prec
     suNg_field *u_gauge_old = alloc_suNg_field(&glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
-        spinor_field_zero_f(prop + i);
+        zero_spinor_field(prop + i);
     }
 
     int tau, k;
@@ -590,7 +590,7 @@ void measure_spectrum_discon_volume(int nm, double *m, int conf_num, double prec
     spinor_field *prop = alloc_spinor_field(4 * nm, &glattice);
 
     for (int i = 0; i < 4 * nm; i++) {
-        spinor_field_zero_f(prop + i);
+        zero_spinor_field(prop + i);
     }
 
     init_propagator_eo(nm, m, precision);
@@ -624,8 +624,8 @@ void measure_formfactor_pt(int ti, int tf, int nm, double *m, int n_mom, int con
     source_seq = alloc_spinor_field(4 * NF, &glattice);
 
     for (int i = 0; i < 4 * NF; i++) {
-        spinor_field_zero_f(prop_i + i);
-        spinor_field_zero_f(prop_seq + i);
+        zero_spinor_field(prop_i + i);
+        zero_spinor_field(prop_seq + i);
     }
 
     init_propagator_eo(1, m, precision); // 1 for number of masses
@@ -673,8 +673,8 @@ void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_m
     prop_seq = alloc_spinor_field(4 * NF, &glattice);
 
     for (int i = 0; i < 4 * NF; i++) {
-        spinor_field_zero_f(prop_i + i);
-        spinor_field_zero_f(prop_seq + i);
+        zero_spinor_field(prop_i + i);
+        zero_spinor_field(prop_seq + i);
     }
 
     init_propagator_eo(1, m, precision); // 1 for number of masses

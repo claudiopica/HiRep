@@ -82,9 +82,9 @@ int main(int argc, char *argv[]) {
     lprintf("CG TEST", 0, "Converged in %d iterations\n", cgiters);
     for (i = 0; i < par.n; ++i) {
         M(s2, &res2[i]);
-        spinor_field_mul_add_assign_f(s2, -par.shift[i], &res2[i]);
-        spinor_field_sub_assign_f(s2, s1);
-        tau = spinor_field_sqnorm_f(s2) / spinor_field_sqnorm_f(s1);
+        mul_add_assign_spinor_field(s2, -par.shift[i], &res2[i]);
+        sub_assign_spinor_field(s2, s1);
+        tau = sqnorm_spinor_field(s2) / sqnorm_spinor_field(s1);
         lprintf("CG TEST", 0, "test cg[%d] = %e (req. %e)\n", i, tau, par.err2);
         if (tau > par.err2) { return_value += 1; }
     }

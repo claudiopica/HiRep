@@ -8,16 +8,6 @@
 
 #include "libhr.h"
 
-// static double EPSILON=1.e-12;
-void random_spinor_field_cpu(spinor_field *s) {
-    geometry_descriptor *type = s->type;
-    _PIECE_FOR(type, ixp) {
-        int start = type->master_start[ixp];
-        int N = type->master_end[ixp] - type->master_start[ixp] + 1;
-        gauss((double *)(_FIELD_AT(s, start)), N * sizeof(suNf_spinor) / sizeof(double));
-    }
-}
-
 void unit_array(double *a, int len) {
     for (int i = 0; i < len; i++) {
         a[i] = 1.;
@@ -56,23 +46,23 @@ int main(int argc, char *argv[]) {
     }
     // Copy spinor field to GPU and back to CPU
     for (int i = 0; i < sfsize; i++) {
-        spinor_field_copy_f_cpu(&sf2[i], &sf1[i]);
+        copy_spinor_field_cpu(&sf2[i], &sf1[i]);
         //print_spinor_field_cpu(&sf2[i]);
         copy_to_gpu_spinor_field(&sf2[i]);
-        spinor_field_zero_f_cpu(&sf2[i]);
+        zero_spinor_field_cpu(&sf2[i]);
         //print_spinor_field_cpu(&sf2[i]);
-        spinor_field_copy_f(&sf3[i], &sf2[i]);
+        copy_spinor_field(&sf3[i], &sf2[i]);
         copy_from_gpu_spinor_field(&sf2[i]);
         //print_spinor_field_cpu(&sf2[i]);
         copy_from_gpu_spinor_field(&sf3[i]);
     }
 
     // Calculate norm on CPU
-    norm_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+    norm_cpu = sqnorm_spinor_field_cpu(&sf1[0]);
     lprintf("GPU TEST", 1, "Norm CPU 1: %.2e\n", norm_cpu);
-    norm_cpu2 = spinor_field_sqnorm_f_cpu(&sf2[0]);
+    norm_cpu2 = sqnorm_spinor_field_cpu(&sf2[0]);
     lprintf("GPU TEST", 1, "Norm CPU 2: %.2e\n", norm_cpu2);
-    norm_cpu3 = spinor_field_sqnorm_f_cpu(&sf3[0]);
+    norm_cpu3 = sqnorm_spinor_field_cpu(&sf3[0]);
     lprintf("GPU TEST", 1, "Norm CPU 3: %.2e\n", norm_cpu3);
     double d1 = norm_cpu - norm_cpu2;
     lprintf("GPU TEST", 1, "diff 1: %.2e\n", d1);

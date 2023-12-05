@@ -310,7 +310,7 @@ int main(int argc, char *argv[]) {
         for (n = 0; n < eig_var.nev; ++n) {
             HEVA(&eva_ws[0], &eva_vec[n]);
             lprintf("RESULT", 0, "Eig %d = %.15e %.15e\n", n, eva_val[n],
-                    spinor_field_prod_re_f(&eva_ws[0], &eva_vec[n]) / spinor_field_sqnorm_f(&eva_vec[n]));
+                    prod_re_spinor_field(&eva_ws[0], &eva_vec[n]) / sqnorm_spinor_field(&eva_vec[n]));
         }
 
         if (list == NULL) { break; }

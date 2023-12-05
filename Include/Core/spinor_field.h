@@ -71,6 +71,7 @@ extern "C" {
     typedef struct _name {                  \
         _type *ptr;                         \
         geometry_descriptor *type;          \
+        int field_dim;                      \
         _MPI_FIELD_DATA(_type)              \
         _GPU_FIELD_DATA(_type)              \
         comm_t comm_type;                   \

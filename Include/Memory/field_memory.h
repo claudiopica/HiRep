@@ -80,6 +80,12 @@ void afree(void *addr);
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_memory.h.tmpl"
 
+#define _FIELD_NAME_READABLE "Represented complexified gauge field"
+#define _FIELD_NAME suNfc_field
+#define _FIELD_TYPE suNfc_field
+#define _IS_SPINOR_LIKE 0
+#include "TMPL/field_memory.h.tmpl"
+
 #define _FIELD_NAME_READABLE "Represented single precision gauge field"
 #define _FIELD_TYPE suNf_field_flt
 #define _IS_SPINOR_LIKE 0

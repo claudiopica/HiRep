@@ -94,7 +94,7 @@ int compute_gamma(int g[4], int ic) {
         if (fabs(dbl - NF) > 1.e-14) { lprintf("ERROR", 0, "u_gauge_f sqnorm=%f\n", dbl); }
 
         for (int beta = 0; beta < 4; beta++) {
-            spinor_field_zero_f_cpu(in);
+            zero_spinor_field_cpu(in);
 #ifdef WITH_FUSE_MASTER_FOR
             _FUSE_MASTER_FOR(&glattice, ix) {
                 _FUSE_IDX(&glattice, ix);
@@ -104,7 +104,7 @@ int compute_gamma(int g[4], int ic) {
                 _FIELD_AT(in, ix)->c[beta].c[ic] = 1.;
             }
 
-            dbl = spinor_field_sqnorm_f_cpu(in);
+            dbl = sqnorm_spinor_field_cpu(in);
             if (fabs(dbl - GLB_T * GLB_X * GLB_Y * GLB_Z) > 1.e-14) { lprintf("ERROR", 0, "source sqnorm=%f\n", dbl); }
 
 #ifdef WITH_GPU
@@ -118,7 +118,7 @@ int compute_gamma(int g[4], int ic) {
             copy_from_gpu_spinor_field(out);
 #endif
 
-            dbl = spinor_field_sqnorm_f_cpu(out);
+            dbl = sqnorm_spinor_field_cpu(out);
             if (fabs(dbl) < 1.e-14) { lprintf("ERROR", 0, "vanishing out sqnorm\n"); }
 
             for (c[0] = 0; c[0] < T; c[0]++) {

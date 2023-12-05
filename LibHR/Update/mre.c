@@ -32,18 +32,18 @@ static void gram_schmidt(mre_par *par, int p, int max) {
     double rii;
 
     for (int i = 0; i < max; i++) {
-        spinor_field_copy_f(v[i], &par->s[p][i]);
+        copy_spinor_field(v[i], &par->s[p][i]);
     }
 
     for (int i = 0; i < max; i++) {
-        rii = spinor_field_sqnorm_f(v[i]);
+        rii = sqnorm_spinor_field(v[i]);
         rii = 1.0 / sqrt(rii);
-        spinor_field_mul_f(v[i], rii, v[i]);
+        mul_spinor_field(v[i], rii, v[i]);
 
         for (int j = i + 1; j < max; j++) {
-            rij = spinor_field_prod_f(v[i], v[j]);
+            rij = prod_spinor_field(v[i], v[j]);
             _complex_minus(rij, rij);
-            spinor_field_mulc_add_assign_f(v[j], rij, v[i]);
+            mulc_add_assign_spinor_field(v[j], rij, v[i]);
         }
     }
 }
@@ -187,7 +187,7 @@ void mre_store(mre_par *par, int p, spinor_field *in) {
     }
 
     par->s[p][0] = *tmp;
-    spinor_field_copy_f(&par->s[p][0], in);
+    copy_spinor_field(&par->s[p][0], in);
     par->num[p]++;
 }
 
@@ -195,7 +195,7 @@ void mre_guess(mre_par *par, int p, spinor_field *out, spinor_operator DD, spino
     int max;
 
     if (num_init == 0 || par->init == 0 || par->max <= 0) {
-        spinor_field_zero_f(out);
+        zero_spinor_field(out);
         return;
     }
 
@@ -204,7 +204,7 @@ void mre_guess(mre_par *par, int p, spinor_field *out, spinor_operator DD, spino
         return;
     }
 
-    spinor_field_zero_f(out);
+    zero_spinor_field(out);
     max = (par->num[p] > par->max) ? par->max : par->num[p];
     gram_schmidt(par, p, max);
 
@@ -212,16 +212,16 @@ void mre_guess(mre_par *par, int p, spinor_field *out, spinor_operator DD, spino
         DD(Dv, v[i]);
 
         for (int j = 0; j < max; j++) {
-            A[j][i] = spinor_field_prod_f(Dv, v[j]);
+            A[j][i] = prod_spinor_field(Dv, v[j]);
         }
 
-        b[i] = spinor_field_prod_f(v[i], pf);
+        b[i] = prod_spinor_field(v[i], pf);
     }
 
     lu_solve(max);
 
     for (int i = 0; i < max; i++) {
-        //		spinor_field_mul_add_assign_f(out, coefficient(i+1, max), s[p][i]);
-        spinor_field_mulc_add_assign_f(out, x[i], v[i]);
+        //		mul_add_assign_spinor_field(out, coefficient(i+1, max), s[p][i]);
+        mulc_add_assign_spinor_field(out, x[i], v[i]);
     }
 }

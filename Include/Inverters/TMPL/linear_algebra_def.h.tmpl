@@ -1,0 +1,17 @@
+// Internal macro for defining generic functions and alias function pointers
+#define CONCAT(_name, _suffix) _name##_suffix
+#define CONCAT_CPU(_name, _suffix) CONCAT(_name, _suffix##_cpu)
+#define _CPU_F_NAME(_name, _suffix) CONCAT_CPU(_name, _suffix)
+#define _CPU_FUNC_INNER(_type, _name, _suffix, _args) _type _CPU_F_NAME(_name##_, _suffix) _args
+#define _GPU_FUNC_INNER(_type, _name, _suffix, _args) _type _GPU_F_NAME(_name##_, _suffix) _args
+#define _PTR_FUNC_INNER(_type, _name, _suffix, _args) extern _type(*_F_NAME(_name##_, _suffix)) _args
+#ifdef WITH_GPU
+#define _DECLARE_LINA_HEADER(a, b, c)      \
+    _PTR_FUNC_INNER(a, b, _FIELD_TYPE, c); \
+    _CPU_FUNC_INNER(a, b, _FIELD_TYPE, c); \
+    _GPU_FUNC_INNER(a, b, _FIELD_TYPE, c);
+#else
+#define _DECLARE_LINA_HEADER(a, b, c)      \
+    _PTR_FUNC_INNER(a, b, _FIELD_TYPE, c); \
+    _CPU_FUNC_INNER(a, b, _FIELD_TYPE, c);
+#endif

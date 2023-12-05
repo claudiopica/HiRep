@@ -337,7 +337,7 @@ int main(int argc, char *argv[]) {
                     p_out[2] = p_in[2];
                     p_out[3] = p_in[3];
                     for (j = 0; j < 4 * NF; j++) {
-                        spinor_field_copy_f(&prop_out[j], &prop_in[j]);
+                        copy_spinor_field(&prop_out[j], &prop_in[j]);
                     }
                 }
                 lprintf("LOOK", 10, "%g%g%g%g %g%g%g%g twist %g", p_in[0], p_in[1], p_in[2], p_in[3], p_out[0], p_out[1],

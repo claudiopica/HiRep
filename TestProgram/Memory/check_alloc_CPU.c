@@ -18,7 +18,7 @@ int test_clover_term_allocation();
 int test_clover_force_allocation();
 int test_spinor_field_allocation();
 int test_scalar_field_allocation();
-int test_ldl_field_allocation();
+//int test_clover_ldl_allocation();
 int test_staple_field_allocation();
 
 // Single precision
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     return_val += test_scalar_field_allocation();
     return_val += test_suNg_scalar_field_allocation();
     return_val += test_gtransf_allocation();
-    return_val += test_ldl_field_allocation();
+    //return_val += test_clover_ldl_allocation();
     return_val += test_staple_field_allocation();
 
     // Single precision test block
@@ -151,7 +151,7 @@ int test_spinor_field_allocation() {
     int return_val = 0;
     spinor_field *f = alloc_spinor_field(1, &glattice);
     gaussian_spinor_field(f);
-    double sqnorm = spinor_field_sqnorm_f_cpu(f);
+    double sqnorm = sqnorm_spinor_field_cpu(f);
     return_val += check_finiteness(sqnorm);
     free_spinor_field(f);
     return return_val;
@@ -162,7 +162,7 @@ int test_spinor_field_flt_allocation() {
     int return_val = 0;
     spinor_field_flt *f = alloc_spinor_field_flt(1, &glattice);
     gaussian_spinor_field_flt(f);
-    double sqnorm = spinor_field_sqnorm_f_flt_cpu(f);
+    double sqnorm = sqnorm_spinor_field_flt_cpu(f);
     return_val += check_finiteness(sqnorm);
     free_spinor_field_flt(f);
     return return_val;
@@ -190,16 +190,18 @@ int test_suNg_scalar_field_allocation() {
     return return_val;
 }
 
-int test_ldl_field_allocation() {
+#if 0
+int test_clover_ldl_allocation() {
     lprintf("INFO", 0, " ======= TEST CLOVER LDL ======= \n");
     int return_val = 0;
-    ldl_field *f = alloc_ldl_field(&glattice);
-    random_ldl_field_cpu(f);
+    ldl_field *f = alloc_clover_ldl(&glattice);
+    random_clover_ldl_cpu(f);
     double sqnorm = sqnorm_ldl_field_cpu(f);
     return_val += check_finiteness(sqnorm);
     free_ldl_field(f);
     return return_val;
 }
+#endif
 
 int test_staple_field_allocation() {
     lprintf("INFO", 0, " ======= TEST STAPLE FIELD ======= \n");

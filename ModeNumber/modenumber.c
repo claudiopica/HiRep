@@ -112,24 +112,24 @@ static void H2X(spinor_field *out, spinor_field *in) {
 static double H2X_shift=0.;
 static void g5H2X(spinor_field *out, spinor_field *in){
   g5Dphi_sq(mass, out, in);
-  spinor_field_mul_add_assign_f(out,H2X_shift,in);
-  spinor_field_g5_assign_f(out);
+  mul_add_assign_spinor_field(out,H2X_shift,in);
+  g5_assign_spinor_field(out);
 }
 */
 
 static void operatorX(spinor_field *out, spinor_field *in, double M2) {
     par.shift[0] = -M2;
     cg_mshift(&par, &H2X, in, out);
-    spinor_field_mul_f(out, -2. * M2, out);
-    spinor_field_add_assign_f(out, in);
+    mul_spinor_field(out, -2. * M2, out);
+    add_assign_spinor_field(out, in);
 }
 
 static void operatorX2(spinor_field *out, spinor_field *in, double M2) {
     /*H2X_shift = M2;*/
     par.shift[0] = -M2;
 
-    spinor_field_zero_f(&x[0]);
-    spinor_field_zero_f(&x[1]);
+    zero_spinor_field(&x[0]);
+    zero_spinor_field(&x[1]);
 
     cg_mshift(&par, &H2X, in, &x[0]);
     cg_mshift(&par, &H2X, &x[0], &x[1]);
@@ -137,23 +137,23 @@ static void operatorX2(spinor_field *out, spinor_field *in, double M2) {
     /* x[0] = H2X^{-1} in = g5H2X^{-1} g5 in */
     /* x[1] = H2X^{-2} in = g5H2X^{-1} g5 x[0] */
     /*
-  spinor_field_g5_assign_f(in);
+  g5_assign_spinor_field(in);
   g5QMR_mshift(&par, &g5H2X, in, &x[0]);
-  spinor_field_g5_assign_f(in);
-  spinor_field_g5_assign_f(&x[0]);  
+  g5_assign_spinor_field(in);
+  g5_assign_spinor_field(&x[0]);  
   g5QMR_mshift(&par, &H2X, &x[0], &x[1]);
-  spinor_field_g5_assign_f(&x[0]);
+  g5_assign_spinor_field(&x[0]);
   */
 
-    spinor_field_copy_f(out, in);
-    spinor_field_lc_add_assign_f(out, -4. * M2, &x[0], 4. * M2 * M2, &x[1]);
+    copy_spinor_field(out, in);
+    lc_add_assign_spinor_field(out, -4. * M2, &x[0], 4. * M2 * M2, &x[1]);
 }
 
 static void operatorZ(spinor_field *out, spinor_field *in, double M2) {
     /*double z=(2.*x*x-1.-epsilon)/(1.-epsilon);*/
     operatorX2(out, in, M2);
-    spinor_field_mul_f(out, 2. / (1. - epsilon), out);
-    spinor_field_mul_add_assign_f(out, -(1. + epsilon) / (1. - epsilon), in);
+    mul_spinor_field(out, 2. / (1. - epsilon), out);
+    mul_add_assign_spinor_field(out, -(1. + epsilon) / (1. - epsilon), in);
 }
 
 static void operatorH(spinor_field *out, spinor_field *in, double M2) {
@@ -172,11 +172,11 @@ static void operatorH(spinor_field *out, spinor_field *in, double M2) {
   return .5 - .5*x*(b0 - b1*z);
   */
 
-    spinor_field_mul_f(w1, c[order], in);
+    mul_spinor_field(w1, c[order], in);
 
     operatorZ(w0, in, M2);
-    spinor_field_mul_f(w0, 2. * c[order], w0);
-    spinor_field_mul_add_assign_f(w0, c[order - 1], in);
+    mul_spinor_field(w0, 2. * c[order], w0);
+    mul_add_assign_spinor_field(w0, c[order - 1], in);
 
     for (int n = order - 2; n >= 0; n--) {
         tmp = w2;
@@ -185,16 +185,16 @@ static void operatorH(spinor_field *out, spinor_field *in, double M2) {
         w0 = tmp;
         operatorZ(w0, w1, M2);
 
-        spinor_field_mul_f(w0, 2., w0);
-        spinor_field_lc_add_assign_f(w0, c[n], in, -1., w2);
+        mul_spinor_field(w0, 2., w0);
+        lc_add_assign_spinor_field(w0, c[n], in, -1., w2);
     }
 
     operatorZ(w2, w1, M2);
-    spinor_field_sub_assign_f(w0, w2);
+    sub_assign_spinor_field(w0, w2);
     operatorX(out, w0, M2);
-    spinor_field_mul_f(out, -.5, out);
+    mul_spinor_field(out, -.5, out);
 
-    spinor_field_mul_add_assign_f(out, .5, in);
+    mul_add_assign_spinor_field(out, .5, in);
 }
 
 double ModeNumber(double M2) {
@@ -212,7 +212,7 @@ double ModeNumber(double M2) {
         operatorH(&eta[1], &eta[0], M2star);
         operatorH(&eta[0], &eta[1], M2star);
 
-        ret += spinor_field_sqnorm_f(&eta[0]);
+        ret += sqnorm_spinor_field(&eta[0]);
     }
 
     return ret / nhits;

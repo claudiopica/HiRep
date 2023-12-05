@@ -88,23 +88,23 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
     cgiter = 0;
     notconverged = 1;
     _complex_1(beta[0]);
-    spinor_field_copy_f(r, in);
+    copy_spinor_field(r, in);
     for (i = 0; i < (par->n); ++i) {
         rho[i] = z1[i] = z2[i] = beta[0];
         _complex_0(alpha[i]);
-        spinor_field_copy_f(&s[i], in);
-        spinor_field_zero_f(&out[i]);
+        copy_spinor_field(&s[i], in);
+        zero_spinor_field(&out[i]);
         sflags[i] = 1;
     }
     /* choose omega so that delta and phi are not zero */
-    /* spinor_field_copy_f(o, in);  omega = in ; this may be changed */
+    /* copy_spinor_field(o, in);  omega = in ; this may be changed */
     gaussian_spinor_field(o0);
-    /* spinor_field_copy_f(o0, in); */
-    spinor_field_copy_f(o, o0);
-    delta = spinor_field_prod_f(o, r);
+    /* copy_spinor_field(o0, in); */
+    copy_spinor_field(o, o0);
+    delta = prod_spinor_field(o, r);
 
     M(Ms, &s[0]);
-    ctmp1 = spinor_field_prod_f(o0, Ms); /* o = in (see above) */
+    ctmp1 = prod_spinor_field(o0, Ms); /* o = in (see above) */
     _complex_div(phi, ctmp1, delta);
 
     _print_complex(delta);
@@ -122,36 +122,36 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
         _complex_minus(beta[0], beta[0]); /* b=-b */
 
         /* compute omega and chi[0] */
-        spinor_field_mulc_f(o, beta[0], Ms);
-        spinor_field_add_assign_f(o, r);
+        mulc_spinor_field(o, beta[0], Ms);
+        add_assign_spinor_field(o, r);
 
         M(Mo, o);
 
-        ctmp2 = spinor_field_prod_f(Mo, o);
-        rtmp1 = 1. / spinor_field_sqnorm_f(Mo);
+        ctmp2 = prod_spinor_field(Mo, o);
+        rtmp1 = 1. / sqnorm_spinor_field(Mo);
         _complex_mulr(chi[0], rtmp1, ctmp2);
 
         /* compute r1 */
-        spinor_field_mulc_f(r1, chi[0], Mo);
-        spinor_field_sub_f(r1, o, r1);
+        mulc_spinor_field(r1, chi[0], Mo);
+        sub_spinor_field(r1, o, r1);
 
         /* update delta and alpha[0] */
         oldalpha = alpha[0];
         _complex_mul(ctmp2, delta, chi[0]);
-        delta = spinor_field_prod_f(o0, r1); /* in = omega al passo zero */
+        delta = prod_spinor_field(o0, r1); /* in = omega al passo zero */
         _complex_minus(ctmp2, ctmp2);
         _complex_mul(ctmp3, beta[0], delta);
         _complex_div(alpha[0], ctmp3, ctmp2); /* alpha[0]=-beta[0]*delta/(deltam1*chi[0]) */
 
         /* compute new out[0] */
         _complex_minus(ctmp2, beta[0]);
-        spinor_field_clc_add_assign_f(&out[0], ctmp2, &s[0], chi[0], o);
+        clc_add_assign_spinor_field(&out[0], ctmp2, &s[0], chi[0], o);
 
         /* compute new s[0] */
         _complex_mul(ctmp2, alpha[0], chi[0]);
         _complex_minus(ctmp2, ctmp2);
-        spinor_field_clc_f(Mo, alpha[0], &s[0], ctmp2, Ms); /* use Mo as temporary storage */
-        spinor_field_add_f(&s[0], r1, Mo);
+        clc_spinor_field(Mo, alpha[0], &s[0], ctmp2, Ms); /* use Mo as temporary storage */
+        add_spinor_field(&s[0], r1, Mo);
 
         /* assign r<-r1 */
         sptmp = r;
@@ -160,7 +160,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
 
         /* update phi */
         M(Ms, &s[0]);
-        ctmp2 = spinor_field_prod_f(o0, Ms); /* in=o al passo 0 (see above) */
+        ctmp2 = prod_spinor_field(o0, Ms); /* in=o al passo 0 (see above) */
         _complex_div(phi, ctmp2, delta);
 
         _print_complex(delta);
@@ -194,16 +194,16 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
                 _complex_mul(ctmp2, z3[i], rho[i]);
                 _complex_mul(ctmp3, ctmp2, chi[i]);
                 _complex_minus(ctmp4, beta[i]);
-                spinor_field_clc_add_assign_f(&out[i], ctmp4, &s[i], ctmp3, o);
-                /*spinor_field_clc_add_assign_f(Mo,ctmp4,s[i],ctmp3,o);
-	spinor_field_add_f(out[i],out[0],Mo);*/
+                clc_add_assign_spinor_field(&out[i], ctmp4, &s[i], ctmp3, o);
+                /*clc_add_assign_spinor_field(Mo,ctmp4,s[i],ctmp3,o);
+	add_spinor_field(out[i],out[0],Mo);*/
                 /* update s[i] */
                 _complex_div(ctmp4, chi[i], beta[i]);
                 _complex_mul(ctmp3, ctmp4, ctmp2);
                 _complex_minus(ctmp3, ctmp3);
                 _complex_mul(ctmp2, z2[i], rho[i]);
                 _complex_mul(ctmp5, ctmp2, ctmp4);
-                spinor_field_clc_add_assign_f(&s[i], ctmp3, o, ctmp5, r1); /* not done yet */
+                clc_add_assign_spinor_field(&s[i], ctmp3, o, ctmp5, r1); /* not done yet */
 
                 ctmp3 = rho[i];
                 _complex_mulr(ctmp2, -par->shift[i - 1], chi[0]);
@@ -212,8 +212,8 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
                 _print_complex(rho[i]);
 
                 _complex_mul(ctmp2, z3[i], rho[i]);
-                spinor_field_clc_f(Mo, ctmp2, r, alpha[i], &s[i]); /* use Mo as temporary storage */
-                spinor_field_copy_f(&s[i], Mo);
+                clc_spinor_field(Mo, ctmp2, r, alpha[i], &s[i]); /* use Mo as temporary storage */
+                copy_spinor_field(&s[i], Mo);
                 /* change pointers instead */
                 /*
 	  sptmp=s[i];
@@ -227,7 +227,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
             }
         }
 
-        rtmp1 = spinor_field_sqnorm_f(r);
+        rtmp1 = sqnorm_spinor_field(r);
 
         if (rtmp1 < par->err2) { notconverged = 0; }
 
@@ -249,9 +249,9 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
     for (i = 0; i < par->n; ++i) {
         double norm;
         M(Ms, out[i]);
-        if (i != 0) { spinor_field_mul_add_assign_f(Ms, -par->shift[i - 1], out[i]); }
-        spinor_field_mul_add_assign_f(Ms, -1.0, in);
-        norm = spinor_field_sqnorm_f(Ms);
+        if (i != 0) { mul_add_assign_spinor_field(Ms, -par->shift[i - 1], out[i]); }
+        mul_add_assign_spinor_field(Ms, -1.0, in);
+        norm = sqnorm_spinor_field(Ms);
         if (fabs(norm) > 5. * par->err2) { printf("BiCGstab Failed: err2[%d] = %e\n", i, norm); }
     }
 #endif

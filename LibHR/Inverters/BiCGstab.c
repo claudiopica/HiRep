@@ -44,18 +44,18 @@ int BiCGstab(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field 
     // Initial residue
     M(Ms, out);
     cgiter++;
-    spinor_field_sub_f(r, in, Ms);
+    sub_spinor_field(r, in, Ms);
 
-    spinor_field_copy_f(s, r);
-    innorm2 = spinor_field_sqnorm_f(in);
+    copy_spinor_field(s, r);
+    innorm2 = sqnorm_spinor_field(in);
 
     // Choose omega so that delta and phi are not zero
     gaussian_spinor_field(o0);
-    spinor_field_copy_f(o, o0);
-    delta = spinor_field_prod_f(o, r);
+    copy_spinor_field(o, o0);
+    delta = prod_spinor_field(o, r);
 
     M(Ms, s);
-    ctmp1 = spinor_field_prod_f(o0, Ms);
+    ctmp1 = prod_spinor_field(o0, Ms);
     _complex_div(phi, ctmp1, delta);
 
     // BiCGstab recursion
@@ -67,35 +67,35 @@ int BiCGstab(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field 
         _complex_minus(beta, beta); /* b=-b */
 
         // Compute omega and chi
-        spinor_field_mulc_f(o, beta, Ms);
-        spinor_field_add_assign_f(o, r);
+        mulc_spinor_field(o, beta, Ms);
+        add_assign_spinor_field(o, r);
 
         M(Mo, o);
 
-        ctmp1 = spinor_field_prod_f(Mo, o);
-        rtmp1 = 1. / spinor_field_sqnorm_f(Mo);
+        ctmp1 = prod_spinor_field(Mo, o);
+        rtmp1 = 1. / sqnorm_spinor_field(Mo);
         _complex_mulr(chi, rtmp1, ctmp1);
 
         // Compute r1
-        spinor_field_mulc_f(r1, chi, Mo);
-        spinor_field_sub_f(r1, o, r1);
+        mulc_spinor_field(r1, chi, Mo);
+        sub_spinor_field(r1, o, r1);
 
         // Update delta and alpha
         _complex_mul(ctmp1, delta, chi);
-        delta = spinor_field_prod_f(o0, r1);
+        delta = prod_spinor_field(o0, r1);
         _complex_minus(ctmp1, ctmp1);
         _complex_mul(ctmp2, beta, delta);
         _complex_div(alpha, ctmp2, ctmp1); // alpha = -beta*delta/(delta*chi)
 
         // Update solution
         _complex_minus(ctmp1, beta);
-        spinor_field_clc_add_assign_f(out, ctmp1, s, chi, o);
+        clc_add_assign_spinor_field(out, ctmp1, s, chi, o);
 
         // Compute s
         _complex_mul(ctmp1, alpha, chi);
         _complex_minus(ctmp1, ctmp1);
-        spinor_field_clc_f(Mo, alpha, s, ctmp1, Ms);
-        spinor_field_add_f(s, r1, Mo);
+        clc_spinor_field(Mo, alpha, s, ctmp1, Ms);
+        add_spinor_field(s, r1, Mo);
 
         // Exchange r <-> r1
         sptmp = r;
@@ -104,17 +104,17 @@ int BiCGstab(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field 
 
         // Update phi
         M(Ms, s);
-        ctmp1 = spinor_field_prod_f(o0, Ms);
+        ctmp1 = prod_spinor_field(o0, Ms);
         _complex_div(phi, ctmp1, delta);
 
-        rtmp1 = spinor_field_sqnorm_f(r);
+        rtmp1 = sqnorm_spinor_field(r);
         if (rtmp1 < par->err2 * innorm2) { notconverged = 0; }
     }
 
     // Test result
     M(Ms, out);
-    spinor_field_sub_assign_f(Ms, in);
-    innorm2 = spinor_field_sqnorm_f(Ms) / innorm2;
+    sub_assign_spinor_field(Ms, in);
+    innorm2 = sqnorm_spinor_field(Ms) / innorm2;
     if (fabs(innorm2) > par->err2) {
         lprintf("INVERTER", 30, "BiCGstab failed: err2 = %1.8e > %1.8e\n", innorm2, par->err2);
     } else {

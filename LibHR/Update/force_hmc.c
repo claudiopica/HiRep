@@ -68,30 +68,30 @@ void force_hmc(double dt, void *vpar) {
 
     if (par->mu == 0 || par->hasenbusch != 0) {
         /* X = H^{-1} pf = D^{-1} g5 pf */
-        spinor_field_zero_f(Xs);
-        spinor_field_g5_assign_f(pf);
+        zero_spinor_field(Xs);
+        g5_assign_spinor_field(pf);
         // n_iters +=
         g5QMR_mshift(&mpar, &D, pf, Xs);
-        spinor_field_g5_assign_f(pf);
+        g5_assign_spinor_field(pf);
 
         if (par->hasenbusch == 0) {
             /* Y =  D^{-1} ( g5 X ) */
-            spinor_field_g5_f(eta, Xs);
+            g5_spinor_field(eta, Xs);
         } else if (par->hasenbusch == 1) {
             /* Y = H^{-1} ( g5 pf[k] + b X ) = D^{-1}( pf + b g5 X ) */
-            spinor_field_g5_f(eta, Xs);
-            spinor_field_mul_f(eta, par->b, eta);
-            spinor_field_add_assign_f(eta, pf);
+            g5_spinor_field(eta, Xs);
+            mul_spinor_field(eta, par->b, eta);
+            add_assign_spinor_field(eta, pf);
         } else if (par->hasenbusch == 2) {
             /* Y= -i D^{-1} ( pf[k] + imu g5 X )*/
             double mu1 = par->mu;
             double mu2 = par->mu + par->b;
             double muS = mu2 * mu2 - mu1 * mu1;
-            spinor_field_g5_f(eta, Xs);
-            spinor_field_mul_f(Xs, muS, Xs);
+            g5_spinor_field(eta, Xs);
+            mul_spinor_field(Xs, muS, Xs);
         }
 
-        spinor_field_zero_f(Ys);
+        zero_spinor_field(Ys);
         // n_iters +=
         g5QMR_mshift(&mpar, &D, eta, Ys);
     } else {
@@ -104,32 +104,32 @@ void force_hmc(double dt, void *vpar) {
     if (par->mu == 0) {
         /* X_e = H^{-1} pf */
         /* X_o = D_{oe} X_e = D_{oe} H^{-1} pf */
-        spinor_field_g5_assign_f(pf);
+        g5_assign_spinor_field(pf);
         mre_guess(&par->mpar, 0, Xs, &D, pf);
         // n_iters +=
         g5QMR_mshift(&mpar, &D, pf, Xs);
         mre_store(&par->mpar, 0, Xs);
-        spinor_field_g5_assign_f(pf);
+        g5_assign_spinor_field(pf);
 
         /* Y_e = H^{-1} ( g5 pf + b X_e ) */
         /* Y_o = D_oe H^{-1} ( g5 pf + b X_e ) */
         if (par->hasenbusch != 1) {
-            spinor_field_copy_f(eta, Xs);
+            copy_spinor_field(eta, Xs);
         } else {
-            spinor_field_g5_f(eta, pf);
-            spinor_field_mul_add_assign_f(eta, par->b, Xs);
+            g5_spinor_field(eta, pf);
+            mul_add_assign_spinor_field(eta, par->b, Xs);
         }
 
-        spinor_field_g5_assign_f(eta);
+        g5_assign_spinor_field(eta);
         mre_guess(&par->mpar, 1, Ys, &D, eta);
         // n_iters +=
         g5QMR_mshift(&mpar, &D, eta, Ys);
         mre_store(&par->mpar, 1, Ys);
-        spinor_field_g5_assign_f(eta);
+        g5_assign_spinor_field(eta);
 
         if (par->hasenbusch == 2) {
             double muS = par->b * par->b;
-            spinor_field_mul_f(Xs, muS, Xs);
+            mul_spinor_field(Xs, muS, Xs);
         }
     } else {
         /* Ye = 1/(QpQm+mu^2) \phi */
@@ -143,7 +143,7 @@ void force_hmc(double dt, void *vpar) {
             double mu1 = par->mu;
             double mu2 = par->mu + par->b;
             double muS = mu2 * mu2 - mu1 * mu1;
-            spinor_field_mul_f(Xs, muS, Xs);
+            mul_spinor_field(Xs, muS, Xs);
         }
     }
     // to here

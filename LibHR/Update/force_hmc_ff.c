@@ -172,12 +172,12 @@ void force_hmc_ff(double dt, void *vpar) {
             Dff_dagger(&Xe, &pf[k]);
             set_ff_dirac_shift(0.);
         } else {
-            spinor_field_copy_f(&Xe, &pf[k]);
+            copy_spinor_field(&Xe, &pf[k]);
         }
 
         lprintf("FORCE", 0, " id %d mass %e shift %e \n", par->id, par->mass, par->b);
 
-        spinor_field_zero_f(&Ye);
+        zero_spinor_field(&Ye);
         mre_guess(&par->mpar, 0, &Ye, &Dff_sq, &Xe);
         n_iters += cg_mshift(&mpar, &Dff_sq, &Xe, &Ye);
         mre_store(&par->mpar, 0, &Ye);
@@ -186,10 +186,10 @@ void force_hmc_ff(double dt, void *vpar) {
 
         if (par->hasenbusch == 2) {
             /*  X_e = D (D^ D)^{-1} (D+b) pf[k] - pf[k] */
-            spinor_field_mul_add_assign_f(&Xe, -1, &pf[k]);
+            mul_add_assign_spinor_field(&Xe, -1, &pf[k]);
         }
 
-        spinor_field_g5_assign_f(&Xe);
+        g5_assign_spinor_field(&Xe);
 
         /* Y_o = A_o^{-1} D_oe (D^ D)^{-1} pf[k]  */
         Dphi_(&Yo, &Ye);
@@ -208,7 +208,7 @@ void force_hmc_ff(double dt, void *vpar) {
 #endif
 
 #ifdef MEASURE_FORCEHMC
-        lprintf("FORCE", 50, "|Xs| = %1.8e |Ys| = %1.8e\n", sqrt(spinor_field_sqnorm_f(Xs)), sqrt(spinor_field_sqnorm_f(Ys)));
+        lprintf("FORCE", 50, "|Xs| = %1.8e |Ys| = %1.8e\n", sqrt(sqnorm_spinor_field(Xs)), sqrt(sqnorm_spinor_field(Ys)));
         double forcestat[2] = { 0., 0. }; /* used for computation of avr and max force */
 #endif
 

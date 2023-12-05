@@ -103,7 +103,7 @@ void create_sequential_source_point(spinor_field *source, int tf, spinor_field *
     suNf_propagator sp0, sp1;
 
     for (beta = 0; beta < 4 * NF; ++beta) {
-        spinor_field_zero_f(&source[beta]);
+        zero_spinor_field(&source[beta]);
     }
 
     ix = ipt(tf - zerocoord[0], 0, 0, 0);
@@ -153,9 +153,9 @@ int main(int argc, char *argv[]) {
     prop_seq = alloc_spinor_field(4 * NF, &glattice);
 
     for (k = 0; k < 4 * NF; k++) {
-        spinor_field_zero_f(prop_1 + k);
-        spinor_field_zero_f(prop_2 + k);
-        spinor_field_zero_f(prop_seq + k);
+        zero_spinor_field(prop_1 + k);
+        zero_spinor_field(prop_2 + k);
+        zero_spinor_field(prop_seq + k);
     }
 
     mes_var.precision = 1e-24;

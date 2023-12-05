@@ -103,12 +103,12 @@ void Dphi_eopre_4f(double m0, spinor_field *out, spinor_field *in, double shift)
     spinor_sigma_pi_rho_div_assign(otmp, ff_sigma, ff_pi, rho, otmp);
     apply_BCs_on_spinor_field(otmp);
     Dphi_(out, otmp);
-    spinor_field_minus_f(out, out);
+    minus_spinor_field(out, out);
 
     spinor_scalarfield_mult_add_assign(out, ff_sigma, rho, in);
     spinor_scalarfield_ig5_mult_add_assign(out, ff_pi, in);
 
-    spinor_field_mul_add_assign_f(out, shift, in);
+    mul_add_assign_spinor_field(out, shift, in);
 
     apply_BCs_on_spinor_field(out);
 }
@@ -139,21 +139,21 @@ void Dphi_eopre_4f_dagger(double m0, spinor_field *out, spinor_field *in, double
     rho = 4.0 + m0;
 
     //Get dagger with g5, for now
-    spinor_field_g5_assign_f(in);
+    g5_assign_spinor_field(in);
     Dphi_(otmp, in);
-    spinor_field_g5_assign_f(in);
-    spinor_field_g5_assign_f(otmp);
+    g5_assign_spinor_field(in);
+    g5_assign_spinor_field(otmp);
     apply_BCs_on_spinor_field(otmp);
     spinor_sigma_pi_dagger_rho_div_assign(otmp, ff_sigma, ff_pi, rho, otmp);
-    spinor_field_g5_assign_f(otmp);
+    g5_assign_spinor_field(otmp);
     Dphi_(out, otmp);
-    spinor_field_g5_assign_f(out);
-    spinor_field_minus_f(out, out);
+    g5_assign_spinor_field(out);
+    minus_spinor_field(out, out);
 
     spinor_scalarfield_mult_add_assign(out, ff_sigma, rho, in);
     spinor_scalarfield_mig5_mult_add_assign(out, ff_pi, in);
 
-    spinor_field_mul_add_assign_f(out, shift, in);
+    mul_add_assign_spinor_field(out, shift, in);
 
     apply_BCs_on_spinor_field(out);
 }
@@ -232,10 +232,10 @@ void Dphi_4f_dagger(double m0, spinor_field *out, spinor_field *in) {
     rho = 4.0 + m0;
 
     //Get dagger with g5, for now
-    spinor_field_g5_assign_f(in);
+    g5_assign_spinor_field(in);
     Dphi_(out, in);
-    spinor_field_g5_assign_f(in);
-    spinor_field_g5_assign_f(out);
+    g5_assign_spinor_field(in);
+    g5_assign_spinor_field(out);
     apply_BCs_on_spinor_field(otmp);
 
     spinor_scalarfield_mult_add_assign(out, ff_sigma, rho, in);

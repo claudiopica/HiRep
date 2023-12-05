@@ -133,18 +133,18 @@ int main(int argc, char *argv[]) {
     timer_set(&clock);
 
     _SPEED_TEST_LIN_ALG_FLT("Copy spinor field single precision", 1, 1, 0, in_flt,
-                            spinor_field_copy_f_flt(&in_flt[0], &in_flt[1]););
+                            copy_spinor_field_flt(&in_flt[0], &in_flt[1]););
 
     _SPEED_TEST_LIN_ALG_FLT("Spinor field product single precision", 1, 1, NF * 4 * 2, in_flt,
-                            spinor_field_prod_f_flt(&in_flt[0], &in_flt[1]););
+                            prod_spinor_field_flt(&in_flt[0], &in_flt[1]););
 
-    _SPEED_TEST_LIN_ALG_FLT("Square norm single precision", 1, 0, NF * 4 * 2, in_flt, spinor_field_sqnorm_f_flt(&in_flt[0]););
+    _SPEED_TEST_LIN_ALG_FLT("Square norm single precision", 1, 0, NF * 4 * 2, in_flt, sqnorm_spinor_field_flt(&in_flt[0]););
 
     _SPEED_TEST_LIN_ALG_FLT("g5 application single precision", 1, 1, NF * 2 * 2, in_flt,
-                            spinor_field_g5_f_flt(&in_flt[0], &in_flt[1]););
+                            g5_spinor_field_flt(&in_flt[0], &in_flt[1]););
 
     _SPEED_TEST_LIN_ALG_FLT("g5 mulc add assign single precision", 1, 1, NF * 6 * 2, in_flt,
-                            spinor_field_g5_mulc_add_assign_f_flt(&in_flt[0], c, &in_flt[1]););
+                            g5_mulc_add_assign_spinor_field_flt(&in_flt[0], c, &in_flt[1]););
 
     // Timer resolution
     for (int i = 0; i < 1; ++i) {

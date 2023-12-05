@@ -19,7 +19,10 @@
 
 #if _IS_SPINOR_LIKE == 0
 #define _n 1
-#define _ALLOCATE _F_ARGS(alloc_, (geometry_descriptor * type))
+#define _ALLOCATE                                  \
+    _F_ARGS(alloc_, (geometry_descriptor * type)); \
+    _F_ARGS(alloc_n_, (unsigned int n, geometry_descriptor *type))
+
 #else
 #define _n n
 #define _ALLOCATE _F_ARGS(alloc_, (unsigned int n, geometry_descriptor *type))

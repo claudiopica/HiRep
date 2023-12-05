@@ -14,7 +14,7 @@
 
 #include "update.h"
 #include "libhr_core.h"
-#include "Inverters/linear_algebra.h"
+#include "inverters.h"
 #include "error.h"
 #include "io.h"
 #include "memory.h"
@@ -1099,7 +1099,8 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in) {
 
     rho = 4. + m0;
 
-    spinor_field_mul_add_assign_f_cpu(out, rho, in);
+    //mul_add_assign(out, rho, in);
+    mul_add_assign_spinor_field_cpu(out, rho, in);
 
 #ifdef BC_T_SF_ROTATED
     SFrho = 3. * _update_par.SF_ds + _update_par.SF_zf - 4.;
@@ -1170,7 +1171,7 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in) {
     apply_BCs_on_spinor_field(in);
     Dphi_cpu_(out, in);
     rho = 4. + m0;
-    spinor_field_mul_add_assign_f_cpu(out, rho, in);
+    mul_add_assign_spinor_field_cpu(out, rho, in);
 
 #ifdef BC_T_SF_ROTATED
     SFrho = 3. * _update_par.SF_ds + _update_par.SF_zf - 4.;
@@ -1217,7 +1218,7 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in) {
     }
 #endif /* BC_T_SF_ROTATED */
 
-    spinor_field_g5_assign_f_cpu(out);
+    g5_assign_spinor_field_cpu(out);
 
     apply_BCs_on_spinor_field(out);
 }
@@ -1251,8 +1252,8 @@ void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in) {
     rho = 4.0 + m0;
     rho *= -rho; /* this minus sign is taken into account below */
 
-    spinor_field_mul_add_assign_f_cpu(out, rho, in);
-    spinor_field_minus_f_cpu(out, out);
+    mul_add_assign_spinor_field_cpu(out, rho, in);
+    minus_spinor_field_cpu(out, out);
     apply_BCs_on_spinor_field(out);
 }
 
@@ -1286,8 +1287,8 @@ void Dphi_oepre_cpu(double m0, spinor_field *out, spinor_field *in) {
 
     rho *= -rho; /* this minus sign is taken into account below */
 
-    spinor_field_mul_add_assign_f_cpu(out, rho, in);
-    spinor_field_minus_f_cpu(out, out);
+    mul_add_assign_spinor_field_cpu(out, rho, in);
+    minus_spinor_field_cpu(out, out);
 
     apply_BCs_on_spinor_field(out);
 }
@@ -1317,9 +1318,9 @@ void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in) {
 
     rho *= -rho; /* this minus sign is taken into account below */
 
-    spinor_field_mul_add_assign_f_cpu(out, rho, in);
-    spinor_field_minus_f_cpu(out, out);
-    spinor_field_g5_assign_f_cpu(out);
+    mul_add_assign_spinor_field_cpu(out, rho, in);
+    minus_spinor_field_cpu(out, out);
+    g5_assign_spinor_field_cpu(out);
 
     apply_BCs_on_spinor_field(out);
 }
@@ -1373,17 +1374,17 @@ void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in) {
     if (init_dirac) { init_Dirac(); }
     Dphi_(otmp, in);
     apply_BCs_on_spinor_field(otmp);
-    spinor_field_mul_f(otmp2, rho, otmp);
-    spinor_field_g5_mulc_add_assign_f(otmp2, imu, otmp);
+    mul_spinor_field(otmp2, rho, otmp);
+    g5_mulc_add_assign_spinor_field(otmp2, imu, otmp);
     Dphi_(out, otmp2);
 
     rho = -(4 + m0);
-    spinor_field_mul_add_assign_f(out, rho, in);
+    mul_add_assign_spinor_field(out, rho, in);
     imu = -I * mu;
-    spinor_field_g5_mulc_add_assign_f(out, imu, in);
+    g5_mulc_add_assign_spinor_field(out, imu, in);
 
-    spinor_field_minus_f(out, out);
-    spinor_field_g5_assign_f(out);
+    minus_spinor_field(out, out);
+    g5_assign_spinor_field(out);
 
     apply_BCs_on_spinor_field(out);
 }
@@ -1536,7 +1537,7 @@ void Cphi_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr) {
 
 void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi(mass, dptr, sptr);
-    spinor_field_g5_assign_f(dptr);
+    g5_assign_spinor_field(dptr);
 }
 
 void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
@@ -1554,14 +1555,14 @@ void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi_inv_(mass, otmp, otmp, 0);
     apply_BCs_on_spinor_field(otmp);
     Dphi_(dptr, otmp);
-    spinor_field_minus_f(dptr, dptr);
+    minus_spinor_field(dptr, dptr);
     Cphi_(mass, dptr, sptr, 1);
     apply_BCs_on_spinor_field(dptr);
 }
 
 void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi_eopre(mass, dptr, sptr);
-    spinor_field_g5_assign_f(dptr);
+    g5_assign_spinor_field(dptr);
 }
 
 void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
@@ -1727,7 +1728,7 @@ void Cphi_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sptr) {
 
 void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi(mass, dptr, sptr);
-    spinor_field_g5_assign_f(dptr);
+    g5_assign_spinor_field(dptr);
 }
 
 void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
@@ -1745,14 +1746,14 @@ void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi_(mass, otmp, otmp, 0, 1);
     apply_BCs_on_spinor_field(otmp);
     Dphi_(dptr, otmp);
-    spinor_field_minus_f(dptr, dptr);
+    minus_spinor_field(dptr, dptr);
     Cphi_(mass, dptr, sptr, 1, 0);
     apply_BCs_on_spinor_field(dptr);
 }
 
 void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr) {
     Cphi_eopre(mass, dptr, sptr);
-    spinor_field_g5_assign_f(dptr);
+    g5_assign_spinor_field(dptr);
 }
 
 void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr) {
@@ -1830,11 +1831,11 @@ void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in,
 
     // in= 1/((4+m)^2+mu^2)*((4+m) in +- i mu g5 in)
 
-    spinor_field_g5_f(aux, in);
-    spinor_field_mulc_f(aux2, z, aux);
-    spinor_field_mul_f(out, (4. + mass), in);
-    spinor_field_add_assign_f(out, aux2);
-    spinor_field_mul_f(out, norm, out);
+    g5_spinor_field(aux, in);
+    mulc_spinor_field(aux2, z, aux);
+    mul_spinor_field(out, (4. + mass), in);
+    add_assign_spinor_field(out, aux2);
+    mul_spinor_field(out, norm, out);
 
     gtmp->type = &glattice;
     _PTR(gtmp) = gtmp_ptr;
@@ -1874,11 +1875,11 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
      ************************************************/
 
         Dxx_tw_inv(m0, mu, etmp, in, DIRECT);
-        spinor_field_mul_f(etmp, -rho, etmp);
+        mul_spinor_field(etmp, -rho, etmp);
         Dphi_(otmp, etmp);
         Dxx_tw_inv(m0, mu, otmp, otmp, DIRECT);
         Dphi_(out, otmp);
-        spinor_field_mul_add_assign_f(out, rho, in);
+        mul_add_assign_spinor_field(out, rho, in);
     } else {
         /*************************************************
      * Operators here implemented is:
@@ -1888,10 +1889,10 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
         Dxx_tw_inv(m0, mu, otmp, otmp, DAGGER);
         Dphi_(out, otmp);
         Dxx_tw_inv(m0, mu, out, out, DAGGER);
-        spinor_field_mul_f(out, -rho, out);
-        spinor_field_mul_add_assign_f(out, rho, in);
+        mul_spinor_field(out, -rho, out);
+        mul_add_assign_spinor_field(out, rho, in);
     }
-    spinor_field_g5_assign_f(out);
+    g5_assign_spinor_field(out);
     apply_BCs_on_spinor_field(out);
 }
 

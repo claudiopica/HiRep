@@ -59,7 +59,8 @@ inline static int safe_mod_fast(int x, int y) {
 #define _3FIELD_AT(s, i, mu) (((s)->ptr) + ((i - (s)->type->master_shift) * 3 + mu))
 #define _4FIELD_AT(s, i, mu) (((s)->ptr) + coord_to_index(i - (s)->type->master_shift, mu))
 #define _6FIELD_AT(s, i, mu) (((s)->ptr) + ((i - (s)->type->master_shift) * 6 + mu))
-#define _DFIELD_AT(s, i, mu, size) (size == 4) ? _4FIELD_AT(s, i, mu) : ((s)->ptr + ((i - (s)->type->master_shift) * size + mu))
+#define _DFIELD_AT(s, i, mu, size) \
+    ((size == 4) ? _4FIELD_AT(s, i, mu) : ((s)->ptr + ((i - (s)->type->master_shift) * size + mu)))
 
 //same as above, but from a pointer.
 #define _FIELD_AT_PTR(s, i, _master_shift) (s + i - _master_shift)
@@ -67,7 +68,7 @@ inline static int safe_mod_fast(int x, int y) {
 #define _3FIELD_AT_PTR(s, i, mu, _master_shift) (s + ((i - _master_shift) * 3 + mu))
 #define _6FIELD_AT_PTR(s, i, mu, _master_shift) (s + ((i - _master_shift) * 6 + mu))
 #define _DFIELD_AT_PTR(s, i, mu, _master_shift, __size) \
-    (__size == 4) ? _4FIELD_AT_PTR(s, i, mu, _master_shift) : (s + ((i - _master_shift) * __size + mu))
+    ((__size == 4) ? _4FIELD_AT_PTR(s, i, mu, _master_shift) : (s + ((i - _master_shift) * __size + mu)))
 
 //compute start of geometry field master piece
 #define _FIELD_BLK(s, i) (((s)->ptr) + ((s)->type->master_start[(i)]) - (s)->type->master_shift)

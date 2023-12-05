@@ -90,28 +90,28 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
     cgiter = 0;
     notconverged = par->n;
 
-    spinor_field_copy_f(p2, in); /* trial solution = 0 */
-    innorm2 = spinor_field_sqnorm_f(in);
+    copy_spinor_field(p2, in); /* trial solution = 0 */
+    innorm2 = sqnorm_spinor_field(in);
     if (par->n == 1) { /* in this case is not a multishift and we use as starting vector out[0] */
         M(Mp, &out[0]);
-        spinor_field_mul_add_assign_f(Mp, -par->shift[0], &out[0]);
-        spinor_field_sub_f(p2, p2, Mp);
+        mul_add_assign_spinor_field(Mp, -par->shift[0], &out[0]);
+        sub_spinor_field(p2, p2, Mp);
     }
-    rho = sqrt(spinor_field_sqnorm_f(p2));
+    rho = sqrt(sqnorm_spinor_field(p2));
     lprintf("INVERTER", 50, "g5QMR: rho init: %1.8e\n", rho * rho / innorm2);
 
-    spinor_field_mul_f(p2, 1. / rho, p2);
-    spinor_field_zero_f(p1);
+    mul_spinor_field(p2, 1. / rho, p2);
+    zero_spinor_field(p1);
     for (int i = 0; i < (par->n); ++i) {
         r[i] = rho;
         c2[i] = c1[i] = 1.;
         s1[i] = s2[i] = 0.;
-        if (par->n != 1) { spinor_field_zero_f(&out[i]); /* if no multishift we start with the trial solution */ }
-        spinor_field_zero_f(q1[i]);
-        spinor_field_zero_f(q2[i]);
+        if (par->n != 1) { zero_spinor_field(&out[i]); /* if no multishift we start with the trial solution */ }
+        zero_spinor_field(q1[i]);
+        zero_spinor_field(q2[i]);
         flags[i] = 1;
     }
-    delta = spinor_field_g5_prod_re_f(p2, p2);
+    delta = g5_prod_re_spinor_field(p2, p2);
     error(fabs(delta) < 1.e-28, 1, "g5QMR " __FILE__, "g5 norm of the initial guess is zero, change the initial guess");
     beta = delta;
 
@@ -120,21 +120,21 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
         ++cgiter;
 
         M(Mp, p2);
-        spinor_field_mul_add_assign_f(Mp, -par->shift[0], p2);
+        mul_add_assign_spinor_field(Mp, -par->shift[0], p2);
 
         /* compute alpha */
-        alpha = spinor_field_g5_prod_re_f(p2, Mp) / delta;
+        alpha = g5_prod_re_spinor_field(p2, Mp) / delta;
 
         /* update p1, p2 */
-        spinor_field_mul_add_assign_f(Mp, -beta, p1);
-        spinor_field_mul_add_assign_f(Mp, -alpha, p2);
+        mul_add_assign_spinor_field(Mp, -beta, p1);
+        mul_add_assign_spinor_field(Mp, -alpha, p2);
         sptmp = p1;
         p1 = p2;
         p2 = Mp;
         Mp = sptmp;
 
         /* update rho */
-        rho = sqrt(spinor_field_sqnorm_f(p2));
+        rho = sqrt(sqnorm_spinor_field(p2));
 
         maxm = 1.e-10; /* to check if the error is going down */
 
@@ -152,15 +152,15 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
                 maxm = (maxm > fabs(m)) ? maxm : fabs(m);
 
                 /* update q */
-                spinor_field_lc_f(Mp, -t * d, q1[i], -e * d, q2[i]);
-                spinor_field_mul_add_assign_f(Mp, d, p1);
+                lc_spinor_field(Mp, -t * d, q1[i], -e * d, q2[i]);
+                mul_add_assign_spinor_field(Mp, d, p1);
                 sptmp = q1[i];
                 q1[i] = q2[i];
                 q2[i] = Mp;
                 Mp = sptmp; /* swap q1[i]<-q2[i]<-Mp and Mp point to q1 */
 
                 /* update solution */
-                spinor_field_mul_add_assign_f(&out[i], c2[i] * r[i], q2[i]);
+                mul_add_assign_spinor_field(&out[i], c2[i] * r[i], q2[i]);
 
                 /* update residuum */
                 r[i] *= -s2[i];
@@ -180,11 +180,11 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
             double olddelta;
 
             /*normalize p2 */
-            spinor_field_mul_f(p2, 1. / rho, p2);
+            mul_spinor_field(p2, 1. / rho, p2);
 
             /* update delta and beta */
             olddelta = delta;
-            delta = spinor_field_g5_prod_re_f(p2, p2);
+            delta = g5_prod_re_spinor_field(p2, p2);
 
             lprintf("INVERTER", 40, "g5QMR: delta=%1.8e rho=%1.8e [iter=%d]\n", delta, rho, cgiter);
             if (fabs(delta) < 1.e-6 || maxm < 1.e-3) { /* the method has failed ! */
@@ -214,9 +214,9 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
         double norm;
         M(Mp, &out[i]);
         ++cgiter;
-        if (par->shift[i] != 0.) { spinor_field_mul_add_assign_f(Mp, -par->shift[i], &out[i]); }
-        spinor_field_sub_f(Mp, Mp, in);
-        norm = spinor_field_sqnorm_f(Mp) / innorm2;
+        if (par->shift[i] != 0.) { mul_add_assign_spinor_field(Mp, -par->shift[i], &out[i]); }
+        sub_spinor_field(Mp, Mp, in);
+        norm = sqnorm_spinor_field(Mp) / innorm2;
         valid[i] = 1;
         if (fabs(norm) > par->err2) {
             valid[i] = 0;
@@ -276,22 +276,22 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
     cgiter = 0;
     notconverged = 1;
 
-    spinor_field_copy_f_flt(p2, in); /* trial solution = 0 */
-    innorm2 = spinor_field_sqnorm_f_flt(in);
+    copy_spinor_field_flt(p2, in); /* trial solution = 0 */
+    innorm2 = sqnorm_spinor_field_flt(in);
     M(Mp, out);
-    spinor_field_sub_f_flt(p2, p2, Mp);
-    rho = sqrt(spinor_field_sqnorm_f_flt(p2));
+    sub_spinor_field_flt(p2, p2, Mp);
+    rho = sqrt(sqnorm_spinor_field_flt(p2));
     lprintf("INVERTER", 60, "g5QMR_core_flt: rho init: %1.8e\n", rho * rho / innorm2);
 
-    spinor_field_mul_f_flt(p2, 1.f / ((float)(rho)), p2);
-    spinor_field_zero_f_flt(p1);
+    mul_spinor_field_flt(p2, 1.f / ((float)(rho)), p2);
+    zero_spinor_field_flt(p1);
     r = rho;
     c2 = c1 = 1.;
     s1 = s2 = 0.;
-    spinor_field_zero_f_flt(q1);
-    spinor_field_zero_f_flt(q2);
+    zero_spinor_field_flt(q1);
+    zero_spinor_field_flt(q2);
     flag = 1;
-    delta = spinor_field_g5_prod_re_f_flt(p2, p2);
+    delta = g5_prod_re_spinor_field_flt(p2, p2);
     beta = delta;
 
     /* cg recursion */
@@ -301,18 +301,18 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
         M(Mp, p2);
 
         /* compute alpha */
-        alpha = spinor_field_g5_prod_re_f_flt(p2, Mp) / delta;
+        alpha = g5_prod_re_spinor_field_flt(p2, Mp) / delta;
 
         /* update p1, p2 */
-        spinor_field_mul_add_assign_f_flt(Mp, ((float)(-beta)), p1);
-        spinor_field_mul_add_assign_f_flt(Mp, -((float)(alpha)), p2);
+        mul_add_assign_spinor_field_flt(Mp, ((float)(-beta)), p1);
+        mul_add_assign_spinor_field_flt(Mp, -((float)(alpha)), p2);
         sptmp = p1;
         p1 = p2;
         p2 = Mp;
         Mp = sptmp;
 
         /* update rho */
-        rho = sqrt(spinor_field_sqnorm_f_flt(p2));
+        rho = sqrt(sqnorm_spinor_field_flt(p2));
 
         maxm = 1.e-10; /* to check if the error is going down */
 
@@ -338,15 +338,15 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
             maxm = (maxm > fabs(m)) ? maxm : fabs(m);
 
             /* update q */
-            spinor_field_lc_f_flt(Mp, ((float)(-t * d)), q1, ((float)(-e * d)), q2);
-            spinor_field_mul_add_assign_f_flt(Mp, ((float)(d)), p1);
+            lc_spinor_field_flt(Mp, ((float)(-t * d)), q1, ((float)(-e * d)), q2);
+            mul_add_assign_spinor_field_flt(Mp, ((float)(d)), p1);
             sptmp = q1;
             q1 = q2;
             q2 = Mp;
             Mp = sptmp; /* swap q1<-q2<-Mp and Mp point to q1 */
 
             /* update solution */
-            spinor_field_mul_add_assign_f_flt(out, ((float)(c2 * r)), q2);
+            mul_add_assign_spinor_field_flt(out, ((float)(c2 * r)), q2);
 
             /* update residuum */
             r *= -s2;
@@ -365,11 +365,11 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
             double olddelta;
 
             /*normalize p2 */
-            spinor_field_mul_f_flt(p2, ((float)(1. / rho)), p2);
+            mul_spinor_field_flt(p2, ((float)(1. / rho)), p2);
 
             /* update delta and beta */
             olddelta = delta;
-            delta = spinor_field_g5_prod_re_f_flt(p2, p2);
+            delta = g5_prod_re_spinor_field_flt(p2, p2);
 
             lprintf("INVERTER", 60, "g5QMR_core_flt: delta=%1.8e rho=%1.8e [iter=%d]\n", delta, rho, cgiter);
             if (fabs(delta) < 1.e-6 || maxm < 1.e-3) { /* the method has failed ! */
@@ -388,9 +388,9 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
 #ifndef NDEBUG
         if (cgiter % 1 == 0) {
             M(sdbg, out);
-            spinor_field_sub_assign_f_flt(sdbg, in);
+            sub_assign_spinor_field_flt(sdbg, in);
             lprintf("INVERTER", 20, "g5QMR_core_flt: [%d] res=%e notconverged=%d\n", cgiter,
-                    spinor_field_sqnorm_f_flt(sdbg) / innorm2, notconverged);
+                    sqnorm_spinor_field_flt(sdbg) / innorm2, notconverged);
         }
 #endif
 
@@ -400,8 +400,8 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
     double norm;
     M(Mp, out);
     ++cgiter;
-    spinor_field_sub_f_flt(Mp, Mp, in);
-    norm = spinor_field_sqnorm_f_flt(Mp) / innorm2;
+    sub_spinor_field_flt(Mp, Mp, in);
+    norm = sqnorm_spinor_field_flt(Mp) / innorm2;
     *valid = 1;
     if (fabs(norm) > err2) {
         *valid = 0;
@@ -426,16 +426,16 @@ static double sh;
 static spinor_operator g5Herm;
 static void Herm(spinor_field *out, spinor_field *in) {
     g5Herm(out, in);
-    if (sh != 0.) { spinor_field_mul_add_assign_f(out, -sh, in); }
-    spinor_field_g5_f(out, out);
+    if (sh != 0.) { mul_add_assign_spinor_field(out, -sh, in); }
+    g5_spinor_field(out, out);
 }
 
 static double sh_flt;
 static spinor_operator_flt g5Herm_flt;
 static void Herm_flt(spinor_field_flt *out, spinor_field_flt *in) {
     g5Herm_flt(out, in);
-    if (sh_flt != 0.) { spinor_field_mul_add_assign_f_flt(out, ((float)(-sh_flt)), in); }
-    spinor_field_g5_f_flt(out, out);
+    if (sh_flt != 0.) { mul_add_assign_spinor_field_flt(out, ((float)(-sh_flt)), in); }
+    g5_spinor_field_flt(out, out);
 }
 
 int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out) {
@@ -480,9 +480,9 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fi
                     g5Herm = M;
                     sh = par->shift[0];
 
-                    spinor_field_g5_f(in, in); /* multiply input by g5 for MINRES */
+                    g5_spinor_field(in, in); /* multiply input by g5 for MINRES */
                     loccg = MINRES(&Mpar, &Herm, in, &out[n], (n == 0) ? &out[n] : &out[n - 1]);
-                    spinor_field_g5_f(in, in); /* restore input vector */
+                    g5_spinor_field(in, in); /* restore input vector */
 
                     cgiter += loccg;
                 }
@@ -511,11 +511,11 @@ int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M
     in_flt = alloc_spinor_field_flt(3, in->type);
     out_flt = in_flt + 1;
     res_flt = out_flt + 1;
-    innorm2 = spinor_field_sqnorm_f(in);
+    innorm2 = sqnorm_spinor_field(in);
 
     /* 0. out = 0 ; res = in */
-    spinor_field_copy_f(res, in);
-    spinor_field_zero_f(out);
+    copy_spinor_field(res, in);
+    zero_spinor_field(out);
 
     if (par->err2_flt <= 0.) {
         mshift_par mpar;
@@ -533,7 +533,7 @@ int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M
         /* 3. res = in - M.out */
 
         assign_sd2s(res_flt, res);
-        spinor_field_zero_f_flt(out_flt);
+        zero_spinor_field_flt(out_flt);
 
         cgiter_flt += g5QMR_core_flt(&valid, par->err2_flt, par->max_iter_flt, M_flt, res_flt, out_flt);
         if (valid == 0) {
@@ -543,9 +543,9 @@ int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M
             Mpar.max_iter = 0;
             g5Herm_flt = M_flt;
             sh_flt = 0.;
-            spinor_field_g5_f_flt(res_flt, res_flt); /* multiply input by g5 for MINRES */
+            g5_spinor_field_flt(res_flt, res_flt); /* multiply input by g5 for MINRES */
             cgiter_minres += MINRES_flt(&Mpar, &Herm_flt, res_flt, out_flt, out_flt);
-            spinor_field_g5_f_flt(res_flt, res_flt); /* restore input vector */
+            g5_spinor_field_flt(res_flt, res_flt); /* restore input vector */
         }
 #ifdef WITH_FUSE_MASTER_FOR
         _FUSE_MASTER_FOR(out->type, ix) {
@@ -559,8 +559,8 @@ int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M
         }
 
         M(res, out);
-        spinor_field_sub_f(res, in, res);
-        err2 = spinor_field_sqnorm_f(res);
+        sub_spinor_field(res, in, res);
+        err2 = sqnorm_spinor_field(res);
         cgiter++;
 
         lprintf("INVERTER", 20, "g5QMR_fltacc [%d]: res=%e\n", cgiter, err2 / innorm2);

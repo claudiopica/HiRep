@@ -155,12 +155,12 @@ void measure_spectrum_semwall_ff_ext(int nm, double *m, int nhits, int conf_num,
         calc_propagator_ff_eo(prop_a, source, dilution);
         flip_T_bc(tau);
         for (l = 0; l < dilution * nm; ++l) {
-            spinor_field_add_assign_f(&prop_p[l], &prop_a[l]);
-            spinor_field_mul_f(&prop_p[l], 0.5, &prop_p[l]);
+            add_assign_spinor_field(&prop_p[l], &prop_a[l]);
+            mul_spinor_field(&prop_p[l], 0.5, &prop_p[l]);
         }
         measure_mesons_ext(meson_correlators, prop_p, source, nm, tau, 1);
         for (l = 0; l < dilution * nm; ++l) {
-            spinor_field_sub_assign_f(&prop_p[l], &prop_a[l]);
+            sub_assign_spinor_field(&prop_p[l], &prop_a[l]);
         }
         measure_mesons_ext(meson_correlators, prop_p, source, nm, tau, 2);
 
@@ -174,12 +174,12 @@ void measure_spectrum_semwall_ff_ext(int nm, double *m, int nhits, int conf_num,
         calc_propagator_ff_eo(prop_a, source, dilution);
         flip_T_bc(tau);
         for (l = 0; l < dilution * nm; ++l) {
-            spinor_field_add_assign_f(&prop_p[l], &prop_a[l]);
-            spinor_field_mul_f(&prop_p[l], 0.5, &prop_p[l]);
+            add_assign_spinor_field(&prop_p[l], &prop_a[l]);
+            mul_spinor_field(&prop_p[l], 0.5, &prop_p[l]);
         }
         measure_mesons_ext(meson_correlators, prop_p, source, nm, tau, 1);
         for (l = 0; l < dilution * nm; ++l) {
-            spinor_field_sub_assign_f(&prop_p[l], &prop_a[l]);
+            sub_assign_spinor_field(&prop_p[l], &prop_a[l]);
         }
         measure_mesons_ext(meson_correlators, prop_p, source, nm, tau, 2);
         flip_scalar_field(ff_pi); //back to normal

@@ -91,10 +91,10 @@ static void calc_propagator_ff_eo_core(spinor_field *psi, spinor_field *eta, int
     }
 
     /* add source */
-    spinor_field_copy_f(tmp, eta);
+    copy_spinor_field(tmp, eta);
 
     for (i = 0; i < QMR_par.n; ++i) {
-        spinor_field_zero_f(&resd[i]);
+        zero_spinor_field(&resd[i]);
     }
 
     if (solver == _CG_4F) {
@@ -111,14 +111,14 @@ static void calc_propagator_ff_eo_core(spinor_field *psi, spinor_field *eta, int
         /* compute solution */
         qprop_mask = psi[i];
         qprop_mask.type = &glat_even;
-        spinor_field_copy_f(&qprop_mask, &resd[i]);
+        copy_spinor_field(&qprop_mask, &resd[i]);
         qprop_mask.type = &glat_odd;
         qprop_mask.ptr = psi[i].ptr + glat_odd.master_shift;
-        //spinor_field_zero_f(&qprop_mask);
+        //zero_spinor_field(&qprop_mask);
         Dphi_(&qprop_mask, &resd[i]);
 
         spinor_sigma_pi_rho_div_assign(&qprop_mask, ff_sigma, ff_pi, (4. + mass[i]), &qprop_mask);
-        spinor_field_minus_f(&qprop_mask, &qprop_mask);
+        minus_spinor_field(&qprop_mask, &qprop_mask);
 
         spinor_field *gtmp = alloc_spinor_field(1, &glattice);
         for (int k = 0; k < n_hopping; k++) {
@@ -156,10 +156,10 @@ static void calc_propagator_ff_oe_core(spinor_field *psi, spinor_field *eta, int
 
     qprop_mask_eta = eta[0];
     qprop_mask_eta.type = &glat_even;
-    spinor_field_sub_f(tmp, &qprop_mask_eta, etmp);
+    sub_spinor_field(tmp, &qprop_mask_eta, etmp);
 
     for (i = 0; i < QMR_par.n; ++i) {
-        spinor_field_zero_f(&resd[i]);
+        zero_spinor_field(&resd[i]);
     }
 
     if (solver == _CG_4F) {
@@ -173,22 +173,22 @@ static void calc_propagator_ff_oe_core(spinor_field *psi, spinor_field *eta, int
 
     for (i = 0; i < QMR_par.n; ++i) {
         /* compute solution */
-        spinor_field_zero_f(&psi[i]);
+        zero_spinor_field(&psi[i]);
         qprop_mask = psi[i];
         qprop_mask.type = &glat_even;
-        spinor_field_copy_f(&qprop_mask, &resd[i]);
+        copy_spinor_field(&qprop_mask, &resd[i]);
 
         qprop_mask.type = &glat_odd;
         qprop_mask.ptr = psi[i].ptr + glat_odd.master_shift;
         Dphi_(&qprop_mask, &resd[i]);
         spinor_sigma_pi_rho_div_assign(&qprop_mask, ff_sigma, ff_pi, (4. + mass[i]), &qprop_mask);
-        spinor_field_sub_f(&qprop_mask, tmp_odd, &qprop_mask);
+        sub_spinor_field(&qprop_mask, tmp_odd, &qprop_mask);
 
         spinor_field *gtmp = alloc_spinor_field(1, &glattice);
         for (int k = 0; k < n_hopping; k++) {
             Dphi_(gtmp, &psi[i]);
             spinor_sigma_pi_rho_div_assign(&psi[i], ff_sigma, ff_pi, (4. + mass[i]), gtmp);
-            spinor_field_minus_f(&psi[i], &psi[i]);
+            minus_spinor_field(&psi[i], &psi[i]);
         }
         free_spinor_field(gtmp);
     }
@@ -204,7 +204,7 @@ static void calc_propagator_ff_hopping_series_core(spinor_field *psi, spinor_fie
     error(init == 0, 1, "calc_prop_ff.c", "z2semwall method not initialized!");
 
     for (i = 0; i < QMR_par.n; ++i) {
-        spinor_field_zero_f(&psi[i]);
+        zero_spinor_field(&psi[i]);
     }
 
     if (n_hopping > 0) {
@@ -212,17 +212,17 @@ static void calc_propagator_ff_hopping_series_core(spinor_field *psi, spinor_fie
         spinor_field *gtmp2 = alloc_spinor_field(1, &glattice);
 
         for (i = 0; i < QMR_par.n; ++i) {
-            spinor_field_zero_f(gtmp);
-            spinor_field_zero_f(gtmp2);
+            zero_spinor_field(gtmp);
+            zero_spinor_field(gtmp2);
             double rho = 4. + mass[i];
             if (n_hopping > 0) {
                 spinor_sigma_pi_rho_div_assign(gtmp, ff_sigma, ff_pi, rho, eta);
-                spinor_field_copy_f(&psi[i], gtmp);
+                copy_spinor_field(&psi[i], gtmp);
                 for (int k = 0; k < n_hopping - 1; k++) {
                     Dphi_(gtmp2, gtmp);
                     spinor_sigma_pi_rho_div_assign(gtmp, ff_sigma, ff_pi, rho, gtmp2);
-                    spinor_field_minus_f(gtmp, gtmp);
-                    spinor_field_add_assign_f(&psi[i], gtmp);
+                    minus_spinor_field(gtmp, gtmp);
+                    add_assign_spinor_field(&psi[i], gtmp);
                 }
             }
         }
@@ -259,17 +259,17 @@ static void calc_propagator_ff_core(spinor_field *psi, spinor_field *eta, int so
     qprop_mask_eta = *eta;
     qprop_mask_eta.type = &glat_odd;
     qprop_mask_eta.ptr = eta->ptr + glat_odd.master_shift;
-    spinor_field_minus_f(&qprop_mask_eta, &qprop_mask_eta);
+    minus_spinor_field(&qprop_mask_eta, &qprop_mask_eta);
     Dphi_(tmp, &qprop_mask_eta);
-    spinor_field_minus_f(&qprop_mask_eta, &qprop_mask_eta);
+    minus_spinor_field(&qprop_mask_eta, &qprop_mask_eta);
 
     spinor_sigma_pi_dagger_rho_div_assign(tmp, ff_sigma, ff_pi, (4. + mass[0]), &qprop_mask_eta);
 
     //if the solution vector is empty use zero guess
-    if (spinor_field_sqnorm_f(psi) < 1e-28) {
-        spinor_field_zero_f(resd);
+    if (sqnorm_spinor_field(psi) < 1e-28) {
+        zero_spinor_field(resd);
     } else {
-        spinor_field_copy_f(resd, psi);
+        copy_spinor_field(resd, psi);
     }
 
     if (solver == _CG_4F) {
@@ -289,14 +289,14 @@ static void calc_propagator_ff_core(spinor_field *psi, spinor_field *eta, int so
 
     qprop_mask_psi = *psi;
     qprop_mask_psi.type = &glat_even;
-    spinor_field_copy_f(&qprop_mask_psi, resd);
+    copy_spinor_field(&qprop_mask_psi, resd);
 
     qprop_mask_psi.type = &glat_odd;
     qprop_mask_psi.ptr = psi->ptr + glat_odd.master_shift;
     Dphi_(&qprop_mask_psi, resd);
 
     spinor_sigma_pi_rho_div_assign(&qprop_mask_psi, ff_sigma, ff_pi, (4. + mass[0]), &qprop_mask_psi);
-    spinor_field_minus_f(&qprop_mask_psi, &qprop_mask_psi);
+    minus_spinor_field(&qprop_mask_psi, &qprop_mask_psi);
 
     ++cgiter; /* One whole call*/
     lprintf("CALC_PROP_CORE", 10, "QMR_eo MVM = %d\n", cgiter);

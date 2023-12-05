@@ -43,6 +43,12 @@
 #define _IS_SPINOR_LIKE 0
 #include "TMPL/field_alloc.c.tmpl"
 
+#define _FIELD_TYPE suNfc_field
+#define _SITE_TYPE suNfc
+#define _FIELD_DIM 4
+#define _IS_SPINOR_LIKE 0
+#include "TMPL/field_alloc.c.tmpl"
+
 #define _FIELD_TYPE suNf_field_flt
 #define _SITE_TYPE suNf_flt
 #define _FIELD_DIM 4

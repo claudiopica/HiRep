@@ -50,23 +50,23 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
     cgiter = 0;
     omega = 1.;
     gamma = 0.;
-    innorm2 = spinor_field_sqnorm_f_flt(in);
+    innorm2 = sqnorm_spinor_field_flt(in);
     if (par->n == 1) { /* non multishift case */
         /* use out[0] as initial guess */
         M(Mk, &out[0]);
         ++cgiter;
-        spinor_field_mul_add_assign_f_flt(Mk, ((float)(-par->shift[0])), &out[0]);
-        spinor_field_sub_f_flt(r, in, Mk);
+        mul_add_assign_spinor_field_flt(Mk, ((float)(-par->shift[0])), &out[0]);
+        sub_spinor_field_flt(r, in, Mk);
     } else { /* initial guess = 0 for multishift */
-        spinor_field_copy_f_flt(r, in);
+        copy_spinor_field_flt(r, in);
     }
-    spinor_field_copy_f_flt(k, r);
-    delta = spinor_field_sqnorm_f_flt(r);
+    copy_spinor_field_flt(k, r);
+    delta = sqnorm_spinor_field_flt(r);
     for (i = 0; i < (par->n); ++i) {
         z1[i] = z2[i] = 1.;
         z3[i] = 0.;
-        spinor_field_copy_f_flt(&p[i], r);
-        if (par->n != 1) { spinor_field_zero_f_flt(&out[i]); }
+        copy_spinor_field_flt(&p[i], r);
+        if (par->n != 1) { zero_spinor_field_flt(&out[i]); }
         /*    sflags[i]=1; */
     }
 
@@ -75,7 +75,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
     do {
         M(Mk, k);
 
-        alpha = spinor_field_prod_re_f_flt(k, Mk);
+        alpha = prod_re_spinor_field_flt(k, Mk);
         oldomega = omega;
         omega = -delta / alpha;
 
@@ -83,23 +83,23 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
             if (sflags[i]) {
                 z3[i] = oldomega * z1[i] * z2[i] /
                         (omega * gamma * (z1[i] - z2[i]) + z1[i] * oldomega * (1. + par->shift[i] * omega));
-                spinor_field_mul_add_assign_f_flt(&out[i], ((float)(-omega * z3[i] / z2[i])), &p[i]);
+                mul_add_assign_spinor_field_flt(&out[i], ((float)(-omega * z3[i] / z2[i])), &p[i]);
             }
         }
-        spinor_field_mul_add_assign_f_flt(r, ((float)(omega)), Mk);
-        lambda = spinor_field_sqnorm_f_flt(r);
+        mul_add_assign_spinor_field_flt(r, ((float)(omega)), Mk);
+        lambda = sqnorm_spinor_field_flt(r);
         gamma = lambda / delta;
         delta = lambda;
 
-        spinor_field_mul_f_flt(k, ((float)(gamma)), k);
-        spinor_field_add_assign_f_flt(k, r);
+        mul_spinor_field_flt(k, ((float)(gamma)), k);
+        add_assign_spinor_field_flt(k, r);
         notconverged = 0; /* assume that all vectors have converged */
 
         for (i = 0; i < (par->n); ++i) {
             if (delta * z3[i] * z3[i] > par->err2 * innorm2) { ++notconverged; }
             if (sflags[i]) {
-                spinor_field_mul_f_flt(&p[i], ((float)(gamma * z3[i] * z3[i] / (z2[i] * z2[i]))), &p[i]);
-                spinor_field_mul_add_assign_f_flt(&p[i], ((float)(z3[i])), r);
+                mul_spinor_field_flt(&p[i], ((float)(gamma * z3[i] * z3[i] / (z2[i] * z2[i]))), &p[i]);
+                mul_add_assign_spinor_field_flt(&p[i], ((float)(z3[i])), r);
                 z1[i] = z2[i];
                 z2[i] = z3[i];
             }
@@ -160,11 +160,11 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
    */
     for (i = 0; i < (par->n); ++i) {
         sflags[i] = 1;
-        if (par->n != 1) { spinor_field_zero_f(&out[i]); }
+        if (par->n != 1) { zero_spinor_field(&out[i]); }
     }
 
     /* compute input norm2 */
-    innorm2 = spinor_field_sqnorm_f(in);
+    innorm2 = sqnorm_spinor_field(in);
 
     /* begin external loop */
     do {
@@ -178,10 +178,10 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
                 M(tmp, &out[i]);
 
                 ++diter;
-                spinor_field_sub_f(res2, in, tmp);
-                spinor_field_mul_add_assign_f(res2, par->shift[i], &out[i]);
+                sub_spinor_field(res2, in, tmp);
+                mul_add_assign_spinor_field(res2, par->shift[i], &out[i]);
                 /* test for convergence */
-                norm[i] = spinor_field_sqnorm_f(res2);
+                norm[i] = sqnorm_spinor_field(res2);
                 lprintf("CGDEBUG", 20, "norm %d = %e relerr=%e\n", i, norm[i], norm[i] / innorm2);
                 if (norm[i] < innorm2 * par->err2) {
                     /* this shift has reached convergence */
@@ -196,14 +196,14 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
                         first = 0;
                         local_par.err2 = norm[i] / innorm2;
                         norm[i] = sqrt(norm[i]);
-                        spinor_field_mul_f(res, 1. / norm[i], res2); /* normalize input res vector */
+                        mul_spinor_field(res, 1. / norm[i], res2); /* normalize input res vector */
                     } else {
                         /* take the scalar product of current residual vector with the 
              * normalized first one as residual norm */
-                        norm[i] = spinor_field_prod_im_f(res, res2);
-                        lprintf("CGDEBUG", 20, "Im=%e check norm=%e\n", norm[i], spinor_field_sqnorm_f(res));
-                        norm[i] = spinor_field_prod_re_f(res, res2);
-                        /* norm[i]=sqrt(spinor_field_sqnorm_f(res2)); */
+                        norm[i] = prod_im_spinor_field(res, res2);
+                        lprintf("CGDEBUG", 20, "Im=%e check norm=%e\n", norm[i], sqnorm_spinor_field(res));
+                        norm[i] = prod_re_spinor_field(res, res2);
+                        /* norm[i]=sqrt(sqnorm_spinor_field(res2)); */
                     }
                 }
             }
@@ -227,7 +227,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
             for (i = 0; i < par->n; ++i) {
                 if (sflags[i] != 0) {
                     assign_s2sd(res2, &out_flt[i]);
-                    spinor_field_mul_add_assign_f(&out[i], norm[i], res2);
+                    mul_add_assign_spinor_field(&out[i], norm[i], res2);
                 }
             }
         }
