@@ -665,7 +665,7 @@ inline hr_complex suNfc_prod(suNfc *u, suNfc *v) {
     hr_complex res = 0.0;
     _suNfc_dagger(tmp1, *u);
     _suNfc_multiply(tmp2, tmp1, *v);
-    _suNfc_trace_re(res, tmp2);
+    _suNfc_trace(res, tmp2);
     return res;
 }
 
