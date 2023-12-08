@@ -135,13 +135,15 @@ _DECLARE_LINEAR_ALGEBRA(double, sqnorm, (_FIELD_TYPE * s1)) {
 _DECLARE_LINEAR_ALGEBRA(double, max, (_FIELD_TYPE * s1)) {
     double max = 0.;
 
-    _ONE_SITE_FOR_SUM(s1, sum, c) {
+#if 0
+    _ONE_SITE_FOR_SUM(s1, sum) {
         for (int mu = 0; mu < _FIELD_DIM; ++mu) {
             double max_loc;
             max_loc = max(_SITE_PTR(s1, mu, _FIELD_DIM));
             max = max > max_loc ? max : max_loc;
         }
     }
+#endif
 #ifdef WITH_MPI
     global_max(&max, 1);
 #endif

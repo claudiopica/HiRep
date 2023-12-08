@@ -513,10 +513,10 @@ visible double prod_re(suNf *s1, suNf *s2) {
 #ifdef REPR_IS_REAL
 visible double prod_re(suNfc *s1, suNfc *s2) {
     suNfc tmp;
-    double res = 0.0;
+    hr_complex res = 0.0;
     _suNfc_dagger_times_suNfc(tmp, *s1, *s2);
-    _suNfc_trace_re(res, tmp);
-    return res;
+    _suNfc_trace(res, tmp);
+    return creal(res);
 }
 #endif
 
@@ -683,7 +683,7 @@ visible hr_complex prod(suNfc *s1, suNfc *s2) {
     suNfc tmp;
     hr_complex res;
     _suNfc_dagger_times_suNfc(tmp, *s1, *s2);
-    _suNfc_trace_re(res, tmp);
+    _suNfc_trace(res, tmp);
     return res;
 }
 #endif
