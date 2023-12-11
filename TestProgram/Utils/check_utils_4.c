@@ -42,6 +42,10 @@ static hr_complex spat_avr_0pp_wrk() {
         pa = tmp = 0.;
     }
 
+#ifdef WITH_NEW_GEOMETRY
+    complete_sendrecv_suNg_field(_u);
+#endif
+
     _PIECE_FOR(&glattice, ixp) {
         if (ixp == glattice.inner_master_pieces) {
             _OMP_PRAGMA(master)

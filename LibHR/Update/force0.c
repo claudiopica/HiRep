@@ -37,6 +37,7 @@ void force0(double dt, void *vpar) {
     /* check input types */
     _TWO_SPINORS_MATCHING(u_gauge, *par->momenta);
 
+#ifndef WITH_GPU
 #ifdef MEASURE_FORCE0
     double forcestat0 = 0.; /* used for computation of avr and max force */
     double forcestat1 = 0.; /* used for computation of avr and max force */
@@ -79,6 +80,9 @@ void force0(double dt, void *vpar) {
     force_ave[0] += dt * forcestat0;
     force_max[0] += dt * forcestat1;
     //  }
+#endif
+#else
+    force0_kernel_gpu(*par->momenta, coeff);
 #endif
 
     apply_BCs_on_momentum_field(force);

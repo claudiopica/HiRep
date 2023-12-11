@@ -3,14 +3,8 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-// #include "spinor_field.h"
-// #include "suN_repr_func.h"
-// #include "update.h"
-// #include "utils.h"
-// #include <math.h>
-// #include <stdio.h>
-
 #include "random.h"
+#include "memory.h"
 #include "libhr_core.h"
 #include "Utils/boundary_conditions.h"
 
@@ -35,21 +29,29 @@ void gaussian_momenta(suNg_av_field *momenta) {
         }
     }
 
+#ifdef WITH_GPU
+    copy_to_gpu_suNg_av_field(momenta);
+#endif
+
     apply_BCs_on_momentum_field(momenta);
+    start_sendrecv_suNg_av_field(momenta);
+    complete_sendrecv_suNg_av_field(momenta);
 }
 
 void gaussian_scalar_momenta(suNg_scalar_field *momenta) {
     double c2 = 1. / sqrt(2.);
-#ifdef WITH_FUSE_MASTER_FOR
-    _FUSE_MASTER_FOR(momenta->type, ix) {
-        _FUSE_IDX(momenta->type, ix);
-#else
+
     _MASTER_FOR(momenta->type, ix) {
-#endif
         suNg_vector *dptr = _FIELD_AT(momenta, ix);
         gauss((double *)dptr, sizeof(suNg_vector) / sizeof(double));
         _vector_mul_g(*dptr, c2, *dptr);
     }
 
-    //apply_BCs_on_scalar_momentum_field(momenta);
+#ifdef WITH_GPU
+    copy_to_gpu_suNg_scalar_field(momenta);
+#endif
+
+    //apply_BCs_on_scalar_momentum_field(momenta); // TODO: this does not seem to exist. It probably should.
+    start_sendrecv_suNg_scalar_field(momenta);
+    complete_sendrecv_suNg_scalar_field(momenta);
 }

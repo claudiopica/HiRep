@@ -217,6 +217,11 @@ void force_hmc_ff(double dt, void *vpar) {
             start_sendrecv_spinor_field(Xs);
             start_sendrecv_spinor_field(Ys);
 
+#ifdef WITH_NEW_GEOMETRY
+            complete_sendrecv_spinor_field(Xs);
+            complete_sendrecv_spinor_field(Ys);
+#endif
+
             _PIECE_FOR(&glattice, xp) {
                 suNg_algebra_vector f;
                 suNf_vector ptmp;

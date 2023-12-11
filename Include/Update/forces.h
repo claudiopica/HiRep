@@ -5,6 +5,7 @@
 
 /// Headerfile for:
 /// - force0.c
+/// - force0_gpu.cu
 /// - luscherweisz.c
 /// - force_fermion_core.c
 /// - force_hmc.c
@@ -124,7 +125,12 @@ typedef struct force_scalar_par {
 
 void force_scalar(double dt, void *par);
 
+#ifdef WITH_GPU
+void force0_kernel_gpu(suNg_av_field *force, double coeff);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
+
 #endif //FORCE0_H

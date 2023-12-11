@@ -13,4 +13,5 @@ void staples(int ix, int mu, suNg *v);
 #ifdef __cplusplus
 }
 #endif
+
 #endif //STAPLES_H

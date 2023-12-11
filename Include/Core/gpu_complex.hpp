@@ -1058,7 +1058,8 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt &hr_com
 * End of generated code
 *
 *******************************************************************************/
-#define I (hr_complex_int(0, 1))
+//#define I (hr_complex_int(0, 1))
+#define I (hr_complex(0, 1))
 #define creal(a) ((a).re)
 #define cimag(a) ((a).im)
 #define conj(a) (hr_complex((a).re, -(a).im))

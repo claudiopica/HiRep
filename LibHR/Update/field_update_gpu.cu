@@ -8,7 +8,7 @@
 __global__ void field_update_kernel(suNg *suNg_field, suNg_algebra_vector *force, int N, int block_start, double dt) {
     suNg_algebra_vector f;
     suNg u;
-    for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < N; ++id) {
+    for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < N; id += gridDim.x * blockDim.x) {
         const int ix = id + block_start;
         for (int comp = 0; comp < 4; comp++) {
             read_gpu<double>(0, &u, suNg_field, ix, comp, 4);

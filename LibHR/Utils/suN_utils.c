@@ -122,7 +122,7 @@ visible void project_to_suNg(suNg *u) {
         // This did not work before without this absolutely cryptic line
         // the compiler now shoes me an error. Might this now
         // work without?
-        memcpy(u->c + NG * i, v2, sizeof(suNg_vector));
+        //memcpy(u->c + NG * i, v2, sizeof(suNg_vector));
 #endif
         ++v2;
         v1 = (suNg_vector *)(u);

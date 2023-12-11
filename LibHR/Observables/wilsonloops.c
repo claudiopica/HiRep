@@ -392,6 +392,10 @@ void WL_Hamiltonian_gauge(suNg_field *out, suNg_field *in) {
     }
     start_sendrecv_gtransf(ws_gtf[1]);
 
+#ifdef WITH_NEW_GEOMETRY
+    complete_sendrecv_gtransf(ws_gtf[1]);
+#endif
+
     _PIECE_FOR(&glattice, ixp) {
         suNg tmp;
         if (ixp == glattice.inner_master_pieces) {
