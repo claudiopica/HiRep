@@ -7,6 +7,7 @@
 #include "libhr_core.h"
 #include "Update/avr_plaquette.h"
 #include "memory.h"
+#include "inverters.h"
 
 static void pg_gaussian_pf(monomial const *m) {
     /* empty */
@@ -25,30 +26,9 @@ static const spinor_field *pg_pseudofermion(monomial const *m) {
 }
 
 static void pg_add_local_action(monomial const *m, scalar_field *loc_action) {
-// TODO: temporary fix, that will be ported after the linear algebra update
-#ifdef WITH_GPU
-    copy_from_gpu_suNg_field(u_gauge);
-    u_gauge->comm_type = CPU_COMM;
-    start_sendrecv_suNg_field(u_gauge);
-    complete_sendrecv_suNg_field(u_gauge);
-    u_gauge->comm_type = GPU_COMM;
-    copy_from_gpu_scalar_field(loc_action);
-    loc_action->comm_type = CPU_COMM;
-    start_sendrecv_scalar_field(loc_action);
-    complete_sendrecv_scalar_field(loc_action);
-    loc_action->comm_type = GPU_COMM;
-#endif
     mon_pg_par *par = (mon_pg_par *)(m->data.par);
-    _MASTER_FOR(&glattice, ix) {
-        *_FIELD_AT(loc_action, ix) += -(par->beta / ((double)NG)) * local_plaq(ix);
-    }
-#ifdef WITH_GPU
-    copy_to_gpu_scalar_field(loc_action);
-    start_sendrecv_scalar_field(loc_action);
-    complete_sendrecv_scalar_field(loc_action);
-    start_sendrecv_suNg_field(u_gauge);
-    complete_sendrecv_suNg_field(u_gauge);
-#endif
+    scalar_field *loc_plaq = local_plaquette();
+    mul_add_assign(loc_action, -(par->beta / ((double)NG)), loc_plaq);
 }
 
 static void pg_free(monomial *m) {

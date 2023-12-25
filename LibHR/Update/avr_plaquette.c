@@ -130,6 +130,32 @@ double avr_plaquette_cpu() {
     return pa;
 }
 
+scalar_field *local_plaquette_cpu() {
+    scalar_field *s = alloc(s, 1, &glattice);
+
+#ifdef WITH_NEW_GEOMETRY
+    complete_sendrecv_suNg_field(u_gauge);
+#endif
+
+    _PIECE_FOR(&glattice, ixp) {
+        if (ixp == glattice.inner_master_pieces) {
+            _OMP_PRAGMA(master)
+            /* wait for gauge field to be transfered */
+            complete_sendrecv_suNg_field(u_gauge);
+            _OMP_PRAGMA(barrier)
+        }
+        _SITE_FOR_SUM(&glattice, ixp, ix, pa) {
+            double *pa = _FIELD_AT(s, ix);
+            *pa = plaq(ix, 1, 0);
+            *pa += plaq(ix, 2, 0);
+            *pa += plaq(ix, 2, 1);
+            *pa += plaq(ix, 3, 0);
+            *pa += plaq(ix, 3, 1);
+            *pa += plaq(ix, 3, 2);
+        }
+    }
+}
+
 void avr_plaquette_time_cpu(double *plaqt, double *plaqs) {
     int ix;
     int tc;
@@ -350,4 +376,5 @@ hr_complex avr_plaquette_wrk() {
 double (*avr_plaquette)(void) = avr_plaquette_cpu;
 void (*full_plaquette)(void) = full_plaquette_cpu;
 void (*avr_plaquette_time)(double *plaqt, double *plaqs) = avr_plaquette_time_cpu;
+scalar_field *(*local_plaquette)(void) = local_plaquette_cpu;
 #endif
