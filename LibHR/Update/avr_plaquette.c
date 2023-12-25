@@ -154,6 +154,7 @@ scalar_field *local_plaquette_cpu() {
             *pa += plaq(ix, 3, 2);
         }
     }
+    return s;
 }
 
 void avr_plaquette_time_cpu(double *plaqt, double *plaqs) {
