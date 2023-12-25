@@ -144,7 +144,7 @@ scalar_field *local_plaquette_cpu() {
             complete_sendrecv_suNg_field(u_gauge);
             _OMP_PRAGMA(barrier)
         }
-        _SITE_FOR_SUM(&glattice, ixp, ix, pa) {
+        _SITE_FOR(&glattice, ixp, ix) {
             double *pa = _FIELD_AT(s, ix);
             *pa = plaq(ix, 1, 0);
             *pa += plaq(ix, 2, 0);

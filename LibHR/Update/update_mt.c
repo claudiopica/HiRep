@@ -235,7 +235,7 @@ int update_ghmc() {
 }
 
 static void flip_mom(suNg_av_field *momenta) {
-    minus(momenta, momenta);
+    minus_suNg_av_field(momenta, momenta);
 }
 
 /*
