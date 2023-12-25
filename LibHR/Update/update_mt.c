@@ -235,24 +235,7 @@ int update_ghmc() {
 }
 
 static void flip_mom(suNg_av_field *momenta) {
-    geometry_descriptor *gd = momenta->type;
-
-// TODO: This is a temporary fix and this function will be replaced by
-// the future linear algebra
-#ifdef WITH_GPU
-    copy_from_gpu_suNg_av_field(momenta);
-#endif
-
-    _MASTER_FOR(gd, ix) {
-        for (int dx = 0; dx < 4; dx++) {
-            suNg_algebra_vector *dptr = (suNg_algebra_vector *)(&momenta->ptr[4 * ix + dx]);
-            _algebra_vector_mul_g(*dptr, -1.0, *dptr);
-        }
-    }
-
-#ifdef WITH_GPU
-    copy_to_gpu_suNg_av_field(momenta);
-#endif
+    minus(momenta, momenta);
 }
 
 /*
