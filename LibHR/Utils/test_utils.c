@@ -62,7 +62,7 @@ float spinor_field_findmax_f_flt(spinor_field_flt *in) {
 /// @param abs2
 void compare_diff(int errors, double abs1, double abs2, char tag[], double precision) {
     double rel = fabs(abs1 - abs2) / fabs(abs1);
-    const char *msg = (rel > precision) ? ++errors, "[FAIL]" : "[ OK ]";
+    const char *msg = (rel > precision || !isfinite(rel) || !isfinite(abs1) || !isfinite(abs2)) ? ++errors, "[FAIL]" : "[ OK ]";
     lprintf(tag, 2, "%s rel=%.10e abs=%.10e diff=%.10e\n", msg, rel, fabs(abs1), fabs(abs1 - abs2));
 }
 

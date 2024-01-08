@@ -552,7 +552,7 @@ double suNg_algebra_vector_sqnorm(suNg_algebra_vector *r);
         suNg_vector *: suNg_vector_sqnorm((suNg_vector *)s1),                         \
         suNg_algebra_vector *: suNg_algebra_vector_sqnorm((suNg_algebra_vector *)s1), \
         double *: ({ (*(double *)s1) * (*(double *)s1); }),                           \
-        float *: ({ (*(double *)s1) * (*(double *)s1); }))
+        float *: ({ (*(float *)s1) * (*(float *)s1); }))
 
 double spinor_max_f(suNf_spinor *r);
 double spinor_max_f_flt(suNf_spinor_flt *r);
@@ -572,33 +572,33 @@ double suNg_algebra_vector_max(suNg_algebra_vector *r);
 #define __max_suNfc(s1)
 #endif
 
-#define max(s1)                                                                    \
-    _Generic((s1),                                                                 \
-        spinor_field *: max_spinor_field((spinor_field *)s1),                      \
-        spinor_field_flt *: max_spinor_field_flt((spinor_field_flt *)s1),          \
-        scalar_field *: max_scalar_field((scalar_field *)s1),                      \
-        suNg_field *: max_suNg_field((suNg_field *)s1),                            \
-        suNf_field *: max_suNf_field((suNf_field *)s1),                            \
-        suNfc_field *: max_suNfc_field((suNfc_field *)s1),                         \
-        suNg_field_flt *: max_suNg_field_flt((suNg_field_flt *)s1),                \
-        suNf_field_flt *: max_suNf_field_flt((suNf_field_flt *)s1),                \
-        suNg_scalar_field *: max_suNg_scalar_field((suNg_scalar_field *)s1),       \
-        suNg_av_field *: max_suNg_av_field((suNg_av_field *)s1),                   \
-        gtransf *: max_gtransf((gtransf *)s1),                                     \
-        clover_term *: max_clover_term((clover_term *)s1),                         \
-        clover_force *: max_clover_force((clover_force *)s1),                      \
-        staple_field *: max_staple_field((staple_field *)s1),                      \
-        suNf_spinor *: spinor_max_f((suNf_spinor *)s1),                            \
-        suNf_spinor_flt *: spinor_max_f_flt((suNf_spinor_flt *)s1),                \
-        __max_suNfc(s1) suNf *: suNf_max((suNf *)s1),                              \
-        suNg *: suNg_max((suNg *)s1),                                              \
-        suNf_flt *: suNf_flt_max((suNf_flt *)s1),                                  \
-        suNg_flt *: suNg_flt_max((suNg_flt *)s1),                                  \
-        suNf_vector *: suNf_vector_max((suNf_vector *)s1),                         \
-        suNg_vector *: suNg_vector_max((suNg_vector *)s1),                         \
-        suNg_algebra_vector *: suNg_algebra_vector_max((suNg_algebra_vector *)s1), \
-        double *: ({ (*(double *)s1) * (*(double *)s1); }),                        \
-        float *: ({ (*(double *)s1) * (*(double *)s1); }))
+#define max(s1)                                                                                 \
+    _Generic((s1),                                                                              \
+        spinor_field *: max_spinor_field((spinor_field *)s1),                                   \
+        spinor_field_flt *: max_spinor_field_flt((spinor_field_flt *)s1),                       \
+        scalar_field *: max_scalar_field((scalar_field *)s1),                                   \
+        suNg_field *: max_suNg_field((suNg_field *)s1),                                         \
+        suNf_field *: max_suNf_field((suNf_field *)s1),                                         \
+        suNfc_field *: max_suNfc_field((suNfc_field *)s1),                                      \
+        suNg_field_flt *: max_suNg_field_flt((suNg_field_flt *)s1),                             \
+        suNf_field_flt *: max_suNf_field_flt((suNf_field_flt *)s1),                             \
+        suNg_scalar_field *: max_suNg_scalar_field((suNg_scalar_field *)s1),                    \
+        suNg_av_field *: max_suNg_av_field((suNg_av_field *)s1),                                \
+        gtransf *: max_gtransf((gtransf *)s1),                                                  \
+        clover_term *: max_clover_term((clover_term *)s1),                                      \
+        clover_force *: max_clover_force((clover_force *)s1),                                   \
+        staple_field *: max_staple_field((staple_field *)s1),                                   \
+        suNf_spinor *: spinor_max_f((suNf_spinor *)s1),                                         \
+        suNf_spinor_flt *: spinor_max_f_flt((suNf_spinor_flt *)s1),                             \
+        __max_suNfc(s1) suNf *: suNf_max((suNf *)s1),                                           \
+        suNg *: suNg_max((suNg *)s1),                                                           \
+        suNf_flt *: suNf_flt_max((suNf_flt *)s1),                                               \
+        suNg_flt *: suNg_flt_max((suNg_flt *)s1),                                               \
+        suNf_vector *: suNf_vector_max((suNf_vector *)s1),                                      \
+        suNg_vector *: suNg_vector_max((suNg_vector *)s1),                                      \
+        suNg_algebra_vector *: suNg_algebra_vector_max((suNg_algebra_vector *)s1),              \
+        double *: ({ (*(double *)s1) > (*(double *)s1) ? (*(double *)s1) : (*(double *)s1); }), \
+        float *: ({ (*(float *)s1) > (*(float *)s1) ? (*(float *)s1) : (*(float *)s1); }))
 
 #define zero(s1)                                                              \
     _Generic((s1),                                                            \

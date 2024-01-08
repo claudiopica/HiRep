@@ -110,6 +110,10 @@ static const int ninputs = 3;
                                  double abs2 = prod(&in[1], &in[0]);, "TEST RED", _prec);                                                                         \
                 _TEST_RED_INV_OP(errors, "prod", 2, in, in + 1, double abs1 = prod(&in[0], &in[1]); mul(&in[2], d, &in[1]);                                       \
                                  double abs2 = prod(&in[0], &in[2]) / d;, "TEST RED", _prec);                                                                     \
+                                                                                                                                                                  \
+                /* max */                                                                                                                                         \
+                _TEST_RED_INV_OP(errors, "max", 2, in, in + 1, zero(&in[0]); double abs1 = max(&in[0]) + 0.1;                                                     \
+                                 double abs2 = 0.1;, "TEST RED", _prec);                                                                                          \
             }                                                                                                                                                     \
             free_field(in);                                                                                                                                       \
         }                                                                                                                                                         \

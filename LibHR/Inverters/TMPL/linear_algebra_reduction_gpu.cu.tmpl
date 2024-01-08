@@ -70,6 +70,8 @@ hr_complex *alloc_complex_sum_field(int n) {
 * @return T		Result of sum of generic type T.
 */
 template <class T> T global_sum_gpu(T *vector, int size);
+template <class T> T global_max_gpu(T *vector, int size);
+
 // This function is defined in global_sum_gpu.cu
 
 // TODO Maxnorm is missing -> I will add this later (SAM)
@@ -146,11 +148,10 @@ _DECLARE_LINEAR_ALGEBRA_GPU_RED(double, max, (_FIELD_TYPE * s1), (s1)) {
     double res = 0.0;
     double *resPiece;
 
-    error(1, 1, __func__, "Not yet implemented because global max reduction is missing.\n");
     _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
               (max_gpu<_FIELD_DIM, _REAL>
                <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), resPiece, N));
-              res = global_sum_gpu(resPiece, N););
+              double res_piece = global_max_gpu(resPiece, N); res = res > res_piece ? res : res_piece;);
 
 #ifdef WITH_MPI
     global_max(&res, 1);

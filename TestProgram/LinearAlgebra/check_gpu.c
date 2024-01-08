@@ -131,6 +131,9 @@ int errors = 0; // count the number of errors during this test unit
                                                                                                                                                                   \
                 _TEST_RED_OP(errors, "|s1|^2", 1, in, double abs1 = sqnorm(&in[0]); double abs2 = sqnorm_cpu(&in[0]);                                             \
                              , "GPU TEST", _prec);                                                                                                                \
+                                                                                                                                                                  \
+                _TEST_RED_OP(errors, "|s1|_infty", 1, in, double abs1 = max(&in[0]); double abs2 = max_cpu(&in[0]);                                               \
+                             , "GPU TEST", _prec);                                                                                                                \
             }                                                                                                                                                     \
             free_field(in);                                                                                                                                       \
         }                                                                                                                                                         \
@@ -155,6 +158,9 @@ int errors = 0; // count the number of errors during this test unit
                              double abs2 = _complex_prod_re(c2, c2);, "GPU TEST", _prec);                                                                         \
                                                                                                                                                                   \
                 _TEST_RED_OP(errors, "|s1|^2", 1, in, double abs1 = sqnorm(&in[0]); double abs2 = sqnorm_cpu(&in[0]);                                             \
+                             , "GPU TEST", _prec);                                                                                                                \
+                                                                                                                                                                  \
+                _TEST_RED_OP(errors, "|s1|_infty", 1, in, double abs1 = max(&in[0]); double abs2 = max_cpu(&in[0]);                                               \
                              , "GPU TEST", _prec);                                                                                                                \
             }                                                                                                                                                     \
             free_field(in);                                                                                                                                       \

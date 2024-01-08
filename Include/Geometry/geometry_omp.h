@@ -194,6 +194,16 @@
 #define _ONE_SITE_FOR_SUM(s, ...) _ONE_SITE_FOR_RED(s, _omp_sum(__VA_ARGS__), )
 
 /**
+ * @brief Iterate over all sites of the local lattice but not by index in memory
+ *        but by site, applying an OpenMP max reduction to the other variables.
+ *        The current site can be found using _SITE_PTR(s).
+ *
+ * @param s             Input field
+ * @param ...           Variables to reduce
+ */
+#define _ONE_SITE_FOR_MAX(s, ...) _ONE_SITE_FOR_RED(s, _omp_max(__VA_ARGS__), )
+
+/**
  * @brief Iterate over two corresponding spinors on the given fields, applying
  *        an OpenMP reduction operation on the other given variables. The current 
  *        spinors can be found using _SPINOR_PTR(s1) and _SPINOR_PTR(s2).
