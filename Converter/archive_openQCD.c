@@ -66,6 +66,10 @@ void read_gauge_field_openQCD(char filename[]) {
 
     fclose(fp);
 
+#ifdef WITH_GPU
+    copy_to_gpu_suNg_field(u_gauge);
+#endif
+
     double new_plaq = avr_plaquette();
 
     if (sqrt((NG * new_plaq - readplaq) * (NG * new_plaq - readplaq)) > 1.e-14) {
@@ -139,6 +143,10 @@ void read_gauge_field_openQCD_SF(char filename[]) {
 
     fclose(fp);
 
+#ifdef WITH_GPU
+    copy_to_gpu_suNg_field(u_gauge);
+#endif
+
     double new_plaq = avr_plaquette();
 
     if (sqrt((NG * new_plaq - readplaq) * (NG * new_plaq - readplaq)) > 1.e-14) {
@@ -157,6 +165,11 @@ void write_gauge_field_openQCD(char filename[]) {
     int mu, i, j;
     double test[2 * NG * NG];
     int size[4] = { GLB_T, GLB_X, GLB_Y, GLB_Z };
+
+#ifdef WITH_GPU
+    copy_from_gpu_suNg_field(u_gauge);
+#endif
+
     double writeplaq = NG * avr_plaquette();
 
     Timer clock;
@@ -222,6 +235,10 @@ static void write_gauge_field_hirep(char filename[], double subs) {
     double *buff = NULL;
     int zsize, rz;
     double plaq;
+
+#ifdef WITH_GPU
+    copy_to_gpu_suNg_field(u_gauge);
+#endif
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
     complete_sendrecv_suNg_field(u_gauge);
