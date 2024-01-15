@@ -17,7 +17,6 @@
 #include "libhr_core.h"
 #include "update.h"
 #include "inverters.h"
-#include "memory.h"
 
 #ifdef WITH_GPU
 
@@ -127,16 +126,21 @@ __device__ static double local_plaq_dev(int ix, suNg *gauge, int *iup_gpu PLAQ_W
 __global__ void _avr_plaquette(suNg *u, double *resField, int *iup_gpu, int N, int block_start PLAQ_WEIGHT_ARG_DEF) {
     for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < N; id += blockDim.x * gridDim.x) {
         const int ix = id + block_start;
-        resField[id] = local_plaq_dev(ix, u, iup_gpu PLAQ_WEIGHT_ARG);
+        resField[id] = plaq_dev(ix, 1, 0, u, iup_gpu PLAQ_WEIGHT_ARG);
+        resField[id] += plaq_dev(ix, 2, 0, u, iup_gpu PLAQ_WEIGHT_ARG);
+        resField[id] += plaq_dev(ix, 2, 1, u, iup_gpu PLAQ_WEIGHT_ARG);
+        resField[id] += plaq_dev(ix, 3, 0, u, iup_gpu PLAQ_WEIGHT_ARG);
+        resField[id] += plaq_dev(ix, 3, 1, u, iup_gpu PLAQ_WEIGHT_ARG);
+        resField[id] += plaq_dev(ix, 3, 2, u, iup_gpu PLAQ_WEIGHT_ARG);
     }
 }
 
-__global__ void _local_plaquette(suNg *u, double *sfield, int *iup_gpu, int N, int block_start PLAQ_WEIGHT_ARG_DEF) {
-    for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < N; id += blockDim.x * gridDim.x) {
-        const int ix = id + block_start;
-        double local_val = local_plaq_dev(ix, u, iup_gpu PLAQ_WEIGHT_ARG);
-        write_gpu<double>(0, &local_val, sfield, ix, 0, 1);
-    }
+void local_plaquette_gpu(scalar_field *s) {
+    complete_sendrecv_suNg_field(u_gauge);
+
+    _CUDA_FOR(u_gauge, ixp, int block_start = u_gauge->type->master_start[ixp];
+              (_avr_plaquette<<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(u_gauge->gpu_ptr, s->gpu_ptr + block_start, iup_gpu, N,
+                                                                        block_start PLAQ_WEIGHT_ARG)););
 }
 
 double avr_plaquette_gpu() {
@@ -162,15 +166,6 @@ double avr_plaquette_gpu() {
 #endif
 
     return res;
-}
-
-scalar_field *local_plaquette_gpu() {
-    scalar_field *s = alloc_scalar_field(1, &glattice);
-    complete_sendrecv_suNg_field(u_gauge);
-    _CUDA_FOR(u_gauge, ixp,
-              (_local_plaquette<<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(u_gauge->gpu_ptr, s->gpu_ptr, iup_gpu, N,
-                                                                          u_gauge->type->master_start[ixp] PLAQ_WEIGHT_ARG)););
-    return s;
 }
 
 __global__ void _avr_plaquette_time(suNg *g, double *resPiece, int zero, int global_T, int *iup_gpu, int *timeslices, int N,
@@ -315,9 +310,9 @@ void full_plaquette_gpu(void) {
 }
 
 double (*avr_plaquette)(void) = avr_plaquette_gpu;
+void (*local_plaquette)(scalar_field *s) = local_plaquette_gpu;
 void (*full_plaquette)(void) = full_plaquette_gpu;
 void (*avr_plaquette_time)(double *plaqt, double *plaqs) = avr_plaquette_time_gpu;
-scalar_field *(*local_plaquette)() = local_plaquette_gpu;
 #endif
 
 #undef PLAQ_WEIGHT_ARG

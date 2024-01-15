@@ -9,6 +9,8 @@
 #include "memory.h"
 #include "inverters.h"
 
+static scalar_field *local_plaq_tmp = NULL;
+
 static void pg_gaussian_pf(monomial const *m) {
     /* empty */
 }
@@ -27,8 +29,9 @@ static const spinor_field *pg_pseudofermion(monomial const *m) {
 
 static void pg_add_local_action(monomial const *m, scalar_field *loc_action) {
     mon_pg_par *par = (mon_pg_par *)(m->data.par);
-    scalar_field *loc_plaq = local_plaquette();
-    mul_add_assign(loc_action, -(par->beta / ((double)NG)), loc_plaq);
+    if (local_plaq_tmp == NULL) { local_plaq_tmp = alloc(local_plaq_tmp, 1, &glattice); }
+    local_plaquette(local_plaq_tmp);
+    mul_add_assign(loc_action, -(par->beta / ((double)NG)), local_plaq_tmp);
 }
 
 static void pg_free(monomial *m) {

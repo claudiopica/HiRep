@@ -34,6 +34,19 @@ int main(int argc, char *argv[]) {
     double plaqs_cpu[GLB_T];
     double plaqs_gpu[GLB_T];
 
+    scalar_field *sgpu = alloc_scalar_field(1, &glattice);
+    scalar_field *scpu = alloc_scalar_field(1, &glattice);
+
+    local_plaquette(sgpu);
+    _MASTER_FOR(&glattice, ix) {
+        *_FIELD_AT(scpu, ix) = local_plaq(ix);
+    }
+
+    copy_to_gpu_scalar_field(scpu);
+    lprintf("SANITY CHECK", 0, "L2 diff: %0.15e, %0.15e\n", sqnorm(scpu), sqnorm(sgpu));
+    sub_assign(scpu, sgpu);
+    lprintf("LOCAL PLAQUETTE", 0, "L2 diff: %0.15e\n", sqnorm(scpu));
+
     avr_plaquette_time_cpu(plaqt_cpu, plaqs_cpu);
     avr_plaquette_time_gpu(plaqt_gpu, plaqs_gpu);
 

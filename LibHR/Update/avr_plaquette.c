@@ -130,9 +130,7 @@ double avr_plaquette_cpu() {
     return pa;
 }
 
-scalar_field *local_plaquette_cpu() {
-    scalar_field *s = alloc(s, 1, &glattice);
-
+void local_plaquette_cpu(scalar_field *s) {
 #ifdef WITH_NEW_GEOMETRY
     complete_sendrecv_suNg_field(u_gauge);
 #endif
@@ -154,7 +152,6 @@ scalar_field *local_plaquette_cpu() {
             *pa += plaq(ix, 3, 2);
         }
     }
-    return s;
 }
 
 void avr_plaquette_time_cpu(double *plaqt, double *plaqs) {
@@ -377,5 +374,5 @@ hr_complex avr_plaquette_wrk() {
 double (*avr_plaquette)(void) = avr_plaquette_cpu;
 void (*full_plaquette)(void) = full_plaquette_cpu;
 void (*avr_plaquette_time)(double *plaqt, double *plaqs) = avr_plaquette_time_cpu;
-scalar_field *(*local_plaquette)(void) = local_plaquette_cpu;
+void (*local_plaquette)(scalar_field *s) = local_plaquette_cpu;
 #endif
