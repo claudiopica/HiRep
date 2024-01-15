@@ -156,7 +156,6 @@ void read_gauge_field_milc_no3row(char filename[]) {
     copy_to_gpu_suNg_field(u_gauge);
 #endif
 
-
     fclose(fp);
     if (head_plaq != 0.0) {
         error(fabs(head_plaq - avr_plaquette()) > 1.e-9, 1, "read_gauge_field_asci", "Plaquette mismatch\n");
