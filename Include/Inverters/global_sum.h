@@ -123,6 +123,36 @@ hr_complex_flt global_sum_gpu_complex_flt(hr_complex_flt *vector, int size);
 */
 hr_complex global_sum_gpu_complex(hr_complex *vector, int size);
 
+/**
+* @brief GPU max reduction (integer)
+*
+* @param vector		Vector with local results
+* @param size		   Size of vector
+*
+* @return int 		   Highest integer in vector
+*/
+int global_max_gpu_int(int *vector, int size);
+
+/**
+* @brief GPU max reduction (single precision reals)
+*
+* @param vector		Vector with local results
+* @param size		   Size of vector
+*
+* @return float		Highest float in vector
+*/
+float global_max_gpu_float(float *vector, int size);
+
+/**
+* @brief Sums across GPU nodes after finding the local sum (double precision reals)
+*
+* @param vector 		Vector with local results
+* @param size		   Size of vector
+*
+* @return double		Highest double in vector
+*/
+double global_max_gpu_double(double *vector, int size);
+
 #endif
 
 #ifdef __cplusplus
