@@ -189,20 +189,6 @@ __device__ static suNf fmat_create(suNf_spinor *a_lhs, suNf_spinor *a_rhs, suNf_
     return fmat;
 }
 
-// TODO: put in Lina improvement
-__global__ void add_assign_suNg_av_field2(suNg_algebra_vector *v1, suNg_algebra_vector *v2, int N, int block_start) {
-    for (int id = blockDim.x * blockIdx.x + threadIdx.x; id < N; id += gridDim.x * blockDim.x) {
-        const int ix = id + block_start;
-        suNg_algebra_vector t1, t2;
-        for (int comp = 0; comp < 4; comp++) {
-            read_gpu<double>(0, &t1, v1, ix, comp, 4);
-            read_gpu<double>(0, &t2, v2, ix, comp, 4);
-            _algebra_vector_add_assign_g(t1, t2);
-            write_gpu<double>(0, &t1, v1, ix, comp, 4);
-        }
-    }
-}
-
 __global__ static void _force_fermion_core(suNf_spinor *Xs, suNf_spinor *Ys, suNg_algebra_vector *force_sum_gpu, suNf *gauge,
                                            int *iup_gpu, double coeff, int N, int block_start) {
     for (int id = blockDim.x * blockIdx.x + threadIdx.x; id < N; id += gridDim.x * blockDim.x) {
@@ -881,15 +867,8 @@ void fermion_force_end_gpu(double dt, suNg_av_field *force) {
 #ifdef WITH_SMEARING
     error(1, 1, __func__, "This function is not ported to GPU for WITH_SMEARING");
 #else
-
-    _PIECE_FOR(&glattice, ixp) {
-        const int N = glattice.master_end[ixp] - glattice.master_start[ixp] + 1;
-        const int block_start = glattice.master_start[ixp];
-        const int grid = (N - 1) / BLOCK_SIZE + 1;
-        add_assign_suNg_av_field2<<<grid, BLOCK_SIZE>>>(force->gpu_ptr, force_sum->gpu_ptr, N, block_start);
-    }
+    add_assign(force, force_sum);
 #endif
-
     apply_BCs_on_momentum_field(force);
 }
 

@@ -7,6 +7,7 @@
 #define AVR_PLAQUETTE_H
 
 #include "hr_complex.h"
+#include "Core/spinor_field.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,6 +20,7 @@ void cplaq(hr_complex *ret, int ix, int mu, int nu);
 extern double (*avr_plaquette)(void);
 extern void (*avr_plaquette_time)(double *plaqt, double *plaqs);
 extern void (*full_plaquette)(void);
+extern void (*local_plaquette)(scalar_field *s);
 double local_plaq(int ix);
 void avr_ts_plaquette(void);
 void cplaq_wrk(hr_complex *ret, int ix, int mu, int nu);

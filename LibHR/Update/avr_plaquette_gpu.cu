@@ -135,6 +135,14 @@ __global__ void _avr_plaquette(suNg *u, double *resField, int *iup_gpu, int N, i
     }
 }
 
+void local_plaquette_gpu(scalar_field *s) {
+    complete_sendrecv_suNg_field(u_gauge);
+
+    _CUDA_FOR(u_gauge, ixp, int block_start = u_gauge->type->master_start[ixp];
+              (_avr_plaquette<<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(u_gauge->gpu_ptr, s->gpu_ptr + block_start, iup_gpu, N,
+                                                                        block_start PLAQ_WEIGHT_ARG)););
+}
+
 double avr_plaquette_gpu() {
     double res = 0.0;
     double *resPiece;
@@ -302,6 +310,7 @@ void full_plaquette_gpu(void) {
 }
 
 double (*avr_plaquette)(void) = avr_plaquette_gpu;
+void (*local_plaquette)(scalar_field *s) = local_plaquette_gpu;
 void (*full_plaquette)(void) = full_plaquette_gpu;
 void (*avr_plaquette_time)(double *plaqt, double *plaqs) = avr_plaquette_time_gpu;
 #endif

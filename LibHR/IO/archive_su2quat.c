@@ -395,6 +395,10 @@ void read_gauge_field_su2q(char filename[]) {
     if (PID == 0) { fclose(fp); }
     free(buff);
 
+#ifdef WITH_GPU
+    copy_to_gpu_suNg_field(u_gauge);
+#endif
+
     /* start sendrecv of global gauge field */
     start_sendrecv_suNg_field(u_gauge);
     complete_sendrecv_suNg_field(u_gauge);

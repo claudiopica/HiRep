@@ -29,6 +29,10 @@ void write_gauge_field_mpieo_LE(char filename[]) {
     int mpiret;
 #endif
 
+#ifdef WITH_GPU
+    copy_from_gpu_suNg_field(u_gauge);
+#endif
+
     plaq = avr_plaquette(); /* to use as a checksum in the header */
     if (PID == 0) {
         int d[5] = { NG, GLB_T, GLB_X, GLB_Y, GLB_Z };
@@ -279,6 +283,10 @@ void read_gauge_field_mpieo_LE(char filename[]) {
 
     if (PID == 0) { fclose(fp); }
     free(buff);
+
+#ifdef WITH_GPU
+    copy_to_gpu_suNg_field(u_gauge);
+#endif
 
     /* start sendrecv of global gauge field */
     start_sendrecv_suNg_field(u_gauge);

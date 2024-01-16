@@ -41,7 +41,6 @@ visible static void suNg_Exp_NG3(suNg *u, suNg *Xin) {
 
     hr_complex qlast;
     q[0] = inverse_fact(NN);
-    q[0] = inverse_fact(NN);
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -49,7 +48,6 @@ visible static void suNg_Exp_NG3(suNg *u, suNg *Xin) {
         for (j = NG - 2; j > 0; j--) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
-        q[0] = inverse_fact(i) - p[0] * qlast;
         q[0] = inverse_fact(i) - p[0] * qlast;
     }
 
@@ -87,7 +85,6 @@ visible static void suNg_Exp_NG4(suNg *u, suNg *Xin) {
 
     hr_complex qlast;
     q[0] = inverse_fact(NN);
-    q[0] = inverse_factorial(NN);
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -96,7 +93,6 @@ visible static void suNg_Exp_NG4(suNg *u, suNg *Xin) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
         q[0] = inverse_fact(i) - p[0] * qlast;
-        q[0] = inverse_factorial(i) - p[0] * qlast;
     }
 
     _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
@@ -137,8 +133,6 @@ visible static void suNg_Exp_NG5(suNg *u, suNg *Xin) {
 
     hr_complex qlast;
     q[0] = inverse_fact(NN);
-    q[0] = inverse_factorial(NN);
-    q[0] = inverse_factorial(NN);
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -147,7 +141,6 @@ visible static void suNg_Exp_NG5(suNg *u, suNg *Xin) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
         q[0] = inverse_fact(i) - p[0] * qlast;
-        q[0] = inverse_factorial(i) - p[0] * qlast;
     }
 
     _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
@@ -194,7 +187,6 @@ visible static void suNg_Exp_NG6(suNg *u, suNg *Xin) {
 
     hr_complex qlast;
     q[0] = inverse_fact(NN);
-    q[0] = inverse_factorial(NN);
 
     for (i = NN - 1; i >= 0; i--) {
         qlast = q[NG - 1];
@@ -203,7 +195,6 @@ visible static void suNg_Exp_NG6(suNg *u, suNg *Xin) {
             q[j] = q[j - 1] - p[j] * qlast;
         }
         q[0] = inverse_fact(i) - p[0] * qlast;
-        q[0] = inverse_factorial(i) - p[0] * qlast;
     }
 
     _suNg_mul_add(*u, q[0], X0, q[1], *Xin);

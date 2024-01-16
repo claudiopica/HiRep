@@ -163,6 +163,9 @@ void read_gauge_field_eolexi_BE(char filename[]) {
 
     if (PID == 0) { fclose(fp); }
 
+#ifdef WITH_GPU
+    copy_to_gpu_suNg_field(u_gauge);
+#endif
     /* start sendrecv of global gauge field */
     start_sendrecv_suNg_field(u_gauge);
     complete_sendrecv_suNg_field(u_gauge);
@@ -335,6 +338,9 @@ void read_gauge_field_eolexi_LE(char filename[]) {
 
     if (PID == 0) { fclose(fp); }
 
+#ifdef WITH_GPU
+    copy_to_gpu_suNg_field(u_gauge);
+#endif
     /* start sendrecv of global gauge field */
     start_sendrecv_suNg_field(u_gauge);
     complete_sendrecv_suNg_field(u_gauge);

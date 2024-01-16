@@ -10,8 +10,8 @@
  * Write and read routines for archiving configurations
  *
  *******************************************************************************/
-// #include "libhr.h"
-#include "Core/global.h"
+#include "libhr.h"
+/*#include "Core/global.h"
 #include "Geometry/communications.h"
 #include "Utils/boundary_conditions.h"
 #include "Utils/timing.h"
@@ -20,7 +20,7 @@
 #include "io.h"
 #include "geometry.h"
 //#include "inverters.h"
-#include "Inverters/global_sum.h"
+#include "Inverters/global_sum.h"*/
 
 void write_gauge_field(char filename[]) {
 #if NG == 2 && !defined(WITH_QUATERNIONS)
@@ -366,6 +366,10 @@ void read_gauge_field_matrix(char filename[]) {
 
     if (PID == 0) { fclose(fp); }
     free(buff);
+
+#ifdef WITH_GPU
+    copy_to_gpu_suNg_field(u_gauge);
+#endif
 
     /* start sendrecv of global gauge field */
     start_sendrecv_suNg_field(u_gauge);

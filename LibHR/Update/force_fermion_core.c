@@ -9,6 +9,7 @@
 #include "memory.h"
 #include "utils.h"
 #include "geometry.h"
+#include "inverters.h"
 
 #define _print_avect(a)                                                                                                   \
     printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n", (a).c1, (a).c2, (a).c3, (a).c4, (a).c5, (a).c6, (a).c7, \
@@ -1018,14 +1019,11 @@ void fermion_force_end_cpu(double dt, suNg_av_field *force) {
     smeared_gauge_force(force_sum, force);
 
 #else
-
-    // Add force to global force field
-    _MASTER_FOR(&glattice, ix) {
-        for (int mu = 0; mu < 4; mu++) {
-            _algebra_vector_add_assign_g(*_4FIELD_AT(force, ix, mu), *_4FIELD_AT(force_sum, ix, mu));
-        }
-    }
-
+#ifndef WITH_GPU
+    add_assign(force, force_sum);
+#else
+    add_assign_cpu(force, force_sum);
+#endif
 #endif
 
     // Boundary conditions
