@@ -32,8 +32,8 @@ int main(int argc, char *argv[]) {
     lprintf("REDUCTION BENCHMARKS", 1, "Testing spinor field sqnorm\n");
     flopsite = flops_per_site(SF_SQNORM);
     bytesite = bytes_per_site(SF_SQNORM);
-    _WARMUP_SPEEDTEST(clock, n_warmup, time_target, n_reps, spinor_field_sqnorm_f(in));
-    _RUN_SPEEDTEST(clock, n_warmup, time_target, n_reps, flopsite, bytesite, spinor_field_sqnorm_f(in));
+    _WARMUP_SPEEDTEST(clock, n_warmup, time_target, n_reps, sqnorm(in));
+    _RUN_SPEEDTEST(clock, n_warmup, time_target, n_reps, flopsite, bytesite, sqnorm(in));
 
     flopsite = flops_per_site(PLAQUETTE);
     bytesite = bytes_per_site(PLAQUETTE);
