@@ -13,12 +13,6 @@ int max_iterations = 10;
 
 #define min(a, b) (a > b) ? b : a
 
-void setup_random_fields(int n, spinor_field s[n]) {
-    for (int i = 0; i < n; i++) {
-        gaussian_spinor_field(&s[i]);
-    }
-}
-
 #ifdef WITH_GPU
 #define synchronize cudaDeviceSynchronize();
 #else
