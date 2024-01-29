@@ -38,29 +38,42 @@ typedef struct force_gauge_par {
 void force0(double, void *);
 
 //luscherweisz.c
-double lw_action(double beta, double c0, double c1);
-void lw_local_action(scalar_field *loc_action, double beta, double c0, double c1);
-void lw_force(double dt, void *vpar);
-void calculate_stfld(int comm);
+void lw_force_gpu(double dt, void *vpar);
+void lw_force_cpu(double dt, void *vpar);
+
+double lw_action_gpu(double, double, double);
+double lw_action_cpu(double, double, double);
+
+void lw_local_action_gpu(scalar_field *, double, double, double);
+void lw_local_action_cpu(scalar_field *, double, double, double);
+
+extern double (*lw_action)(double beta, double c0, double c1);
+extern void (*lw_local_action)(scalar_field *loc_action, double beta, double c0, double c1);
+extern void (*lw_force)(double dt, void *vpar);
+extern void (*calculate_stfld)(int comm);
 double lw_action_density(int ix, double beta, double c0, double c1);
 
 //fermion_force_core.c
-extern void (*force_fermion_core)(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue);
-extern void (*fermion_force_begin)(void);
-extern void (*fermion_force_end)(double dt, suNg_av_field *force);
+#ifdef WITH_CLOVER
+void force_clover_logdet(double mass, double residue); //TODO: this simply forwards to compute_force_logdet. can we remove it?
+#endif
 #ifdef WITH_EXPCLOVER
 extern void (*force_clover_fermion)(spinor_field *Xs, spinor_field *Ys, double residue);
 void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double residue);
 #endif
 
 void force_fermion_core_gpu(spinor_field *, spinor_field *, int, double, double);
-void fermion_force_begin_gpu(void);
-void fermion_force_end_gpu(double, suNg_av_field *);
-
 void force_fermion_core_cpu(spinor_field *, spinor_field *, int, double, double);
+
+void fermion_force_begin_gpu(void);
 void fermion_force_begin_cpu(void);
+
+void fermion_force_end_gpu(double, suNg_av_field *);
 void fermion_force_end_cpu(double, suNg_av_field *);
 
+extern void (*force_fermion_core)(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue);
+extern void (*fermion_force_begin)(void);
+extern void (*fermion_force_end)(double dt, suNg_av_field *force);
 #ifdef WITH_GPU
 void call_fermion_kernel(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force_sum, double coeff);
 void exec_calculate_stfld(suNg_field *stfld[], int comm);
@@ -132,5 +145,4 @@ void force0_kernel_gpu(suNg_av_field *force, double coeff);
 #ifdef __cplusplus
 }
 #endif
-
 #endif //FORCE0_H

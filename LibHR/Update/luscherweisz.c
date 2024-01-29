@@ -47,7 +47,7 @@ stfld[2*nu+1]->ptr[3*ix+i] = ix -> ix+nu -> ix+nu+mu -> ix+mu
 *********************************************************************/
 static staple_field *stfld[8] = { NULL };
 
-void calculate_stfld(int comm) {
+void calculate_stfld_cpu(int comm) {
     suNg wu1;
 
     if (stfld[0] == NULL) {
@@ -129,27 +129,29 @@ double lw_action_density(int ix, double beta, double c0, double c1) {
     return (beta / NG) * (c0 * plaqs + c1 * rects);
 }
 
-double lw_action(double beta, double c0, double c1) {
+double lw_action_cpu(double beta, double c0, double c1) {
     double s = 0;
-    calculate_stfld(NOCOMM);
+    calculate_stfld_cpu(NOCOMM);
 
     _MASTER_FOR(&glattice, ix) {
         s += lw_action_density(ix, beta, c0, c1);
     }
 
+#ifdef WITH_MPI
     global_sum(&s, 1);
+#endif
     return s;
 }
 
-void lw_local_action(scalar_field *loc_action, double beta, double c0, double c1) {
-    calculate_stfld(COMM);
+void lw_local_action_cpu(scalar_field *loc_action, double beta, double c0, double c1) {
+    calculate_stfld_cpu(COMM);
     int iy = ipt(2, 0, 0, 0);
     _MASTER_FOR(&glattice, ix) {
         *_FIELD_AT(loc_action, iy) += lw_action_density(ix, beta, c0, c1);
     }
 }
 
-void lw_force(double dt, void *vpar) {
+void lw_force_cpu(double dt, void *vpar) {
     suNg ws[4], wu1, wu2;
     suNg_algebra_vector wf1;
 
@@ -159,7 +161,7 @@ void lw_force(double dt, void *vpar) {
     double c0 = par->c0;
     double c1 = par->c1;
 
-    calculate_stfld(COMM);
+    calculate_stfld_cpu(COMM);
 
     // Calculation of the force in (ix,mu).
     // In the drawings below, mu is the direction of the missing link.
@@ -307,3 +309,10 @@ void lw_force(double dt, void *vpar) {
 
     apply_BCs_on_momentum_field(force);
 }
+
+#ifndef WITH_GPU
+void (*calculate_stfld)(int comm) = calculate_stfld_cpu;
+void (*lw_force)(double dt, void *vpar) = lw_force_cpu;
+double (*lw_action)(double beta, double c0, double c1) = lw_action_cpu;
+void (*lw_local_action)(scalar_field *loc_action, double beta, double c0, double c1) = lw_local_action_cpu;
+#endif
