@@ -3,7 +3,7 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-// Ported functions in boundary_conditions.c by Agostino Patella
+// Ported functions from boundary_conditions.c by Agostino Patella
 // and Claudio Pica
 
 #include "libhr_core.h"
