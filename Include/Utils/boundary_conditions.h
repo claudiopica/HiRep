@@ -28,10 +28,15 @@ void apply_BCs_on_momentum_field(suNg_av_field *force);
 void apply_BCs_on_spinor_field(spinor_field *sp);
 void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp);
 void apply_background_field_zdir(suNg_field *V, double Q, int n);
-void apply_BCs_on_clover_term(clover_term *);
-#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
+void apply_BCs_on_clover_term(clover_term *cl);
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 void SF_classical_solution();
 #endif
+
+void sp_T_antiperiodic_BCs_gpu(suNf_field *flt);
+void sp_X_antiperiodic_BCs_gpu(suNf_field *flt);
+void sp_Y_antiperiodic_BCs_gpu(suNf_field *flt);
+void sp_Z_antiperiodic_BCs_gpu(suNf_field *flt);
 
 #ifdef __cplusplus
 }
