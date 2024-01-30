@@ -143,9 +143,9 @@ int setup_process(int *argc, char ***argv) {
     PID = MPI_PID;
     WORLD_SIZE = MPI_WORLD_SIZE;
     RID = 0;
-    // TODO: improve the local rank
-    LID = atoi(getenv("OMPI_COMM_WORLD_LOCAL_RANK"));
-
+    MPI_Comm shared_comm;
+    MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL, &shared_comm);
+    MPI_Comm_rank(shared_comm, &LID);
 #else
     RID = 0;
     PID = 0;
