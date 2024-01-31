@@ -316,6 +316,7 @@ void apply_BCs_on_clover_term(clover_term *cl) {
 
 #ifdef BC_T_ANTIPERIODIC
 static void sp_T_antiperiodic_BCs() {
+#ifndef WITH_GPU
     if (COORD[0] == 0) {
         int index;
         int ix, iy, iz;
@@ -332,10 +333,14 @@ static void sp_T_antiperiodic_BCs() {
             }
         }
     }
+#else
+    sp_T_antiperiodic_BCs_gpu(u_gauge_f);
+#endif
 }
 #endif
 #ifdef BC_X_ANTIPERIODIC
 static void sp_X_antiperiodic_BCs() {
+#ifndef WITH_GPU
     if (COORD[1] == 0) {
         int index;
         int it, iy, iz;
@@ -352,10 +357,14 @@ static void sp_X_antiperiodic_BCs() {
             }
         }
     }
+#else
+    sp_X_antiperiodic_BCs_gpu(u_gauge_f);
+#endif
 }
 #endif
 #ifdef BC_Y_ANTIPERIODIC
 static void sp_Y_antiperiodic_BCs() {
+#ifndef WITH_GPU
     if (COORD[2] == 0) {
         int index;
         int ix, it, iz;
@@ -372,10 +381,14 @@ static void sp_Y_antiperiodic_BCs() {
             }
         }
     }
+#else
+    sp_Y_antiperiodic_BCs_gpu(u_gauge_f);
+#endif
 }
 #endif
 #ifdef BC_Z_ANTIPERIODIC
 static void sp_Z_antiperiodic_BCs() {
+#ifndef WITH_GPU
     if (COORD[3] == 0) {
         int index;
         int ix, iy, it;
@@ -392,6 +405,9 @@ static void sp_Z_antiperiodic_BCs() {
             }
         }
     }
+#else
+    sp_Z_antiperiodic_BCs_gpu(u_gauge_f);
+#endif
 }
 #endif
 
