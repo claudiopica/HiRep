@@ -52,7 +52,7 @@ monomial *lw_create(monomial_data const *data) {
 
     // Setup pointers to update functions
     m->free = &lw_free;
-    m->update_force = &lw_force;
+    m->update_force = lw_force;
     m->force_par = &par->force_par;
     m->update_field = &update_gauge_field;
     m->field_par = &par->field_par;

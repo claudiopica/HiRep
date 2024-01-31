@@ -12,8 +12,7 @@ int main(int argc, char *argv[]) {
     setup_gauge_fields();
 
     // Random gauge
-    suNg_field *in_gpu, *in_cpu;
-    in_gpu = alloc_suNg_field(&glattice);
+    suNg_field *in_cpu;
     in_cpu = alloc_suNg_field(&glattice);
 
     random_suNg_field_cpu(u_gauge);
