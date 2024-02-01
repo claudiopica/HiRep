@@ -67,7 +67,7 @@ typedef struct {
 #define cuDeviceGetAttribute hipDeviceGetAttribute
 #define CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH hipDeviceAttributeMemoryBusWidth
 #define CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE hipDeviceAttributeMemoryClockRate
-#define CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE hipDeviceAttributeL2CacheSize 
+#define CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE hipDeviceAttributeL2CacheSize
 #define cudaMemcpyToSymbol hipMemcpyToSymbol
 #endif
 
