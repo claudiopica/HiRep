@@ -19,6 +19,7 @@
 #include "Random/ranlux.h"
 #include "io.h"
 #include "geometry.h"
+#include "memory.h"
 
 #if NG == 2 && !defined(WITH_QUATERNIONS)
 
