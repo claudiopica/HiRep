@@ -17,10 +17,16 @@
 #ifdef WITH_GPU
 
 #include <stdio.h>
+#ifndef HIP
 #include <cuda.h>
 #include <driver_types.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
+#else
+#include <hip/hip_runtime.h>
+#include <hip/driver_types.h>
+#include <hip/hip_runtime_api.h>
+#endif
 
 #include "IO/input_par.h"
 

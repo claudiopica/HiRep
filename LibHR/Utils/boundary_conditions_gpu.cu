@@ -85,7 +85,7 @@ void sp_T_antiperiodic_BCs_gpu(suNf_field *flt) {
         int grid_z = (Z_EXT - 1) / block_dim + 1;
         dim3 block(block_dim, block_dim, block_dim);
         dim3 grid(grid_x, grid_y, grid_z);
-        apply_boundary_conditions_T<<<grid, block>>>(flt->gpu_ptr, T_BORDER, ipt_gpu, X_EXT, Y_EXT, Z_EXT);
+        apply_boundary_conditions_T<<<grid, block, 0, 0>>>(flt->gpu_ptr, T_BORDER, ipt_gpu, X_EXT, Y_EXT, Z_EXT);
         cudaDeviceSynchronize();
     }
 }
@@ -98,7 +98,7 @@ void sp_X_antiperiodic_BCs_gpu(suNf_field *flt) {
         int grid_z = (Z_EXT - 1) / block_dim + 1;
         dim3 block(block_dim, block_dim, block_dim);
         dim3 grid(grid_t, grid_y, grid_z);
-        apply_boundary_conditions_X<<<grid, block>>>(flt->gpu_ptr, X_BORDER, ipt_gpu, T_EXT, Y_EXT, Z_EXT);
+        apply_boundary_conditions_X<<<grid, block, 0, 0>>>(flt->gpu_ptr, X_BORDER, ipt_gpu, T_EXT, Y_EXT, Z_EXT);
         cudaDeviceSynchronize();
     }
 }
@@ -111,7 +111,7 @@ void sp_Y_antiperiodic_BCs_gpu(suNf_field *flt) {
         int grid_z = (Z_EXT - 1) / block_dim + 1;
         dim3 block(block_dim, block_dim, block_dim);
         dim3 grid(grid_t, grid_x, grid_z);
-        apply_boundary_conditions_Y<<<grid, block>>>(flt->gpu_ptr, Y_BORDER, ipt_gpu, T_EXT, X_EXT, Z_EXT);
+        apply_boundary_conditions_Y<<<grid, block, 0, 0>>>(flt->gpu_ptr, Y_BORDER, ipt_gpu, T_EXT, X_EXT, Z_EXT);
         cudaDeviceSynchronize();
     }
 }
@@ -124,7 +124,7 @@ void sp_Z_antiperiodic_BCs_gpu(suNf_field *flt) {
         int grid_y = (Y_EXT - 1) / block_dim + 1;
         dim3 block(block_dim, block_dim, block_dim);
         dim3 grid(grid_t, grid_x, grid_y);
-        apply_boundary_conditions_Z<<<grid, block>>>(flt->gpu_ptr, Z_BORDER, ipt_gpu, T_EXT, X_EXT, Y_EXT);
+        apply_boundary_conditions_Z<<<grid, block, 0, 0>>>(flt->gpu_ptr, Z_BORDER, ipt_gpu, T_EXT, X_EXT, Y_EXT);
         cudaDeviceSynchronize();
     }
 }

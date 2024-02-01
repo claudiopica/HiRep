@@ -28,10 +28,11 @@ void force0_kernel_gpu(suNg_av_field *force, double coeff) {
         const int block_start = glattice.master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
 #ifdef PLAQ_WEIGHTS
-        _force0_gpu<<<grid, BLOCK_SIZE>>>(u_gauge->gpu_ptr, force->gpu_ptr, coeff, iup_gpu, idn_gpu, plaq_weight_gpu, N,
-                                          block_start);
+        _force0_gpu<<<grid, BLOCK_SIZE, 0, 0>>>(u_gauge->gpu_ptr, force->gpu_ptr, coeff, iup_gpu, idn_gpu, plaq_weight_gpu, N,
+                                                block_start);
 #else
-        _force0_gpu<<<grid, BLOCK_SIZE>>>(u_gauge->gpu_ptr, force->gpu_ptr, coeff, iup_gpu, idn_gpu, NULL, N, block_start);
+        _force0_gpu<<<grid, BLOCK_SIZE, 0, 0>>>(u_gauge->gpu_ptr, force->gpu_ptr, coeff, iup_gpu, idn_gpu, NULL, N,
+                                                block_start);
 #endif
         cudaDeviceSynchronize();
     }

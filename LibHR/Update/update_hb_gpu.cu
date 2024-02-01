@@ -19,6 +19,6 @@ void exec_project(void) {
         const int N = glattice.master_end[ixp] - glattice.master_start[ixp] + 1;
         const int block_start = glattice.master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
-        project_kernel<<<grid, BLOCK_SIZE>>>(u_gauge->gpu_ptr, N, block_start);
+        project_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(u_gauge->gpu_ptr, N, block_start);
     }
 }
