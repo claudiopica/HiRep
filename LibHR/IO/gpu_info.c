@@ -15,7 +15,9 @@
 #include "gpu.h"
 #ifdef WITH_MPI
 #include "mpi.h"
-//#include <mpi-ext.h> // Needed for CUDA-awareness check, see https://docs.open-mpi.org/en/v5.0.x/man-openmpi/man3/MPIX_Query_cuda_support.3.html
+#ifndef HIP
+#include <mpi-ext.h> // Needed for CUDA-awareness check, see https://docs.open-mpi.org/en/v5.0.x/man-openmpi/man3/MPIX_Query_cuda_support.3.html
+#endif
 #endif
 
 const char *sComputeMode[] = {
