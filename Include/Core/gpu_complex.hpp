@@ -515,10 +515,9 @@ struct __align__(8) hr_complex {
         re = x;
         im = 0;
     }
-    __host__ __device__ hr_complex(const int a, const int b) {
-        re = a;
-        im = b;
-    }
+
+    constexpr __host__ __device__ hr_complex(const int a, const int b): re(a), im(b) {}
+
     __host__ __device__ hr_complex(const int a, const float b) {
         re = a;
         im = b;
@@ -1059,7 +1058,8 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt &hr_com
 *
 *******************************************************************************/
 //#define I (hr_complex_int(0, 1))
-#define I (hr_complex(0, 1))
+//#define I (hr_complex(0, 1))
+constexpr hr_complex I = hr_complex(0,1);
 #define creal(a) ((a).re)
 #define cimag(a) ((a).im)
 #define conj(a) (hr_complex((a).re, -(a).im))

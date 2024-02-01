@@ -192,7 +192,11 @@ sub obj_rules {
         my $cc_rule = "cc";
         if (/\.cu$/) {
             if(!$with_gpu) { next; } #skip cuda files if not with_gpu
-            $cc_rule = "nvcc";
+	    if (!$hip) { 
+	        $cc_rule = "nvcc"; 
+	    } else {
+	        $cc_rule = "hipcc"
+	    }
             if (/\.device\.cu$/) {
                 $_ =~ s/\.device\.cu//;
             }
