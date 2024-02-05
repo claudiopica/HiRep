@@ -63,9 +63,8 @@ _DECLARE(start_sendrecv_reduced_, (_FIELD_TYPE * f)) {
 
 _DECLARE(complete_sendrecv_reduced_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
-    int nreq = 2 * _NUMBER_OF_BUFFERS(f->type, _GEOM_TYPE);
     _F_NAME(release_communications_, _FIELD_TYPE)(f);
-    hr_sendrecv_complete(nreq, f->comm_req);
+    hr_sendrecv_complete(f->nreqs, f->comm_req);
 #endif
 }
 

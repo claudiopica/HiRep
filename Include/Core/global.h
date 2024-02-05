@@ -233,6 +233,14 @@ GLB_VAR(int, four_fermion_active, = 0); // whether four fermion interactions are
 #define THREADSIZE 1
 #endif
 
+// Maximum size of messages sent via openmpi
+// You can set this to something very large
+// Sometimes it can be beneficial to cut up
+// messages into smaller messages
+// This is limited to the maximum integer size
+// due to the MPI API
+#define MAX_MSG_SIZE (1 << 30)
+
 #undef GLB_VAR
 
 #endif
