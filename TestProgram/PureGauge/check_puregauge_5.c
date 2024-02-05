@@ -7,7 +7,7 @@
 
 #include "libhr.h"
 
-static suNg_field *g;
+static gtransf *g;
 
 static void random_g(void) {
     _MASTER_FOR(&glattice, ix) {

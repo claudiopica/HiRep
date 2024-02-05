@@ -27,6 +27,9 @@
 #if !defined _IS_SPINOR_LIKE
 #error Missing _IS_SPINOR_LIKE in memory.c
 #endif
+#if !defined _REAL
+#error Missing _REAL in memory.c
+#endif
 
 #define _F_ARGS(_name, _args) _FIELD_TYPE *_F_NAME(_name, _FIELD_TYPE) _args
 
@@ -145,14 +148,24 @@ _DECLARE_STATIC(free_mpi_field_data_, (_FIELD_TYPE * f)) {
 _DECLARE_STATIC(allocate_mpi_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
 #ifdef WITH_MPI
     if ((_NUMBER_OF_BUFFERS(type, _GEOM_TYPE)) > 0) {
-        int number_of_requests = n * 2 * _NUMBER_OF_BUFFERS(type, _GEOM_TYPE);
+        int number_of_requests = 0;
+        for (int buff_id = 0; buff_id < _NUMBER_OF_BUFFERS(type, _GEOM_TYPE); buff_id++) {
+            int nbuffers_in_request =
+                ((_FIELD_DIM * f->type->rbuf_len[buff_id] * sizeof(_SITE_TYPE) / sizeof(_REAL)) - 1) / MAX_MSG_SIZE + 1;
+            number_of_requests += (nbuffers_in_request - 1) / 2 + 1;
+        }
+        number_of_requests *= n * 2; // As much as there are fields (factor n)
+            // and we need a send and a receive handle each (factor 2)
+        f->nreqs = number_of_requests / n;
         f->comm_req = amalloc(number_of_requests * sizeof(MPI_Request), ALIGN);
         error((f->comm_req) == NULL, 1, __func__, "Could not allocate memory space for field (MPI).\n");
         for (int ix = 0; ix < number_of_requests; ++ix) {
             f->comm_req[ix] = MPI_REQUEST_NULL;
         }
         for (int i = 1; i < n; ++i) {
-            f[i].comm_req = f[i - 1].comm_req + 2 * _NUMBER_OF_BUFFERS(type, _GEOM_TYPE);
+            f[i].comm_req = f[i - 1].comm_req + number_of_requests / n;
+            f[i].nreqs = number_of_requests / n;
+            // f[i].comm_req = f[i - 1].comm_req + 2 * _NUMBER_OF_BUFFERS(type, _GEOM_TYPE);
         }
         for (int i = 0; i < n; ++i) {
             _CALL(allocate_sendbuffer_)(f, i);
@@ -200,3 +213,4 @@ _ALLOCATE {
 #undef _SITE_TYPE
 #undef _FIELD_DIM
 #undef _IS_SPINOR_LIKE
+#undef _REAL

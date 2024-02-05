@@ -53,6 +53,7 @@ extern "C" {
 #undef _MPI_FIELD_DATA
 #define _MPI_FIELD_DATA(_type) \
     MPI_Request *comm_req;     \
+    unsigned int nreqs;        \
     _type *sendbuf_ptr;        \
     _type *sendbuf_gpu_ptr;    \
     _type *recvbuf_gpu_ptr;
