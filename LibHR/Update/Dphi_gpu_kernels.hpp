@@ -229,49 +229,49 @@ __global__ void Dphi_gpu_inner_kernel(kernel_field_input *input) {
 
                 /******************************* direction +0 *********************************/
                 if (input->imask_gpu[ix] & T_UP_MASK) {
-                    const int iy = input->iup_gpu[4*ix];
+                    const int iy = input->iup_gpu[4 * ix];
                     DPHI_T_UP_GPU(ix, iy, in, gauge, r, sn, u);
                 }
 
                 /******************************* direction -0 *********************************/
                 if (input->imask_gpu[ix] & T_DN_MASK) {
-                    const int iy = input->idn_gpu[4*ix];
+                    const int iy = input->idn_gpu[4 * ix];
                     DPHI_T_DN_GPU(ix, iy, in, gauge, r, sn, u);
                 }
 
                 /******************************* direction +1 *********************************/
                 if (input->imask_gpu[ix] & X_UP_MASK) {
-                    const int iy = input->iup_gpu[4*ix+1];
+                    const int iy = input->iup_gpu[4 * ix + 1];
                     DPHI_X_UP_GPU(ix, iy, in, gauge, r, sn, u);
                 }
 
                 /******************************* direction -1 *********************************/
                 if (input->imask_gpu[ix] & X_DN_MASK) {
-                    const int iy = input->idn_gpu[4*ix+1];
+                    const int iy = input->idn_gpu[4 * ix + 1];
                     DPHI_X_DN_GPU(ix, iy, in, gauge, r, sn, u);
                 }
 
                 /******************************* direction +2 *********************************/
                 if (input->imask_gpu[ix] & Y_UP_MASK) {
-                    const int iy = input->iup_gpu[4*ix+2];
+                    const int iy = input->iup_gpu[4 * ix + 2];
                     DPHI_Y_UP_GPU(ix, iy, in, gauge, r, sn, u);
                 }
 
                 /******************************* direction -2 *********************************/
                 if (input->imask_gpu[ix] & Y_DN_MASK) {
-                    const int iy = input->idn_gpu[4*ix+2];
+                    const int iy = input->idn_gpu[4 * ix + 2];
                     DPHI_Y_DN_GPU(ix, iy, in, gauge, r, sn, u);
                 }
 
                 /******************************* direction +3 *********************************/
                 if (input->imask_gpu[ix] & Z_UP_MASK) {
-                    const int iy = input->iup_gpu[4*ix+3];
+                    const int iy = input->iup_gpu[4 * ix + 3];
                     DPHI_Z_UP_GPU(ix, iy, in, gauge, r, sn, u);
                 }
 
                 /******************************* direction -3 *********************************/
                 if (input->imask_gpu[ix] & Z_DN_MASK) {
-                    const int iy = input->idn_gpu[4*ix+3];
+                    const int iy = input->idn_gpu[4 * ix + 3];
                     DPHI_Z_DN_GPU(ix, iy, in, gauge, r, sn, u);
                 }
 
