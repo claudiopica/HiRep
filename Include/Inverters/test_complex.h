@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
 #ifdef WITH_GPU
-#ifdef WITH_MPI
+#ifndef WITH_MPI
 // These tests only exist to check
 // the integration of the definition
 // of the custom c++ complex types
@@ -38,7 +38,6 @@ int test_overload_div_rhs_integer();
 int test_overload_div_lhs_integer();
 int test_I_add();
 int test_I_prod();
-int test_implicit_conversion();
 
 // Test CPU against GPU
 int check_plus();

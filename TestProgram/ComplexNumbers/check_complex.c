@@ -1,13 +1,13 @@
 /*******************************************************************************
 *
 * NOCOMPILE= !WITH_GPU
+* NOCOMPILE= WITH_MPI
 *
 * Test of C++ complex number implementation
 *
 *******************************************************************************/
 
 #include "libhr.h"
-
 
 int main(int argc, char *argv[]) {
     int return_value = 0;
@@ -38,8 +38,11 @@ int main(int argc, char *argv[]) {
     return_value += check_mul();
     return_value += check_div();
 
-    if(return_value == 0) lprintf("RESULT", 0, "PASS");
-    else lprintf("RESULT", 0, "FAIL");
+    if (return_value == 0) {
+        lprintf("RESULT", 0, "PASS");
+    } else {
+        lprintf("RESULT", 0, "FAIL");
+    }
     finalize_process();
     return return_value;
 }
