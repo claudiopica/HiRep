@@ -10,9 +10,17 @@
 extern "C" {
 #endif
 
+#ifdef WITH_GPU
+#ifdef WITH_MPI
+// These tests only exist to check
+// the integration of the definition
+// of the custom c++ complex types
+// with the c native complex numbers
+// test without MPI.
+
+// CPU consistency checks
 int test_gpu_complex();
 int test_overload_plus_rhs_double();
-int test_overload_plus_rhs_double_gpu();
 int test_overload_plus_lhs_double();
 int test_overload_prod_rhs_double();
 int test_overload_prod_lhs_double();
@@ -21,7 +29,6 @@ int test_overload_div_lhs_double();
 int test_overload_plus_hr_complex();
 int test_overload_minus_hr_complex();
 int test_overload_prod_hr_complex();
-int test_overload_prod_hr_complex_gpu();
 int test_overload_div_hr_complex();
 int test_negate();
 int test_cast_double();
@@ -31,7 +38,16 @@ int test_overload_div_rhs_integer();
 int test_overload_div_lhs_integer();
 int test_I_add();
 int test_I_prod();
+int test_implicit_conversion();
 
+// Test CPU against GPU
+int check_plus();
+int check_minus();
+int check_mul();
+int check_div();
+
+#endif
+#endif
 #ifdef __cplusplus
 }
 #endif

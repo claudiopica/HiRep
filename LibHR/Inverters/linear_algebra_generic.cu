@@ -1002,7 +1002,7 @@ visible void clc(suNf_spinor *r, hr_complex k1, suNf_spinor *s1, hr_complex k2, 
     _spinor_clc_f(*r, k1, *s1, k2, *s2);
 }
 
-visible void clc(suNf_spinor_flt *r, hr_complex k1, suNf_spinor_flt *s1, hr_complex k2, suNf_spinor_flt *s2) {
+visible void clc(suNf_spinor_flt *r, hr_complex_flt k1, suNf_spinor_flt *s1, hr_complex_flt k2, suNf_spinor_flt *s2) {
     _spinor_clc_f(*r, k1, *s1, k2, *s2);
 }
 
@@ -1010,6 +1010,7 @@ visible void clc_add_assign(suNf_spinor *r, hr_complex k1, suNf_spinor *s1, hr_c
     _spinor_clc_add_assign_f(*r, k1, *s1, k2, *s2);
 }
 
-visible void clc_add_assign(suNf_spinor_flt *r, hr_complex k1, suNf_spinor_flt *s1, hr_complex k2, suNf_spinor_flt *s2) {
+visible void clc_add_assign(suNf_spinor_flt *r, hr_complex_flt k1, suNf_spinor_flt *s1, hr_complex_flt k2,
+                            suNf_spinor_flt *s2) {
     _spinor_clc_add_assign_f(*r, k1, *s1, k2, *s2);
 }
