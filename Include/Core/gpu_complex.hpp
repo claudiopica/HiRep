@@ -199,7 +199,7 @@ typedef struct hr_complex_t<float> hr_complex_flt;
 #define I (hr_complex_int(0, 1))
 #define creal(a) ((a).re)
 #define cimag(a) ((a).im)
-#define conj(a) (a.conj())
+#define conj(a) ((a).conj())
 
 visible double carg(hr_complex c);
 visible hr_complex cpow(hr_complex c, double pow);
