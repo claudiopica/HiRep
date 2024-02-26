@@ -31,7 +31,7 @@ int enable_GPU_peer_to_peer_access();
 void init_gpu(input_gpu gpu_var_init) {
     lprintf("GPU_INIT", 0, "Initializing GPU\n");
     struct cudaDeviceProp device_prop;
-    cudaGetDeviceProperties(&device_prop, gpu_var_init.gpuID);
+    CHECK_CUDA(cudaGetDeviceProperties(&device_prop, gpu_var_init.gpuID));
 
     // Print GPU info
     print_device_count_info(gpu_var_init);
@@ -66,9 +66,9 @@ void select_GPU(input_gpu gpu_var_init) {
     */
 
     gpu_id = LID; // use local process id to select a GPU
-    cudaSetDevice(gpu_id);
+    CHECK_CUDA(cudaSetDevice(gpu_id));
     int current_device;
-    cudaGetDevice(&current_device);
+    CHECK_CUDA(cudaGetDevice(&current_device));
     lprintf("GPU_INIT", 0, "GPU Affinity: GPU %d has been bound to MPI Rank %d (local %d)\n", current_device, PID, LID);
     enable_GPU_peer_to_peer_access();
 
@@ -88,17 +88,31 @@ void select_GPU(input_gpu gpu_var_init) {
 int enable_GPU_peer_to_peer_access() {
 #if defined(WITH_MPI)
     int device_count = 0;
-    cudaGetDeviceCount(&device_count);
+    CHECK_CUDA(cudaGetDeviceCount(&device_count));
 
     for (int i = 0; i < device_count; ++i) {
-        if (i > PID) {
+        if (i != LID) {
             int peer_access_available = 0;
-            cudaDeviceCanAccessPeer(&peer_access_available, PID, i);
-            lprintf("INFO", 0, "Peer-to-peer access: GPU Node %d can access node %d\n", PID, i);
-            error(peer_access_available == 0, 1, "setup_GPU_peer_to_peer_access", "Unable to enable peer-to-peer access.\n");
+            CHECK_CUDA(cudaDeviceCanAccessPeer(&peer_access_available, LID, i));
+            if (peer_access_available) {
+                lprintf("INFO", 0, "Peer-to-peer access: local GPU device %d can access device %d: %d\n", LID, i,
+                        peer_access_available);
+            } else {
+                error(peer_access_available == 0, 1, "setup_GPU_peer_to_peer_access",
+                      "Unable to enable peer-to-peer access.\n");
+            }
 
-            cudaDeviceEnablePeerAccess(PID, i);
-            lprintf("INFO", 0, "Enabled peer-to-peer access from node %d to %d\n", PID, i);
+            cudaError_t err = cudaDeviceEnablePeerAccess(i, 0);
+            if (err == cudaErrorInvalidDevice) {
+                error(1, 1, __func__, "Peer memory access cannot be enabled on invalid device\n");
+            } else if (err == cudaErrorPeerAccessAlreadyEnabled) {
+                lprintf("INFO", 0, "Tried to enable peer access from %d to %d but access was already enabled\n", LID, i);
+            } else if (err == cudaErrorInvalidValue) {
+                error(1, 1, __func__, "Flags must be set to 0 in cudaDeviceEnablePeerAccess\n");
+            } else if (err != cudaSuccess) {
+                CHECK_CUDA(err);
+            }
+            lprintf("INFO", 0, "Enabled peer-to-peer access between local GPU devices %d and %d\n", LID, i);
         }
     }
 #endif

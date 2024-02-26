@@ -22,6 +22,7 @@ static double csw_value;
         const int grid = (N - 1) / BLOCK_SIZE + 1;                               \
         const int block_start = (_type)->master_start[ixp];                      \
         _call;                                                                   \
+        CudaCheckError();                                                        \
     }
 
 __device__ static void clover_loop(int ix, int mu, int nu, suNf *u, suNf *gauge, int *iup_gpu, int *idn_gpu) {

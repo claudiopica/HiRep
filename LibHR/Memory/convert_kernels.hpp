@@ -42,6 +42,7 @@ template <int FIELD_DIM, typename REAL, typename FIELD_TYPE> void to_cpu_format_
         const int grid = (N - 1) / BLOCK_SIZE + 1;
         to_cpu_format_kernel<FIELD_DIM, REAL>
             <<<grid, BLOCK_SIZE>>>(out->gpu_ptr, in->gpu_ptr, N, block_start, in->type->master_shift);
+        CudaCheckError();
     }
 }
 
@@ -52,6 +53,7 @@ template <int FIELD_DIM, typename REAL, typename FIELD_TYPE> void to_gpu_format_
         const int grid = (N - 1) / BLOCK_SIZE + 1;
         to_gpu_format_kernel<FIELD_DIM, REAL>
             <<<grid, BLOCK_SIZE>>>(out->gpu_ptr, in->gpu_ptr, N, block_start, in->type->master_shift);
+        CudaCheckError();
     }
 }
 
