@@ -11,6 +11,7 @@
 
 #include "geometry.h"
 #include "memory.h"
+#include "libhr_core.h"
 
 #ifdef WITH_MPI
 

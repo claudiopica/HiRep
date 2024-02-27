@@ -230,7 +230,8 @@ _DECLARE(static void, Dphi_boundary, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
         const _GAUGE_TYPE *gauge = GFIELD(u_gauge_f, _REP_SUFFIX)->gpu_ptr;
         int grid = (boxEvenVolume(geometryBoxes) - 1) / BLOCK_SIZE + 1;
         _GPU_F_NAME(init_kernel_input, _SUFFIX)(out, in, gauge, buffer_box, gd_t);
-        Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE>>>(_VAR(input_d, _SUFFIX));
+        Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE>
+            <<<grid, BLOCK_SIZE, 0, 0>>>(_VAR(input_d, _SUFFIX));
         buffer_box = buffer_box->next;
         i++;
     }
@@ -271,8 +272,8 @@ void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sp
         const int grid = (N - 1) / BLOCK_SIZE_CLOVER + 1;
         const int block_start = sptr->type->master_start[ixp];
         suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start;
-        Cphi_gpu_kernel_<_VECTOR_TYPE, _REAL><<<grid, BLOCK_SIZE_CLOVER>>>(_GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp),
-                                                                           cl_term_gpu, mass, assign, N, block_start);
+        Cphi_gpu_kernel_<_VECTOR_TYPE, _REAL><<<grid, BLOCK_SIZE_CLOVER, 0, 0>>>(
+            _GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp), cl_term_gpu, mass, assign, N, block_start);
     }
 }
 
@@ -291,7 +292,7 @@ void _GPU_F_NAME_(Cphi_inv, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE
         const int grid = (N - 1) / BLOCK_SIZE_CLOVER + 1;
         const int block_start = sptr->type->master_start[ixp];
         ldl_t *cl_ldl_gpu = cl_ldl->gpu_ptr + block_start;
-        Cphi_inv_kernel_<_VECTOR_TYPE, _COMPLEX, _REAL><<<grid, BLOCK_SIZE_CLOVER>>>(
+        Cphi_inv_kernel_<_VECTOR_TYPE, _COMPLEX, _REAL><<<grid, BLOCK_SIZE_CLOVER, 0, 0>>>(
             _GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp), cl_ldl_gpu, mass, assign, N, block_start);
     }
 }
@@ -316,9 +317,9 @@ void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sp
         const int grid = (N - 1) / BLOCK_SIZE_CLOVER + 1;
         const int block_start = sptr->type->master_start[ixp];
         suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start;
-        Cphi_gpu_kernel_<_VECTOR_TYPE, _REAL><<<grid, BLOCK_SIZE_CLOVER>>>(_GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp),
-                                                                           cl_term_gpu, mass, invexpmass, assign, N,
-                                                                           block_start, NN_loc, NNexp_loc);
+        Cphi_gpu_kernel_<_VECTOR_TYPE, _REAL>
+            <<<grid, BLOCK_SIZE_CLOVER, 0, 0>>>(_GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp), cl_term_gpu, mass,
+                                                invexpmass, assign, N, block_start, NN_loc, NNexp_loc);
     }
 }
 #endif

@@ -471,7 +471,7 @@ int main(void)
     // Piece for is used identically to the CPU
     _PIECE_FOR(s->type, ixp) {
         // Local block is passed using _GPU_FIELD_BLK
-        example_kernel<<<grid_size, block_size>>>(_GPU_FIELD_BLK(s,ixp), vol4h);
+        example_kernel<<<grid_size, block_size, 0, 0>>>(_GPU_FIELD_BLK(s,ixp), vol4h);
     }
 }
 
@@ -518,7 +518,7 @@ int main(void)
     // Piece for is used identically to the CPU
     _PIECE_FOR(s->type, ixp) {
         // Local block is passed using _GPU_4FIELD_BLK
-        example_kernel<<<grid_size, block_size>>>(_GPU_4FIELD_BLK(u,ixp), vol4h);
+        example_kernel<<<grid_size, block_size, 0, 0>>>(_GPU_4FIELD_BLK(u,ixp), vol4h);
     }
 }
 
@@ -620,7 +620,7 @@ int void(main)
     // the odd sites component wise.
     int stride = T*X*Y*Z/2;
 
-    example_kernel<<<grid_size, block_size>>>(field->gpu_ptr, stride);
+    example_kernel<<<grid_size, block_size, 0, 0>>>(field->gpu_ptr, stride);
 }
 
 __global__ void example_kernel(suNf_spinor *start, int stride)

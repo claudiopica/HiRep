@@ -11,8 +11,8 @@
 #ifndef MEMORY_GENERIC_H
 #define MEMORY_GENERIC_H
 
-#include "random.h"
-#include "utils.h"
+//#include "random.h"
+//#include "utils.h"
 
 #define alloc(_s1, _n, _geom)                                      \
     _Generic((_s1),                                                \

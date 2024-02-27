@@ -25,6 +25,6 @@ void exec_field_update(suNg_field *suNg_field, suNg_av_field *force, double dt) 
         const int N = glattice.master_end[ixp] - glattice.master_start[ixp] + 1;
         const int block_start = glattice.master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
-        field_update_kernel<<<grid, BLOCK_SIZE>>>(suNg_field->gpu_ptr, force->gpu_ptr, N, block_start, dt);
+        field_update_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(suNg_field->gpu_ptr, force->gpu_ptr, N, block_start, dt);
     }
 }

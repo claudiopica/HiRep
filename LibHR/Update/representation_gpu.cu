@@ -33,12 +33,12 @@ void represent_gauge_field_gpu() {
         int N = boxEvenVolume(L);
         int block_start = L->base_index;
         int grid = (N - 1) / BLOCK_SIZE + 1;
-        represent_gauge_field_kernel<<<grid, BLOCK_SIZE>>>(u_gauge_f->gpu_ptr, gauge_ptr, N, block_start);
+        represent_gauge_field_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(u_gauge_f->gpu_ptr, gauge_ptr, N, block_start);
 
         N = boxOddVolume(L);
         block_start = L->base_index_odd;
         grid = (N - 1) / BLOCK_SIZE + 1;
-        represent_gauge_field_kernel<<<grid, BLOCK_SIZE>>>(u_gauge_f->gpu_ptr, gauge_ptr, N, block_start);
+        represent_gauge_field_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(u_gauge_f->gpu_ptr, gauge_ptr, N, block_start);
 
         if (L->type == INNER) { complete_sendrecv_suNg_field(u_gauge); }
 
