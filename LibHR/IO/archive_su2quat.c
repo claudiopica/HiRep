@@ -10,16 +10,7 @@
  * Write and read routines for archiving configurations
  *
  *******************************************************************************/
-// #include "libhr.h"
-#include "Core/global.h"
-#include "Geometry/communications.h"
-#include "Utils/boundary_conditions.h"
-#include "Utils/timing.h"
-#include "Update/avr_plaquette.h"
-#include "Random/ranlux.h"
-#include "io.h"
-#include "geometry.h"
-#include "memory.h"
+#include "libhr.h"
 
 #if NG == 2 && !defined(WITH_QUATERNIONS)
 
@@ -78,6 +69,10 @@ void write_gauge_field_su2q(char filename[]) {
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
     complete_sendrecv_suNg_field(u_gauge);
     apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions
+#endif
+
+#ifdef WITH_GPU
+    copy_from_gpu_suNg_field(u_gauge);
 #endif
 
     error((NG != 2), 1, "write_gauge_field_su2q", "This function cannot be called if NG!=2");
