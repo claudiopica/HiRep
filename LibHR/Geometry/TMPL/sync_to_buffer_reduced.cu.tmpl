@@ -254,7 +254,7 @@ _DECLARE(void, sync_box_to_buffer_gpu_reduced_,
          (geometry_descriptor * gd, box_t *src, _FIELD_TYPE *in, void *sendbuf, int buf, char mask)) {
     const int max_vol = fmax(boxEvenVolume(src), boxOddVolume(src));
     const int grid = (max_vol - 1) / BLOCK_SIZE + 1;
-    _F_NAME(box_to_buffer_kernel_reduced_, _FIELD_TYPE)<<<grid, BLOCK_SIZE>>>(input[buf], sb_icoord_gpu, ipt_gpu, mask);
+    _F_NAME(box_to_buffer_kernel_reduced_, _FIELD_TYPE)<<<grid, BLOCK_SIZE, 0, 0>>>(input[buf], sb_icoord_gpu, ipt_gpu, mask);
 }
 
 #undef _DECLARE

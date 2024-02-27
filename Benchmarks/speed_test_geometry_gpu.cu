@@ -26,7 +26,7 @@ void simple_read_gpu(spinor_field *field) {
         const int N = field->type->master_end[ixp] - field->type->master_start[ixp] + 1;
         const int block_start = field->type->master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
-        read_speedtest_kernel<<<grid, BLOCK_SIZE>>>(field->gpu_ptr, N, block_start);
+        read_speedtest_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(field->gpu_ptr, N, block_start);
     }
 }
 
@@ -35,6 +35,6 @@ void simple_write_gpu(spinor_field *field) {
         const int N = field->type->master_end[ixp] - field->type->master_start[ixp] + 1;
         const int block_start = field->type->master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
-        write_speedtest_kernel<<<grid, BLOCK_SIZE>>>(field->gpu_ptr, N, block_start);
+        write_speedtest_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(field->gpu_ptr, N, block_start);
     }
 }

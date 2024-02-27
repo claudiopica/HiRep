@@ -17,10 +17,16 @@
 #ifdef WITH_GPU
 
 #include <stdio.h>
+#ifndef HIP
 #include <cuda.h>
 #include <driver_types.h>
 #include <cuda_runtime.h>
 #include <cuda_runtime_api.h>
+#else
+#include <hip/hip_runtime.h>
+#include <hip/driver_types.h>
+#include <hip/hip_runtime_api.h>
+#endif
 
 #include "IO/input_par.h"
 
@@ -32,6 +38,38 @@ typedef struct {
     unsigned int gpuID;
     input_record_t read[2]; /* for the reading function */
 } input_gpu;
+
+#ifdef HIP
+#define cudaMalloc hipMalloc
+#define cudaMemcpy hipMemcpy
+#define cudaMemset hipMemset
+#define cub hipcub
+#define cudaMemcpyHostToDevice hipMemcpyHostToDevice
+#define cudaMemcpyDeviceToDevice hipMemcpyDeviceToDevice
+#define cudaMemcpyHostToHost hipMemcpyHostToHost
+#define cudaMemcpyDeviceToHost hipMemcpyDeviceToHost
+#define cudaDeviceSynchronize hipDeviceSynchronize
+#define cudaError_t hipError_t
+#define cudaDeviceProp hipDeviceProp_t
+#define cudaSuccess hipSuccess
+#define cudaGetErrorString hipGetErrorString
+#define cudaStreamCreate hipStreamCreate
+#define cudaStream_t hipStream_t
+#define cudaGetDeviceProperties hipGetDeviceProperties
+#define cudaSetDevice hipSetDevice
+#define cudaGetDevice hipGetDevice
+#define cudaDeviceCanAccessPeer hipDeviceCanAccessPeer
+#define cudaDeviceEnablePeerAccess hipDeviceEnablePeerAccess
+#define cudaFree hipFree
+#define cudaGetDeviceCount hipGetDeviceCount
+#define cudaDriverGetVersion hipDriverGetVersion
+#define cudaRuntimeGetVersion hipRuntimeGetVersion
+#define cuDeviceGetAttribute hipDeviceGetAttribute
+#define CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH hipDeviceAttributeMemoryBusWidth
+#define CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE hipDeviceAttributeMemoryClockRate
+#define CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE hipDeviceAttributeL2CacheSize
+#define cudaMemcpyToSymbol hipMemcpyToSymbol
+#endif
 
 #define init_input_gpu(varname)                                                               \
     {                                                                                         \

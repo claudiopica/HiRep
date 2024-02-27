@@ -70,7 +70,7 @@ void local_hmc_action_gpu(local_action_type type, scalar_field *loc_action, suNg
             const int N = glattice.master_end[ixp] - glattice.master_start[ixp] + 1;
             const int block_start = glattice.master_start[ixp];
             const int grid = (N - 1) / BLOCK_SIZE + 1;
-            _flip_sign<<<grid, BLOCK_SIZE>>>(loc_action->gpu_ptr, N, block_start);
+            _flip_sign<<<grid, BLOCK_SIZE, 0, 0>>>(loc_action->gpu_ptr, N, block_start);
         }
         break;
     default:
@@ -84,7 +84,7 @@ void local_hmc_action_gpu(local_action_type type, scalar_field *loc_action, suNg
 
         suNg_vector *scalar_momenta = NULL;
         if (u_scalar != NULL) { scalar_momenta = momenta_s->gpu_ptr; }
-        _loc_action_hmc<<<grid, BLOCK_SIZE>>>(momenta->gpu_ptr, scalar_momenta, loc_action->gpu_ptr, N, block_start);
+        _loc_action_hmc<<<grid, BLOCK_SIZE, 0, 0>>>(momenta->gpu_ptr, scalar_momenta, loc_action->gpu_ptr, N, block_start);
     }
 
     int nmon = num_mon();
@@ -99,7 +99,7 @@ void pf_local_action_gpu(scalar_field *loc_action, spinor_field *pf) {
         const int N = glattice.master_end[ixp] - glattice.master_start[ixp] + 1;
         const int block_start = glattice.master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
-        _pf_local_action<<<grid, BLOCK_SIZE>>>(loc_action->gpu_ptr, pf->gpu_ptr, N, block_start);
+        _pf_local_action<<<grid, BLOCK_SIZE, 0, 0>>>(loc_action->gpu_ptr, pf->gpu_ptr, N, block_start);
     }
 }
 

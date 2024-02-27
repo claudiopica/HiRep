@@ -16,6 +16,7 @@ my $test_wrapper_cmd = "test_wrapper.pl";
 my %options = ();
 my $with_gpu = 0; #this is also in the %options
 my $with_mpi = 0; #this is also in the %options
+my $hip = 0;
 
 my %targets = (); #global list of objects for which rules have been emitted. This is to avoid duplicate rules
 my $absroot; #absolute path to root project directory
@@ -42,7 +43,7 @@ coreincdir = $root/Include/Core
 AR = ar
 
 INCLUDE = $INCLUDE -I$incdir -I$coreincdir
-CFLAGS = -std=c11 $MACRO $CFLAGS $INCLUDE
+CFLAGS = $MACRO $CFLAGS $INCLUDE
 GPUFLAGS = $MACRO $GPUFLAGS $INCLUDE
 LDFLAGS = -L$builddir $LDFLAGS
 
@@ -59,6 +60,12 @@ rule cc
 rule nvcc
   command = $ENV $NVCC -ccbin $CC -MMD -MF $out.d $GPUFLAGS --x cu --device-c $in -o $out
   description = $setbg NVCC $setnorm $out
+  depfile = $out.d
+  deps = gcc
+
+rule hipcc
+  command = $ENV $NVCC -c -MMD -MF $out.d $GPUFLAGS $in -o $out
+  description = $setbg HIPCC $setnorm $out
   depfile = $out.d
   deps = gcc
 
@@ -185,7 +192,11 @@ sub obj_rules {
         my $cc_rule = "cc";
         if (/\.cu$/) {
             if(!$with_gpu) { next; } #skip cuda files if not with_gpu
-            $cc_rule = "nvcc";
+	    if (!$hip) { 
+	        $cc_rule = "nvcc"; 
+	    } else {
+	        $cc_rule = "hipcc"
+	    }
             if (/\.device\.cu$/) {
                 $_ =~ s/\.device\.cu//;
             }
@@ -342,20 +353,33 @@ sub read_conf {
             die("'WITH_GPU' is set but no 'NVCC' compiler given!\n");
         }
         $with_gpu = 1;
+        if (contains($options{'MACRO'},"HIP")) {
+            $hip = 1;
+        }
 
         # find CUDA install dir
         # ideally we would ask the NVCC compiler, but it does not seems to be supported
         my $nvcc = $options{'NVCC'}[0];
         my $nvcc_path = `echo 'command -v $nvcc' | sh`;
-        $nvcc_path =~ m{(.*?)/bin/$nvcc} or die("Cannot locate NVCC compiler [$nvcc]!\n");
+        my $errmsg;
+        $nvcc_path =~ m{(.*?)/bin/$nvcc} or die("Cannot locate C++/GPU compiler [$nvcc]!\n");
         my $cuda_path = $1;
         # print ("CUDA= $cuda_path\n");
         # add standard CUDA include and lib dirs
-        push(@{$options{'INCLUDE'}},"-I$cuda_path/include/");
-        push(@{$options{'LDFLAGS'}},"-lcuda");
+        if(!$hip) {
+            push(@{$options{'INCLUDE'}},"-I$cuda_path/include/");
+            push(@{$options{'LDFLAGS'}},"-lcuda -lstdc++");
+            push(@{$options{'CFLAGS'}},"-std=c11");
+            
+            # set linker
+            unshift @{$options{'LINK'}}, "$nvcc --forward-unknown-to-host-compiler -ccbin"; 
+        } else {
+            push(@{$options{'GPUFLAGS'}},"-xhip -fgpu-rdc -std=c++17");
+            push(@{$options{'LDFLAGS'}},"-lstdc++ --hip-link");
 
-        #set linker 
-        unshift @{$options{'LINK'}}, "$nvcc --forward-unknown-to-host-compiler -ccbin"; 
+            push(@{$options{'MACRO'}},"__HIP_PLATFORM_AMD__");
+            push(@{$options{'MACRO'}},"__HIP_PLATFORM_HCC__");
+        }
     }
 
     # add standard definitions to MACRO

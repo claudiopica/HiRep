@@ -7,7 +7,11 @@
 
 #include "inverters.h"
 #include "libhr_core.h"
+#ifndef HIP
 #include <cub/cub.cuh>
+#else
+#include <hipcub/hipcub.hpp>
+#endif
 
 template <class T> T global_max_gpu(T *vector, int size) {
     T *maxval_d;
