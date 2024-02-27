@@ -6,8 +6,9 @@
 #ifdef WITH_GPU
 #include "gpu.h"
 #include "error.h"
+#include "io.h"
 
-void __cudaSafeCall(cudaError_t err, const char *file, const int line) {
+void __cudaSafeCall(cudaError_t err, const char *func, const char *file, const int line) {
 #ifdef CUDA_CHECK_ERROR
 
 #pragma warning(push)
@@ -15,7 +16,7 @@ void __cudaSafeCall(cudaError_t err, const char *file, const int line) {
 
     do {
         if (cudaSuccess != err) {
-            lprintf("CUDA", 0, "cudaSafeCall() failed at %s:%i\n", file, line);
+            lprintf("CUDA", 0, "cudaSafeCall() failed in %s, at %s:%i\n", func, file, line);
             error((cudaSuccess != err), 1, "CudaSafeCall", cudaGetErrorString(err));
         }
     } while (0);
@@ -27,7 +28,7 @@ void __cudaSafeCall(cudaError_t err, const char *file, const int line) {
     return;
 }
 
-void __cudaCheckError(const char *file, int line) /*TODO: inline void? (SAM) */
+void __cudaCheckError(const char *func, const char *file, int line) /*TODO: inline void? (SAM) */
 {
 #ifdef CUDA_CHECK_ERROR
 
@@ -37,15 +38,15 @@ void __cudaCheckError(const char *file, int line) /*TODO: inline void? (SAM) */
     do {
         cudaError_t err = cudaGetLastError();
         if (cudaSuccess != err) {
-            lprintf("CUDA", 0, "cudaCheckError() failed at %s:%i\n", file, line);
+            lprintf("CUDA", 0, "cudaCheckError() failed in %s at %s:%i\n", func, file, line);
             error((cudaSuccess != err), 1, "CudaCheckError", cudaGetErrorString(err));
         }
 
         // More careful checking. However, this will affect performance.
         // Comment if not needed.
-        err = cudaThreadSynchronize();
+        err = cudaDeviceSynchronize();
         if (cudaSuccess != err) {
-            lprintf("CUDA", 0, "cudaCheckError() with sync failed at %s:%i\n", file, line);
+            lprintf("CUDA", 0, "cudaCheckError() with sync failed in %s at %s:%i\n", func, file, line);
             error((cudaSuccess != err), 1, "CudaCheckError with sync", cudaGetErrorString(err));
         }
     } while (0);
