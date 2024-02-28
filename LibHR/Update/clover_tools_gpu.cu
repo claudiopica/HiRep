@@ -22,6 +22,7 @@ static double csw_value;
         const int grid = (N - 1) / BLOCK_SIZE + 1;                               \
         const int block_start = (_type)->master_start[ixp];                      \
         _call;                                                                   \
+        CudaCheckError();                                                        \
     }
 
 __device__ static void clover_loop(int ix, int mu, int nu, suNf *u, suNf *gauge, int *iup_gpu, int *idn_gpu) {
@@ -361,11 +362,11 @@ void compute_ldl_decomp_gpu(double sigma0) {
     }
 
     _CUDA_CALL((&glattice), grid, (N * NF * NF), block_start, ixp,
-               (_compute_ldl_decomp<<<grid, BLOCK_SIZE>>>(cl_term->gpu_ptr, cl_ldl->gpu_ptr, sigma, N, block_start)));
+               (_compute_ldl_decomp<<<grid, BLOCK_SIZE, 0, 0>>>(cl_term->gpu_ptr, cl_ldl->gpu_ptr, sigma, N, block_start)));
 
-    _CUDA_CALL((&glattice), grid, N, block_start, ixp, (_ldl<<<grid, BLOCK_SIZE>>>(cl_ldl->gpu_ptr, 0, N, block_start)));
+    _CUDA_CALL((&glattice), grid, N, block_start, ixp, (_ldl<<<grid, BLOCK_SIZE, 0, 0>>>(cl_ldl->gpu_ptr, 0, N, block_start)));
 
-    _CUDA_CALL((&glattice), grid, N, block_start, ixp, (_ldl<<<grid, BLOCK_SIZE>>>(cl_ldl->gpu_ptr, 1, N, block_start)));
+    _CUDA_CALL((&glattice), grid, N, block_start, ixp, (_ldl<<<grid, BLOCK_SIZE, 0, 0>>>(cl_ldl->gpu_ptr, 1, N, block_start)));
 }
 
 void compute_clover_term_gpu() {
@@ -373,8 +374,8 @@ void compute_clover_term_gpu() {
     start_sendrecv_suNf_field(u_gauge_f);
     complete_sendrecv_suNf_field(u_gauge_f);
     _CUDA_CALL((&glattice), grid, N, block_start, ixp,
-               (_compute_clover_term<<<grid, BLOCK_SIZE>>>(cl_term->gpu_ptr, csw_value, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, N,
-                                                           block_start)););
+               (_compute_clover_term<<<grid, BLOCK_SIZE, 0, 0>>>(cl_term->gpu_ptr, csw_value, u_gauge_f->gpu_ptr, iup_gpu,
+                                                                 idn_gpu, N, block_start)););
 
     apply_BCs_on_clover_term(cl_term);
 }
@@ -383,14 +384,14 @@ void clover_la_logdet_gpu(double nf, double mass, scalar_field *la) {
     compute_ldl_decomp_gpu(4.0 + mass);
 
     _CUDA_CALL((&glat_odd), grid, N, block_start, ixp,
-               (_clover_la_logdet<<<grid, BLOCK_SIZE>>>(nf, la->gpu_ptr, cl_ldl->gpu_ptr, N, block_start)));
+               (_clover_la_logdet<<<grid, BLOCK_SIZE, 0, 0>>>(nf, la->gpu_ptr, cl_ldl->gpu_ptr, N, block_start)));
 }
 
 void compute_force_logdet_gpu(double mass, double coeff) {
     compute_ldl_decomp_gpu(4.0 + mass);
 
     _CUDA_CALL((&glat_odd), grid, N, block_start, ixp,
-               (_compute_clover_force<<<grid, BLOCK_SIZE>>>(cl_ldl->gpu_ptr, cl_force->gpu_ptr, coeff, N, block_start)));
+               (_compute_clover_force<<<grid, BLOCK_SIZE, 0, 0>>>(cl_ldl->gpu_ptr, cl_force->gpu_ptr, coeff, N, block_start)));
 }
 
 void clover_init_gpu(double csw) {

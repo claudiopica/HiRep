@@ -26,41 +26,6 @@
 #error Missing _ISREAL in linear_algebra_gpu.cu
 #endif
 
-// TODO: these somewhere else
-/* auxillary functions for GPU reductions */
-#ifndef ALLOC_AUX_GPU
-#define ALLOC_AUX_GPU
-
-double *alloc_double_sum_field(int n) {
-    static double *res = NULL;
-    static int n_size = 0;
-    if (n > n_size && res != NULL) {
-        cudaFree(res);
-        res = NULL;
-    }
-
-    if (res == NULL) {
-        cudaMalloc((void **)&res, n * sizeof(double));
-        n_size = n;
-    }
-    return res;
-}
-
-hr_complex *alloc_complex_sum_field(int n) {
-    static hr_complex *res = NULL;
-    static int n_size = 0;
-    if (n > n_size && res != NULL) {
-        cudaFree(res);
-        res = NULL;
-    }
-    if (res == NULL) {
-        cudaMalloc((void **)&res, n * sizeof(hr_complex));
-        n_size = n;
-    }
-    return res;
-}
-#endif
-
 /**
 * @brief Sums across GPU nodes after finding the local sum (generics)
 *
@@ -83,7 +48,7 @@ _DECLARE_LINEAR_ALGEBRA_GPU_RED(double, prod_re, (_FIELD_TYPE * s1, _FIELD_TYPE 
     double *resPiece;
 
     _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
-              (prod_re_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+              (prod_re_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
                   _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), resPiece, N));
               res += global_sum_gpu(resPiece, N););
 #ifdef WITH_MPI
@@ -100,7 +65,7 @@ _DECLARE_LINEAR_ALGEBRA_GPU_RED(double, prod_im, (_FIELD_TYPE * s1, _FIELD_TYPE 
     double *resPiece;
 
     _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
-              (prod_im_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+              (prod_im_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
                   _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), resPiece, N));
               res += global_sum_gpu(resPiece, N););
 #ifdef WITH_MPI
@@ -120,7 +85,7 @@ _DECLARE_LINEAR_ALGEBRA_GPU_RED(hr_complex, prod, (_FIELD_TYPE * s1, _FIELD_TYPE
     hr_complex *resPiece;
 
     _CUDA_FOR(s1, ixp, resPiece = alloc_complex_sum_field(N);
-              (prod_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+              (prod_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
                   _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), resPiece, N));
               res += global_sum_gpu(resPiece, N););
 #ifdef WITH_MPI
@@ -136,7 +101,7 @@ _DECLARE_LINEAR_ALGEBRA_GPU_RED(double, sqnorm, (_FIELD_TYPE * s1), (s1)) {
 
     _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
               (sqnorm_gpu<_FIELD_DIM, _REAL>
-               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), resPiece, N));
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), resPiece, N));
               res += global_sum_gpu(resPiece, N););
 #ifdef WITH_MPI
     global_sum(&res, 1);
@@ -150,7 +115,7 @@ _DECLARE_LINEAR_ALGEBRA_GPU_RED(double, max, (_FIELD_TYPE * s1), (s1)) {
 
     _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
               (max_gpu<_FIELD_DIM, _REAL>
-               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), resPiece, N));
+               <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), resPiece, N));
               double res_piece = global_max_gpu(resPiece, N); res = res > res_piece ? res : res_piece;);
 
 #ifdef WITH_MPI

@@ -18,7 +18,7 @@
 #define FIELD_MEMORY_H
 
 #include <stdlib.h>
-#include "libhr_core.h"
+#include "Core/spinor_field.h"
 
 #ifdef __cplusplus
 extern "C" {

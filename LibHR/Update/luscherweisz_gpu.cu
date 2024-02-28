@@ -251,7 +251,7 @@ void calculate_stfld_gpu(int comm) {
         const int N = glattice.master_end[ixp] - glattice.master_start[ixp] + 1;
         const int block_start = glattice.master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
-        _calculate_stfld<<<grid, BLOCK_SIZE>>>(stflt_gpu_ptr_d, u_gauge->gpu_ptr, N, block_start, iup_gpu, idn_gpu);
+        _calculate_stfld<<<grid, BLOCK_SIZE, 0, 0>>>(stflt_gpu_ptr_d, u_gauge->gpu_ptr, N, block_start, iup_gpu, idn_gpu);
     }
 
     if (comm) {
@@ -285,8 +285,8 @@ void lw_force_gpu(double dt, void *vpar) {
         const int N = glattice.master_end[ixp] - glattice.master_start[ixp] + 1;
         const int block_start = glattice.master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
-        _lw_force<<<grid, BLOCK_SIZE>>>(stflt_gpu_ptr_d, u_gauge->gpu_ptr, force->gpu_ptr, N, block_start, dt, beta, c0, c1,
-                                        iup_gpu, idn_gpu);
+        _lw_force<<<grid, BLOCK_SIZE, 0, 0>>>(stflt_gpu_ptr_d, u_gauge->gpu_ptr, force->gpu_ptr, N, block_start, dt, beta, c0,
+                                              c1, iup_gpu, idn_gpu);
     }
 
     apply_BCs_on_momentum_field(force);
@@ -302,7 +302,7 @@ double lw_action_gpu(double beta, double c0, double c1) {
         resPiece = alloc_double_sum_field(N);
         const int block_start = glattice.master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
-        _lw_action<<<grid, BLOCK_SIZE>>>(stflt_gpu_ptr_d, u_gauge->gpu_ptr, beta, c0, c1, resPiece, N, block_start);
+        _lw_action<<<grid, BLOCK_SIZE, 0, 0>>>(stflt_gpu_ptr_d, u_gauge->gpu_ptr, beta, c0, c1, resPiece, N, block_start);
         res += global_sum_gpu(resPiece, N);
     }
 
@@ -322,12 +322,12 @@ void lw_local_action_gpu(scalar_field *loc_action, double beta, double c0, doubl
         const int block_start = glattice.master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
         resPiece = alloc_double_sum_field(N);
-        _lw_action<<<grid, BLOCK_SIZE>>>(stflt_gpu_ptr_d, u_gauge->gpu_ptr, beta, c0, c1, resPiece, N, block_start);
+        _lw_action<<<grid, BLOCK_SIZE, 0, 0>>>(stflt_gpu_ptr_d, u_gauge->gpu_ptr, beta, c0, c1, resPiece, N, block_start);
         res += global_sum_gpu(resPiece, N);
     }
 
     int iy = ipt(2, 0, 0, 0);
-    _add_assign_loc_action<<<1, 1>>>(loc_action->gpu_ptr, res, iy);
+    _add_assign_loc_action<<<1, 1, 0, 0>>>(loc_action->gpu_ptr, res, iy);
 }
 
 void (*calculate_stfld)(int comm) = calculate_stfld_gpu;

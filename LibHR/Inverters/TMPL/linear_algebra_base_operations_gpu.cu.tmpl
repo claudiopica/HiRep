@@ -30,7 +30,7 @@
 _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, mul_add_assign, (_FIELD_TYPE * s1, _REAL r, _FIELD_TYPE *s2), (s1, r, s2)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (mul_add_assign_gpu<_FIELD_DIM><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+              (mul_add_assign_gpu<_FIELD_DIM><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
                   _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), r, _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
 }
 
@@ -39,7 +39,7 @@ _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, mulc_add_assign, (_FIELD_TYPE * s1, _COMPLE
 #if !_ISREAL
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (mulc_add_assign_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+              (mulc_add_assign_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
                   _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), c, _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
 #else
     error(1, 1, __func__, "Calling complex multiplication for real field.\n");
@@ -50,8 +50,8 @@ _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, mulc_add_assign, (_FIELD_TYPE * s1, _COMPLE
 _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, mul, (_FIELD_TYPE * s1, _REAL r, _FIELD_TYPE *s2), (s1, r, s2)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (mul_gpu<_FIELD_DIM><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), r,
-                                                                             _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
+              (mul_gpu<_FIELD_DIM><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), r,
+                                                                                   _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
 }
 
 /* s1=c*s2 c complex */
@@ -59,7 +59,7 @@ _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, mulc, (_FIELD_TYPE * s1, _COMPLEX c, _FIELD
 #if !_ISREAL
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (mulc_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+              (mulc_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
                   _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), c, _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
 #else
     error(1, 1, __func__, "Calling complex multiplication for real field.\n");
@@ -70,25 +70,25 @@ _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, mulc, (_FIELD_TYPE * s1, _COMPLEX c, _FIELD
 _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, add, (_FIELD_TYPE * r, _FIELD_TYPE *s1, _FIELD_TYPE *s2), (r, s1, s2)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (add_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_DFIELD_BLK(r, ixp, _FIELD_DIM),
-                                                                                    _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM),
-                                                                                    _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
+              (add_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
+                  _GPU_DFIELD_BLK(r, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM),
+                  _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
 }
 
 /* r=s1-s2 */
 _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, sub, (_FIELD_TYPE * r, _FIELD_TYPE *s1, _FIELD_TYPE *s2), (r, s1, s2)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (sub_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(_GPU_DFIELD_BLK(r, ixp, _FIELD_DIM),
-                                                                                    _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM),
-                                                                                    _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
+              (sub_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
+                  _GPU_DFIELD_BLK(r, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM),
+                  _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
 }
 
 /* s1+=s2 */
 _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, add_assign, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (add_assign_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+              (add_assign_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
                   _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
 }
 
@@ -96,7 +96,7 @@ _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, add_assign, (_FIELD_TYPE * s1, _FIELD_TYPE 
 _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, sub_assign, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (sub_assign_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+              (sub_assign_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
                   _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
 }
 
@@ -104,6 +104,6 @@ _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, sub_assign, (_FIELD_TYPE * s1, _FIELD_TYPE 
 _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, minus, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), (s1, s2)) {
     _TWO_SPINORS_MATCHING(s1, s2);
     _CUDA_FOR(s1, ixp,
-              (minus_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA>>>(
+              (minus_gpu<_FIELD_DIM, _REAL><<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(
                   _GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM), N)););
 }
