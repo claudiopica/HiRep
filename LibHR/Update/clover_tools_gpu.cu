@@ -465,6 +465,7 @@ void Cphi_init(double mass, double invexpmass) {
             CudaCheckError();
         }
         cphi_exp_mass = mass;
+        cphi_invexp_mass = invexpmass;
     }
 }
 
