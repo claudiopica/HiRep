@@ -12,6 +12,8 @@
 
 #ifdef WITH_EXPCLOVER
 
+#define NNEXP_MAX MAX_FACTORIAL
+
 static int NN;
 static int NNexp;
 
@@ -371,7 +373,7 @@ visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
 
     int i, j, k;
     double q[2 * NF], qlast;
-
+    double q2[NNEXP_MAX][2 * NF]; // TODO: not optimal
     double **q2 = (double **)malloc((NNexp + 1) * sizeof(double *));
     for (int l = 0; l < NNexp + 1; ++l) {
         q2[l] = (double *)malloc((2 * NF) * sizeof(double));
@@ -419,11 +421,6 @@ visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
             C[2 * NF * j + i] = q[j];
         }
     }
-
-    for (int l = 0; l < NNexp + 1; ++l) {
-        free(q2[l]);
-    }
-    free(q2);
 }
 
 #endif
@@ -445,13 +442,7 @@ visible static void doublehornerNF2(double *C, suNfc *A, int NNexp) {
 
     int i, j, k;
     double q[2 * NF], qlast;
-
-    double **q2 = (double **)malloc((NNexp + 1) * sizeof(double *));
-    for (int l = 0; l < NNexp + 1; ++l) {
-        q2[l] = (double *)malloc((2 * NF) * sizeof(double));
-    }
-
-    //  for(i=0; i<2*NF-1;i++)printf("p[%d] = %2.20e\n", i, creal(p[i]));
+    double q2[NNEXP_MAX][2 * NF]; // TODO: not optimal
 
     for (j = 0; j <= NNexp; j++) {
         q[0] = inverse_fact(NNexp + 2);
@@ -493,11 +484,6 @@ visible static void doublehornerNF2(double *C, suNfc *A, int NNexp) {
             C[2 * NF * j + i] = q[j];
         }
     }
-
-    for (int l = 0; l < NNexp + 1; ++l) {
-        free(q2[l]);
-    }
-    free(q2);
 }
 #endif
 

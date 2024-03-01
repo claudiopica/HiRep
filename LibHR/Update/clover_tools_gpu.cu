@@ -8,11 +8,14 @@
 #include "utils.h"
 #include "memory.h"
 #include "io.h"
+#include "update.h"
 
 #ifdef WITH_GPU
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 static double sigma;
 static double csw_value;
+static double cphi_exp_mass = 0;
+static double cphi_invexp_mass = 0;
 
 #define c_idx(i, j) ((i) * ((i) + 1) / 2 + (j))
 
@@ -373,11 +376,19 @@ void compute_clover_term_gpu() {
     sigma = 0xF00F;
     start_sendrecv_suNf_field(u_gauge_f);
     complete_sendrecv_suNf_field(u_gauge_f);
+
     _CUDA_CALL((&glattice), grid, N, block_start, ixp,
                (_compute_clover_term<<<grid, BLOCK_SIZE, 0, 0>>>(cl_term->gpu_ptr, csw_value, u_gauge_f->gpu_ptr, iup_gpu,
                                                                  idn_gpu, N, block_start)););
+    cphi_exp_mass = 0;
 
     apply_BCs_on_clover_term(cl_term);
+#if defined(WITH_EXPCLOVER) && defined(WITH_GPU)
+    double mass = get_dirac_mass();
+    mass = (4. + mass);
+    double invexpmass = 1.0 / mass;
+    Cphi_init(mass, invexpmass);
+#endif
 }
 
 void clover_la_logdet_gpu(double nf, double mass, scalar_field *la) {
@@ -394,14 +405,87 @@ void compute_force_logdet_gpu(double mass, double coeff) {
                (_compute_clover_force<<<grid, BLOCK_SIZE, 0, 0>>>(cl_ldl->gpu_ptr, cl_force->gpu_ptr, coeff, N, block_start)));
 }
 
+#if defined(WITH_GPU) && defined(WITH_EXPCLOVER)
+
+__global__ void Cphi_init_(suNfc *cl_term, suNfc *cl_term_expAplus, suNfc *cl_term_expAminus, double mass, double invexpmass,
+                           int N, int block_start, int NN_loc) {
+    for (int ix = blockIdx.x * blockDim.x + threadIdx.x; ix < N; ix += gridDim.x * blockDim.x) {
+        suNfc s0, s1, s2, s3, Aplus[4], Aminus[4], expAplus[4], expAminus[4];
+        read_gpu<double>(0, &s0, cl_term, ix, 0, 4);
+        read_gpu<double>(0, &s1, cl_term, ix, 1, 4);
+        read_gpu<double>(0, &s2, cl_term, ix, 2, 4);
+        read_gpu<double>(0, &s3, cl_term, ix, 3, 4);
+
+        _suNfc_mul(Aplus[0], invexpmass, s0);
+        _suNfc_mul(Aplus[1], invexpmass, s1);
+        _suNfc_dagger(Aplus[2], Aplus[1]);
+        _suNfc_mul(Aplus[3], -invexpmass, s0);
+
+        _suNfc_mul(Aminus[0], invexpmass, s2);
+        _suNfc_mul(Aminus[1], invexpmass, s3);
+        _suNfc_dagger(Aminus[2], Aminus[1]);
+        _suNfc_mul(Aminus[3], -invexpmass, s2);
+
+        clover_exp(Aplus, expAplus, NN_loc);
+        clover_exp(Aminus, expAminus, NN_loc);
+
+        _suNfc_mul_assign(expAplus[0], mass);
+        _suNfc_mul_assign(expAplus[1], mass);
+        _suNfc_mul_assign(expAplus[2], mass);
+        _suNfc_mul_assign(expAplus[3], mass);
+        _suNfc_mul_assign(expAminus[0], mass);
+        _suNfc_mul_assign(expAminus[1], mass);
+        _suNfc_mul_assign(expAminus[2], mass);
+        _suNfc_mul_assign(expAminus[3], mass);
+
+        write_gpu<double>(0, &expAplus[0], cl_term_expAplus, ix, 0, 4);
+        write_gpu<double>(0, &expAplus[1], cl_term_expAplus, ix, 1, 4);
+        write_gpu<double>(0, &expAplus[2], cl_term_expAplus, ix, 2, 4);
+        write_gpu<double>(0, &expAplus[3], cl_term_expAplus, ix, 3, 4);
+        write_gpu<double>(0, &expAminus[0], cl_term_expAminus, ix, 0, 4);
+        write_gpu<double>(0, &expAminus[1], cl_term_expAminus, ix, 1, 4);
+        write_gpu<double>(0, &expAminus[2], cl_term_expAminus, ix, 2, 4);
+        write_gpu<double>(0, &expAminus[3], cl_term_expAminus, ix, 3, 4);
+    }
+}
+
+#endif
+
+void Cphi_init(double mass, double invexpmass) {
+    if (mass != cphi_exp_mass || invexpmass != cphi_invexp_mass) {
+        _PIECE_FOR((&glattice), ixp) {
+            const int N = (&glattice)->master_end[ixp] - (&glattice)->master_start[ixp] + 1;
+            const int grid = (N - 1) / BLOCK_SIZE_CLOVER + 1;
+            const int block_start = (&glattice)->master_start[ixp];
+            suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start; // TODO: Aplus, Aminus
+            suNfc *cl_term_gpu_expAplus = cl_term_expAplus->gpu_ptr + 4 * block_start; // TODO: Aplus, Aminus
+            suNfc *cl_term_gpu_expAminus = cl_term_expAminus->gpu_ptr + 4 * block_start;
+            Cphi_init_<<<grid, BLOCK_SIZE_CLOVER, 0, 0>>>(cl_term_gpu, cl_term_gpu_expAplus, cl_term_gpu_expAminus, mass,
+                                                          invexpmass, N, block_start, get_NNexp());
+            CudaCheckError();
+        }
+        cphi_exp_mass = mass;
+    }
+}
+
 void clover_init_gpu(double csw) {
     cl_term = alloc_clover_term(&glattice);
+#if defined(WITH_GPU) && defined(WITH_EXPCLOVER)
+    cl_term_expAplus = alloc_clover_term(&glattice);
+    cl_term_expAminus = alloc_clover_term(&glattice);
+#endif
     cl_ldl = alloc_ldl_field(&glattice);
     cl_force = alloc_clover_force(&glattice);
 
     cudaMemset(cl_term->gpu_ptr, 0, 4 * sizeof(suNfc) * glattice.gsize_gauge);
     cudaMemset(cl_ldl->gpu_ptr, 0, sizeof(ldl_t) * glattice.gsize_gauge);
     cudaMemset(cl_force->gpu_ptr, 0, 6 * sizeof(suNf) * glattice.gsize_gauge);
+#if defined(WITH_EXPCLOVER) && defined(WITH_GPU)
+    double mass = get_dirac_mass();
+    mass = (4. + mass);
+    double invexpmass = 1.0 / mass;
+    Cphi_init(mass, invexpmass);
+#endif
 
     sigma = 0xF00F;
     csw_value = csw;

@@ -99,12 +99,10 @@ _DECLARE_STATIC(free_gpu_field_data_, (_FIELD_TYPE * f)) {
 _DECLARE_STATIC(allocate_gpu_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
 #ifdef WITH_GPU
     if (alloc_mem_t & GPU_MEM) {
-        cudaError_t err;
         int bytes_per_site = sizeof(_SITE_TYPE);
         size_t number_of_sites = _NUMBER_OF_SITES(f->type, _GEOM_TYPE);
         size_t field_size = number_of_sites * bytes_per_site * _FIELD_DIM * n;
-        err = cudaMalloc((void **)&(f->gpu_ptr), field_size);
-        error(err != cudaSuccess, 1, __func__, "Could not allocate GPU memory space for field");
+        CHECK_CUDA(cudaMalloc((void **)&(f->gpu_ptr), field_size));
         /* For spinors: Map the elements of the spinor arrays to the
         starting points in the previously allocated space */
         for (int i = 1; i < n; ++i) {
