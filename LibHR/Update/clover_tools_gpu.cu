@@ -457,8 +457,8 @@ void Cphi_init(double mass, double invexpmass) {
             const int N = (&glattice)->master_end[ixp] - (&glattice)->master_start[ixp] + 1;
             const int grid = (N - 1) / BLOCK_SIZE_CLOVER + 1;
             const int block_start = (&glattice)->master_start[ixp];
-            suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start; // TODO: Aplus, Aminus
-            suNfc *cl_term_gpu_expAplus = cl_term_expAplus->gpu_ptr + 4 * block_start; // TODO: Aplus, Aminus
+            suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start;
+            suNfc *cl_term_gpu_expAplus = cl_term_expAplus->gpu_ptr + 4 * block_start;
             suNfc *cl_term_gpu_expAminus = cl_term_expAminus->gpu_ptr + 4 * block_start;
             Cphi_init_<<<grid, BLOCK_SIZE_CLOVER, 0, 0>>>(cl_term_gpu, cl_term_gpu_expAplus, cl_term_gpu_expAminus, mass,
                                                           invexpmass, N, block_start, get_NNexp());
