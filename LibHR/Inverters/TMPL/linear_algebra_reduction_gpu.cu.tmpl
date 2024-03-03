@@ -116,7 +116,7 @@ _DECLARE_LINEAR_ALGEBRA_GPU_RED(double, max, (_FIELD_TYPE * s1), (s1)) {
     double res = 0.0;
     double *resPiece;
 
-    _CUDA_FOR(s1, ixp, resPiece = alloc_quad_double_sum_field(N);
+    _CUDA_FOR(s1, ixp, resPiece = alloc_double_sum_field(N);
               (max_gpu<_FIELD_DIM, _REAL>
                <<<grid_size, BLOCK_SIZE_LINEAR_ALGEBRA, 0, 0>>>(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), resPiece, N));
               double res_piece = global_max_gpu(resPiece, N); res = res > res_piece ? res : res_piece;);

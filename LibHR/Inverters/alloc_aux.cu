@@ -1,4 +1,5 @@
 #include "libhr_core.h"
+#include "inverters.h"
 
 #ifdef WITH_GPU
 

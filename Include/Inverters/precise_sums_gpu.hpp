@@ -38,4 +38,6 @@ struct __align__(16) quad_double {
     }
 };
 
+quad_double *alloc_quad_double_sum_field(int n);
+
 #endif
