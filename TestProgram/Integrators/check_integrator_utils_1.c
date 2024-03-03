@@ -292,8 +292,8 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
     complete_sendrecv_suNg_av_field(suN_momenta);
     if (u_scalar != NULL) {
         copy(scalar_momenta, scalar_momenta_copy);
-        start_sendrecv_suNg_scalar_momenta(scalar_momenta);
-        complete_sendrecv_suNg_scalar_momenta(scalar_momenta);
+        start_sendrecv_suNg_scalar_field(scalar_momenta);
+        complete_sendrecv_suNg_scalar_field(scalar_momenta);
     }
     copy(u_gauge, u_gauge_copy);
     start_sendrecv_suNg_field(u_gauge);
