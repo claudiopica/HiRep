@@ -23,6 +23,8 @@ template <class T> T global_max_gpu(T *vector, int size) {
     cudaMalloc((void **)&d_tmp_storage, temp_storage_bytes);
     cub::DeviceReduce::Max(d_tmp_storage, temp_storage_bytes, vector, maxval_d, size);
     cudaMemcpy(&maxval, maxval_d, sizeof(T), cudaMemcpyDeviceToHost);
+    cudaFree(maxval_d);
+    cudaFree(d_tmp_storage);
     return maxval;
 }
 
@@ -36,6 +38,8 @@ template <class T> T global_sum_gpu(T *vector, int size) {
     cudaMalloc((void **)&d_tmp_storage, temp_storage_bytes);
     cub::DeviceReduce::Sum(d_tmp_storage, temp_storage_bytes, vector, sum_d, size);
     cudaMemcpy(&sum, sum_d, sizeof(T), cudaMemcpyDeviceToHost);
+    cudaFree(sum_d);
+    cudaFree(d_tmp_storage);
     return sum;
 }
 

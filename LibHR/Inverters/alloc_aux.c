@@ -18,8 +18,8 @@ double *alloc_double_sum_field(int n) {
 }
 
 hr_complex *alloc_complex_sum_field(int n) {
-    hr_complex *res = NULL;
-    int n_size = 0;
+    static hr_complex *res = NULL;
+    static int n_size = 0;
     if (n > n_size && res != NULL) {
         cudaFree(res);
         res = NULL;
