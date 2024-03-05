@@ -176,15 +176,9 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile) {
     return 0;
 }
 
-static void suNg_av_field_copy(suNg_av_field *g1, suNg_av_field *g2) {
-#ifdef CHECK_SPINOR_MATCHING
-    _TWO_SPINORS_MATCHING(g1, g2);
-#endif
-    memcpy(g1->ptr, g2->ptr, 4 * g1->type->gsize_gauge * sizeof(*(g1->ptr)));
-}
-
 double integrate_ghmc(int regenerate, ghmc_par *update_par) {
     static suNg_av_field *suN_momenta_copy;
+    static suNg_scalar_field *scalar_momenta_copy;
     static double deltaH;
     static suNg_field *u_gauge_copy = NULL;
     static scalar_field *la = NULL; /* local action field for Metropolis test */
@@ -195,11 +189,15 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
         suN_momenta_copy = alloc_suNg_av_field(&glattice);
 
         u_gauge_copy = alloc_suNg_field(&glattice);
-        suNg_field_copy(u_gauge_copy, u_gauge);
+        copy(u_gauge_copy, u_gauge);
+        start_sendrecv_suNg_field(u_gauge_copy);
+        complete_sendrecv_suNg_field(u_gauge_copy);
 
         if (u_scalar != NULL) {
             u_scalar_copy = alloc_suNg_scalar_field(&glattice);
-            suNg_scalar_field_copy(u_scalar_copy, u_scalar);
+            copy(u_scalar_copy, u_scalar);
+            start_sendrecv_suNg_scalar_field(u_scalar_copy);
+            complete_sendrecv_suNg_scalar_field(u_scalar_copy);
         }
         pf_copy = (spinor_field **)malloc(num_mon() * sizeof(spinor_field *));
         for (int i = 0; i < num_mon(); i++) {
@@ -214,11 +212,15 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
         lprintf("HMC", 30, "Generating gaussian momenta and pseudofermions...");
 
         gaussian_momenta(suN_momenta);
-        suNg_av_field_copy(suN_momenta_copy, suN_momenta);
+        copy(suN_momenta_copy, suN_momenta);
+        start_sendrecv_suNg_av_field(suN_momenta_copy);
+        complete_sendrecv_suNg_av_field(suN_momenta_copy);
 
         if (u_scalar != NULL) {
             gaussian_scalar_momenta(scalar_momenta);
-            // to be done scalar_av_field_copy(scalar_momenta_copy, scalar_momenta);
+            copy(scalar_momenta_copy, scalar_momenta);
+            start_sendrecv_suNg_scalar_field(scalar_momenta_copy);
+            complete_sendrecv_suNg_scalar_field(scalar_momenta_copy);
         }
         lprintf("HMC", 30, " done.\n");
     }
@@ -266,22 +268,37 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
     }
     local_hmc_action(DELTA, la, suN_momenta, scalar_momenta);
 
-    /* Metropolis test */
+#ifndef WITH_GPU
     _OMP_PRAGMA(single) {
         deltaH = 0.0;
     }
     _MASTER_FOR_SUM(la->type, i, deltaH) {
         deltaH += *_FIELD_AT(la, i);
     }
+#else
+    deltaH = 0.0;
+    _PIECE_FOR(la->type, ixp) {
+        const int block_size = la->type->master_end[ixp] - la->type->master_start[ixp] + 1;
+        deltaH += global_sum_gpu_double(_GPU_FIELD_BLK(la, ixp), block_size);
+    }
+#endif
 
     global_sum(&deltaH, 1);
 
     // Restore the copies
 
-    suNg_av_field_copy(suN_momenta, suN_momenta_copy);
-    // we need to write the function for the scalar momenta Antonio
-    suNg_field_copy(u_gauge, u_gauge_copy);
-    if (u_scalar != NULL) { suNg_scalar_field_copy(u_scalar, u_scalar_copy); }
+    copy(suN_momenta, suN_momenta_copy);
+    start_sendrecv_suNg_av_field(suN_momenta);
+    complete_sendrecv_suNg_av_field(suN_momenta);
+    if (u_scalar != NULL) {
+        copy(scalar_momenta, scalar_momenta_copy);
+        start_sendrecv_suNg_scalar_field(scalar_momenta);
+        complete_sendrecv_suNg_scalar_field(scalar_momenta);
+    }
+    copy(u_gauge, u_gauge_copy);
+    start_sendrecv_suNg_field(u_gauge);
+    complete_sendrecv_suNg_field(u_gauge);
+    if (u_scalar != NULL) { copy(u_scalar, u_scalar_copy); }
 
     for (int i = 0; i < num_mon(); ++i) {
         monomial const *m = mon_n(i);
