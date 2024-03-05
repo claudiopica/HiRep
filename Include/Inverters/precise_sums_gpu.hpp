@@ -21,13 +21,13 @@ struct __align__(16) quad_double {
     visible inline __attribute__((always_inline)) quad_double operator+(const quad_double &x) {
         double new_val = val;
         double new_compensation = compensation;
-        _2Sum_acc_hirep(new_val, new_compensation, x.val);
+        _2Sum_acc(new_val, new_compensation, x.val);
         new_compensation += x.compensation;
         return quad_double(new_val, new_compensation);
     }
 
     visible inline __attribute__((always_inline)) quad_double &operator+=(const quad_double &x) {
-        _2Sum_acc_hirep(val, compensation, x.val);
+        _2Sum_acc(val, compensation, x.val);
         compensation += x.compensation;
         return *this;
     }
