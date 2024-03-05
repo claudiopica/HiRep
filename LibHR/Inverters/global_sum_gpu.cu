@@ -44,6 +44,7 @@ template float global_sum_gpu<float>(float *vector, int size);
 template double global_sum_gpu<double>(double *vector, int size);
 template hr_complex_flt global_sum_gpu<hr_complex_flt>(hr_complex_flt *vector, int size);
 template hr_complex global_sum_gpu<hr_complex>(hr_complex *vector, int size);
+template quad_double global_sum_gpu<quad_double>(quad_double *vector, int size);
 
 template int global_max_gpu<int>(int *vector, int size);
 template float global_max_gpu<float>(float *vector, int size);

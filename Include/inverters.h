@@ -16,6 +16,9 @@
 #include "Inverters/linear_solvers.h"
 #include "Inverters/global_sum.h"
 #include "Inverters/precise_sums.h"
+#ifdef __cplusplus
+#include "Inverters/precise_sums_gpu.hpp"
+#endif
 #include "Inverters/scalarfield_operations.h"
 #include "Inverters/test_complex.h"
 

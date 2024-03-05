@@ -7,30 +7,30 @@
 
 /* Re <s1,s2> */
 template <unsigned int FIELD_DIM, typename REAL, typename SITE_TYPE>
-__global__ void prod_re_gpu(SITE_TYPE *s1, SITE_TYPE *s2, double *resField, int N) {
+__global__ void prod_re_gpu(SITE_TYPE *s1, SITE_TYPE *s2, quad_double *resField, int N) {
     SITE_TYPE site1;
     SITE_TYPE site2;
     for (int ix = blockIdx.x * blockDim.x + threadIdx.x; ix < N; ix += blockDim.x * gridDim.x) {
-        resField[ix] = 0.0;
+        resField[ix] = quad_double(0.0);
         for (int mu = 0; mu < FIELD_DIM; ++mu) {
             read_gpu<REAL>(N, &site1, s1, ix, mu, FIELD_DIM);
             read_gpu<REAL>(N, &site2, s2, ix, mu, FIELD_DIM);
-            resField[ix] += prod_re(&site1, &site2);
+            resField[ix].val += prod_re(&site1, &site2);
         }
     }
 }
 
 /* Im <s1,s2> */
 template <unsigned int FIELD_DIM, typename REAL, typename SITE_TYPE>
-__global__ void prod_im_gpu(SITE_TYPE *s1, SITE_TYPE *s2, double *resField, int N) {
+__global__ void prod_im_gpu(SITE_TYPE *s1, SITE_TYPE *s2, quad_double *resField, int N) {
     SITE_TYPE site1;
     SITE_TYPE site2;
     for (int ix = blockIdx.x * blockDim.x + threadIdx.x; ix < N; ix += blockDim.x * gridDim.x) {
-        resField[ix] = 0.0;
+        resField[ix] = quad_double(0.0);
         for (int mu = 0; mu < FIELD_DIM; ++mu) {
             read_gpu<REAL>(N, &site1, s1, ix, mu, FIELD_DIM);
             read_gpu<REAL>(N, &site2, s2, ix, mu, FIELD_DIM);
-            resField[ix] += prod_im(&site1, &site2);
+            resField[ix].val += prod_im(&site1, &site2);
         }
     }
 }
@@ -82,13 +82,13 @@ __global__ void g5_prod_im_gpu(SITE_TYPE *s1, SITE_TYPE *s2, double *resField, i
 
 /* Re <s1,s1> */
 template <unsigned int FIELD_DIM, typename REAL, typename SITE_TYPE>
-__global__ void sqnorm_gpu(SITE_TYPE *s1, double *resField, int N) {
+__global__ void sqnorm_gpu(SITE_TYPE *s1, quad_double *resField, int N) {
     SITE_TYPE site1;
     for (int ix = blockIdx.x * blockDim.x + threadIdx.x; ix < N; ix += blockDim.x * gridDim.x) {
-        resField[ix] = 0.0;
+        resField[ix] = quad_double(0.0);
         for (int mu = 0; mu < FIELD_DIM; mu++) {
             read_gpu<REAL>(N, &site1, s1, ix, mu, FIELD_DIM);
-            resField[ix] += prod_re(&site1, &site1);
+            resField[ix].val += prod_re(&site1, &site1);
         }
     }
 }
