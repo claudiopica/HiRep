@@ -3,6 +3,7 @@
 
 #include "geometry.h"
 #include "Utils/generics.h"
+#include "inverters.h"
 
 /* Re <s1,s2> */
 template <unsigned int FIELD_DIM, typename REAL, typename SITE_TYPE>

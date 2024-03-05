@@ -180,7 +180,7 @@ my @libs = ("libhrobservables.a", "libhr.a"); #order is important
                   "DiracOperator", "Algebra", "Disconnected", "Scattering", 
                   "Memory", "Sources", "RIMOM", "Utils", "Propagator", 
                   "Integrators", "StoredConfs", "SpinorField", "WilsonLoops", 
-                  "Update", "Mesons", "Geometry", "LinearAlgebra",
+                  "Update", "Mesons", "Geometry", "LinearAlgebra", "ComplexNumbers",
                 #  "RotatedSF", # this is broken
                 #  "Deflate", # this is broken
   );
