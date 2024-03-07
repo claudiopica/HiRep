@@ -463,6 +463,11 @@ void Cphi_init(double mass, double invexpmass) {
             Cphi_init_<<<grid, BLOCK_SIZE_CLOVER, 0, 0>>>(cl_term_gpu, cl_term_gpu_expAplus, cl_term_gpu_expAminus, mass,
                                                           invexpmass, N, block_start, get_NNexp());
             CudaCheckError();
+            cl_term_gpu_expAplus = cl_term_expAplusinv->gpu_ptr + 4 * block_start;
+            cl_term_gpu_expAminus = cl_term_expAminusinv->gpu_ptr + 4 * block_start;
+            Cphi_init_<<<grid, BLOCK_SIZE_CLOVER, 0, 0>>>(cl_term_gpu, cl_term_gpu_expAplus, cl_term_gpu_expAminus, 1 / mass,
+                                                          -invexpmass, N, block_start, get_NNexp());
+            CudaCheckError();
         }
         cphi_exp_mass = mass;
         cphi_invexp_mass = invexpmass;
@@ -474,6 +479,8 @@ void clover_init_gpu(double csw) {
 #if defined(WITH_GPU) && defined(WITH_EXPCLOVER)
     cl_term_expAplus = alloc_clover_term(&glattice);
     cl_term_expAminus = alloc_clover_term(&glattice);
+    cl_term_expAplusinv = alloc_clover_term(&glattice);
+    cl_term_expAminusinv = alloc_clover_term(&glattice);
 #endif
     cl_ldl = alloc_ldl_field(&glattice);
     cl_force = alloc_clover_force(&glattice);

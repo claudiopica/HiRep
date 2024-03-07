@@ -303,11 +303,11 @@ void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sp
     evaluate_sw_order(&mass);
     mass = (4. + mass);
     double invexpmass = 1.0 / mass;
+    Cphi_init(mass, invexpmass);
     if (inverse == 1) {
         invexpmass = -1.0 / mass;
         mass = 1 / mass;
     }
-    Cphi_init(mass, invexpmass);
 
     int NN_loc = get_NN();
     int NNexp_loc = get_NNexp();
@@ -317,8 +317,13 @@ void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sp
         const int grid = (N - 1) / BLOCK_SIZE_CLOVER + 1;
         const int block_start = sptr->type->master_start[ixp];
         suNfc *cl_term_gpu_expAplus, *cl_term_gpu_expAminus;
-        cl_term_gpu_expAplus = cl_term_expAplus->gpu_ptr + 4 * block_start;
-        cl_term_gpu_expAminus = cl_term_expAminus->gpu_ptr + 4 * block_start;
+        if (!inverse) {
+            cl_term_gpu_expAplus = cl_term_expAplus->gpu_ptr + 4 * block_start;
+            cl_term_gpu_expAminus = cl_term_expAminus->gpu_ptr + 4 * block_start;
+        } else {
+            cl_term_gpu_expAplus = cl_term_expAplusinv->gpu_ptr + 4 * block_start;
+            cl_term_gpu_expAminus = cl_term_expAminusinv->gpu_ptr + 4 * block_start;
+        }
         Cphi_gpu_kernel_<_VECTOR_TYPE, _REAL><<<grid, BLOCK_SIZE_CLOVER, 0, 0>>>(
             _GPU_FIELD_BLK(dptr, ixp), _GPU_FIELD_BLK(sptr, ixp), cl_term_gpu_expAplus, cl_term_gpu_expAminus, mass, invexpmass,
             assign, N, block_start, NN_loc, NNexp_loc);
