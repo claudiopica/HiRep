@@ -5,7 +5,7 @@
 
 #ifdef WITH_GPU
 
-#include "inverters.h"
+//#include "inverters.h"
 #include "libhr_core.h"
 #ifndef HIP
 #include <cub/cub.cuh>
@@ -52,6 +52,8 @@ template hr_complex global_sum_gpu<hr_complex>(hr_complex *vector, int size);
 template int global_max_gpu<int>(int *vector, int size);
 template float global_max_gpu<float>(float *vector, int size);
 template double global_max_gpu<double>(double *vector, int size);
+
+extern "C" {
 
 int global_sum_gpu_int(int *vector, int size) {
     int res;
@@ -132,5 +134,5 @@ double global_max_gpu_double(double *vector, int size) {
     cudaFree(vector_d);
     return res;
 }
-
+}
 #endif
