@@ -13,6 +13,8 @@
 
 #ifdef WITH_MPI
 
+void init_hr_comms();
+void finalize_hr_comms();
 void hr_sendrecv(void *sendbuffer, void *recvbuffer, geometry_descriptor *type, MPI_Datatype mpi_real_type, int field_dim,
                  int size_of_real, int mpi_chunks_per_site, int nbuffers, MPI_Request *field_reqs);
 void hr_sendrecv_complete(int nreq, MPI_Request *field_reqs);
