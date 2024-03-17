@@ -38,7 +38,7 @@ visible void det_Cmplx_Ng(hr_complex *res, suNg *a) {
     int i;
     hr_complex tmp;
     b = *a;
-    ludcmp(b.c, indx, &d, NG);
+    ludcmp(b.c, indx, &d);
     *res = d;
     for (i = 0; i < NG; ++i) {
         _complex_mul(tmp, *res, b.c[NG * i + i]);
