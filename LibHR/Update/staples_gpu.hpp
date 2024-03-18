@@ -10,7 +10,8 @@
 #include "update.h"
 #include "libhr_core.h"
 
-__device__ void staples_dev(int ix, int mu, suNg *v, suNg *gauge, int *iup_gpu, int *idn_gpu, double *plaq_weight) {
+__device__ __forceinline__ void staples_dev(int ix, int mu, suNg *v, suNg *gauge, int *iup_gpu, int *idn_gpu,
+                                            double *plaq_weight) {
     suNg staple, tr1, tr2;
     suNg p1, p2, p3;
     int nu, i, ixpmu, ixpnu, ixmnu, ixpmumnu;
