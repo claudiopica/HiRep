@@ -64,7 +64,7 @@ _KERNEL(box_to_buffer_kernel_, (kernel_field_input * input, coord4 *icoord, int 
 
 _DECLARE(void, sync_box_to_buffer_gpu_, (geometry_descriptor * gd, box_t *src, _FIELD_TYPE *in, void *sendbuf)) {
     /* TODO: we do not want to compare pointers */
-    enum gd_type gd_t = GLOBAL;
+    gd_type gd_t = GLOBAL;
     if (gd == &glat_even) { gd_t = EVEN; }
     if (gd == &glat_odd) { gd_t = ODD; }
 

@@ -49,11 +49,6 @@ enum box_type {
     SENDBUF = 5
 };
 
-// TODO: this should be in geometry.h and geometry descriptor should contain it
-// enum to define geometry type
-// this is a simple bitmask with GLOBAL = EVEN | ODD
-enum gd_type { EVEN = 1, ODD = 2, GLOBAL = 3 };
-
 ///  ----h
 ///  ....|  NB: the h[4] is not in the box,
 ///  ....|  i.e. coordinates needs to be l[]<= p[] <h[]
