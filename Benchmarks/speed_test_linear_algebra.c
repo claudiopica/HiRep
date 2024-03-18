@@ -19,19 +19,19 @@ static double time_target = 500.;
 #define synchronize
 #endif
 
-void setup_random_fields(int n, spinor_field s[n]) {
+void setup_random_fields_lina(int n, spinor_field s[n]) {
     for (int i = 0; i < n; i++) {
         gaussian_spinor_field(&s[i]);
     }
 }
 
-int bytes_per_site(int ninputs, int noutputs, int sitesize) {
+int bytes_per_site_lina(int ninputs, int noutputs, int sitesize) {
     return (ninputs + 2 * noutputs) * sitesize;
 }
 
 #define _PRINT_SETUP(_ninputs, _noutputs, _flopsite, _in)                                                  \
     do {                                                                                                   \
-        int bytesite = bytes_per_site(_ninputs, _noutputs, sizeof((&_in[0])->ptr));                        \
+        int bytesite = bytes_per_site_lina(_ninputs, _noutputs, sizeof((&_in[0])->ptr));                   \
         lprintf("LA TEST", 0, "Flop per size = %d\n", _flopsite);                                          \
         lprintf("LA TEST", 0, "Byte per site = %d\n", bytesite);                                           \
         lprintf("LA TEST", 0, "Data movement = %e MB\n", (double)bytesite / (1024. * 1024.) * GLB_VOLUME); \
@@ -41,7 +41,6 @@ int bytes_per_site(int ninputs, int noutputs, int sitesize) {
     lprintf("WARMUP", 0, "Warmup application of %s %d times.\n", _name, n_warmup); \
     _elapsed = 0;                                                                  \
     for (int i = 0; i < n_warmup; ++i) {                                           \
-        setup_random_fields(_ninputs, _in);                                        \
         timer_lap(&_clock);                                                        \
         _test;                                                                     \
         synchronize;                                                               \
@@ -61,7 +60,6 @@ int bytes_per_site(int ninputs, int noutputs, int sitesize) {
         lprintf("LA TEST", 0, "Trying reps: %d\n", _n_reps);                \
         _elapsed = 0;                                                       \
         for (int i = 0; i < _n_reps; ++i) {                                 \
-            setup_random_fields(_ninputs, _in);                             \
             timer_lap(&_clock);                                             \
             _test;                                                          \
             synchronize;                                                    \
@@ -85,7 +83,7 @@ int bytes_per_site(int ninputs, int noutputs, int sitesize) {
         lprintf("RESULT", 0,                                                                         \
                 "Peak Memory Bandwidth: %1.6g GB/s, "                                                \
                 "Performance reached: %0.2f \%\n",                                                   \
-                peak_memory_bandwidth, _bandwidth / peak_memory_bandwidth);                          \
+                peak_memory_bandwidth, 100 * _bandwidth / peak_memory_bandwidth);                    \
     } while (0);
 
 #else
@@ -94,7 +92,7 @@ int bytes_per_site(int ninputs, int noutputs, int sitesize) {
 
 #define _PRINT_RESULT(_name, _ninputs, _noutputs, _elapsed, _n_reps, _flopsite, _in)          \
     do {                                                                                      \
-        int bytesite = bytes_per_site(_ninputs, _noutputs, sizeof((*(&_in[0])->ptr)));        \
+        int bytesite = bytes_per_site_lina(_ninputs, _noutputs, sizeof((*(&_in[0])->ptr)));   \
         double vol_reps = (double)_n_reps * GLB_VOLUME;                                       \
         double bandwidth = (vol_reps * bytesite) / _elapsed / 1.e6;                           \
         lprintf("RESULT", 0,                                                                  \
@@ -110,7 +108,7 @@ int bytes_per_site(int ninputs, int noutputs, int sitesize) {
 
 #define _SPEED_TEST_LIN_ALG(_name, _ninputs, _noutputs, _flopsite, _in, _test)      \
     do {                                                                            \
-        setup_random_fields(_ninputs, _in);                                         \
+        setup_random_fields_lina(_ninputs, _in);                                    \
         _PRINT_SETUP(_ninputs, _noutputs, _flopsite, _in);                          \
         Timer clock;                                                                \
         double elapsed;                                                             \
@@ -135,13 +133,15 @@ int main(int argc, char *argv[]) {
 
     _SPEED_TEST_LIN_ALG("Copy spinor field", 1, 1, 0, in, copy_spinor_field(&in[0], &in[1]););
 
-    _SPEED_TEST_LIN_ALG("Spinor field product", 1, 1, NF * 4 * 2, in, prod_spinor_field(&in[0], &in[1]););
+    _SPEED_TEST_LIN_ALG("Spinor field product", 2, 0, NF * 4 * 2 * 2 + 1, in, prod_spinor_field(&in[0], &in[1]););
 
-    _SPEED_TEST_LIN_ALG("Square norm", 1, 0, NF * 4 * 2, in, sqnorm_spinor_field(&in[0]););
+    _SPEED_TEST_LIN_ALG("Square norm", 1, 0, NF * 4 * 2 * 2 + 1, in, sqnorm_spinor_field(&in[0]););
+
+    _SPEED_TEST_LIN_ALG("Mul add assign", 2, 1, NF * 6 * 2, in, mul_add_assign_spinor_field(&in[0], c, &in[1]));
 
     _SPEED_TEST_LIN_ALG("g5 application", 1, 1, NF * 2 * 2, in, g5_spinor_field(&in[0], &in[1]););
 
-    _SPEED_TEST_LIN_ALG("g5 mulc add assign", 1, 1, NF * 6 * 2, in, g5_mulc_add_assign_spinor_field(&in[0], c, &in[1]););
+    _SPEED_TEST_LIN_ALG("g5 mulc add assign", 2, 1, NF * 6 * 2, in, g5_mulc_add_assign_spinor_field(&in[0], c, &in[1]););
 
     // Timer resolution
     for (int i = 0; i < 1; ++i) {
