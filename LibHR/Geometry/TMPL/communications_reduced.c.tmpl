@@ -44,7 +44,6 @@ _GPU_DECLARE(sync_reduced_, (_FIELD_TYPE * f)) {
 
 _DECLARE(sync_reduced_init_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
-    _BUFFER_BOX_FOR(L, _F_NAME(sync_box_reduced_init_, _FIELD_TYPE)(f->type, L->sendBox, f, f->sendbuf_gpu_ptr, i);)
     _F_NAME(check_sendrecv_guard_, _FIELD_TYPE)(f);
     _F_NAME(lock_communications_, _FIELD_TYPE)(f);
     _GPU_F_NAME(sync_reduced_, _FIELD_TYPE)(f);

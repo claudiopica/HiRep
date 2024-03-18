@@ -18,6 +18,7 @@
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
 
+#include "Geometry/geometry_type.h"
 #include "Geometry/geometry_indexing.h"
 #include "Geometry/communications.h"
 #include "Geometry/communications_reduced.h"

@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+#include "Geometry/geometry_type.h"
+
 /**
  * @struct geometry_descriptor
  * @brief This struct should contain all information necessary to perform operations
@@ -122,6 +124,9 @@ typedef struct geometry_descriptor {
     int *fuse_mask;
     int fuse_gauge_size;
     int fuse_inner_counter;
+#ifdef WITH_NEW_GEOMETRY
+    gd_type desc;
+#endif
 } geometry_descriptor;
 
 #ifdef __cplusplus

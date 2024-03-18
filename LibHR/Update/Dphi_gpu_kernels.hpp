@@ -11,6 +11,9 @@
 #include "update.h"
 #include "utils.h"
 
+#define SUBBLOCKS 32
+
+#ifndef LARGE_N
 #define DPHI_T_UP_GPU(ix, iy, in, gauge, r, sn, u)        \
     in_spinor_field<REAL>(&((sn).c[0]), (in), (iy), 0);   \
     in_spinor_field<REAL>(&((sn).c[1]), (in), (iy), 2);   \
@@ -155,9 +158,190 @@
     _vector_mul_add_assign_f((r).c[1], -0.5, (sn).c[1]);       \
     _vector_i_mul_sub_assign_f((r).c[3], -0.5, (sn).c[1]);
 
-#define read_reduced(iy, in, sn, piece)                                        \
+#else
+
+#define prefetch_gauge(ix, u_cpx, gauge, tgt_comp, vcomp, idn_gpu)                                      \
+    read_gpu<REAL>(0, &(u_cpx[0]), gauge, ix, NF * tgt_comp + vcomp, 4);                                \
+    read_gpu<REAL>(0, &(u_cpx[2]), gauge, ix, NF * tgt_comp + vcomp + NF * NF, 4);                      \
+    read_gpu<REAL>(0, &(u_cpx[4]), gauge, ix, NF * tgt_comp + vcomp + 2 * NF * NF, 4);                  \
+    read_gpu<REAL>(0, &(u_cpx[6]), gauge, ix, NF * tgt_comp + vcomp + 3 * NF * NF, 4);                  \
+    read_gpu<REAL>(0, &(u_cpx[1]), gauge, idn_gpu[4 * ix], NF * vcomp + tgt_comp, 4);                   \
+    read_gpu<REAL>(0, &(u_cpx[3]), gauge, idn_gpu[4 * ix + 1], NF * vcomp + tgt_comp + NF * NF, 4);     \
+    read_gpu<REAL>(0, &(u_cpx[5]), gauge, idn_gpu[4 * ix + 2], NF * vcomp + tgt_comp + 2 * NF * NF, 4); \
+    read_gpu<REAL>(0, &(u_cpx[7]), gauge, idn_gpu[4 * ix + 3], NF * vcomp + tgt_comp + 3 * NF * NF, 4);
+
+#define write_out(r0, r1, r2, r3, out, ix, tgt_comp)        \
+    _complex_mul(r0, -0.5, r0);                             \
+    _complex_mul(r1, -0.5, r1);                             \
+    _complex_mul(r2, -0.5, r2);                             \
+    _complex_mul(r3, -0.5, r3);                             \
+    write_gpu<REAL>(0, &r0, out, ix, tgt_comp, 1);          \
+    write_gpu<REAL>(0, &r1, out, ix, tgt_comp + NF, 1);     \
+    write_gpu<REAL>(0, &r2, out, ix, tgt_comp + 2 * NF, 1); \
+    write_gpu<REAL>(0, &r3, out, ix, tgt_comp + 3 * NF, 1);
+
+#define DPHI_T_UP_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                            \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);            \
+    _complex_mul_assign(r0, u_cpx[0], sn_cpx0);                                 \
+    _complex_mul_assign(r2, u_cpx[0], sn_cpx0);                                 \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                       \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);            \
+    _complex_mul_assign(r1, u_cpx[0], sn_cpx0);                                 \
+    _complex_mul_assign(r3, u_cpx[0], sn_cpx0);
+
+#ifdef REPR_IS_REAL
+#define DPHI_T_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                            \
+    read_sub_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);        \
+    _complex_mul_assign(r0, (u_cpx[1]), sn_cpx0);                               \
+    _complex_mul_sub_assign(r2, (u_cpx[1]), sn_cpx0);                           \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                       \
+    read_sub_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);        \
+    _complex_mul_assign(r1, (u_cpx[1]), sn_cpx0);                               \
+    _complex_mul_sub_assign(r3, (u_cpx[1]), sn_cpx0);
+#else
+#define DPHI_T_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                            \
+    read_sub_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);        \
+    _complex_mul_assign(r0, conj(u_cpx[1]), sn_cpx0);                           \
+    _complex_mul_sub_assign(r2, conj(u_cpx[1]), sn_cpx0);                       \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                       \
+    read_sub_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);        \
+    _complex_mul_assign(r1, conj(u_cpx[1]), sn_cpx0);                           \
+    _complex_mul_sub_assign(r3, conj(u_cpx[1]), sn_cpx0);
+#endif
+
+#define DPHI_X_UP_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);                   \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                     \
+    _complex_mul_assign(r0, u_cpx[2], sn_cpx0);                                 \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    _complex_mul_assign(r3, u_cpx[2], sn_cpx0);                                 \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);                   \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                \
+    _complex_mul_assign(r1, u_cpx[2], sn_cpx0);                                 \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    _complex_mul_assign(r2, u_cpx[2], sn_cpx0);
+
+#ifdef REPR_IS_REAL
+#define DPHI_X_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);                   \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                     \
+    _complex_mul_assign(r0, (u_cpx[3]), sn_cpx0);                               \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    _complex_mul_assign(r3, (u_cpx[3]), sn_cpx0);                               \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);                   \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                \
+    _complex_mul_assign(r1, (u_cpx[3]), sn_cpx0);                               \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    _complex_mul_assign(r2, (u_cpx[3]), sn_cpx0);
+
+#else
+#define DPHI_X_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);                   \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                     \
+    _complex_mul_assign(r0, conj(u_cpx[3]), sn_cpx0);                           \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    _complex_mul_assign(r3, conj(u_cpx[3]), sn_cpx0);                           \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);                   \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                \
+    _complex_mul_assign(r1, conj(u_cpx[3]), sn_cpx0);                           \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    _complex_mul_assign(r2, conj(u_cpx[3]), sn_cpx0);
+
+#endif
+
+#define DPHI_Y_UP_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                            \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);            \
+    _complex_mul_assign(r0, u_cpx[4], sn_cpx0);                                 \
+    _complex_mul_assign(r3, u_cpx[4], sn_cpx0);                                 \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                       \
+    read_sub_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);        \
+    _complex_mul_assign(r1, u_cpx[4], sn_cpx0);                                 \
+    _complex_mul_sub_assign(r2, u_cpx[4], sn_cpx0);
+
+#ifdef REPR_IS_REAL
+#define DPHI_Y_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                            \
+    read_sub_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);        \
+    _complex_mul_assign(r0, (u_cpx[5]), sn_cpx0);                               \
+    _complex_mul_sub_assign(r3, (u_cpx[5]), sn_cpx0);                           \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                       \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);            \
+    _complex_mul_assign(r1, (u_cpx[5]), sn_cpx0);                               \
+    _complex_mul_assign(r2, (u_cpx[5]), sn_cpx0);
+
+#else
+#define DPHI_Y_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                            \
+    read_sub_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);        \
+    _complex_mul_assign(r0, conj(u_cpx[5]), sn_cpx0);                           \
+    _complex_mul_sub_assign(r3, conj(u_cpx[5]), sn_cpx0);                       \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                       \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);            \
+    _complex_mul_assign(r1, conj(u_cpx[5]), sn_cpx0);                           \
+    _complex_mul_assign(r2, conj(u_cpx[5]), sn_cpx0);
+
+#endif
+
+#define DPHI_Z_UP_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);                   \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                     \
+    _complex_mul_assign(r0, u_cpx[6], sn_cpx0);                                 \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    _complex_mul_assign(r2, u_cpx[6], sn_cpx0);                                 \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);                   \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                \
+    _complex_mul_assign(r1, u_cpx[6], sn_cpx0);                                 \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    _complex_mul_assign(r3, u_cpx[6], sn_cpx0);
+
+#ifdef REPR_IS_REAL
+#define DPHI_Z_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);                   \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                     \
+    _complex_mul_assign(r0, (u_cpx[7]), sn_cpx0);                               \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    _complex_mul_assign(r2, (u_cpx[7]), sn_cpx0);                               \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);                   \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                \
+    _complex_mul_assign(r1, (u_cpx[7]), sn_cpx0);                               \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    _complex_mul_assign(r3, (u_cpx[7]), sn_cpx0);
+
+#else
+#define DPHI_Z_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx) \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 2 * NF, 1);                   \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp, 1);                     \
+    _complex_mul_assign(r0, conj(u_cpx[7]), sn_cpx0);                           \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    _complex_mul_assign(r2, conj(u_cpx[7]), sn_cpx0);                           \
+    read_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + 3 * NF, 1);                   \
+    _complex_i_plus(sn_cpx0, sn_cpx0);                                          \
+    read_assign_gpu<REAL>(0, &(sn_cpx0), in, iy, vcomp + NF, 1);                \
+    _complex_mul_assign(r1, conj(u_cpx[7]), sn_cpx0);                           \
+    _complex_i_minus(sn_cpx0, sn_cpx0);                                         \
+    _complex_mul_assign(r3, conj(u_cpx[7]), sn_cpx0);
+
+#endif
+#endif
+
+#define read_reduced(iy, in, sn, piece, base_in)                               \
     do {                                                                       \
-        const int block_offset = input->base_in[(piece)-1];                    \
+        const int block_offset = base_in;                                      \
         const HSPINOR_TYPE *in_offset = (HSPINOR_TYPE *)((in) + block_offset); \
         const int iy_loc = (iy)-block_offset;                                  \
         read_gpu<REAL>(0, &(sn), in_offset, iy_loc, 0, 1);                     \
@@ -211,212 +395,332 @@
     _vector_mul_add_assign_f(r.c[1], -0.5, sn.c[1]);   \
     _vector_i_mul_sub_assign_f(r.c[3], -0.5, sn.c[1]);
 
+#ifndef LARGE_N
+
 template <typename HSPINOR_TYPE, class REAL, typename COMPLEX, typename SITE_TYPE, typename GAUGE_TYPE>
-__global__ void Dphi_gpu_inner_kernel(kernel_field_input *input) {
-    _KERNEL_PIECE_FOR(piece) {
-        if (input->gd_in & piece) {
-            for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < input->vol_out[piece - 1]; id += gridDim.x * blockDim.x) {
-                int ix = id + input->base_out[piece - 1];
-                SITE_TYPE *out = (SITE_TYPE *)input->field_out;
-                SITE_TYPE *in = ((SITE_TYPE *)input->field_in);
-                GAUGE_TYPE *gauge = (GAUGE_TYPE *)input->gauge;
+__global__ void Dphi_gpu_inner_kernel(SITE_TYPE *in, SITE_TYPE *out, const GAUGE_TYPE *gauge, int vol_in, int vol_out,
+                                      int base_in, int base_out, gd_type piece, char *imask_gpu, int *iup_gpu, int *idn_gpu) {
+    for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < vol_out; id += gridDim.x * blockDim.x) {
+        int ix = id + base_out;
 
-                SITE_TYPE r;
-                HSPINOR_TYPE sn;
-                GAUGE_TYPE u;
+        SITE_TYPE r;
+        HSPINOR_TYPE sn;
+        GAUGE_TYPE u;
 
-                _spinor_zero_f(r);
+        _spinor_zero_f(r);
 
-                /******************************* direction +0 *********************************/
-                if (input->imask_gpu[ix] & T_UP_MASK) {
-                    const int iy = input->iup_gpu[4 * ix];
-                    DPHI_T_UP_GPU(ix, iy, in, gauge, r, sn, u);
-                }
-
-                /******************************* direction -0 *********************************/
-                if (input->imask_gpu[ix] & T_DN_MASK) {
-                    const int iy = input->idn_gpu[4 * ix];
-                    DPHI_T_DN_GPU(ix, iy, in, gauge, r, sn, u);
-                }
-
-                /******************************* direction +1 *********************************/
-                if (input->imask_gpu[ix] & X_UP_MASK) {
-                    const int iy = input->iup_gpu[4 * ix + 1];
-                    DPHI_X_UP_GPU(ix, iy, in, gauge, r, sn, u);
-                }
-
-                /******************************* direction -1 *********************************/
-                if (input->imask_gpu[ix] & X_DN_MASK) {
-                    const int iy = input->idn_gpu[4 * ix + 1];
-                    DPHI_X_DN_GPU(ix, iy, in, gauge, r, sn, u);
-                }
-
-                /******************************* direction +2 *********************************/
-                if (input->imask_gpu[ix] & Y_UP_MASK) {
-                    const int iy = input->iup_gpu[4 * ix + 2];
-                    DPHI_Y_UP_GPU(ix, iy, in, gauge, r, sn, u);
-                }
-
-                /******************************* direction -2 *********************************/
-                if (input->imask_gpu[ix] & Y_DN_MASK) {
-                    const int iy = input->idn_gpu[4 * ix + 2];
-                    DPHI_Y_DN_GPU(ix, iy, in, gauge, r, sn, u);
-                }
-
-                /******************************* direction +3 *********************************/
-                if (input->imask_gpu[ix] & Z_UP_MASK) {
-                    const int iy = input->iup_gpu[4 * ix + 3];
-                    DPHI_Z_UP_GPU(ix, iy, in, gauge, r, sn, u);
-                }
-
-                /******************************* direction -3 *********************************/
-                if (input->imask_gpu[ix] & Z_DN_MASK) {
-                    const int iy = input->idn_gpu[4 * ix + 3];
-                    DPHI_Z_DN_GPU(ix, iy, in, gauge, r, sn, u);
-                }
-
-                write_out_spinor_field<REAL>(&r, out, ix);
-            }
+        /******************************* direction +0 *********************************/
+        if (imask_gpu[ix] & T_UP_MASK) {
+            const int iy = iup_gpu[4 * ix];
+            DPHI_T_UP_GPU(ix, iy, in, gauge, r, sn, u);
         }
+
+        /******************************* direction -0 *********************************/
+        if (imask_gpu[ix] & T_DN_MASK) {
+            const int iy = idn_gpu[4 * ix];
+            DPHI_T_DN_GPU(ix, iy, in, gauge, r, sn, u);
+        }
+
+        /******************************* direction +1 *********************************/
+        if (imask_gpu[ix] & X_UP_MASK) {
+            const int iy = iup_gpu[4 * ix + 1];
+            DPHI_X_UP_GPU(ix, iy, in, gauge, r, sn, u);
+        }
+
+        /******************************* direction -1 *********************************/
+        if (imask_gpu[ix] & X_DN_MASK) {
+            const int iy = idn_gpu[4 * ix + 1];
+            DPHI_X_DN_GPU(ix, iy, in, gauge, r, sn, u);
+        }
+
+        /******************************* direction +2 *********************************/
+        if (imask_gpu[ix] & Y_UP_MASK) {
+            const int iy = iup_gpu[4 * ix + 2];
+            DPHI_Y_UP_GPU(ix, iy, in, gauge, r, sn, u);
+        }
+
+        /******************************* direction -2 *********************************/
+        if (imask_gpu[ix] & Y_DN_MASK) {
+            const int iy = idn_gpu[4 * ix + 2];
+            DPHI_Y_DN_GPU(ix, iy, in, gauge, r, sn, u);
+        }
+
+        /******************************* direction +3 *********************************/
+        if (imask_gpu[ix] & Z_UP_MASK) {
+            const int iy = iup_gpu[4 * ix + 3];
+            DPHI_Z_UP_GPU(ix, iy, in, gauge, r, sn, u);
+        }
+
+        /******************************* direction -3 *********************************/
+        if (imask_gpu[ix] & Z_DN_MASK) {
+            const int iy = idn_gpu[4 * ix + 3];
+            DPHI_Z_DN_GPU(ix, iy, in, gauge, r, sn, u);
+        }
+
+        write_out_spinor_field<REAL>(&r, out, ix);
     }
 }
 
-// Cannot run two boundary kernels at the same time -> race condition
-template <typename HSPINOR_TYPE, class REAL, typename SITE_TYPE, typename GAUGE_TYPE>
-__global__ void Dphi_gpu_boundary_kernel(kernel_field_input *input) {
-    _KERNEL_PIECE_FOR(piece) {
-        if (input->gd_in & piece) {
-            for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < input->vol_in[piece - 1]; id += gridDim.x * blockDim.x) {
-                int ix = 0;
-                int iy = id + input->base_in[piece - 1];
+#else
 
-                SITE_TYPE *out = (SITE_TYPE *)input->field_out;
-                SITE_TYPE *in = (SITE_TYPE *)input->field_in;
+template <typename HSPINOR_TYPE, class REAL, typename COMPLEX, typename SITE_TYPE, typename GAUGE_TYPE>
+__global__ void Dphi_gpu_inner_kernel(SITE_TYPE *in, SITE_TYPE *out, const GAUGE_TYPE *gauge, int vol_in, int vol_out,
+                                      int base_in, int base_out, gd_type piece, char *imask_gpu, int *iup_gpu, int *idn_gpu) {
+    for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < vol_out * NF; id += gridDim.x * blockDim.x) {
+        // This might degrade performance for unusually sized lattices
+        int divider = SUBBLOCKS;
+        while (vol_out % divider != 0) {
+            divider--;
+        }
 
-                SITE_TYPE r;
-                HSPINOR_TYPE sn;
-                GAUGE_TYPE u;
+        const int ix = id % divider + (id / (divider * NF)) * divider + base_out;
+        const int tgt_comp = (id / divider) % NF;
 
-                _spinor_zero_f(r);
+        COMPLEX sn_cpx0;
+#ifdef REPR_IS_REAL
+        REAL u_cpx[8];
+#else
+        COMPLEX u_cpx[8];
+#endif
+        COMPLEX r0, r1, r2, r3;
+        _complex_0(r0);
+        _complex_0(r1);
+        _complex_0(r2);
+        _complex_0(r3);
 
-                /******************************* direction +0 *********************************/
-                if (input->mask & T_UP_MASK) {
-                    ix = find_neighbor(input, iy, DOWN, 0);
-                    read_reduced(iy, in, sn, piece);
-                    DPHI_RED_T_UP_GPU(r, sn);
-                }
+        for (int vcomp = 0; vcomp < NF; vcomp++) {
+            prefetch_gauge(ix, u_cpx, gauge, tgt_comp, vcomp, idn_gpu);
 
-                /******************************* direction -0 *********************************/
-                if (input->mask & T_DN_MASK) {
-                    ix = find_neighbor(input, iy, UP, 0);
-                    read_reduced(iy, in, sn, piece);
-                    DPHI_RED_T_DN_GPU(r, sn);
-                }
+            /******************************* direction +0 *********************************/
+            if (imask_gpu[ix] & T_UP_MASK) {
+                const int iy = iup_gpu[4 * ix];
+                DPHI_T_UP_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx);
+            }
 
-                /******************************* direction +1 *********************************/
-                if (input->mask & X_UP_MASK) {
-                    ix = find_neighbor(input, iy, DOWN, 1);
-                    read_reduced(iy, in, sn, piece);
-                    DPHI_RED_X_UP_GPU(r, sn);
-                }
+            /******************************* direction -0 *********************************/
+            if (imask_gpu[ix] & T_DN_MASK) {
+                const int iy = idn_gpu[4 * ix];
+                DPHI_T_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx);
+            }
 
-                /******************************* direction -1 *********************************/
-                if (input->mask & X_DN_MASK) {
-                    ix = find_neighbor(input, iy, UP, 1);
-                    read_reduced(iy, in, sn, piece);
-                    DPHI_RED_X_DN_GPU(r, sn);
-                }
+            /******************************* direction +1 *********************************/
+            if (imask_gpu[ix] & X_UP_MASK) {
+                const int iy = iup_gpu[4 * ix + 1];
+                DPHI_X_UP_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx);
+            }
 
-                /******************************* direction +2 *********************************/
-                if (input->mask & Y_UP_MASK) {
-                    ix = find_neighbor(input, iy, DOWN, 2);
-                    read_reduced(iy, in, sn, piece);
-                    DPHI_RED_Y_UP_GPU(r, sn);
-                }
+            /******************************* direction -1 *********************************/
+            if (imask_gpu[ix] & X_DN_MASK) {
+                const int iy = idn_gpu[4 * ix + 1];
+                DPHI_X_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx);
+            }
 
-                /******************************* direction -2 *********************************/
-                if (input->mask & Y_DN_MASK) {
-                    ix = find_neighbor(input, iy, UP, 2);
-                    read_reduced(iy, in, sn, piece);
-                    DPHI_RED_Y_DN_GPU(r, sn);
-                }
+            /******************************* direction +2 *********************************/
+            if (imask_gpu[ix] & Y_UP_MASK) {
+                const int iy = iup_gpu[4 * ix + 2];
+                DPHI_Y_UP_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx);
+            }
 
-                /******************************* direction +3 *********************************/
-                if (input->mask & Z_UP_MASK) {
-                    ix = find_neighbor(input, iy, DOWN, 3);
-                    read_reduced(iy, in, sn, piece);
-                    DPHI_RED_Z_UP_GPU(r, sn);
-                }
+            /******************************* direction -2 *********************************/
+            if (imask_gpu[ix] & Y_DN_MASK) {
+                const int iy = idn_gpu[4 * ix + 2];
+                DPHI_Y_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx);
+            }
 
-                /******************************* direction -3 *********************************/
-                if (input->mask & Z_DN_MASK) {
-                    ix = find_neighbor(input, iy, UP, 3);
-                    read_reduced(iy, in, sn, piece);
-                    DPHI_RED_Z_DN_GPU(r, sn);
-                }
+            /******************************* direction +3 *********************************/
+            if (imask_gpu[ix] & Z_UP_MASK) {
+                const int iy = iup_gpu[4 * ix + 3];
+                DPHI_Z_UP_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx);
+            }
 
-                write_assign_gpu<REAL>(0, &r, out, ix, 0, 1);
+            /******************************* direction -3 *********************************/
+            if (imask_gpu[ix] & Z_DN_MASK) {
+                const int iy = idn_gpu[4 * ix + 3];
+                DPHI_Z_DN_GPU(ix, iy, vcomp, in, gauge, r0, r1, r2, r3, sn_cpx0, u_cpx);
             }
         }
+
+        write_out(r0, r1, r2, r3, out, ix, tgt_comp);
+    }
+}
+#endif
+
+// Cannot run two boundary kernels at the same time -> race condition
+template <typename HSPINOR_TYPE, class REAL, typename SITE_TYPE, typename GAUGE_TYPE>
+__global__ void Dphi_gpu_boundary_kernel(SITE_TYPE *in, SITE_TYPE *out, const GAUGE_TYPE *gauge, int vol_in, int vol_out,
+                                         int base_in, int base_out, gd_type piece, char mask, int *iup_gpu, int *idn_gpu) {
+    for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < vol_in; id += gridDim.x * blockDim.x) {
+        int ix = 0;
+        int iy = id + base_in;
+
+        SITE_TYPE r;
+        HSPINOR_TYPE sn;
+        GAUGE_TYPE u;
+
+        _spinor_zero_f(r);
+
+        /******************************* direction +0 *********************************/
+        if (mask & T_UP_MASK) {
+            ix = find_neighbor(iy, DOWN, 0, iup_gpu, idn_gpu);
+            read_reduced(iy, in, sn, piece, base_in);
+            DPHI_RED_T_UP_GPU(r, sn);
+        }
+
+        /******************************* direction -0 *********************************/
+        if (mask & T_DN_MASK) {
+            ix = find_neighbor(iy, UP, 0, iup_gpu, idn_gpu);
+            read_reduced(iy, in, sn, piece, base_in);
+            DPHI_RED_T_DN_GPU(r, sn);
+        }
+
+        /******************************* direction +1 *********************************/
+        if (mask & X_UP_MASK) {
+            ix = find_neighbor(iy, DOWN, 1, iup_gpu, idn_gpu);
+            read_reduced(iy, in, sn, piece, base_in);
+            DPHI_RED_X_UP_GPU(r, sn);
+        }
+
+        /******************************* direction -1 *********************************/
+        if (mask & X_DN_MASK) {
+            ix = find_neighbor(iy, UP, 1, iup_gpu, idn_gpu);
+            read_reduced(iy, in, sn, piece, base_in);
+            DPHI_RED_X_DN_GPU(r, sn);
+        }
+
+        /******************************* direction +2 *********************************/
+        if (mask & Y_UP_MASK) {
+            ix = find_neighbor(iy, DOWN, 2, iup_gpu, idn_gpu);
+            read_reduced(iy, in, sn, piece, base_in);
+            DPHI_RED_Y_UP_GPU(r, sn);
+        }
+
+        /******************************* direction -2 *********************************/
+        if (mask & Y_DN_MASK) {
+            ix = find_neighbor(iy, UP, 2, iup_gpu, idn_gpu);
+            read_reduced(iy, in, sn, piece, base_in);
+            DPHI_RED_Y_DN_GPU(r, sn);
+        }
+
+        /******************************* direction +3 *********************************/
+        if (mask & Z_UP_MASK) {
+            ix = find_neighbor(iy, DOWN, 3, iup_gpu, idn_gpu);
+            read_reduced(iy, in, sn, piece, base_in);
+            DPHI_RED_Z_UP_GPU(r, sn);
+        }
+
+        /******************************* direction -3 *********************************/
+        if (mask & Z_DN_MASK) {
+            ix = find_neighbor(iy, UP, 3, iup_gpu, idn_gpu);
+            read_reduced(iy, in, sn, piece, base_in);
+            DPHI_RED_Z_DN_GPU(r, sn);
+        }
+
+        write_assign_gpu<REAL>(0, &r, out, ix, 0, 1);
     }
 }
 
 #ifdef WITH_CLOVER
-template <typename VECTOR_TYPE, class REAL, typename SITE_TYPE>
+template <typename VECTOR_TYPE, class REAL, typename COMPLEX, typename SITE_TYPE>
 __global__ void Cphi_gpu_kernel_(SITE_TYPE *dptr, SITE_TYPE *sptr, suNfc *cl_term, double mass, int assign, int N,
                                  int block_start) {
-    for (int ix = blockIdx.x * blockDim.x + threadIdx.x; ix < N; ix += gridDim.x * blockDim.x) {
-        VECTOR_TYPE v1, v2;
-        VECTOR_TYPE s0, s1, out;
-        suNfc cl_0, cl_1;
-
-        read_gpu<REAL>(0, &s0, sptr, ix, 0, 1);
-        read_gpu<REAL>(0, &s1, sptr, ix, 1, 1);
-        read_gpu<double>(0, &cl_0, cl_term, ix, 0, 4);
-        read_gpu<double>(0, &cl_1, cl_term, ix, 1, 4);
-        _suNfc_multiply(v1, cl_0, s0);
-        _suNfc_multiply(v2, cl_1, s1);
-        _vector_add_f(v1, v1, v2);
-        _vector_mul_add_assign_f(v1, mass, s0);
-        if (assign) {
-            read_gpu<REAL>(0, &out, dptr, ix, 0, 1);
-            _vector_add_assign_f(v1, out);
+    for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < N * NF * 4; id += gridDim.x * blockDim.x) {
+        const int dir = id / (N * NF);
+        const int id2 = id % (N * NF);
+        int divider = SUBBLOCKS;
+        while (N % divider != 0) {
+            divider--;
         }
-        write_gpu<REAL>(0, &v1, dptr, ix, 0, 1);
+        const int tgt_comp = (id2 / divider) % NF;
+        const int ix = id2 % divider + (id2 / (divider * NF)) * divider;
 
-        _suNfc_inverse_multiply(v1, cl_1, s0);
-        _suNfc_multiply(v2, cl_0, s1);
-        _vector_sub_f(v1, v1, v2);
-        _vector_mul_add_assign_f(v1, mass, s1);
-        if (assign) {
-            read_gpu<REAL>(0, &out, dptr, ix, 1, 1);
-            _vector_add_assign_f(v1, out);
-        }
-        write_gpu<REAL>(0, &v1, dptr, ix, 1, 1);
+        COMPLEX v1, v2, v3;
+        COMPLEX s0, s1, out;
+        COMPLEX cl_0, cl_1;
 
-        read_gpu<REAL>(0, &s0, sptr, ix, 2, 1);
-        read_gpu<REAL>(0, &s1, sptr, ix, 3, 1);
-        read_gpu<double>(0, &cl_0, cl_term, ix, 2, 4);
-        read_gpu<double>(0, &cl_1, cl_term, ix, 3, 4);
-        _suNfc_multiply(v1, cl_0, s0);
-        _suNfc_multiply(v2, cl_1, s1);
-        _vector_add_f(v1, v1, v2);
-        _vector_mul_add_assign_f(v1, mass, s0);
-        if (assign) {
-            read_gpu<REAL>(0, &out, dptr, ix, 2, 1);
-            _vector_add_assign_f(v1, out);
-        }
-        write_gpu<REAL>(0, &v1, dptr, ix, 2, 1);
+        if (dir == 0) {
+            v3 = 0.0;
 
-        _suNfc_inverse_multiply(v1, cl_1, s0);
-        _suNfc_multiply(v2, cl_0, s1);
-        _vector_sub_f(v1, v1, v2);
-        _vector_mul_add_assign_f(v1, mass, s1);
-        if (assign) {
-            read_gpu<REAL>(0, &out, dptr, ix, 3, 1);
-            _vector_add_assign_f(v1, out);
+            for (int vcomp = 0; vcomp < NF; vcomp++) {
+                read_gpu<REAL>(0, &s0, sptr, ix, vcomp, 1);
+                read_gpu<REAL>(0, &s1, sptr, ix, vcomp + NF, 1);
+                read_gpu<double>(0, &cl_0, cl_term, ix, NF * tgt_comp + vcomp, 4);
+                read_gpu<double>(0, &cl_1, cl_term, ix, NF * tgt_comp + vcomp + NF * NF, 4);
+                v1 = cl_0 * s0;
+                v2 = cl_1 * s1;
+                v3 += v1 + v2;
+                if (vcomp == tgt_comp) { v3 += mass * s0; }
+            }
+
+            if (assign) {
+                write_assign_gpu<REAL>(0, &v3, dptr, ix, tgt_comp, 1);
+            } else {
+                write_gpu<REAL>(0, &v3, dptr, ix, tgt_comp, 1);
+            }
         }
-        write_gpu<REAL>(0, &v1, dptr, ix, 3, 1);
+
+        if (dir == 1) {
+            v3 = 0.0;
+
+            for (int vcomp = 0; vcomp < NF; vcomp++) {
+                // this reread might not be ideal
+                read_gpu<REAL>(0, &s0, sptr, ix, vcomp, 1);
+                read_gpu<REAL>(0, &s1, sptr, ix, vcomp + NF, 1);
+                read_gpu<double>(0, &cl_0, cl_term, ix, NF * tgt_comp + vcomp, 4);
+                read_gpu<double>(0, &cl_1, cl_term, ix, NF * vcomp + tgt_comp + NF * NF, 4);
+                v1 = conj(cl_1) * s0;
+                v2 = cl_0 * s1;
+                v3 += (v1 - v2);
+                if (vcomp == tgt_comp) { v3 += mass * s1; }
+            }
+
+            if (assign) {
+                write_assign_gpu<REAL>(0, &v3, dptr, ix, tgt_comp + NF, 1);
+            } else {
+                write_gpu<REAL>(0, &v3, dptr, ix, tgt_comp + NF, 1);
+            }
+        }
+
+        if (dir == 2) {
+            v3 = 0.0;
+
+            for (int vcomp = 0; vcomp < NF; vcomp++) {
+                read_gpu<REAL>(0, &s0, sptr, ix, vcomp + 2 * NF, 1);
+                read_gpu<REAL>(0, &s1, sptr, ix, vcomp + 3 * NF, 1);
+                read_gpu<double>(0, &cl_0, cl_term, ix, NF * tgt_comp + vcomp + 2 * NF * NF, 4);
+                read_gpu<double>(0, &cl_1, cl_term, ix, NF * tgt_comp + vcomp + 3 * NF * NF, 4);
+                v1 = cl_0 * s0;
+                v2 = cl_1 * s1;
+                v3 += v1 + v2;
+                if (vcomp == tgt_comp) { v3 += mass * s0; }
+            }
+
+            if (assign) {
+                write_assign_gpu<REAL>(0, &v3, dptr, ix, tgt_comp + 2 * NF, 1);
+            } else {
+                write_gpu<REAL>(0, &v3, dptr, ix, tgt_comp + 2 * NF, 1);
+            }
+        }
+
+        if (dir == 3) {
+            v3 = 0.0;
+
+            for (int vcomp = 0; vcomp < NF; vcomp++) {
+                read_gpu<REAL>(0, &s0, sptr, ix, vcomp + 2 * NF, 1);
+                read_gpu<REAL>(0, &s1, sptr, ix, vcomp + 3 * NF, 1);
+                read_gpu<double>(0, &cl_0, cl_term, ix, NF * tgt_comp + vcomp + 2 * NF * NF, 4);
+                read_gpu<double>(0, &cl_1, cl_term, ix, NF * vcomp + tgt_comp + 3 * NF * NF, 4);
+                v1 = conj(cl_1) * s0;
+                v2 = cl_0 * s1;
+                v3 += (v1 - v2);
+                if (vcomp == tgt_comp) { v3 += mass * s1; }
+            }
+
+            if (assign) {
+                write_assign_gpu<REAL>(0, &v3, dptr, ix, tgt_comp + 3 * NF, 1);
+            } else {
+                write_gpu<REAL>(0, &v3, dptr, ix, tgt_comp + 3 * NF, 1);
+            }
+        }
     }
 }
 

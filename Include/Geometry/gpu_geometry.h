@@ -35,7 +35,8 @@
 #define _BUF_GPU_4FIELD_BLK(s, i) (((s)->gpu_ptr) + 4 * ((s)->type->rbuf_start[(i)] - (s)->type->master_shift))
 #define _BUF_GPU_DFIELD_BLK(s, i, size) (((s)->gpu_ptr) + size * ((s)->type->rbuf_start[(i)] - (s)->type->master_shift))
 
-#define find_neighbor(input, _ix, _dir, _mu) ((_dir == UP) ? input->iup_gpu[4 * (_ix) + _mu] : input->idn_gpu[4 * (_ix) + _mu])
+#define find_neighbor(_ix, _dir, _mu, _iup_gpu, _idn_gpu) \
+    ((_dir == UP) ? (_iup_gpu)[4 * (_ix) + _mu] : (_idn_gpu)[4 * (_ix) + _mu])
 #define _DIR(MASK) ((MASK & UP_MASK) ? UP : DOWN)
 #define _MU(MASK) ((MASK & T_MASK) ? 0 : (MASK & X_MASK) ? 1 : (MASK & Y_MASK) ? 2 : 3)
 
@@ -68,7 +69,7 @@ typedef struct _kernel_field_input {
     int *iup_gpu;
     int *idn_gpu;
     char *imask_gpu;
-    enum gd_type gd_in;
+    gd_type gd_in;
     char mask;
 } kernel_field_input;
 
