@@ -18,7 +18,7 @@ struct __align__(16) quad_double {
     }
 
     // Maybe we need to add the compensation term of the added variable?
-    visible inline __attribute__((always_inline)) quad_double operator+(const quad_double &x) {
+    visible inline __attribute__((always_inline)) quad_double operator+(const quad_double &x) const {
         double new_val = val;
         double new_compensation = compensation;
         _2Sum_acc(new_val, new_compensation, x.val);
