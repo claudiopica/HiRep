@@ -124,7 +124,7 @@ int setup_process(int *argc, char ***argv) {
 #ifdef WITH_MPI
     /* INIT MPI*/
     int mpiret;
-    int required = MPI_THREAD_FUNNELED;
+    int required = MPI_THREAD_SERIALIZED;
 
     int provided;
     mpiret = MPI_Init_thread(argc, argv, required, &provided);
@@ -135,8 +135,10 @@ int setup_process(int *argc, char ***argv) {
         lprintf("MPI", 0, "ERROR: %s\n", mesg);
         error(1, 1, "setup_process " __FILE__, "MPI inizialization failed");
     }
-    error(provided < MPI_THREAD_FUNNELED, 1, "setup_process " __FILE__,
+    error(provided < MPI_THREAD_SERIALIZED, 1, "setup_process " __FILE__,
           "MPI inizialization failed, The threading support level is lesser than that demanded.\n");
+
+    init_hr_comms();
 
     MPI_Comm_rank(MPI_COMM_WORLD, &MPI_PID);
     MPI_Comm_size(MPI_COMM_WORLD, &MPI_WORLD_SIZE);
@@ -258,14 +260,15 @@ void finalize_process() {
     // #ifndef WITH_NEW_GEOMETRY
     //   free_geometry_mpi_eo();
     // #endif
-    lprintf("SYSTEM", 0, "Process finalized.\n");
 
 #ifdef WITH_MPI
+    finalize_hr_comms();
     /* MPI variables */
     int init;
     MPI_Initialized(&init);
     if (init) { MPI_Finalize(); }
 #endif
+    lprintf("SYSTEM", 0, "Process finalized.\n");
 }
 
 /* setup_replicas
