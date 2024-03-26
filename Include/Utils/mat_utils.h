@@ -13,7 +13,7 @@ extern "C" {
 
 //inv_Cmplx_Ng.c
 #ifndef GAUGE_SON
-visible void ludcmp(hr_complex *a, int *indx, double *d, int N);
+visible void ludcmp(hr_complex *a, int *indx, double *d);
 visible void lubksb(hr_complex *a, int *indx, hr_complex *b, int N);
 visible void inv_Cmplx_Ng(suNg *a);
 #endif

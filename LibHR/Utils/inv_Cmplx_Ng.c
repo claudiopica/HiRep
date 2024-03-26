@@ -40,7 +40,7 @@ visible void inv_Cmplx_Ng(suNg *a) {
     double d;
     int i, j;
     b = *a;
-    ludcmp(b.c, indx, &d, NG);
+    ludcmp(b.c, indx, &d);
     for (j = 0; j < NG; j++) {
         for (i = 0; i < NG; i++) {
             _complex_0(col[i]);
@@ -55,17 +55,17 @@ visible void inv_Cmplx_Ng(suNg *a) {
 
 #endif
 
-visible void ludcmp(hr_complex *a, int *indx, double *d, int N) {
+visible void ludcmp(hr_complex *a, int *indx, double *d) {
     const double tiny = 1.0e-20;
     int i, j, k, imax;
     double big, tmp, dum;
-    double *vv = (double *)malloc(N * sizeof(double));
+    double vv[NG];
     hr_complex ctmp, csum;
     *d = 1;
-    for (j = 0; j < N; ++j) {
+    for (j = 0; j < NG; ++j) {
         big = 0;
-        for (i = 0; i < N; ++i) {
-            tmp = _complex_prod_re(a[j * N + i], a[j * N + i]);
+        for (i = 0; i < NG; ++i) {
+            tmp = _complex_prod_re(a[j * NG + i], a[j * NG + i]);
             if (tmp > big) { big = tmp; }
         }
 #ifndef WITH_GPU
@@ -74,24 +74,24 @@ visible void ludcmp(hr_complex *a, int *indx, double *d, int N) {
         vv[j] = 1 / sqrt(big);
     }
     imax = 0;
-    for (j = 0; j < N; j++) { //Loop ower columns Crout's method
+    for (j = 0; j < NG; j++) { //Loop ower columns Crout's method
         //Calculate upper triangular matrix
         for (i = 0; i < j; i++) {
-            csum = a[i * N + j];
+            csum = a[i * NG + j];
             for (k = 0; k < i; k++) {
-                csum -= a[i * N + k] * a[k * N + j];
+                csum -= a[i * NG + k] * a[k * NG + j];
             }
-            a[i * N + j] = csum;
+            a[i * NG + j] = csum;
         }
         //Calculate lower triangular matrix and
         // find the largest pivot element
         big = 0;
-        for (i = j; i < N; ++i) {
-            csum = a[i * N + j];
+        for (i = j; i < NG; ++i) {
+            csum = a[i * NG + j];
             for (k = 0; k < j; ++k) {
-                csum -= a[i * N + k] * a[k * N + j];
+                csum -= a[i * NG + k] * a[k * NG + j];
             }
-            a[i * N + j] = csum;
+            a[i * NG + j] = csum;
             dum = sqrt(_complex_prod_re(csum, csum));
             dum *= vv[i];
             if (dum >= big) {
@@ -100,28 +100,27 @@ visible void ludcmp(hr_complex *a, int *indx, double *d, int N) {
             }
         }
         if (j != imax) { //Do we need to interchage rows
-            for (k = 0; k < N; ++k) {
-                ctmp = a[imax * N + k];
-                a[imax * N + k] = a[j * N + k];
-                a[j * N + k] = ctmp;
+            for (k = 0; k < NG; ++k) {
+                ctmp = a[imax * NG + k];
+                a[imax * NG + k] = a[j * NG + k];
+                a[j * NG + k] = ctmp;
             }
             *d = -*d;
             vv[imax] = vv[j];
         }
         indx[j] = imax;
 
-        tmp = sqrt(_complex_prod_re(a[j * N + j], a[j * N + j]));
-        if (tmp == 0) { a[j * N + j] = tiny; }
+        tmp = sqrt(_complex_prod_re(a[j * NG + j], a[j * NG + j]));
+        if (tmp == 0) { a[j * NG + j] = tiny; }
 
         //Divide by pivot element
-        if (j != N - 1) {
-            _complex_inv(csum, a[j * N + j]);
-            for (int i1 = j + 1; i1 < N; ++i1) {
-                a[i1 * N + j] = csum * a[i1 * N + j];
+        if (j != NG - 1) {
+            _complex_inv(csum, a[j * NG + j]);
+            for (int i1 = j + 1; i1 < NG; ++i1) {
+                a[i1 * NG + j] = csum * a[i1 * NG + j];
             }
         }
     }
-    free(vv);
 }
 
 visible void lubksb(hr_complex *a, int *indx, hr_complex *b, int N) {
