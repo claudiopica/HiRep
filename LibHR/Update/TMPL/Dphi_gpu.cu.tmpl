@@ -186,10 +186,13 @@ _DECLARE(static void, Dphi_inner_init, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
     enum gd_type gd_t;
     if (in->type == &glattice) {
         gd_t = GLOBAL;
+        _VAR(MVMcounter, _SUFFIX) += 2;
     } else if (in->type == &glat_odd) {
         gd_t = ODD;
+        _VAR(MVMcounter, _SUFFIX)++;
     } else if (in->type == &glat_even) {
         gd_t = EVEN;
+        _VAR(MVMcounter, _SUFFIX)++;
     }
 
     const _GAUGE_TYPE *gauge = GFIELD(u_gauge_f, _REP_SUFFIX)->gpu_ptr;
