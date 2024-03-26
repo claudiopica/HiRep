@@ -1,0 +1,15 @@
+digraph "Geometry"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  compound=true
+  subgraph clusterdir_8d9c9bab54275f7223e972448cc224a9 {
+    graph [ bgcolor="#daedff", pencolor="grey25", style="filled,dashed,", label="LibHR", fontname="Helvetica", fontsize="10", URL="dir_8d9c9bab54275f7223e972448cc224a9.html"]
+  dir_59539e0497069495010ff976c201df9d [shape=box, label="Geometry", style="filled,bold,", fillcolor="#daedff", color="grey25", URL="dir_59539e0497069495010ff976c201df9d.html"];
+  }
+  dir_856524284ebe840938865dc061f982fb [shape=box, label="Include", style="", fillcolor="#daedff", color="red", URL="dir_856524284ebe840938865dc061f982fb.html"];
+  dir_59539e0497069495010ff976c201df9d->dir_856524284ebe840938865dc061f982fb [headlabel="18", labeldistance=1.5 headhref="dir_000006_000007.html"];
+}

@@ -1,0 +1,11 @@
+digraph "field_scalar_par"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  Node1 [label="field_scalar_par",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" field\nmomenta" ,fontname="Helvetica"];
+  Node2 [label="suNg_scalar_field",height=0.2,width=0.4,color="red",URL="$d6/d10/structsuNg__scalar__field.html",tooltip="SU(N_g) scalar field of SU(N_g) vectors."];
+}

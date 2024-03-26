@@ -1,0 +1,17 @@
+digraph "remez"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  compound=true
+  subgraph clusterdir_96cea3264d8327c0d8fc46bc059f8987 {
+    graph [ bgcolor="#daedff", pencolor="grey50", style="filled,dashed,", label="Update", fontname="Helvetica", fontsize="10", URL="dir_96cea3264d8327c0d8fc46bc059f8987.html"]
+  subgraph clusterdir_6d485c649c77e77e35abccf2d7323a20 {
+    graph [ bgcolor="#daedff", pencolor="grey25", style="filled,bold,", label="", fontname="Helvetica", fontsize="10", URL="dir_6d485c649c77e77e35abccf2d7323a20.html"]
+    dir_6d485c649c77e77e35abccf2d7323a20 [shape=plaintext, label="remez"];
+  dir_8df947763f7c33a95037fe4f07f4ee24 [shape=box, label="Zolotarev", style="filled,", fillcolor="#4ea9ff", color="grey25", URL="dir_8df947763f7c33a95037fe4f07f4ee24.html"];
+  }
+  }
+}
