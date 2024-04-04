@@ -92,6 +92,7 @@ static unsigned long int _VAR(MVMcounter, _SUFFIX) = 0;
  */
 _DECLARE(unsigned long int, getMVM, ()) {
     unsigned long int res = _VAR(MVMcounter, _SUFFIX) >> 1; /* divide by two */
+    _VAR(MVMcounter, _SUFFIX) = 0;
     return res;
 }
 
@@ -155,6 +156,8 @@ _DECLARE(static void, init_Dirac, ()) {
  */
 _DECLARE(static void, Dphi_inner, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
     const gd_type gd_t = in->type->desc;
+    if (gd_t & EVEN) { _VAR(MVMcounter, _SUFFIX)++; }
+    if (gd_t & ODD) { _VAR(MVMcounter, _SUFFIX)++; }
 
 #ifdef LARGE_N
     int grid = (max(boxEvenVolume(geometryBoxes) * NF, boxOddVolume(geometryBoxes) * NF) - 1) / BLOCK_SIZE_DIRAC + 1;
