@@ -33,3 +33,19 @@ jobs:
         nc: ${{ matrix.nc }}
         repr: ${{ matrix.repr }}
         ecsw: ${{ matrix.ecsw }}
+
+    - uses: ./.github/actions/runtests
+      with:
+        dir: Utils
+        mpi: -no-mpi
+        simd: --vect
+        nc: ${{ matrix.nc }}
+        repr: ${{ matrix.repr }}
+
+    - uses: ./.github/actions/runtests
+      with:
+        dir: Utils
+        mpi: -no-mpi
+        simd: --avx2
+        nc: ${{ matrix.nc }}
+        repr: ${{ matrix.repr }}
