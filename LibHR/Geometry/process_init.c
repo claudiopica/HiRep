@@ -203,6 +203,14 @@ int setup_process(int *argc, char ***argv)
     return 0;
   }
 
+#ifdef AVX2_HIREP
+    lprintf("SYSTEM", 0, "AVX2 support enabled\n");
+#endif
+
+#ifdef SIMD_VECTOR_HIREP
+    lprintf("SYSTEM", 0, "SIMD VECTORIZATION support enabled\n");
+#endif
+
   setup_random();
 
   return 0;

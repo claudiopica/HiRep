@@ -1,4 +1,4 @@
-NG = 3
+NG = 2
 REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
@@ -46,23 +46,29 @@ MACRO += -DIO_FLUSH
 #MACRO += -DAMALLOC_MEASURE
 #MACRO += -DMEASURE_FORCE
 #MACRO += -DWITH_UNTESTED
-MACRO += -DAVX2_HIREP
+#MACRO += -DSIMD_VECTOR_HIREP
+#MACRO += -DAVX2_HIREP
 #Compiler
-#CFLAGS = -Wall -Wshadow -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
-CFLAGS = -Wall -Wshadow -std=c99 -O2 -march=core-avx2 -mtune=core-avx2 -Wfatal-errors -Werror -fopenmp #-g
-#CFLAGS = -Wall -Wshadow -std=c99 -O3  #-fopenmp #-g #-march=core-avx2 -mtune=core-avx2 -g
-#CFLAGS = -Wall -Wshadow -std=c99 -O3 -fopenmp=libomp
-#CFLAGS = -Wall -Wshadow -std=c99 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
+#CFLAGS = -Wall -Wshadow -std=c11 -O3 -fomit-frame-pointer -msse -msse2 
+CFLAGS = -Wall -Wshadow -std=c11 -O3 -march=core-avx2 -mtune=core-avx2  #-fopenmp #-g
+#CFLAGS = -Wall -Wshadow -std=c11 -O3  #-fopenmp #-g #-march=core-avx2 -mtune=core-avx2 -g
+#CFLAGS = -Wall -Wshadow -std=c11 -O3 -fopenmp=libomp
+#CFLAGS = -Wall -Wshadow -std=c11 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
 
 #CC = gcc-11
 #MPICC = /opt/local/bin/mpicc
 #LDFLAGS = -L /opt/local/lib/mpich-mp/ -L /opt/local/lib/ -fopenmp #-l efence
 #INCLUDE = -I /opt/local/include/mpich-mp/ -I /opt/local/include/  -I /usr/include
+CC = /opt/local/bin/gcc-mp-13
+MPICC = /opt/local/bin/mpicc-mpich-gcc13
+LDFLAGS = #-fopenmp #-l efence
+INCLUDE = -I /opt/local/include -I /opt/local/include/gcc13 -I /opt/local/include/mpich-gcc13/
 
-CC = /opt/local/bin/gcc-mp-11
-MPICC = /opt/local/bin/mpicc-openmpi-gcc11
-LDFLAGS = -fopenmp #-l efence
-INCLUDE = -I /opt/local/include/gcc11 -I /opt/local/include/libomp/ -I /opt/local/include  -I /usr/include
+#CC = /opt/local/bin/clang-mp-17   
+#MPICC = /opt/local/bin/mpicc-mpich-clang17
+#LDFLAGS = #-fopenmp #-l efence
+#INCLUDE = -I /opt/local/include/clang17 -I /opt/local/include/mpich-clang17/
+
 
 #CC = clang
 #MPICC = /usr/local/bin/mpicc

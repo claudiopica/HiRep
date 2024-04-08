@@ -216,4 +216,8 @@
 #error Exponential lover term cannot be use simultaneously with the dirac smearing (not yet implemented)
 #endif
 
+#if defined(SIMD_VECTOR_HIREP) && defined(AVX2_HIREP)
+#error At most one SIMD option should be specified (SIMD_VECTOR_HIREP||AVX2_HIREP||None)
+#endif
+
 #endif /* CHECK_OPTIONS_H */

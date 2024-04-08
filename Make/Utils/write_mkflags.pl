@@ -5,45 +5,54 @@ use Getopt::Long 'HelpMessage';
 use File::Copy qw(move);
 
 GetOptions(
-  'file|f=s' => \( my $file = 'MkFlags'),
-  'ng|n=i' => \( my $NG = 2),
-  'repr|r=s'   => \(my $repr = 'FUND'),
-  'gauge=s'   => \(my $gauge = 'SUN'),
-  'mpi!'   => \(my $mpi = 1),
-  't=s'   => \(my $TBC = 'P'),
-  'x=s'   => \(my $XBC = 'P'),
-  'y=s'   => \(my $YBC = 'P'),
-  'z=s'   => \(my $ZBC = 'P'),
-  'twisted!'   => \(my $xyz_twist = 0),
-  'sf!'   => \(my $sfbc = 0),
-  'sfhalf!'   => \(my $sfhalfbc = 0),
-  'sfrotated!'   => \(my $sfrotatedbc = 0),
-  'smearing!'   => \(my $smearing = 0),
-  'clover|c!'   => \(my $clover = 0),
-  'expclover|e!'   => \(my $expclover = 0),
-  'eo!'   => \(my $eoprec = 1),
-  'quat|q!'   => \(my $quat = 0),
-  'ndebug!'   => \(my $ndebug = 1),
-  'dfloat!'   => \(my $dfloat = 0),
-  'checkspinor!'   => \(my $scheck = 1),
+  'file|f=s'     => \(my $file = 'MkFlags.ini'),
+  'ng|n=i'       => \(my $NG = 2),
+  'repr|r=s'     => \(my $repr = 'FUND'),
+  'gauge=s'      => \(my $gauge = 'SUN'),
+  'mpi!'         => \(my $mpi = 1),
+  'gpu!'         => \(my $gpu = 0),
+  'omp!'         => \(my $omp = 0),
+  't=s'          => \(my $TBC = 'P'),
+  'x=s'          => \(my $XBC = 'P'),
+  'y=s'          => \(my $YBC = 'P'),
+  'z=s'          => \(my $ZBC = 'P'),
+  'twisted!'     => \(my $xyz_twist = 0),
+  'sfhalf!'      => \(my $sfhalfbc = 0),
+  'smearing!'    => \(my $smearing = 0),
+  'clover|c!'    => \(my $clover = 0),
+  'expclover|e!' => \(my $expclover = 0),
+  'eo!'          => \(my $eoprec = 1),
+  'quat|q!'      => \(my $quat = 0),
+  'ndebug!'      => \(my $ndebug = 1),
+  'dfloat!'      => \(my $dfloat = 0),
+  'checkspinor!' => \(my $scheck = 1),
   'mpitiming!'   => \(my $mpit = 0),
-  'ioflush!'   => \(my $iof = 1),
-  'unrollrepr!'   => \(my $unrollr = 0),
-  'timing!'   => \(my $timing = 0),
+  'ioflush!'     => \(my $iof = 1),
+  'unrollrepr!'  => \(my $unrollr = 0),
+  'timing!'      => \(my $timing = 0),
   'bartiming!'   => \(my $btiming = 0),
-  'memory!'   => \(my $mem = 0),
-  'force!'   => \(my $force = 0),
-  'cc=s'   => \(my $cc = "gcc"),
-  'mpicc=s'   => \(my $mpicc = "mpicc"),
-  'cflags=s'   => \(my $cflags = "-Wall -Wshadow -Wfatal-errors -Werror -std=c99 -O3"),
-  'ldflags=s'   => \(my $ldflags = ""),
-  'include=s'   => \(my $include = ""),
-  'ccache!'   => \(my $ccache = 0),
-  'help'     =>   sub { HelpMessage(2) },
+  'memory!'      => \(my $mem = 0),
+  'force!'       => \(my $force = 0),
+  'avx2!'        => \(my $avx2 = 0),
+  'vect!'        => \(my $vect = 0),
+  'fuse!'        => \(my $fuse = 0),
+  'hwloc!'       => \(my $hwloc = 0),
+  'env=s'        => \(my $env = ""),
+  'cc=s'         => \(my $cc = "gcc"),
+  'mpicc=s'      => \(my $mpicc = "mpicc"),
+  'cflags=s'     => \(my $cflags = "-Wall -O3"),
+  'nvcc=s'       => \(my $nvcc = "nvcc"),
+  'gpuflags=s'   => \(my $gpuflags = ""),
+  'ldflags=s'    => \(my $ldflags = ""),
+  'include=s'    => \(my $include = ""),
+  'ccache!'      => \(my $ccache = 0),
+  'color!'       => \(my $color = 1),
+  'help'         => sub { HelpMessage(2) },
 ) or HelpMessage(1);
 
 # validate parameters
 validate_ng();
+validate_quat();
 validate_repr();
 validate_gauge();
 validate_t();
@@ -54,6 +63,13 @@ validate_z();
 sub validate_ng {
     if($NG<2) {
         print "Error: Number of colors (--ng|n) must be 2 or bigger\n";
+        HelpMessage(1);
+    }
+}
+
+sub validate_quat {
+    if($quat && ($NG != 2)) {
+        print "Error: Quaternions (--quat|q) can only be used when colors (--ng|n) is 2\n";
         HelpMessage(1);
     }
 }
@@ -93,8 +109,14 @@ sub validate_t {
         $TBC = "BC_T_THETA"
     } elsif ($TBC eq "O") { 
         $TBC = "BC_T_OPEN"
+    } elsif ($TBC eq "S") { 
+        $TBC = "BC_T_SF"
+    } elsif ($TBC eq "SR") { 
+        $TBC = "BC_T_SF_ROTATED"
+    } elsif ($TBC eq "M") { 
+        $TBC = "BC_T_MIXED"
     } else {
-        print "Error: The T boundary condition representation must be one of the following: P, A, T, O\n";
+        print "Error: The T boundary condition representation must be one of the following: P, A, T, O, S, SR, M\n";
         HelpMessage(1);
     }
 }
@@ -145,7 +167,7 @@ sub backup_oldflags {
 }
 
 backup_oldflags();
-open(my $fh, '>', $file) or die "Could not open file '$file' !";
+open(my $fh, '>', $file) or die "Can not open '$file' $!";
 # write ng
 print $fh "NG = $NG\n";
 # write repr
@@ -153,58 +175,79 @@ print $fh "REPR = $repr\n";
 # write gauge
 print $fh "GAUGE_GROUP = $gauge\n";
 # write T boundary condition
-print $fh "MACRO += -D$TBC\n";
+print $fh "MACRO += $TBC\n";
 # write X boundary condition
-print $fh "MACRO += -D$XBC\n";
+print $fh "MACRO += $XBC\n";
 # write Y boundary condition
-print $fh "MACRO += -D$YBC\n";
+print $fh "MACRO += $YBC\n";
 # write Z boundary condition
-print $fh "MACRO += -D$ZBC\n";
+print $fh "MACRO += $ZBC\n";
 # write twisted boundary condition
-$xyz_twist && print $fh "MACRO += -DBC_XYZ_TWISTED\n";
-# write sf boundary condition
-$sfbc && print $fh "MACRO += -DBASIC_SF\n";
+$xyz_twist && print $fh "MACRO += GAUGE_SPATIAL_TWIST\n";
 # write sf half field boundary condition
-$sfhalfbc && print $fh "MACRO += -DHALFBG_SF\n";
-# write sf rotated boundary condition
-$sfrotatedbc && print $fh "MACRO += -DROTATED_SF\n";
+$sfhalfbc && print $fh "MACRO += HALFBG_SF\n";
 # write smearing
-$smearing && print $fh "MACRO += -DWITH_SMEARING\n";
+$smearing && print $fh "MACRO += WITH_SMEARING\n";
 # write clover
-$clover && print $fh "MACRO += -DWITH_CLOVER\n";
+$clover && print $fh "MACRO += WITH_CLOVER\n";
 # write expclover
-$expclover && print $fh "MACRO += -DWITH_EXPCLOVER\n";
+$expclover && print $fh "MACRO += WITH_EXPCLOVER\n";
 # write eo preconditioning
-$eoprec && print $fh "MACRO += -DWITH_EO\n";
+$eoprec && print $fh "MACRO += UPDATE_EO\n";
 # write quaternions 
-$quat && print $fh "MACRO += -DWITH_QUATERNIONS\n";
+$quat && print $fh "MACRO += WITH_QUATERNIONS\n";
 # write ndebug
-$ndebug && print $fh "MACRO += -DNDEBUG\n";
+$ndebug && print $fh "MACRO += NDEBUG\n";
 # write dphi float
-$dfloat && print $fh "MACRO += -DDPHI_FLOAT\n";
+$dfloat && print $fh "MACRO += DPHI_FLT\n";
 # write check spinor
-$scheck && print $fh "MACRO += -DCHECK_SPINOR_MATCHING\n";
+$scheck && print $fh "MACRO += CHECK_SPINOR_MATCHING\n";
 # write mpitiming
-$mpit && print $fh "MACRO += -DMPI_TIMING\n";
+$mpit && print $fh "MACRO += MPI_TIMING\n";
 # write io flush
-$iof && print $fh "MACRO += -DIO_FLUSH\n";
+$iof && print $fh "MACRO += IO_FLUSH\n";
 # write unroll representation
-$unrollr && print $fh "MACRO += -DUNROLL_GROUP_REPRESENT\n";
+$unrollr && print $fh "MACRO += UNROLL_GROUP_REPRESENT\n";
 # write timing
-$timing && print $fh "MACRO += -DTIMING\n";
+$timing && print $fh "MACRO += TIMING\n";
 # write timing
-$btiming && print $fh "MACRO += -DTIMING_WITH_BARRIERS\n";
+$btiming && print $fh "MACRO += TIMING_WITH_BARRIERS\n";
 # write memory
-$mem && print $fh "MACRO += -DAMALLOC_MEASURE\n";
+$mem && print $fh "MACRO += AMALLOC_MEASURE\n";
 # write force
-$force && print $fh "MACRO += -DMEASURE_FORCE\n";
+$force && print $fh "MACRO += MEASURE_FORCE\n";
+# write avx2
+$avx2 && print $fh "MACRO += AVX2_HIREP\n";
+# write vect
+$vect && print $fh "MACRO += SIMD_VECTOR_HIREP\n";
+# write fuse
+$fuse && print $fh "MACRO += WITH_FUSE_MASTER_FOR\n";
+# write hwloc
+$hwloc && print $fh "MACRO += HWLOC\n";
+if ($hwloc) {
+    $ldflags .=" -lhwloc";
+}
 # write mpi
-$mpi && print $fh "MACRO += -DWITH_MPI\n";
+$mpi && print $fh "MACRO += WITH_MPI\n";
+# write GPU
+$gpu && print $fh "MACRO += WITH_GPU\n";
+# openMP
+if($omp) {
+    $cflags .=" -fopenmp";
+    $ldflags .=" -fopenmp -latomic";
+}
+
 # write compiler options
 if ($ccache!=0) { $cc="ccache ".$cc; $mpicc="ccache ".$mpicc; }
+if ($color!=1) { print $fh "NOCOLOR = 1\n\n"; }
+print $fh "ENV = $env\n";
 print $fh "CC = $cc\n";
 print $fh "MPICC = $mpicc\n";
 print $fh "CFLAGS = $cflags\n";
+
+print $fh "NVCC = $nvcc\n";
+print $fh "GPUFLAGS = $gpuflags\n";
+
 print $fh "INCLUDE = $include\n";
 print $fh "LDFLAGS = $ldflags\n";
 
@@ -225,41 +268,55 @@ write_mkflags - write flags file for compilation of HiRep
   --ng,-n             [2]         Number of colors
   --repr,-r           [FUND]      Fermion representation (FUND, 2S, 2A, ADJ)
   --gauge,-g          [SUN]       Gauge group (SUN, SON)
-  -t                  [P]         T boundary conditions (P, A, T, O)
+                                  P=Periodic
+                                  A=Antiperiodic
+                                  T=Theta
+                                  O=Open
+                                  S=Schrodinger functional
+                                  SR=Rotated schrodinger functional
+                                  M=Open + Schrodinger functional
+  -t                  [P]         T boundary conditions (P, A, T, O ,S ,SR , M)
   -x                  [P]         X boundary conditions (P, A, T)
   -y                  [P]         Y boundary conditions (P, A, T)
   -z                  [P]         Z boundary conditions (P, A, T)
 
   --[no-]mpi          [true]      Use MPI
+  --[no-]omp          [false]     Use OpenMP acceleration
+  --env               []          Environment variables used for compilation
   --cc                [gcc]       Compiler
   --mpicc             [mpicc]     MPI Compiler
-  --cflags            [-Wall -Wshadow -std=c99 -O3]       Compilation options
+  --cflags            [-Wall -O3] Compilation options
+  --nvcc              [nvcc]      CUDA compiler
+  --gpuflags          []          CUDA compilation options
   --include           []          Extra include headers
   --ldflags           []          Linking options
   --[no-]ndebug       [true]      Set ndebug flag
   --[no-]ccache       [false]     Use ccache
+  --[no-]color        [true]      Color compilation output
 
   --[no-]eo           [true]      Even-Odd preconditioning
   
-  --[no-]twist        [false]     XYZ twisted boundary conditions
-  --[no-]sf           [false]     Schrodinger functional b.c.
-  --[no-]sfhalf       [false]     Schrodinger functional b.c., half field
-  --[no-]sfrotate     [false]     Rotated Schrodinger functional b.c.
+  --[no-]gauge-twist  [false]     Spatial gauge twist
+  --[no-]sfhalf       [false]     Schrodinger functional half field
   --[no-]smearing     [false]     Smearing action
   --[no-]clover,-c    [false]     Clover improved action
   --[no-]expclover,-e [false]     ExpClover improved action
 
-  --[no-]quat,-q      [false]     Use quaternion representation (only for SU2)
+  --[no-]quat,-q      [false]     Use quaternion representation (only valid for SU2)
   --[no-]dfloat       [false]     Use single precision acceleration
   --[no-]unrollrepr   [false]     Unroll group representation functions
 
+  --[no-]avx2         [false]     Enable avx2 kernels of (some) linear algebra functions
+  --[no-]vect         [false]     Enable SIMD vectorized kernels of (some) linear algebra functions
+  --[no-]fuse         [false]     Enable use of the fused index in the masterfor
   --[no-]checkspinor  [true]      Check spinor field type
   --[no-]mpitiming    [false]     Enable timing of MPI calls
   --[no-]ioflush      [true]      Flush IO after each operations on logs
   --[no-]timing       [false]     Enable timing
   --[no-]bartiming    [false]     Enable MPI barriers in timing
   --[no-]memory       [false]     Print memory usage
-  --[no-]force        [false]     Print statics for forces in molecular dynamics
+  --[no-]force        [false]     Print statistics for forces in molecular dynamics
+  --[no-]hwloc        [false]     Improved process (and possibly gpu) affinity using hwloc
 
 =head1 VERSION
 
