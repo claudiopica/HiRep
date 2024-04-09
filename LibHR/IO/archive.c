@@ -53,6 +53,10 @@ void write_gauge_field_matrix(char filename[]) {
 #endif
 
     plaq = avr_plaquette(); /* to use as a checksum in the header */
+
+#ifdef WITH_GPU
+    copy_from_gpu_suNg_field(u_gauge);
+#endif
     if (PID == 0) {
         int d[5] = { NG, GLB_T, GLB_X, GLB_Y, GLB_Z };
         error((fp = fopen(filename, "wb")) == NULL, 1, "write_gauge_field", "Failed to open file for writing");
