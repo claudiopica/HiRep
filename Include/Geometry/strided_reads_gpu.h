@@ -23,6 +23,46 @@ enum DIRECTION { UP = 0, DOWN = 1 };
 #ifdef __cplusplus
 
 template <typename REAL, typename FIELD_TYPE, typename SITE_TYPE>
+__host__ __device__ __forceinline__ void read_sub_assign_gpu(int stride, SITE_TYPE *s, const FIELD_TYPE *in, int ix, int comp,
+                                                             int dim) {
+    const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
+    const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
+#ifdef FIXED_STRIDE
+    int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + ((comp)*n_components) * (THREADSIZE);
+    const int _stride = THREADSIZE;
+#else
+    int iz = ix + ((comp)*n_components) * (THREADSIZE);
+    const int _stride = stride;
+#endif
+    REAL *in_cpx = (REAL *)in;
+    REAL *in_comp_cpx = (REAL *)s;
+    for (int i = 0; i < n_components; ++i) {
+        in_comp_cpx[i] -= in_cpx[iz];
+        iz += _stride;
+    }
+}
+
+template <typename REAL, typename FIELD_TYPE, typename SITE_TYPE>
+__host__ __device__ __forceinline__ void read_assign_gpu(int stride, SITE_TYPE *s, const FIELD_TYPE *in, int ix, int comp,
+                                                         int dim) {
+    const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
+    const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
+#ifdef FIXED_STRIDE
+    int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + ((comp)*n_components) * (THREADSIZE);
+    const int _stride = THREADSIZE;
+#else
+    int iz = ix + ((comp)*n_components) * (THREADSIZE);
+    const int _stride = stride;
+#endif
+    REAL *in_cpx = (REAL *)in;
+    REAL *in_comp_cpx = (REAL *)s;
+    for (int i = 0; i < n_components; ++i) {
+        in_comp_cpx[i] += in_cpx[iz];
+        iz += _stride;
+    }
+}
+
+template <typename REAL, typename FIELD_TYPE, typename SITE_TYPE>
 __host__ __device__ __forceinline__ void read_gpu(int stride, SITE_TYPE *s, const FIELD_TYPE *in, size_t ix, int comp,
                                                   int dim) {
     const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
