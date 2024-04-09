@@ -15,7 +15,7 @@
 #include "Utils/gaugefix.h"
 #include "Utils/HYP_smearing.h"
 #include "Utils/mat_utils.h"
-#include "Utils/max_eig.h"
+#include "Utils/eigval.h"
 #include "Utils/print_compile_options.h"
 #include "Utils/shift_fields.h"
 #include "Utils/single_double_utils.h"

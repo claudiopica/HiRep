@@ -477,7 +477,7 @@ void eig_init(int nev, int nevt, int kmax, int maxiter, double lbnd, double omeg
     // Eigen Stuff
     int MVM = 0; // counter for matrix-vector multiplications
 
-    max_H(&H2_pre, &glat_even, &max);
+    max_eigval(&H2_pre, &glat_even, &max);
     // lprintf("MAIN",0,"MAXCHECK: cnfg=%e  uppbound=%e diff=%e %s\n",max,mupp,mupp-max,(mupp-max)<0?"[FAILED]":"[OK]");
     max = 1.1 * max;
 

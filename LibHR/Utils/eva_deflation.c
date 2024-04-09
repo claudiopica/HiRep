@@ -56,7 +56,7 @@ static void find_low_eig_H2(const eva_prec *e_par, geometry_descriptor *type, in
 
     lprintf("EVA_PREC", 0, "Starting EVA\n");
 
-    max_H(H_loc, type, &max);
+    max_eigval(H_loc, type, &max);
     max *= 1.1;
 
     ie = eva(e_par->nev, e_par->nevt, start, e_par->kmax, e_par->maxiter, max, e_par->omega1, e_par->omega2, H_loc, ev, eigval,

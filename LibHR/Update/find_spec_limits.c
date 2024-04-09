@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "update.h"
@@ -27,11 +27,12 @@ void find_spec_H2(double *max, double *min) {
     d1 = malloc(sizeof(*d1) * nevt);
 #ifdef UPDATE_EO
     ev = alloc_spinor_field(nevt, &glat_even);
-    MVM += max_H(&H2, &glat_even, max);
 #else
     ev = alloc_spinor_field(nevt, &glattice);
-    MVM += max_H(&H2, &glattice, max);
 #endif
+
+    MVM += max_eigval(&H2, ev->type, max);
+    *max *= 1.1;
 
     ie = eva(nev, nevt, 0, kmax, maxiter, *max, omega1, omega2, &H2, ev, d1, &status);
     MVM += status;
