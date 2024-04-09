@@ -88,7 +88,12 @@
 #endif
 
 #define GAMMA 3.0
+
+#ifndef WITH_GPU
 #define MAX_ROTATE 1000
+#else
+#define MAX_ROTATE 32
+#endif
 
 static int nop, nvc = 0;
 static double *dd, *ee;
