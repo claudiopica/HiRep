@@ -42,7 +42,7 @@ template <class T> struct __align__(sizeof(T)) hr_complex_t {
         return *this;
     }
 
-    hr_complex_t visible inline __attribute__((always_inline)) operator-(void) {
+    hr_complex_t visible inline __attribute__((always_inline)) operator-(void) const {
         return hr_complex_t(-re, -im);
     }
 
@@ -104,34 +104,6 @@ template <class T> struct __align__(sizeof(T)) hr_complex_t {
     hr_complex_t visible inline __attribute__((always_inline)) conj() {
         return hr_complex_t(re, -im);
     }
-
-    /** COMPLEX ARGUMENT **/
-    double visible inline __attribute__((always_inline)) carg(hr_complex_t c) {
-        double arg = 0;
-        if (creal(c) > 0) {
-            return atan(cimag(c) / creal(c));
-        } else if (creal(c) < 0 && cimag(c) >= 0) {
-            return atan(cimag(c) / creal(c)) + PI;
-        } else if (creal(c) < 0 && cimag(c) < 0) {
-            return atan(cimag(c) / creal(c)) - PI;
-        } else if (creal(c) == 0 && cimag(c) > 0) {
-            return PI / 2.0;
-        } else if (creal(c) == 0 && cimag(c) < 0) {
-            return -PI / 2.0;
-        } else if (creal(c) == 0 && creal(c) == 0) {
-            // This is technically undefined, so this will
-            // give 0 in the hopes that we get 0 by the
-            // mod and does not quit with error
-            return 0.0;
-        }
-    }
-
-    /** COMPLEX POWER **/
-    hr_complex_t visible inline __attribute__((always_inline)) cpow(hr_complex_t c, double pow) {
-        const double arg = carg(c);
-        const double mod = sqrt(creal(_complex_prod(c, c)));
-        return hr_complex_t(powf(mod, pow), 0) * hr_complex_t(cos(pow * arg), sin(pow * arg));
-    }
 };
 
 /** ADD **/
@@ -154,7 +126,7 @@ template <class T, class L> auto visible inline __attribute__((always_inline)) o
 }
 
 template <class T, class L> auto visible inline __attribute__((always_inline)) operator-(const T x, const hr_complex_t<L> &c) {
-    return hr_complex_t(c.re - x, c.im - (T)0);
+    return hr_complex_t(x - c.re, (T)0 - c.im);
 }
 
 template <class T, class L>
@@ -173,7 +145,7 @@ template <class T, class L> auto visible inline __attribute__((always_inline)) o
 
 template <class T, class L>
 auto visible inline __attribute__((always_inline)) operator*(const hr_complex_t<T> &a, const hr_complex_t<L> &b) {
-    return hr_complex_t(a.re * b.re - a.im * b.im, a.im * b.re + a.re * b.im);
+    return hr_complex_t(a.re * b.re - b.im * a.im, a.im * b.re + b.im * a.re);
 }
 
 /** DIVIDE **/
@@ -201,6 +173,7 @@ typedef struct hr_complex_t<float> hr_complex_flt;
 #define conj(a) ((a).conj())
 
 visible double carg(hr_complex c);
+
 visible hr_complex cpow(hr_complex c, double pow);
 
 #endif
