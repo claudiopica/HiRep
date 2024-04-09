@@ -9,7 +9,7 @@
 #include "io.h"
 
 void __cudaSafeCall(cudaError_t err, const char *func, const char *file, const int line) {
-#ifdef CUDA_CHECK_ERROR
+#ifndef CUDA_NO_CHECK_ERROR
 
 #pragma warning(push)
 #pragma warning(disable : 4127) // Prevent warning on do-while(0);
@@ -23,14 +23,14 @@ void __cudaSafeCall(cudaError_t err, const char *func, const char *file, const i
 
 #pragma warning(pop)
 
-#endif // CUDA_CHECK_ERROR
+#endif
 
     return;
 }
 
 void __cudaCheckError(const char *func, const char *file, int line) /*TODO: inline void? (SAM) */
 {
-#ifdef CUDA_CHECK_ERROR
+#ifndef CUDA_NO_CHECK_ERROR
 
 #pragma warning(push)
 #pragma warning(disable : 4127) // Prevent warning on do-while(0);
@@ -53,7 +53,11 @@ void __cudaCheckError(const char *func, const char *file, int line) /*TODO: inli
 
 #pragma warning(pop)
 
-#endif // CUDA_CHECK_ERROR
+#else
+
+    cudaDeviceSynchronize();
+
+#endif
 
     return;
 }

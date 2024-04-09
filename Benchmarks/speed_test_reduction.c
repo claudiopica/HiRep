@@ -2,6 +2,8 @@
  *
  * Speed test of reduction operations (incl. plaquette)
  *
+ * NOCOMPILE= !WITH_GPU
+ *
  *******************************************************************************/
 
 #include "libhr.h"
