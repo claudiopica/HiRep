@@ -10,8 +10,6 @@
 #include "libhr.h"
 #include <string.h>
 
-#define PI 3.141592653589793238462643383279502884197
-
 #if defined(BC_T_SF_ROTATED) && defined(BC_T_SF)
 #error This code does not work with the Schroedinger functional !!!
 #endif

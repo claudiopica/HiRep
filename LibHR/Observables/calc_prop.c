@@ -13,8 +13,6 @@
 #include "update.h"
 #include "geometry.h"
 
-#define PI 3.141592653589793238462643383279502884197
-
 // Helps QMR solver find more accurate solutions
 #undef GAUSSIAN_NOISE
 //#define GAUSSIAN_NOISE

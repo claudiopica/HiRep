@@ -20,6 +20,14 @@
 #include "geometry.h"
 #include <stddef.h>
 
+#ifndef M_PI
+// Define M_PI if its not part of the C standard
+#define M_PI 3.14159265358979323846264338327
+#endif
+
+// Allow also to use PI for M_PI
+#define PI M_PI
+
 /* local lattice attributes */
 GLB_VAR(int, T, = 0); /* local lattice size in direction T */
 GLB_VAR(int, X, = 0); /* local lattice size in direction X */

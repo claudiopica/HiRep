@@ -24,7 +24,6 @@
 #error This code does not work with the fermion twisting !!!
 #endif
 
-#define PI 3.141592653589793238462643383279502884197
 static void twist_XYZ_bc(double theta_x, double theta_y, double theta_z) {
     int index;
     int ix, iy, iz, it;

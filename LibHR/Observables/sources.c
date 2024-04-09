@@ -11,8 +11,6 @@
 #include "geometry.h"
 #include "inverters.h"
 
-#define PI 3.141592653589793238462643383279502884197
-
 /* Random timeslice not previously chosen */
 static int random_tau() {
     static int *slices = NULL;

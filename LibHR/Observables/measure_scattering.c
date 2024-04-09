@@ -5,8 +5,6 @@
 #include "utils.h"
 #include "inverters.h"
 
-#define PI 3.141592653589793238462643383279502884197
-
 /* TJ - Extracting Vincent's meson-meson scattering measurements so that we can put them in LibHR
 
    Also adding momenta to the sinks

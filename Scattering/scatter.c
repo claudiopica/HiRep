@@ -12,8 +12,6 @@
 #include "libhr.h"
 #include <string.h>
 
-#define PI M_PI
-
 /**
  * @brief Structure containing data from the input file relevant to scattering.
  */

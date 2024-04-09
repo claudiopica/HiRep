@@ -488,7 +488,6 @@ static void chiSF_ds_BT(double ds) {
 /* BOUNDARY CONDITIONS TO BE APPLIED ON THE FUNDAMENTAL GAUGE FIELD        */
 /***************************************************************************/
 
-#define PI 3.141592653589793238462643383279502884197
 #define ST 1.414213562373095048801688724209698078570
 
 #if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)

@@ -11,8 +11,6 @@
 #include "utils.h"
 #include <string.h>
 
-#define PI 3.141592653589793238462643383279502884197
-
 meson_observable *triplet_discon_correlators = NULL; //For four fermion interaction
 
 //If ind2=-2 disconnected correlator

@@ -7,10 +7,6 @@
 #include "IO/logger.h"
 #include "inverters.h"
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846264338327
-#endif
-
 static suNg_field *ws_gf = NULL;
 static suNg_field *ws_gf_tmp = NULL;
 static suNg_field *Vprime = NULL;
