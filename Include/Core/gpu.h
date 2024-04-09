@@ -71,6 +71,14 @@ typedef struct {
 #define cudaMemcpyToSymbol hipMemcpyToSymbol
 #endif
 
+#ifndef M_PI
+// Define M_PI if its not part of the C standard
+#define M_PI 3.14159265358979323846264338327
+#endif
+
+// Allow also to use PI for M_PI
+#define PI M_PI
+
 #define init_input_gpu(varname)                                                               \
     {                                                                                         \
         .read = { { "gpuID", "gpuID = %d", INT_T, &(varname) }, { NULL, NULL, INT_T, NULL } } \

@@ -1,7 +1,5 @@
 #include "libhr_core.h"
 
-#define PI 3.141592653589793238462643383279502884197
-
 visible double carg(hr_complex c) {
     double arg = 0;
     if (creal(c) > 0) {

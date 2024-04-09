@@ -11,8 +11,6 @@
 #include "utils.h"
 #include "inverters.h"
 
-#define PI 3.141592653589793238462643383279502884197
-
 enum { _g5_ff = 0, _pipig_ff_re, _pipig_ff_im, _pipig_conserved_ff, NCHANNELS_FF };
 
 static char *ff_channel_names[NCHANNELS_FF] = { "g5_ff", "pipig_ff_re", "pipig_ff_im", "pipig_conserved_ff" };

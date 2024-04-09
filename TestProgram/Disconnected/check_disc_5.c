@@ -16,10 +16,6 @@
 #include "libhr.h"
 #include <string.h>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846264338327950288419716939937510
-#endif
-
 static hr_complex gid[16] = { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. }; /* gid = tr Gamma  */
 static hr_complex g0[16] = { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. }; /*  g0 = tr gamma_0 Gamma */
 static hr_complex g1[16] = { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. }; /*  g1 = tr gamma_1 Gamma */

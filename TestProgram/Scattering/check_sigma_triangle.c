@@ -8,7 +8,6 @@
 
 #include "libhr.h"
 
-#define PI 3.1415926535
 #define SQR(A) ((A) * (A))
 #define CMUL(a, b) \
     (a).re *= b;   \

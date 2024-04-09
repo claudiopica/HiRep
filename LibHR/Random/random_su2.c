@@ -18,7 +18,7 @@
 #define NVEC (32)
 #define NRAN (2 * NVEC)
 #define PI_HALF 1.5707964f
-#define PI 3.1415927f
+#define PI_FLT 3.1415927f
 #define TWO_PI 6.2831854f
 
 static int *i_vec = NULL, *i_y, *i_v;
@@ -71,7 +71,7 @@ static void update_vec(int tid) {
 
     for (i = 0; i < NVEC; i++) {
         r1 = 2.0 * r[tid][i] - 1.0;
-        r2 = TWO_PI * r[tid][NVEC + i] - PI;
+        r2 = TWO_PI * r[tid][NVEC + i] - PI_FLT;
         rsq = sqrt(1.0 - r1 * r1);
 
         vec1[tid][i] = r1;

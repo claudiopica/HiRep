@@ -13,10 +13,6 @@
 #include "libhr.h"
 #include <string.h>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846264338327950288419716939937510
-#endif
-
 static double gid[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; /* gid = tr \bar{Gamma} Gamma / 4 */
 static double g0[16] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0

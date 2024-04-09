@@ -12,7 +12,6 @@
 #define GPU_COMPLEX_H
 
 #include "Core/gpu.h"
-#define PI 3.141592653589793238462643383279502884197
 
 template <class T> struct __align__(sizeof(T)) hr_complex_t {
     T re, im;

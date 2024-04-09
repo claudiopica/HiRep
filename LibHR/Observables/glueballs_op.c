@@ -5,7 +5,6 @@
 #include "utils.h"
 #include <string.h>
 #define npaths 17
-static double PI = 3.141592653589793238462643383279502884197;
 static hr_complex *mom_def_Cp_tr_paths = NULL;
 static hr_complex *mom_def_Cm_tr_paths = NULL;
 static hr_complex *path_storage = NULL;

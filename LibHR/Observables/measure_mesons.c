@@ -12,8 +12,6 @@
 #include "inverters.h"
 #include <string.h>
 
-#define PI 3.141592653589793238462643383279502884197
-
 //header with extern definition is in measure_mesons.h
 meson_observable *meson_correlators = NULL;
 meson_observable *discon_correlators = NULL;

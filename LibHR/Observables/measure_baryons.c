@@ -11,8 +11,6 @@
 #include "inverters.h"
 #include <string.h>
 
-#define PI 3.141592653589793238462643383279502884197
-
 #define corr_left_mult_g5(C)              \
     do {                                  \
         for (int i = 2; i < 4; i++)       \
