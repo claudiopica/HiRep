@@ -6,9 +6,9 @@
 
 #include "libhr.h"
 
-static int n_warmup = 50;
+static int n_warmup = 100;
 #ifdef WITH_GPU
-static double time_target = 50.;
+static double time_target = 5000.;
 #else
 static double time_target = 500.;
 #endif
@@ -31,7 +31,7 @@ int bytes_per_site_lina(int ninputs, int noutputs, int sitesize) {
 
 #define _PRINT_SETUP(_ninputs, _noutputs, _flopsite, _in)                                                  \
     do {                                                                                                   \
-        int bytesite = bytes_per_site_lina(_ninputs, _noutputs, sizeof((&_in[0])->ptr));                   \
+        int bytesite = bytes_per_site_lina(_ninputs, _noutputs, sizeof(suNf_spinor));                      \
         lprintf("LA TEST", 0, "Flop per size = %d\n", _flopsite);                                          \
         lprintf("LA TEST", 0, "Byte per site = %d\n", bytesite);                                           \
         lprintf("LA TEST", 0, "Data movement = %e MB\n", (double)bytesite / (1024. * 1024.) * GLB_VOLUME); \
@@ -92,7 +92,7 @@ int bytes_per_site_lina(int ninputs, int noutputs, int sitesize) {
 
 #define _PRINT_RESULT(_name, _ninputs, _noutputs, _elapsed, _n_reps, _flopsite, _in)          \
     do {                                                                                      \
-        int bytesite = bytes_per_site_lina(_ninputs, _noutputs, sizeof((*(&_in[0])->ptr)));   \
+        int bytesite = bytes_per_site_lina(_ninputs, _noutputs, sizeof(suNf_spinor));         \
         double vol_reps = (double)_n_reps * GLB_VOLUME;                                       \
         double bandwidth = (vol_reps * bytesite) / _elapsed / 1.e6;                           \
         lprintf("RESULT", 0,                                                                  \
