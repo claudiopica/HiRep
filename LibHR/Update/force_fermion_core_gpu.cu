@@ -83,6 +83,8 @@
 
 static suNg_av_field *force_sum = NULL;
 
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+
 __device__ static void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu) {
     if (mu == 0 && nu == 1) {
         for (int i = 0; i < NF; i++) {
@@ -188,6 +190,8 @@ __device__ static suNf fmat_create(suNf_spinor *a_lhs, suNf_spinor *a_rhs, suNf_
     }
     return fmat;
 }
+
+#endif
 
 __global__ static void _force_fermion_core(suNf_spinor *Xs, suNf_spinor *Ys, suNg_algebra_vector *force_sum_gpu, suNf *gauge,
                                            int *iup_gpu, double coeff, int N, int block_start) {

@@ -103,7 +103,7 @@ __global__ void _lw_force(suNg **stfld, suNg *gauge, suNg_algebra_vector *force,
                           double c0, double c1, int *iup_gpu, int *idn_gpu) {
     suNg ws[4], wu1, wu2;
     suNg s;
-    suNg u, u1, u0;
+    suNg u, u1;
     suNg_algebra_vector f, wf1;
 
     int ix = blockIdx.x * blockDim.x + threadIdx.x;
