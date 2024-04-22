@@ -155,7 +155,13 @@ __host__ __device__ __forceinline__ void write_assign_atomic_gpu(int stride, SIT
     REAL *out_cpx = (REAL *)out;
     REAL *out_comp_cpx = (REAL *)s;
     for (int i = 0; i < n_components; ++i) {
+// Be aware that for lower architectures this is the same
+// as the write assign!!!
+#if __CUDA_ARCH__ >= 600
         atomicAdd(&out_cpx[iz], out_comp_cpx[i]);
+#else
+        out_cpx[iz] += out_comp_cpx[i];
+#endif
         iz += _stride;
     }
 }
