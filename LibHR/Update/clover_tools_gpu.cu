@@ -450,6 +450,7 @@ __global__ void Cphi_init_(suNfc *cl_term, suNfc *cl_term_expAplus, suNfc *cl_te
 #endif
 
 void Cphi_init(double mass, double invexpmass) {
+#ifdef WITH_EXPCLOVER
     if (mass != cphi_exp_mass || invexpmass != cphi_invexp_mass || stale_expclover) {
         _PIECE_FOR((&glattice), ixp) {
             const int N = (&glattice)->master_end[ixp] - (&glattice)->master_start[ixp] + 1;
@@ -471,6 +472,7 @@ void Cphi_init(double mass, double invexpmass) {
         cphi_exp_mass = mass;
         cphi_invexp_mass = invexpmass;
     }
+#endif
 }
 
 void clover_init_gpu(double csw) {
