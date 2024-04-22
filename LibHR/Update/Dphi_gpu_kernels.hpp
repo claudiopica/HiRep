@@ -777,45 +777,26 @@ __global__ void Cphi_inv_kernel_(SITE_TYPE *dptr, SITE_TYPE *sptr, ldl_t *ldl_gp
 #ifdef WITH_EXPCLOVER
 
 template <typename VECTOR_TYPE, class REAL, typename SITE_TYPE>
-__global__ void Cphi_gpu_kernel_(SITE_TYPE *dptr, SITE_TYPE *sptr, suNfc *cl_term, double mass, double invexpmass, int assign,
-                                 int N, int block_start, int NN_loc, int NNexp_loc) {
+__global__ void Cphi_gpu_kernel_(SITE_TYPE *dptr, SITE_TYPE *sptr, suNfc *cl_term_expAplus, suNfc *cl_term_expAminus,
+                                 double mass, double invexpmass, int assign, int N, int block_start, int NN_loc,
+                                 int NNexp_loc) {
     for (int ix = blockIdx.x * blockDim.x + threadIdx.x; ix < N; ix += gridDim.x * blockDim.x) {
-        suNfc Aplus[4];
-        suNfc Aminus[4];
-
         suNfc expAplus[4];
         suNfc expAminus[4];
+
+        read_gpu<double>(0, &expAplus[0], cl_term_expAplus, ix, 0, 4);
+        read_gpu<double>(0, &expAplus[1], cl_term_expAplus, ix, 1, 4);
+        read_gpu<double>(0, &expAplus[2], cl_term_expAplus, ix, 2, 4);
+        read_gpu<double>(0, &expAplus[3], cl_term_expAplus, ix, 3, 4);
+        read_gpu<double>(0, &expAminus[0], cl_term_expAminus, ix, 0, 4);
+        read_gpu<double>(0, &expAminus[1], cl_term_expAminus, ix, 1, 4);
+        read_gpu<double>(0, &expAminus[2], cl_term_expAminus, ix, 2, 4);
+        read_gpu<double>(0, &expAminus[3], cl_term_expAminus, ix, 3, 4);
+
         VECTOR_TYPE v1, v2;
         SITE_TYPE out, in, tmp;
-        suNfc s0, s1, s2, s3;
 
         read_gpu<REAL>(0, &in, sptr, ix, 0, 1);
-        read_gpu<double>(0, &s0, cl_term, ix, 0, 4);
-        read_gpu<double>(0, &s1, cl_term, ix, 1, 4);
-        read_gpu<double>(0, &s2, cl_term, ix, 2, 4);
-        read_gpu<double>(0, &s3, cl_term, ix, 3, 4);
-
-        _suNfc_mul(Aplus[0], invexpmass, s0);
-        _suNfc_mul(Aplus[1], invexpmass, s1);
-        _suNfc_dagger(Aplus[2], Aplus[1]);
-        _suNfc_mul(Aplus[3], -invexpmass, s0);
-
-        _suNfc_mul(Aminus[0], invexpmass, s2);
-        _suNfc_mul(Aminus[1], invexpmass, s3);
-        _suNfc_dagger(Aminus[2], Aminus[1]);
-        _suNfc_mul(Aminus[3], -invexpmass, s2);
-
-        clover_exp(Aplus, expAplus, NN_loc);
-        clover_exp(Aminus, expAminus, NN_loc);
-
-        _suNfc_mul_assign(expAplus[0], mass);
-        _suNfc_mul_assign(expAplus[1], mass);
-        _suNfc_mul_assign(expAplus[2], mass);
-        _suNfc_mul_assign(expAplus[3], mass);
-        _suNfc_mul_assign(expAminus[0], mass);
-        _suNfc_mul_assign(expAminus[1], mass);
-        _suNfc_mul_assign(expAminus[2], mass);
-        _suNfc_mul_assign(expAminus[3], mass);
 
         // Comp 0
         _suNfc_multiply(v1, expAplus[0], in.c[0]);
