@@ -8,7 +8,7 @@
 
 static int n_warmup = 100;
 #ifdef WITH_GPU
-static double time_target = 50.;
+static double time_target = 5000.;
 #else
 static double time_target = 500.;
 #endif
@@ -19,34 +19,33 @@ static double time_target = 500.;
 #define synchronize
 #endif
 
-void setup_random_fields_flt(int n, spinor_field_flt s[n]) {
+void setup_random_fields_lina_flt(int n, spinor_field_flt s[n]) {
     for (int i = 0; i < n; i++) {
         gaussian_spinor_field_flt(&s[i]);
     }
 }
 
-int bytes_per_site(int ninputs, int noutputs, int sitesize) {
-    return (ninputs + 2 * noutputs) * sitesize;
+int bytes_per_site_lina_flt(int ninputs, int noutputs, int sitesize) {
+    return (ninputs + noutputs) * sitesize;
 }
 
-#define _PRINT_SETUP(_ninputs, _noutputs, _flopsite, _in)                                                  \
-    do {                                                                                                   \
-        int bytesite = bytes_per_site(_ninputs, _noutputs, sizeof((&_in[0])->ptr));                        \
-        lprintf("LA TEST", 0, "Flop per size = %d\n", _flopsite);                                          \
-        lprintf("LA TEST", 0, "Byte per site = %d\n", bytesite);                                           \
-        lprintf("LA TEST", 0, "Data movement = %e MB\n", (double)bytesite / (1024. * 1024.) * GLB_VOLUME); \
+#define _PRINT_SETUP(_ninputs, _noutputs, _flopsite, _in)                                                   \
+    do {                                                                                                    \
+        int bytesite = bytes_per_site_lina_flt(_ninputs, _noutputs, sizeof(suNf_spinor_flt));               \
+        lprintf("LA TEST", 0, "Flop per size = %d\n", _flopsite);                                           \
+        lprintf("LA TEST", 0, "Byte per site = %d\n", bytesite);                                            \
+        lprintf("LA TEST", 0, "Data movement = %e MiB\n", (double)bytesite / (1024. * 1024.) * GLB_VOLUME); \
     } while (0);
 
 #define _WARMUP(_name, _elapsed, _n_reps, _clock, _in, _test, _ninputs)            \
     lprintf("WARMUP", 0, "Warmup application of %s %d times.\n", _name, n_warmup); \
     _elapsed = 0;                                                                  \
+    timer_lap(&_clock);                                                            \
     for (int i = 0; i < n_warmup; ++i) {                                           \
-        setup_random_fields_flt(_ninputs, _in);                                    \
-        timer_lap(&_clock);                                                        \
         _test;                                                                     \
         synchronize;                                                               \
-        _elapsed += timer_lap(&_clock) * 1.e-3;                                    \
     }                                                                              \
+    _elapsed = timer_lap(&_clock) * 1.e-3;                                         \
     int _n_reps = (int)(n_warmup * 1.01 * (time_target / _elapsed));               \
     bcast_int(&n_reps, 1);                                                         \
     lprintf("WARMUP", 0,                                                           \
@@ -60,13 +59,12 @@ int bytes_per_site(int ninputs, int noutputs, int sitesize) {
     do {                                                                    \
         lprintf("LA TEST", 0, "Trying reps: %d\n", _n_reps);                \
         _elapsed = 0;                                                       \
+        timer_lap(&_clock);                                                 \
         for (int i = 0; i < _n_reps; ++i) {                                 \
-            setup_random_fields_flt(_ninputs, _in);                         \
-            timer_lap(&_clock);                                             \
             _test;                                                          \
             synchronize;                                                    \
-            _elapsed += timer_lap(&_clock) * 1.e-3;                         \
         }                                                                   \
+        _elapsed = timer_lap(&_clock) * 1.e-3;                              \
         _n_reps = (int)((double)(_n_reps * 1.01 * time_target) / _elapsed); \
         bcast_int(&n_reps, 1);                                              \
     } while (_elapsed < time_target * .95);
@@ -85,7 +83,7 @@ int bytes_per_site(int ninputs, int noutputs, int sitesize) {
         lprintf("RESULT", 0,                                                                         \
                 "Peak Memory Bandwidth: %1.6g GB/s, "                                                \
                 "Performance reached: %0.2f \%\n",                                                   \
-                peak_memory_bandwidth, _bandwidth / peak_memory_bandwidth);                          \
+                peak_memory_bandwidth, 100 * _bandwidth / peak_memory_bandwidth);                    \
     } while (0);
 
 #else
@@ -94,7 +92,7 @@ int bytes_per_site(int ninputs, int noutputs, int sitesize) {
 
 #define _PRINT_RESULT(_name, _ninputs, _noutputs, _elapsed, _n_reps, _flopsite, _in)                                        \
     do {                                                                                                                    \
-        int bytesite = bytes_per_site(_ninputs, _noutputs, sizeof((*(&_in[0])->ptr)));                                      \
+        int bytesite = bytes_per_site_lina_flt(_ninputs, _noutputs, sizeof(suNf_spinor_flt));                               \
         double vol_reps = (double)_n_reps * GLB_VOLUME;                                                                     \
         double bandwidth = (vol_reps * bytesite) / _elapsed / 1.e6;                                                         \
         lprintf("RESULT", 0,                                                                                                \
@@ -109,7 +107,7 @@ int bytes_per_site(int ninputs, int noutputs, int sitesize) {
 
 #define _SPEED_TEST_LIN_ALG_FLT(_name, _ninputs, _noutputs, _flopsite, _in, _test)  \
     do {                                                                            \
-        setup_random_fields_flt(_ninputs, _in);                                     \
+        setup_random_fields_lina_flt(_ninputs, _in);                                \
         _PRINT_SETUP(_ninputs, _noutputs, _flopsite, _in);                          \
         Timer clock;                                                                \
         double elapsed;                                                             \

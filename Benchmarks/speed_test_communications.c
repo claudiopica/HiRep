@@ -422,7 +422,7 @@ int main(int argc, char *argv[]) {
                 steps[k] * singlestep, elapsed_mean, elapsed_var);
     }
 
-    lprintf("MAIN", 0, "check number %1.10e (must be differnt from zero)\n ", opt_trick);
+    lprintf("MAIN", 0, "check number %1.10e (must be different from zero)\n ", opt_trick);
 
     /* close communications */
     finalize_process();
