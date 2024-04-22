@@ -76,13 +76,13 @@ static comms_args *c_args = NULL;
 
 // Communication routine using shared struct
 void communicate(comms_args *l) {
+    if (!init) {
 #ifdef WITH_GPU
     // Initialize correct CUDA device context on consumer thread
-    if (!init) {
         CHECK_CUDA(cudaSetDevice(LID));
         init = 1;
-    }
 #endif
+    }
 
     // Standard blocking communications
     int chars_per_site = l->mpi_chunks_per_site * l->size_of_real / sizeof(char);

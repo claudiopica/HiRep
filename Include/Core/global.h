@@ -19,6 +19,7 @@
 
 #include "geometry.h"
 #include <stddef.h>
+#include "flags.h"
 
 #ifndef M_PI
 // Define M_PI if its not part of the C standard
@@ -246,7 +247,4 @@ GLB_VAR(int, four_fermion_active, = 0); // whether four fermion interactions are
     // Not sure this works for going back to the old striding (SAM)
 #define THREADSIZE 1
 #endif
-
-#undef GLB_VAR
-
 #endif

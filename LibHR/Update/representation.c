@@ -88,6 +88,6 @@ void represent_gauge_field() {
 #endif
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-    compute_clover_term();
+    stale_clover = 1;
 #endif
 }

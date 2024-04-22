@@ -249,6 +249,7 @@ void _GPU_F_NAME_(Dphi, _SUFFIX)(_FIELD_TYPE *out, _FIELD_TYPE *in) {
 
 #ifdef WITH_CLOVER
 void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sptr, int assign) {
+    compute_clover_term();
     mass = (4. + mass);
     _PIECE_FOR(sptr->type, ixp) {
         const int N = sptr->type->master_end[ixp] - sptr->type->master_start[ixp] + 1;
@@ -261,6 +262,7 @@ void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sp
 }
 
 void _GPU_F_NAME_(Cphi_inv, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sptr, int assign) {
+    compute_clover_term();
     mass = (4. + mass);
     compute_ldl_decomp(mass);
 
@@ -283,6 +285,7 @@ void _GPU_F_NAME_(Cphi_inv, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE
 
 #ifdef WITH_EXPCLOVER
 void _GPU_F_NAME_(Cphi, _SUFFIX)(double mass, _FIELD_TYPE *dptr, _FIELD_TYPE *sptr, int assign, int inverse) {
+    compute_clover_term();
     evaluate_sw_order(&mass);
     mass = (4. + mass);
     double invexpmass = 1.0 / mass;

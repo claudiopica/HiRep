@@ -374,19 +374,19 @@ void compute_ldl_decomp_gpu(double sigma0) {
 }
 
 void compute_clover_term_gpu() {
-    sigma = 0xF00F;
-    start_sendrecv_suNf_field(u_gauge_f);
-    complete_sendrecv_suNf_field(u_gauge_f);
-
-    _CUDA_CALL((&glattice), grid, N, block_start, ixp,
-               (_compute_clover_term<<<grid, BLOCK_SIZE, 0, 0>>>(cl_term->gpu_ptr, csw_value, u_gauge_f->gpu_ptr, iup_gpu,
-                                                                 idn_gpu, N, block_start)););
-    cphi_exp_mass = 0;
-
-    apply_BCs_on_clover_term(cl_term);
+    if (stale_clover) {
+        sigma = 0xF00F;
+        start_sendrecv_suNf_field(u_gauge_f);
+        complete_sendrecv_suNf_field(u_gauge_f);
+        _CUDA_CALL((&glattice), grid, N, block_start, ixp,
+                   (_compute_clover_term<<<grid, BLOCK_SIZE, 0, 0>>>(cl_term->gpu_ptr, csw_value, u_gauge_f->gpu_ptr, iup_gpu,
+                                                                     idn_gpu, N, block_start)););
+        apply_BCs_on_clover_term(cl_term);
 #if defined(WITH_EXPCLOVER) && defined(WITH_GPU)
-    cphi_stale = 1;
+        stale_expclover = 1;
 #endif
+        stale_clover = 0;
+    }
 }
 
 void clover_la_logdet_gpu(double nf, double mass, scalar_field *la) {
@@ -450,7 +450,7 @@ __global__ void Cphi_init_(suNfc *cl_term, suNfc *cl_term_expAplus, suNfc *cl_te
 #endif
 
 void Cphi_init(double mass, double invexpmass) {
-    if (mass != cphi_exp_mass || invexpmass != cphi_invexp_mass || cphi_stale) {
+    if (mass != cphi_exp_mass || invexpmass != cphi_invexp_mass || stale_expclover) {
         _PIECE_FOR((&glattice), ixp) {
             const int N = (&glattice)->master_end[ixp] - (&glattice)->master_start[ixp] + 1;
             const int grid = (N - 1) / BLOCK_SIZE_CLOVER + 1;
@@ -467,9 +467,9 @@ void Cphi_init(double mass, double invexpmass) {
                                                           -invexpmass, N, block_start, get_NNexp());
             CudaCheckError();
         }
+        stale_expclover = 0;
         cphi_exp_mass = mass;
         cphi_invexp_mass = invexpmass;
-        cphi_stale = 0;
     }
 }
 
