@@ -1413,7 +1413,7 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in) {
  *************************************************/
 
 void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
-    compute_clover_term();
+    compute_clover_term_cpu();
     // Correct mass term
     mass = (4. + mass);
     // Loop over local sites
@@ -1463,7 +1463,7 @@ void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) 
 }
 
 void Cphi_inv_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign) {
-    compute_clover_term();
+    compute_clover_term_cpu();
     int N = 2 * NF;
     mass = (4. + mass);
 
@@ -1621,7 +1621,7 @@ void Cphi_diag_inv_flt(double mass, spinor_field_flt *dptr, spinor_field_flt *sp
 // Inverse: 0, then normal operator; 1, then inverse operator;
 // Assume hermiticity!!
 void Cphi_cpu_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse) {
-    compute_clover_term();
+    compute_clover_term_cpu();
     evaluate_sw_order(&mass);
 
     // Correct mass term

@@ -16,7 +16,6 @@ static double sigma;
 static double csw_value;
 static double cphi_exp_mass = 0;
 static double cphi_invexp_mass = 0;
-static int cphi_stale = 0;
 
 #define c_idx(i, j) ((i) * ((i) + 1) / 2 + (j))
 
@@ -375,7 +374,7 @@ void compute_ldl_decomp_gpu(double sigma0) {
 }
 
 void compute_clover_term_gpu() {
-    if (stale_clover) {
+    if (stale_clover_gpu) {
         sigma = 0xF00F;
         start_sendrecv_suNf_field(u_gauge_f);
         complete_sendrecv_suNf_field(u_gauge_f);
@@ -386,7 +385,7 @@ void compute_clover_term_gpu() {
 #ifdef WITH_EXPCLOVER
         stale_expclover = 1;
 #endif
-        stale_clover = 0;
+        stale_clover_gpu = 0;
     }
 }
 
@@ -451,6 +450,7 @@ __global__ void Cphi_init_(suNfc *cl_term, suNfc *cl_term_expAplus, suNfc *cl_te
 #endif
 
 void Cphi_init(double mass, double invexpmass) {
+    compute_clover_term();
 #ifdef WITH_EXPCLOVER
     if (mass != cphi_exp_mass || invexpmass != cphi_invexp_mass || stale_expclover) {
         _PIECE_FOR((&glattice), ixp) {
@@ -491,7 +491,7 @@ void clover_init_gpu(double csw) {
     cudaMemset(cl_ldl->gpu_ptr, 0, sizeof(ldl_t) * glattice.gsize_gauge);
     cudaMemset(cl_force->gpu_ptr, 0, 6 * sizeof(suNf) * glattice.gsize_gauge);
 #if defined(WITH_EXPCLOVER) && defined(WITH_GPU)
-    cphi_stale = 1;
+    compute_clover_term();
 #endif
 
     sigma = 0xF00F;

@@ -88,6 +88,9 @@ void represent_gauge_field() {
 #endif
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-    stale_clover = 1;
+#ifdef WITH_GPU
+    stale_clover_gpu = 1;
+#endif
+    stale_clover_cpu = 1;
 #endif
 }
