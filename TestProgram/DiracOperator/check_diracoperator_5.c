@@ -113,9 +113,9 @@ int main(int argc, char *argv[]) {
 #endif
 
     setup_random_gauge_fields();
-    compute_clover_term();
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    compute_clover_term();
     double csw_check = get_csw(); // Query GPU setting of csw
     set_csw_cpu(&csw_check); // Set CPU setting to the same value
     setup_clover();
