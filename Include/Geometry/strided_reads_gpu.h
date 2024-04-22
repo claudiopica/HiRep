@@ -140,6 +140,26 @@ __host__ __device__ __forceinline__ void write_assign_gpu(int stride, SITE_TYPE 
     }
 }
 
+template <typename REAL, typename FIELD_TYPE, typename SITE_TYPE>
+__host__ __device__ __forceinline__ void write_assign_atomic_gpu(int stride, SITE_TYPE *s, FIELD_TYPE *out, int ix, int comp,
+                                                                 int dim) {
+    const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
+    const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
+#ifdef FIXED_STRIDE
+    int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + (comp)*n_components * (THREADSIZE);
+    const int _stride = THREADSIZE;
+#else
+    int iz = ix + ((comp)*n_components) * (THREADSIZE);
+    const int _stride = stride;
+#endif
+    REAL *out_cpx = (REAL *)out;
+    REAL *out_comp_cpx = (REAL *)s;
+    for (int i = 0; i < n_components; ++i) {
+        atomicAdd(&out_cpx[iz], out_comp_cpx[i]);
+        iz += _stride;
+    }
+}
+
 __device__ __forceinline__ void read_clover(hr_complex *c, const ldl_t *in, int ix, int dn, int j) {
     // Number of doubles per site
     const int n_components = sizeof(ldl_t) / sizeof(double);

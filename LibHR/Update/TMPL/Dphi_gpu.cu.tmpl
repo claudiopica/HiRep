@@ -210,15 +210,18 @@ _DECLARE(static void, Dphi_boundary, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
         int grid = (boxEvenVolume(geometryBoxes) - 1) / BLOCK_SIZE + 1;
 
         if (gd_t & EVEN) {
-            Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE>>>(
-                in_offset, out_offset, gauge, boxEvenVolume(buffer_box), boxOddVolume(geometryBoxes), buffer_box->base_index,
-                geometryBoxes->base_index_odd, EVEN, buffer_box->mask, iup_gpu, idn_gpu);
+            Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE>
+                <<<grid, BLOCK_SIZE, 0, memory_streams[(2 * i) % 16]>>>(in_offset, out_offset, gauge, boxEvenVolume(buffer_box),
+                                                                        boxOddVolume(geometryBoxes), buffer_box->base_index,
+                                                                        geometryBoxes->base_index_odd, EVEN, buffer_box->mask,
+                                                                        iup_gpu, idn_gpu);
         }
 
         if (gd_t & ODD) {
-            Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE>>>(
-                in_offset, out_offset, gauge, boxOddVolume(buffer_box), boxEvenVolume(geometryBoxes),
-                buffer_box->base_index_odd, geometryBoxes->base_index, ODD, buffer_box->mask, iup_gpu, idn_gpu);
+            Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE>
+                <<<grid, BLOCK_SIZE, 0, memory_streams[(2 * i + 1) % 16]>>>(
+                    in_offset, out_offset, gauge, boxOddVolume(buffer_box), boxEvenVolume(geometryBoxes),
+                    buffer_box->base_index_odd, geometryBoxes->base_index, ODD, buffer_box->mask, iup_gpu, idn_gpu);
         }
         CudaCheckError();
 

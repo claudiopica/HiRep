@@ -214,14 +214,14 @@ _DECLARE(void, sync_box_to_buffer_gpu_reduced_,
     _GAUGE_TYPE *gauge = GFIELD(u_gauge, _REP_SUFFIX)->gpu_ptr;
 
     if (gd_t & EVEN) {
-        _F_NAME(box_to_buffer_kernel_reduced_, _FIELD_TYPE)<<<grid, BLOCK_SIZE, 0, 0>>>(
+        _F_NAME(box_to_buffer_kernel_reduced_, _FIELD_TYPE)<<<grid, BLOCK_SIZE, 0, memory_streams[(2 * buf) % 16]>>>(
             in_offset, out_offset, gauge, sb_icoord_gpu, ipt_gpu, boxEvenVolume(geometryBoxes), boxEvenVolume(box),
             geometryBoxes->base_index, box->base_index, mask, idn_gpu);
         CudaCheckError();
     }
 
     if (gd_t & ODD) {
-        _F_NAME(box_to_buffer_kernel_reduced_, _FIELD_TYPE)<<<grid, BLOCK_SIZE, 0, 0>>>(
+        _F_NAME(box_to_buffer_kernel_reduced_, _FIELD_TYPE)<<<grid, BLOCK_SIZE, 0, memory_streams[(2 * buf + 1) % 16]>>>(
             in_offset, out_offset, gauge, sb_icoord_gpu, ipt_gpu, boxOddVolume(geometryBoxes), boxOddVolume(box),
             geometryBoxes->base_index_odd, box->base_index_odd, mask, idn_gpu);
         CudaCheckError();

@@ -143,6 +143,7 @@ GLB_VAR(coord4 *, sb_icoord_gpu, );
 #define BLOCK_SIZE_SYNC 32
 
 GLB_VAR(cudaStream_t, non_default_stream, = NULL);
+GLB_VAR(cudaStream_t, memory_streams[16]);
 GLB_VAR(kernel_field_input, **input, = NULL);
 
 GLB_VAR(input_gpu, gpu_var, = init_input_gpu(gpu_var));
