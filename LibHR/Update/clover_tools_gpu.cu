@@ -359,6 +359,7 @@ double get_csw_gpu() {
 }
 
 void compute_ldl_decomp_gpu(double sigma0) {
+    compute_clover_term();
     if (sigma == sigma0) {
         return;
     } else {
@@ -382,7 +383,7 @@ void compute_clover_term_gpu() {
                    (_compute_clover_term<<<grid, BLOCK_SIZE, 0, 0>>>(cl_term->gpu_ptr, csw_value, u_gauge_f->gpu_ptr, iup_gpu,
                                                                      idn_gpu, N, block_start)););
         apply_BCs_on_clover_term(cl_term);
-#if defined(WITH_EXPCLOVER) && defined(WITH_GPU)
+#ifdef WITH_EXPCLOVER
         stale_expclover = 1;
 #endif
         stale_clover = 0;

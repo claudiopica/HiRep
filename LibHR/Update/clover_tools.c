@@ -312,6 +312,7 @@ void compute_clover_term_cpu() {
 }
 
 void compute_ldl_decomp_cpu(double sigma0) {
+    compute_clover_term();
     if (sigma == sigma0) {
         return;
     } else {
