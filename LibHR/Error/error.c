@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
+* Copyright (c) 2008-2024, Claudio Pica, Sofie Martins                      *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
@@ -10,9 +10,11 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "IO/logger.h"
-#include "Geometry/setup.h"
-#include "error.h"
+//#include "Geometry/setup.h"
+//#include "error.h"
+#include "libhr_core.h"
+#include "io.h"
+#include "geometry.h"
 
 /**
  * @brief Print message to error file defined on startup.
@@ -35,6 +37,9 @@ void error(int test, int no, const char *name, const char *text) {
         if (no < 0) {
             exit(0);
         } else {
+#ifdef WITH_MPI
+            MPI_Abort(MPI_COMM_WORLD, no);
+#endif
             finalize_process();
             exit(no);
         }
