@@ -27,10 +27,12 @@ int main(int argc, char *argv[]) {
 
     // The global sum is the most efficient reduction we can do
     // TODO; only do reduction, bypass the host to device copy
-    _WARMUP_SPEEDTEST(clock, n_warmup, time_target, n_reps, global_sum_gpu_double((double *)u_gauge->ptr, 1));
-    _RUN_SPEEDTEST(clock, n_warmup, time_target, n_reps, flopsite, bytesite, global_sum_gpu_double((double *)u_gauge->ptr, 1));
+    _WARMUP_SPEEDTEST(clock, n_warmup, time_target, n_reps, double res = global_sum_gpu_double((double *)u_gauge->ptr, 1);
+                      global_sum((double *)&res, 1));
+    _RUN_SPEEDTEST(clock, n_warmup, time_target, n_reps, flopsite, bytesite,
+                   double res = global_sum_gpu_double((double *)u_gauge->ptr, 1);
+                   global_sum((double *)&res, 1));
 
-    // How about the spinor field sqnorm?
     lprintf("REDUCTION BENCHMARKS", 1, "Testing spinor field sqnorm\n");
     flopsite = flops_per_site(SF_SQNORM);
     bytesite = bytes_per_site(SF_SQNORM);
@@ -43,5 +45,6 @@ int main(int argc, char *argv[]) {
     _WARMUP_SPEEDTEST(clock, n_warmup, time_target, n_reps, avr_plaquette());
     _RUN_SPEEDTEST(clock, n_warmup, time_target, n_reps, flopsite, bytesite, avr_plaquette());
 
+    finalize_process();
     return 0;
 }

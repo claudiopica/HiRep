@@ -21,8 +21,8 @@ static const int ninputs = 3;
 #define _TEST_BASE(_FIELD_TYPE, _max_geom, _prec)                                                                                                                 \
     do {                                                                                                                                                          \
         for (int geom_idx = 0; geom_idx < _max_geom; ++geom_idx) {                                                                                                \
-            _FIELD_TYPE *in = alloc(in, 1, geometries[geom_idx]);                                                                                                 \
-            _FIELD_TYPE *out = alloc(out, 1, geometries[geom_idx]);                                                                                               \
+            _FIELD_TYPE *in = alloc(in, 2, geometries[geom_idx]);                                                                                                 \
+            _FIELD_TYPE *out = in + 1;                                                                                                                            \
                                                                                                                                                                   \
             for (int k = 0; k < niter; k++) {                                                                                                                     \
                 lprintf(                                                                                                                                          \
@@ -37,7 +37,6 @@ static const int ninputs = 3;
                 _TEST_CPU_INV_OP(errors, "zero", 1, in, out, zero(out); zero(in);, "TEST BASE", _prec);                                                           \
             }                                                                                                                                                     \
             free_field(in);                                                                                                                                       \
-            free_field(out);                                                                                                                                      \
         }                                                                                                                                                         \
     } while (0)
 

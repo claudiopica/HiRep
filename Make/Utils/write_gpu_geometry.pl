@@ -11,7 +11,7 @@ use strict;
 # rep ... Fermion Representation String Descriptor
 # su2quat ... SU(2) with Quaternions true/false
 # Gauge group ... SU(N) or SO(N), possible strings GAUGE_SUN, GAUGE_SON
-my ($Ng,$rep,$su2quat,$gauge_group,$fixed_stride)=@ARGV;
+my ($Ng,$rep,$su2quat,$gauge_group)=@ARGV;
 
 # open STDOUT, ">gpu_geometry.h";
 open STDOUT, ">strided_reads.h";
@@ -49,13 +49,7 @@ my @precision_desc = ("Double Precision", "Single Precision");
 my $basename = "suN";
 my @rep_suffixes = ("g", "f");
 
-my $stride;
-if ($fixed_stride==1) {
-    $stride = "THREADSIZE";
-} else {
-    $stride = "_stride";
-}
-
+my $stride = "THREADSIZE";
 
 ### WRITING FILE CONTENTS
 write_prolog();
@@ -106,11 +100,7 @@ sub write_epilog {
 }
 
 sub write_idx_finder {
-    if ($fixed_stride==1) {
-        print "#define calc_idx(_idx,_typename,_type,_dim) (( (_idx) / THREADSIZE ) * THREADSIZE ) * _dim * sizeof(_typename) / sizeof(_type) + (_idx)%THREADSIZE\n\n";
-    } else {
-        print "#define calc_idx(_idx,...) (_idx)\n\n";
-    }
+    print "#define calc_idx(_idx,_typename,_type,_dim) (( (_idx) / THREADSIZE ) * THREADSIZE ) * _dim * sizeof(_typename) / sizeof(_type) + (_idx)%THREADSIZE\n\n";
 }
 
 sub write_gpu_spinor {

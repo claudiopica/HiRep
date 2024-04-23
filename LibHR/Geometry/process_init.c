@@ -261,6 +261,14 @@ void finalize_process() {
     //   free_geometry_mpi_eo();
     // #endif
 
+#ifdef WITH_GPU
+    CHECK_CUDA(cudaSetDevice(LID));
+    CHECK_CUDA(cudaStreamDestroy(non_default_stream));
+    for (int i = 0; i < 16; i++) {
+        CHECK_CUDA(cudaStreamDestroy(memory_streams[i]));
+    }
+#endif
+
 #ifdef WITH_MPI
     finalize_hr_comms();
     /* MPI variables */

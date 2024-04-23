@@ -39,6 +39,7 @@ _GPU_DECLARE(sync_reduced_, (_FIELD_TYPE * f)) {
 #ifdef WITH_MPI
     _BUFFER_BOX_FOR(L, _F_NAME(sync_box_to_buffer_gpu_reduced_, _FIELD_TYPE)(f->type, L->sendBox, f, f->sendbuf_gpu_ptr, i,
                                                                              L->mask);)
+    CudaCheckError();
 #endif
 }
 

@@ -144,6 +144,7 @@ GLB_VAR(coord4 *, sb_icoord_gpu, );
 #define BLOCK_SIZE_SYNC 32
 
 GLB_VAR(cudaStream_t, non_default_stream, = NULL);
+GLB_VAR(cudaStream_t, memory_streams[16]);
 GLB_VAR(kernel_field_input, **input, = NULL);
 
 GLB_VAR(input_gpu, gpu_var, = init_input_gpu(gpu_var));
@@ -240,11 +241,7 @@ GLB_VAR(scalar_field, *ff_pi_mom, = NULL);
 
 GLB_VAR(int, four_fermion_active, = 0); // whether four fermion interactions are active
 
-#ifdef FIXED_STRIDE
-    // GPU fixed reading stride
+#ifndef THREADSIZE
 #define THREADSIZE 32
-#else
-    // Not sure this works for going back to the old striding (SAM)
-#define THREADSIZE 1
 #endif
 #endif

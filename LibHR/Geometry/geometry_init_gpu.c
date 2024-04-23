@@ -60,6 +60,9 @@ void init_neighbors_gpu() {
     sb_icoord_gpu = icoord_gpu + main_mem_volume;
 
     CHECK_CUDA(cudaStreamCreate(&non_default_stream));
+    for (int i = 0; i < 16; i++) {
+        CHECK_CUDA(cudaStreamCreate(&memory_streams[i]));
+    }
 
     input = (kernel_field_input **)malloc(glattice.nbuffers_spinor * sizeof(kernel_field_input) / 2);
     for (int i = 0; i < glattice.nbuffers_spinor / 2; i++) {

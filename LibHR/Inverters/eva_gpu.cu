@@ -48,6 +48,7 @@ void rotate_gpu(int n, spinor_field *pkk, hr_complex v[]) {
         const int start = pkk->type->master_start[ixp];
         const int grid = (N - 1) / BLOCK_SIZE + 1;
         rotate_kernel<<<grid, BLOCK_SIZE, 0, 0>>>(n, pkk_gpu_d, v, start, N);
+        CudaCheckError();
     }
 
     cudaFree(pkk_gpu_d);

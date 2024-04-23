@@ -34,9 +34,10 @@ _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, copy, (_FIELD_TYPE * s1, _FIELD_TYPE *s2), 
         // the padding that is there to avoid segfaults for 32-site striding
         int block_size_adjusted = block_size;
         if (block_size % THREADSIZE != 0) { block_size_adjusted = ((block_size / THREADSIZE) + 1) * THREADSIZE; }
-        cudaMemcpy(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM),
-                   block_size_adjusted * _FIELD_DIM * sizeof(_SITE_TYPE), cudaMemcpyDeviceToDevice);
+        CHECK_CUDA(cudaMemcpy(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), _GPU_DFIELD_BLK(s2, ixp, _FIELD_DIM),
+                              block_size_adjusted * _FIELD_DIM * sizeof(_SITE_TYPE), cudaMemcpyDeviceToDevice));
     }
+    cudaDeviceSynchronize();
 }
 
 /* s1=0 */
@@ -45,8 +46,9 @@ _DECLARE_LINEAR_ALGEBRA_GPU_OP(void, zero, (_FIELD_TYPE * s1), (s1)) {
         const int block_size = s1->type->master_end[ixp] - s1->type->master_start[ixp] + 1;
         int block_size_adjusted = block_size;
         if (block_size % THREADSIZE != 0) { block_size_adjusted = ((block_size / THREADSIZE) + 1) * THREADSIZE; }
-        cudaMemset(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), 0, block_size_adjusted * _FIELD_DIM * sizeof(_SITE_TYPE));
+        CHECK_CUDA(cudaMemset(_GPU_DFIELD_BLK(s1, ixp, _FIELD_DIM), 0, block_size_adjusted * _FIELD_DIM * sizeof(_SITE_TYPE)));
     }
+    cudaDeviceSynchronize();
 }
 
 //user interface macros

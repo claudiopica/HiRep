@@ -291,7 +291,7 @@ int main(int argc, char *argv[]) {
 
         int MVM = 0; /* counter for matrix-vector multiplications */
 
-        max_H(&H2EVA, &glattice, &max);
+        max_eigval(&H2EVA, &glattice, &max);
         lprintf("MAIN", 0, "MAXCHECK: cnfg=%e  uppbound=%e diff=%e %s\n", max, mupp, mupp - max,
                 (mupp - max) < 0 ? "[FAILED]" : "[OK]");
         max *= 1.1;

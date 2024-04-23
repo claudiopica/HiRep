@@ -1,6 +1,6 @@
 /****************************************************************************
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
             /* Lowest eigenvalues */
             if (strcmp(eigval_var.make, "true") == 0) {
                 double max;
-                max_H(&H2eva, &glattice, &max);
+                max_eigval(&H2eva, &glattice, &max);
                 max *= 1.1;
                 int status;
                 int ie = eva(eigval_var.nev, eigval_var.nevt, 0, eigval_var.kmax, eigval_var.maxiter, max, eigval_var.omega1,

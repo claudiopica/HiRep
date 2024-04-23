@@ -615,7 +615,7 @@ __global__ void Dphi_gpu_boundary_kernel(SITE_TYPE *in, SITE_TYPE *out, const GA
             DPHI_RED_Z_DN_GPU(r, sn);
         }
 
-        write_assign_gpu<REAL>(0, &r, out, ix, 0, 1);
+        write_assign_atomic_gpu<REAL>(0, &r, out, ix, 0, 1);
     }
 }
 

@@ -28,7 +28,9 @@ int main(int argc, char *argv[]) {
     scalar_field *tmp = alloc_scalar_field(1, &glattice);
 
     suNg_field *gfield_tmp = alloc_suNg_field(&glattice);
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
     suNf_field *gfield_f_tmp = alloc_suNf_field(&glattice);
+#endif
 
     random_scalar_field_cpu(loc_action);
     copy_to_gpu_scalar_field(loc_action);

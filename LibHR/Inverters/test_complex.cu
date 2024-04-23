@@ -349,8 +349,8 @@ template <class L> void random_number(hr_complex_t<L> &c) {
                                                                                       \
             a = c __operator__ b;                                                     \
             __fname__##_gpu<<<1, 1>>>(b_gpu, c_gpu, a_d);                             \
+            CudaCheckError();                                                         \
                                                                                       \
-            cudaDeviceSynchronize();                                                  \
             cudaMemcpy(&a_gpu, a_d, sizeof(CPX1), cudaMemcpyDeviceToHost);            \
                                                                                       \
             auto b2 = hr_complex_t(b);                                                \
@@ -370,8 +370,8 @@ template <class L> void random_number(hr_complex_t<L> &c) {
                                                                                       \
             a = b __operator__ c;                                                     \
             __fname__##_gpu<<<1, 1>>>(c_gpu, b_gpu, a_d);                             \
+            CudaCheckError();                                                         \
                                                                                       \
-            cudaDeviceSynchronize();                                                  \
             cudaMemcpy(&a_gpu, a_d, sizeof(CPX1), cudaMemcpyDeviceToHost);            \
                                                                                       \
             auto b2 = hr_complex_t(b);                                                \

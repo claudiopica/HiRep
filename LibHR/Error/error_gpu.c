@@ -10,31 +10,19 @@
 
 void __cudaSafeCall(cudaError_t err, const char *func, const char *file, const int line) {
 #ifndef CUDA_NO_CHECK_ERROR
-
-#pragma warning(push)
-#pragma warning(disable : 4127) // Prevent warning on do-while(0);
-
     do {
         if (cudaSuccess != err) {
             lprintf("CUDA", 0, "cudaSafeCall() failed in %s, at %s:%i\n", func, file, line);
             error((cudaSuccess != err), 1, "CudaSafeCall", cudaGetErrorString(err));
         }
     } while (0);
-
-#pragma warning(pop)
-
 #endif
-
     return;
 }
 
 void __cudaCheckError(const char *func, const char *file, int line) /*TODO: inline void? (SAM) */
 {
 #ifndef CUDA_NO_CHECK_ERROR
-
-#pragma warning(push)
-#pragma warning(disable : 4127) // Prevent warning on do-while(0);
-
     do {
         cudaError_t err = cudaGetLastError();
         if (cudaSuccess != err) {
@@ -50,15 +38,9 @@ void __cudaCheckError(const char *func, const char *file, int line) /*TODO: inli
             error((cudaSuccess != err), 1, "CudaCheckError with sync", cudaGetErrorString(err));
         }
     } while (0);
-
-#pragma warning(pop)
-
 #else
-
     cudaDeviceSynchronize();
-
 #endif
-
     return;
 }
 
