@@ -722,6 +722,7 @@ __global__ static void _force_clover_fermion_taylor(double invexpmass, suNf *cl_
 
 void force_clover_fermion_gpu(spinor_field *Xs, spinor_field *Ys, double residue) {
 #ifdef WITH_EXPCLOVER
+    compute_clover_term();
     double invexpmass = get_dirac_mass();
     evaluate_sw_order(&invexpmass);
     invexpmass = 1.0 / (4.0 + invexpmass);
@@ -753,6 +754,7 @@ void force_clover_fermion_gpu(spinor_field *Xs, spinor_field *Ys, double residue
 
 #ifdef WITH_EXPCLOVER
 void force_clover_fermion_taylor_gpu(spinor_field *Xs, spinor_field *Ys, double residue) {
+    compute_clover_term();
     double invexpmass = get_dirac_mass();
     evaluate_sw_order(&invexpmass);
     invexpmass = 1.0 / (4.0 + invexpmass);

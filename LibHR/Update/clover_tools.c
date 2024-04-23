@@ -296,19 +296,23 @@ void clover_la_logdet_cpu(double nf, double mass, scalar_field *la) {
 }
 
 void compute_clover_term_cpu() {
-    sigma = 0xF00F;
+    if (stale_clover_cpu) {
+        sigma = 0xF00F;
 #ifdef WITH_FUSE_MASTER_FOR
-    _FUSE_MASTER_FOR(&glattice, id) {
-        _FUSE_IDX(&glattice, id);
+        _FUSE_MASTER_FOR(&glattice, id) {
+            _FUSE_IDX(&glattice, id);
 #else
-    _MASTER_FOR(&glattice, id) {
+        _MASTER_FOR(&glattice, id) {
 #endif
-        _compute_clover_term(id);
+            _compute_clover_term(id);
+        }
+        apply_BCs_on_clover_term(cl_term);
+        stale_clover_cpu = 0;
     }
-    apply_BCs_on_clover_term(cl_term);
 }
 
 void compute_ldl_decomp_cpu(double sigma0) {
+    compute_clover_term_cpu();
     if (sigma == sigma0) {
         return;
     } else {

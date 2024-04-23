@@ -31,6 +31,10 @@ extern void (*compute_force_logdet)(double, double);
 extern void (*clover_init)(double);
 extern void (*set_csw)(double *);
 
+#if defined(WITH_GPU) && defined(WITH_EXPCLOVER)
+void Cphi_init(double mass, double invexpmass);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

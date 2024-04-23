@@ -115,6 +115,7 @@ int main(int argc, char *argv[]) {
     setup_random_gauge_fields();
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    compute_clover_term();
     double csw_check = get_csw(); // Query GPU setting of csw
     set_csw_cpu(&csw_check); // Set CPU setting to the same value
     setup_clover();
@@ -152,17 +153,17 @@ int main(int argc, char *argv[]) {
 
 #ifdef WITH_CLOVER
 
-    _TEST_GPU_OP(errors, "Cphi_", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, &in_flt[1], in, 0);
-                 Cphi_cpu_(-hmass, &in_flt[1], in, 0);, "GPU_TEST", EPSILON_TEST);
+    _TEST_GPU_OP(errors, "Cphi_", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, &in[1], in, 0);
+                 Cphi_cpu_(-hmass, &in[1], in, 0);, "GPU_TEST", EPSILON_TEST);
 
-    _TEST_GPU_OP(errors, "Cphi_ (+=)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, &in_flt[1], in, 1);
-                 Cphi_cpu_(-hmass, &in_flt[1], in, 1);, "GPU_TEST", EPSILON_TEST);
+    _TEST_GPU_OP(errors, "Cphi_ (+=)", ninputs + noutputs + 1, in, in + 1, Cphi_(-hmass, &in[1], in, 1);
+                 Cphi_cpu_(-hmass, &in[1], in, 1);, "GPU_TEST", EPSILON_TEST);
 
-    _TEST_GPU_OP(errors, "Cphi_inv_", ninputs + noutputs + 1, in, in + 1, Cphi_inv_(-hmass, &in_flt[1], in, 0);
-                 Cphi_inv_cpu_(-hmass, &in_flt[1], in, 0);, "GPU_TEST", EPSILON_TEST);
+    _TEST_GPU_OP(errors, "Cphi_inv_", ninputs + noutputs + 1, in, in + 1, Cphi_inv_(-hmass, &in[1], in, 0);
+                 Cphi_inv_cpu_(-hmass, &in[1], in, 0);, "GPU_TEST", EPSILON_TEST);
 
-    _TEST_GPU_OP(errors, "Cphi_inv_ (+=)", ninputs + noutputs + 1, in, in + 1, Cphi_inv_(-hmass, &in_flt[1], in, 1);
-                 Cphi_inv_cpu_(-hmass, &in_flt[1], in, 1);, "GPU_TEST", EPSILON_TEST);
+    _TEST_GPU_OP(errors, "Cphi_inv_ (+=)", ninputs + noutputs + 1, in, in + 1, Cphi_inv_(-hmass, &in[1], in, 1);
+                 Cphi_inv_cpu_(-hmass, &in[1], in, 1);, "GPU_TEST", EPSILON_TEST);
 
 #endif
 

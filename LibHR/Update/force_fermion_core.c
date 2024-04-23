@@ -421,6 +421,7 @@ static void A_times_spinor(suNf_spinor *out, suNfc *Aplus, suNfc *Aminus, suNf_s
 
 // EXP CSW FORCE TERM
 void force_clover_fermion_cpu(spinor_field *Xs, spinor_field *Ys, double residue) {
+    compute_clover_term_cpu();
     double invexpmass = get_dirac_mass();
 
     evaluate_sw_order(&invexpmass);
@@ -558,6 +559,7 @@ void force_clover_fermion_cpu(spinor_field *Xs, spinor_field *Ys, double residue
 }
 
 void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double residue) {
+    compute_clover_term_cpu();
     double invexpmass = get_dirac_mass();
 
     evaluate_sw_order(&invexpmass);

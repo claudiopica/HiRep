@@ -19,6 +19,7 @@
 
 #include "geometry.h"
 #include <stddef.h>
+#include "flags.h"
 
 #ifndef M_PI
 // Define M_PI if its not part of the C standard
@@ -179,6 +180,12 @@ GLB_VAR(suNf_field, *u_gauge_f, = NULL);
 GLB_VAR(suNg_field, *u_gauge_s, = NULL);
 GLB_VAR(suNf_field_flt, *u_gauge_f_flt, = NULL);
 GLB_VAR(clover_term, *cl_term, = NULL);
+#if defined(WITH_EXPCLOVER) && defined(WITH_GPU)
+GLB_VAR(clover_term, *cl_term_expAplus, = NULL);
+GLB_VAR(clover_term, *cl_term_expAminus, = NULL);
+GLB_VAR(clover_term, *cl_term_expAplusinv, = NULL);
+GLB_VAR(clover_term, *cl_term_expAminusinv, = NULL);
+#endif
 GLB_VAR(clover_force, *cl_force, = NULL);
 GLB_VAR(ldl_field, *cl_ldl, = NULL);
 GLB_VAR(suNg_av_field, *suN_momenta, = NULL);
@@ -237,7 +244,4 @@ GLB_VAR(int, four_fermion_active, = 0); // whether four fermion interactions are
 #ifndef THREADSIZE
 #define THREADSIZE 32
 #endif
-
-#undef GLB_VAR
-
 #endif
