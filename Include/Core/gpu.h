@@ -46,7 +46,7 @@ typedef struct {
 #define cub hipcub
 #define cudaGetLastError hipGetLastError
 #define cudaErrorInvalidDevice hipErrorInvalidDevice
-#define cudaErrorPeerAccessAlreadyEnable hipErrorPeerAccessAlreadyEnable
+#define cudaErrorPeerAccessAlreadyEnabled hipErrorPeerAccessAlreadyEnabled
 #define cudaErrorInvalidValue hipErrorInvalidValue
 #define cudaStreamDestroy hipStreamDestroy
 #define cudaMemcpyHostToDevice hipMemcpyHostToDevice
