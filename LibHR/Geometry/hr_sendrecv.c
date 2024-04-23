@@ -97,9 +97,19 @@ void communicate(comms_args *l) {
         number_of_sites = roundUp(l->type->sbuf_len[i], THREADSIZE) / 2;
         int send_size_in_dbl = l->field_dim * number_of_sites * l->mpi_chunks_per_site;
 
-        CHECK_MPI(MPI_Sendrecv(send_buffer, send_size_in_dbl, MPI_DOUBLE, send_proc, i, recv_buffer, recv_size_in_dbl,
+#ifdef COMMS_NONBLOCKING
+        CHECK_MPI(
+            MPI_Irecv(recv_buffer, recv_size_in_dbl, l->mpi_real_type, recv_proc, i, cart_comm, &(l->field_reqs[2 * i + 1])));
+        CHECK_MPI(MPI_Isend(send_buffer, send_size_in_dbl, l->mpi_real_type, send_proc, i, cart_comm, &(l->field_reqs[2 * i])));
+#else
+        CHECK_MPI(MPI_Sendrecv(send_buffer, send_size_in_dbl, l->mpi_real_type, send_proc, i, recv_buffer, recv_size_in_dbl,
                                MPI_DOUBLE, recv_proc, i, cart_comm, MPI_STATUS_IGNORE));
+#endif
     }
+
+#ifdef COMMS_NONBLOCKING
+    if (l->nbuffers > 0) { MPI_Waitall(2 * l->nbuffers, l->field_reqs, MPI_STATUSES_IGNORE); }
+#endif
 }
 
 void *wait_for_signal(void *argv) {
