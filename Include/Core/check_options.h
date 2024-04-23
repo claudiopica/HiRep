@@ -221,16 +221,24 @@
 #endif
 
 // GPU checks
-#if defined(WITH_GPU) && defined(WITH_MPI) && !defined(WITH_NEW_GEOMETRY)
+#ifdef WITH_GPU
+#ifndef WITH_NEW_GEOMETRY
 #error Multi-GPU version does not work with old geometry. Please use new geometry.
 #endif
 
-#if defined(WITH_GPU) && defined(GAUGE_SON)
+#ifdef GAUGE_SON
 #error SO(N) gauge groups not yet implemented on GPU
 #endif
 
-#if NF > 3 && WITH_EXPCLOVER && WITH_GPU
+#if NF > 3 && WITH_EXPCLOVER
 #error "Exponential clover on GPU not implemented for NF>3"
+#endif
+
+#if !((defined(BC_T_PERIODIC) || defined(BC_T_ANTIPERIODIC)) && (defined(BC_X_PERIODIC) || defined(BC_X_ANTIPERIODIC)) && \
+      (defined(BC_Y_PERIODIC) || defined(BC_Y_ANTIPERIODIC)) && (defined(BC_Z_PERIODIC) || defined(BC_Z_ANTIPERIODIC)))
+#error "WITH_GPU only supports periodic or antiperiodic boundary conditions."
+#endif
+
 #endif
 
 #endif /* CHECK_OPTIONS_H */
