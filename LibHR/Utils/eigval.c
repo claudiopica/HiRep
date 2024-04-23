@@ -11,8 +11,7 @@
 #include "memory.h"
 
 /* use inverse power method to find smallest eigenvalue */
-int min_eigval(spinor_operator H, geometry_descriptor *type, double *min)
-{
+int min_eigval(spinor_operator H, geometry_descriptor *type, double *min) {
     spinor_field *s0, *s1, *s2, *stmp;
     mshift_par par;
     int count = 0;
@@ -32,10 +31,9 @@ int min_eigval(spinor_operator H, geometry_descriptor *type, double *min)
     par.err2 = 1.0e-6;
     par.max_iter = 0;
 
-    while(tmp > 1.0e-4)
-    {
+    while (tmp > 1.0e-4) {
         norm = sqnorm_spinor_field(s1);
-        norm = 1.0/sqrt(norm);
+        norm = 1.0 / sqrt(norm);
         mul_spinor_field(s1, norm, s1);
 
         count += cg_mshift(&par, H, s1, s2);
@@ -58,8 +56,7 @@ int min_eigval(spinor_operator H, geometry_descriptor *type, double *min)
 }
 
 /* use power method to find largest eigenvalue */
-int max_eigval(spinor_operator H, geometry_descriptor *type, double *max)
-{
+int max_eigval(spinor_operator H, geometry_descriptor *type, double *max) {
     spinor_field *s0, *s1, *s2, *stmp;
     int count = 0;
     double eig = 0;
@@ -72,10 +69,9 @@ int max_eigval(spinor_operator H, geometry_descriptor *type, double *max)
     s2 = s1 + 1;
     gaussian_spinor_field(s1);
 
-    while(tmp > 1.0e-4)
-    {
+    while (tmp > 1.0e-4) {
         norm = sqnorm_spinor_field(s1);
-        norm = 1.0/sqrt(norm);
+        norm = 1.0 / sqrt(norm);
         mul_spinor_field(s1, norm, s1);
 
         H(s2, s1);
