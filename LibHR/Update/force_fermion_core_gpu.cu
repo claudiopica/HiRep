@@ -83,6 +83,8 @@
 
 static suNg_av_field *force_sum = NULL;
 
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+
 __device__ static void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu) {
     if (mu == 0 && nu == 1) {
         for (int i = 0; i < NF; i++) {
@@ -188,6 +190,8 @@ __device__ static suNf fmat_create(suNf_spinor *a_lhs, suNf_spinor *a_rhs, suNf_
     }
     return fmat;
 }
+
+#endif
 
 __global__ static void _force_fermion_core(suNf_spinor *Xs, suNf_spinor *Ys, suNg_algebra_vector *force_sum_gpu, suNf *gauge,
                                            int *iup_gpu, double coeff, int N, int block_start) {
@@ -730,6 +734,7 @@ void force_clover_fermion_gpu(spinor_field *Xs, spinor_field *Ys, double residue
         suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start;
         _force_clover_fermion<<<grid, BLOCK_SIZE, 0, 0>>>(invexpmass, cl_force_gpu, cl_term_gpu, _GPU_FIELD_BLK(Xs, ixp),
                                                           _GPU_FIELD_BLK(Ys, ixp), residue, get_NNexp(), N, block_start);
+        CudaCheckError();
     }
 #endif
 
@@ -741,6 +746,7 @@ void force_clover_fermion_gpu(spinor_field *Xs, spinor_field *Ys, double residue
         suNf *cl_force_gpu = cl_force->gpu_ptr + 6 * block_start;
         _force_clover_fermion<<<grid, BLOCK_SIZE, 0, 0>>>(cl_force_gpu, _GPU_FIELD_BLK(Xs, ixp), _GPU_FIELD_BLK(Ys, ixp),
                                                           residue, N, block_start);
+        CudaCheckError();
     }
 #endif
 }
@@ -760,6 +766,7 @@ void force_clover_fermion_taylor_gpu(spinor_field *Xs, spinor_field *Ys, double 
         suNfc *cl_term_gpu = cl_term->gpu_ptr + 4 * block_start;
         _force_clover_fermion_taylor<<<grid, BLOCK_SIZE, 0, 0>>>(invexpmass, cl_force_gpu, cl_term_gpu, _GPU_FIELD_BLK(Xs, ixp),
                                                                  _GPU_FIELD_BLK(Ys, ixp), residue, get_NNexp(), N, block_start);
+        CudaCheckError();
     }
 }
 #endif
@@ -776,6 +783,7 @@ void force_clover_core_gpu(double dt) {
         const int grid = (N - 1) / BLOCK_SIZE + 1;
         _force_clover_core<<<grid, BLOCK_SIZE, 0, 0>>>(cl_force->gpu_ptr, force_sum->gpu_ptr, u_gauge_f->gpu_ptr, iup_gpu,
                                                        idn_gpu, dt, coeff, N, block_start);
+        CudaCheckError();
     }
 }
 
@@ -844,6 +852,7 @@ void force_fermion_core_gpu(spinor_field *Xs, spinor_field *Ys, int auto_fill_od
         const int grid = (N - 1) / BLOCK_SIZE + 1;
         _force_fermion_core<<<grid, BLOCK_SIZE, 0, 0>>>(Xs->gpu_ptr, Ys->gpu_ptr, force_sum->gpu_ptr, u_gauge_f->gpu_ptr,
                                                         iup_gpu, coeff, N, block_start);
+        CudaCheckError();
     }
 
     Xs->type = Xtmp.type;

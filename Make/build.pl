@@ -161,10 +161,9 @@ my @libs = ("libhrobservables.a", "libhr.a"); #order is important
     "speed_test_clover_flt" => [ "speed_test_clover_flt.c", ],
     "speed_test_reduction" => [ "speed_test_reduction.c", ],
     "speed_test_linear_algebra" => [ "speed_test_linear_algebra.c", ],
-    #"speed_test_linear_algebra_flt" => [ "speed_test_linear_algebra_flt.c", ],
+    "speed_test_linear_algebra_flt" => [ "speed_test_linear_algebra_flt.c", ],
     "speed_test_random" => [ "speed_test_random.c", ],
-    #"speed_test_geometry" => [ "speed_test_geometry.c", "speed_test_geometry_gpu.cu", ],
-    #"speed_test_communications" => [ "speed_test_communications.c" ]
+    "speed_test_communications" => [ "speed_test_communications.c" ]
   );
 
   add_exes($topdir, \%exes, \@libs_core);

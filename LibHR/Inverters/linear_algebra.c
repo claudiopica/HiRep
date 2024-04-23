@@ -368,6 +368,7 @@ hr_complex suNf_flt_prod(suNf_flt *u, suNf_flt *v) {
 
 hr_complex suNgc_prod(suNgc *u, suNgc *v) {
     suNgc tmp1, tmp2;
+    _suNg_unit(tmp2);
     hr_complex res = 0.0;
     _suNg_dagger(tmp1, *u);
     _suNg_multiply(tmp2, tmp1, *v);
@@ -377,6 +378,7 @@ hr_complex suNgc_prod(suNgc *u, suNgc *v) {
 
 hr_complex suNfc_prod(suNfc *u, suNfc *v) {
     suNfc tmp1, tmp2;
+    _suNfc_unit(tmp2);
     hr_complex res = 0.0;
     _suNfc_dagger(tmp1, *u);
     _suNfc_multiply(tmp2, tmp1, *v);

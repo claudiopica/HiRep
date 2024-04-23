@@ -331,13 +331,6 @@ sub read_conf {
         $options{'WQUAT'} = [ "0" ] ;
     }
 
-    # stride fixed?
-    if (contains($options{'MACRO'}, "FIXED_STRIDE")) {
-        $options{'IS_STRIDE_FIXED'} = [ "1" ] ;
-    } else {
-        $options{'IS_STRIDE_FIXED'} = [ "0" ] ;
-    }
-
     # handle WITH_MPI compiler 
     if (contains($options{'MACRO'},"WITH_MPI")) {
         $options{'CC'} = $options{'MPICC'};
@@ -374,12 +367,13 @@ sub read_conf {
             # set linker
             unshift @{$options{'LINK'}}, "$nvcc --forward-unknown-to-host-compiler -ccbin"; 
         } else {
-            push(@{$options{'GPUFLAGS'}},"-xhip -fgpu-rdc -std=c++17");
+            push(@{$options{'GPUFLAGS'}},"-xhip -fgpu-rdc");
             push(@{$options{'LDFLAGS'}},"-lstdc++ --hip-link");
 
             push(@{$options{'MACRO'}},"__HIP_PLATFORM_AMD__");
             push(@{$options{'MACRO'}},"__HIP_PLATFORM_HCC__");
         }
+        push(@{$options{'GPUFLAGS'}},"-std=c++17");
     }
 
     # add standard definitions to MACRO
