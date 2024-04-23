@@ -6,12 +6,8 @@
 
 #include "libhr.h"
 
-static int n_warmup = 50;
-#ifdef WITH_GPU
-static double time_target = 50.;
-#else
-static double time_target = 500.;
-#endif
+static int n_warmup = 100;
+static double time_target = 5000.;
 
 #ifdef WITH_GPU
 #define synchronize cudaDeviceSynchronize();
@@ -26,7 +22,11 @@ void setup_random_fields_lina(int n, spinor_field s[n]) {
 }
 
 int bytes_per_site_lina(int ninputs, int noutputs, int sitesize) {
+#ifdef WITH_GPU
+    return (ninputs + noutputs) * sitesize;
+#else
     return (ninputs + 2 * noutputs) * sitesize;
+#endif
 }
 
 #define _PRINT_SETUP(_ninputs, _noutputs, _flopsite, _in)                                                  \
@@ -59,12 +59,12 @@ int bytes_per_site_lina(int ninputs, int noutputs, int sitesize) {
     do {                                                                    \
         lprintf("LA TEST", 0, "Trying reps: %d\n", _n_reps);                \
         _elapsed = 0;                                                       \
+        timer_lap(&_clock);                                                 \
         for (int i = 0; i < _n_reps; ++i) {                                 \
-            timer_lap(&_clock);                                             \
             _test;                                                          \
             synchronize;                                                    \
-            _elapsed += timer_lap(&_clock) * 1.e-3;                         \
         }                                                                   \
+        _elapsed = timer_lap(&_clock) * 1.e-3;                              \
         _n_reps = (int)((double)(_n_reps * 1.01 * time_target) / _elapsed); \
         bcast_int(&n_reps, 1);                                              \
     } while (_elapsed < time_target * .95);

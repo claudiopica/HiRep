@@ -7,8 +7,8 @@
 #include "libhr.h"
 #include <math.h>
 
-static int n_warmup = 50;
-static double time_target = 500.;
+static int n_warmup = 100;
+static double time_target = 5000.;
 int max_iterations = 10;
 
 #define min(a, b) (a > b) ? b : a
@@ -70,7 +70,7 @@ int max_iterations = 10;
         lprintf("WARMUP", 0, "Warmup application of %s %d times\n", _name, n_warmup);                        \
         double elapsed = timer_lap(&clock) * 1.e-3;                                                          \
         for (int i = 0; i < n_warmup; ++i) {                                                                 \
-            _test                                                                                            \
+            _test synchronize;                                                                               \
         };                                                                                                   \
         elapsed = timer_lap(&clock) * 1.e-3;                                                                 \
         int n_reps = (int)(n_warmup * 1.01 * time_target / elapsed);                                         \
@@ -85,7 +85,7 @@ int max_iterations = 10;
             lprintf("LA TEST", 0, "Trying reps: %d\n", n_reps);                                              \
             elapsed = timer_lap(&clock) * 1.e-3;                                                             \
             for (int i = 0; i < n_reps; ++i) {                                                               \
-                _test                                                                                        \
+                _test synchronize;                                                                           \
             };                                                                                               \
             elapsed = timer_lap(&clock) * 1.e-3;                                                             \
             n_reps = (int)((double)(n_reps * 1.01 * time_target) / elapsed);                                 \
