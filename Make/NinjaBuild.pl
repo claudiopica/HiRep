@@ -331,13 +331,6 @@ sub read_conf {
         $options{'WQUAT'} = [ "0" ] ;
     }
 
-    # stride fixed?
-    if (contains($options{'MACRO'}, "FIXED_STRIDE")) {
-        $options{'IS_STRIDE_FIXED'} = [ "1" ] ;
-    } else {
-        $options{'IS_STRIDE_FIXED'} = [ "0" ] ;
-    }
-
     # handle WITH_MPI compiler 
     if (contains($options{'MACRO'},"WITH_MPI")) {
         $options{'CC'} = $options{'MPICC'};

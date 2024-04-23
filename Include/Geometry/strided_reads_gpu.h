@@ -9,11 +9,7 @@
 #ifndef STRIDED_READS_GPU_HPP
 #define STRIDED_READS_GPU_HPP
 
-#ifdef FIXED_STRIDE
 #define THREADSIZE 32
-#else
-#define THREADSIZE 1
-#endif
 
 //#include "libhr_core.h"
 //#include "geometry.h"
@@ -27,13 +23,8 @@ __host__ __device__ __forceinline__ void read_sub_assign_gpu(int stride, SITE_TY
                                                              int dim) {
     const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
     const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
-#ifdef FIXED_STRIDE
     int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + ((comp)*n_components) * (THREADSIZE);
     const int _stride = THREADSIZE;
-#else
-    int iz = ix + ((comp)*n_components) * (THREADSIZE);
-    const int _stride = stride;
-#endif
     REAL *in_cpx = (REAL *)in;
     REAL *in_comp_cpx = (REAL *)s;
     for (int i = 0; i < n_components; ++i) {
@@ -47,13 +38,8 @@ __host__ __device__ __forceinline__ void read_assign_gpu(int stride, SITE_TYPE *
                                                          int dim) {
     const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
     const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
-#ifdef FIXED_STRIDE
     int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + ((comp)*n_components) * (THREADSIZE);
     const int _stride = THREADSIZE;
-#else
-    int iz = ix + ((comp)*n_components) * (THREADSIZE);
-    const int _stride = stride;
-#endif
     REAL *in_cpx = (REAL *)in;
     REAL *in_comp_cpx = (REAL *)s;
     for (int i = 0; i < n_components; ++i) {
@@ -67,13 +53,8 @@ __host__ __device__ __forceinline__ void read_gpu(int stride, SITE_TYPE *s, cons
                                                   int dim) {
     const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
     const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
-#ifdef FIXED_STRIDE
     size_t iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + ((comp)*n_components) * (THREADSIZE);
     const int _stride = THREADSIZE;
-#else
-    size_t iz = ix + ((comp)*n_components) * (THREADSIZE);
-    const int _stride = stride;
-#endif
     REAL *in_cpx = (REAL *)in;
     REAL *in_comp_cpx = (REAL *)s;
     for (int i = 0; i < n_components; ++i) {
@@ -86,13 +67,8 @@ template <typename REAL, typename FIELD_TYPE, typename SITE_TYPE>
 __host__ __device__ __forceinline__ void write_gpu(int stride, SITE_TYPE *s, FIELD_TYPE *out, size_t ix, int comp, int dim) {
     const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
     const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
-#ifdef FIXED_STRIDE
     size_t iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + (comp)*n_components * (THREADSIZE);
     const int _stride = THREADSIZE;
-#else
-    size_t iz = ix + ((comp)*n_components) * (THREADSIZE);
-    const int _stride = stride;
-#endif
     REAL *out_cpx = (REAL *)out;
     REAL *out_comp_cpx = (REAL *)s;
     for (int i = 0; i < n_components; ++i) {
@@ -125,13 +101,8 @@ __host__ __device__ __forceinline__ void write_assign_gpu(int stride, SITE_TYPE 
                                                           int dim) {
     const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
     const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
-#ifdef FIXED_STRIDE
     int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + (comp)*n_components * (THREADSIZE);
     const int _stride = THREADSIZE;
-#else
-    int iz = ix + ((comp)*n_components) * (THREADSIZE);
-    const int _stride = stride;
-#endif
     REAL *out_cpx = (REAL *)out;
     REAL *out_comp_cpx = (REAL *)s;
     for (int i = 0; i < n_components; ++i) {

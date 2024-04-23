@@ -200,8 +200,6 @@ $expclover && print $fh "MACRO += WITH_EXPCLOVER\n";
 $eoprec && print $fh "MACRO += UPDATE_EO\n";
 # write new geometry
 $newgeo && print $fh "MACRO += WITH_NEW_GEOMETRY\n";
-# write fixed stride
-$fixedstr && print $fh "MACRO += FIXED_STRIDE\n";
 # write quaternions 
 $quat && print $fh "MACRO += WITH_QUATERNIONS\n";
 # write ndebug

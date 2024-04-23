@@ -221,6 +221,7 @@
 #endif
 
 // GPU checks
+
 #ifdef WITH_GPU
 #ifndef WITH_NEW_GEOMETRY
 #error Multi-GPU version does not work with old geometry. Please use new geometry.
