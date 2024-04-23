@@ -99,19 +99,6 @@ __device__ static void cplaq_dev(hr_complex *res, int ix, int mu, int nu, suNg *
 #endif
 }
 
-__device__ static double local_plaq_dev(int ix, suNg *gauge, int *iup_gpu PLAQ_WEIGHT_ARG_DEF) {
-    double pa;
-
-    pa = plaq_dev(ix, 1, 0, gauge, iup_gpu PLAQ_WEIGHT_ARG);
-    pa += plaq_dev(ix, 2, 0, gauge, iup_gpu PLAQ_WEIGHT_ARG);
-    pa += plaq_dev(ix, 2, 1, gauge, iup_gpu PLAQ_WEIGHT_ARG);
-    pa += plaq_dev(ix, 3, 0, gauge, iup_gpu PLAQ_WEIGHT_ARG);
-    pa += plaq_dev(ix, 3, 1, gauge, iup_gpu PLAQ_WEIGHT_ARG);
-    pa += plaq_dev(ix, 3, 2, gauge, iup_gpu PLAQ_WEIGHT_ARG);
-
-    return pa;
-}
-
 // TODO: put somewhere central for inverters
 #define _CUDA_FOR(s, ixp, body)                                                        \
     do {                                                                               \
