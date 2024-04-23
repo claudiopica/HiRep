@@ -44,6 +44,11 @@ typedef struct {
 #define cudaMemcpy hipMemcpy
 #define cudaMemset hipMemset
 #define cub hipcub
+#define cudaGetLastError hipGetLastError
+#define cudaErrorInvalidDevice hipErrorInvalidDevice
+#define cudaErrorPeerAccessAlreadyEnable hipErrorPeerAccessAlreadyEnable
+#define cudaErrorInvalidValue hipErrorInvalidValue
+#define cudaStreamDestroy hipStreamDestroy
 #define cudaMemcpyHostToDevice hipMemcpyHostToDevice
 #define cudaMemcpyDeviceToDevice hipMemcpyDeviceToDevice
 #define cudaMemcpyHostToHost hipMemcpyHostToHost
