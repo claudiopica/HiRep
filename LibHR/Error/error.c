@@ -37,7 +37,9 @@ void error(int test, int no, const char *name, const char *text) {
         if (no < 0) {
             exit(0);
         } else {
+#ifdef WITH_MPI
             MPI_Abort(MPI_COMM_WORLD, no);
+#endif
             finalize_process();
             exit(no);
         }
