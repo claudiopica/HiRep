@@ -34,7 +34,6 @@ void init_ghmc(ghmc_par *par) {
     /* allocate space for the backup copy of suNg_field */
     if (u_gauge_old == NULL) { u_gauge_old = alloc_suNg_field(&glattice); }
     copy_suNg_field(u_gauge_old, u_gauge);
-    printf("plaq gauge: %0.15e\n", avr_plaquette(u_gauge_old));
 
     /* allocate space for the backup copy of the scalar field */
     if (u_scalar != NULL) {
@@ -213,11 +212,7 @@ int update_ghmc() {
             }
         } else {
             lprintf("HMC", 10, "Configuration rejected.\n");
-            start_sendrecv_suNg_field(u_gauge);
-            printf("plaq old: %0.15e\n", avr_plaquette(u_gauge_old));
             copy_suNg_field(u_gauge, u_gauge_old);
-            start_sendrecv_suNg_field(u_gauge);
-            printf("plaq after copy: %0.15e\n", avr_plaquette());
             if (u_scalar != NULL) { copy_suNg_scalar_field(u_scalar, u_scalar_old); }
             if (four_fermion_active) {
                 copy_scalar_field(ff_sigma, ff_sigma_old);
