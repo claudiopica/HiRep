@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
             static suNg_field *Vwf = NULL;
             if (Vwf == NULL) { Vwf = alloc_suNg_field(&glattice); }
             gettimeofday(&start, 0);
-            suNg_field_copy(Vwf, u_gauge);
+            copy_suNg_field(Vwf, u_gauge);
             WF_update_and_measure(RK3_ADAPTIVE, Vwf, &(flow.wf->tmax), &(flow.wf->eps), &(flow.wf->delta), flow.wf->nmeas,
                                   DONTSTORE);
             gettimeofday(&end, 0);

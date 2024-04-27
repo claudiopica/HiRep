@@ -9,7 +9,6 @@
 #include "Update/avr_plaquette.h"
 #include "Update/cabmar.h"
 #include "Update/clover_tools.h"
-#include "Update/copy_gfield.h"
 #include "Update/dirac.h"
 #include "Update/field_update.h"
 #include "Update/find_spec_limits.h"

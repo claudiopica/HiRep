@@ -33,20 +33,21 @@ void init_ghmc(ghmc_par *par) {
 
     /* allocate space for the backup copy of suNg_field */
     if (u_gauge_old == NULL) { u_gauge_old = alloc_suNg_field(&glattice); }
-    suNg_field_copy(u_gauge_old, u_gauge);
+    copy_suNg_field(u_gauge_old, u_gauge);
+    printf("plaq gauge: %0.15e\n", avr_plaquette(u_gauge_old));
 
     /* allocate space for the backup copy of the scalar field */
     if (u_scalar != NULL) {
         if (u_scalar_old == NULL) { u_scalar_old = alloc_suNg_scalar_field(&glattice); }
-        suNg_scalar_field_copy(u_scalar_old, u_scalar);
+        copy_suNg_scalar_field(u_scalar_old, u_scalar);
     }
 
     /* allocate space for backup copy of four fermion fields */
     if (four_fermion_active) {
         if (ff_sigma_old == NULL) { ff_sigma_old = alloc_scalar_field(1, &glattice); }
         if (ff_pi_old == NULL) { ff_pi_old = alloc_scalar_field(1, &glattice); }
-        scalar_field_copy(ff_sigma_old, ff_sigma);
-        scalar_field_copy(ff_pi_old, ff_pi);
+        copy_scalar_field(ff_sigma_old, ff_sigma);
+        copy_scalar_field(ff_pi_old, ff_pi);
     }
 
     /* allocate momenta */
@@ -184,11 +185,11 @@ int update_ghmc() {
     lprintf("HMC", 10, "[DeltaS = %1.8e][exp(-DS) = %1.8e]\n", deltaH, exp(-deltaH));
 
     if (deltaH < 0) {
-        suNg_field_copy(u_gauge_old, u_gauge);
-        if (u_scalar != NULL) { suNg_scalar_field_copy(u_scalar_old, u_scalar); }
+        copy_suNg_field(u_gauge_old, u_gauge);
+        if (u_scalar != NULL) { copy_suNg_scalar_field(u_scalar_old, u_scalar); }
         if (four_fermion_active) {
-            scalar_field_copy(ff_sigma_old, ff_sigma);
-            scalar_field_copy(ff_pi_old, ff_pi);
+            copy_scalar_field(ff_sigma_old, ff_sigma);
+            copy_scalar_field(ff_pi_old, ff_pi);
         }
     } else {
         double r;
@@ -204,19 +205,23 @@ int update_ghmc() {
         bcast(&r, 1);
 
         if (r > 0) {
-            suNg_field_copy(u_gauge_old, u_gauge);
-            if (u_scalar != NULL) { suNg_scalar_field_copy(u_scalar_old, u_scalar); }
+            copy_suNg_field(u_gauge_old, u_gauge);
+            if (u_scalar != NULL) { copy_suNg_scalar_field(u_scalar_old, u_scalar); }
             if (four_fermion_active) {
-                scalar_field_copy(ff_sigma_old, ff_sigma);
-                scalar_field_copy(ff_pi_old, ff_pi);
+                copy_scalar_field(ff_sigma_old, ff_sigma);
+                copy_scalar_field(ff_pi_old, ff_pi);
             }
         } else {
             lprintf("HMC", 10, "Configuration rejected.\n");
-            suNg_field_copy(u_gauge, u_gauge_old);
-            if (u_scalar != NULL) { suNg_scalar_field_copy(u_scalar, u_scalar_old); }
+            start_sendrecv_suNg_field(u_gauge);
+            printf("plaq old: %0.15e\n", avr_plaquette(u_gauge_old));
+            copy_suNg_field(u_gauge, u_gauge_old);
+            start_sendrecv_suNg_field(u_gauge);
+            printf("plaq after copy: %0.15e\n", avr_plaquette());
+            if (u_scalar != NULL) { copy_suNg_scalar_field(u_scalar, u_scalar_old); }
             if (four_fermion_active) {
-                scalar_field_copy(ff_sigma, ff_sigma_old);
-                scalar_field_copy(ff_pi, ff_pi_old);
+                copy_scalar_field(ff_sigma, ff_sigma_old);
+                copy_scalar_field(ff_pi, ff_pi_old);
             }
             start_sendrecv_suNg_field(
                 u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
@@ -306,11 +311,11 @@ int reverse_update_ghmc() {
     global_sum(&deltaH, 1);
     lprintf("HMC", 10, "[DeltaS = %1.8e][exp(-DS) = %1.8e]\n", deltaH, exp(-deltaH));
 
-    suNg_field_copy(u_gauge_old, u_gauge);
-    if (u_scalar != NULL) { suNg_scalar_field_copy(u_scalar_old, u_scalar); }
+    copy_suNg_field(u_gauge_old, u_gauge);
+    if (u_scalar != NULL) { copy_suNg_scalar_field(u_scalar_old, u_scalar); }
     if (four_fermion_active) {
-        scalar_field_copy(ff_sigma_old, ff_sigma);
-        scalar_field_copy(ff_pi_old, ff_pi);
+        copy_scalar_field(ff_sigma_old, ff_sigma);
+        copy_scalar_field(ff_pi_old, ff_pi);
     }
 
     lprintf("HMC", 10, "Configuration accepted.\n");

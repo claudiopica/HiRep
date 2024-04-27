@@ -7,16 +7,6 @@
 #include "libhr_core.h"
 #include "random.h"
 
-void scalar_field_copy(scalar_field *s1, scalar_field *s2) {
-    error(s1 == NULL, 1, "scalar_field_copy [scalarfield_operations.c]", "Attempt to access unallocated memory space");
-    error(s2 == NULL, 1, "scalar_field_copy [scalarfield_operations.c]", "Attempt to access unallocated memory space");
-
-    _MASTER_FOR(&glattice, ix) {
-        double c = *_FIELD_AT(s2, ix);
-        *_FIELD_AT(s1, ix) = c;
-    }
-}
-
 //s=-s
 void flip_scalar_field(scalar_field *s) {
     error(s == NULL, 1, "flip_scalar_field [scalarfield_operations.c]", "Attempt to access unallocated memory space");

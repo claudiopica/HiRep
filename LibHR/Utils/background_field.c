@@ -23,7 +23,7 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
 
     Vtest_old = alloc_suNg_field(&glattice);
     Vtest_new = alloc_suNg_field(&glattice);
-    suNg_field_copy(Vtest_old, V);
+    copy_suNg_field(Vtest_old, V);
 
     start_sendrecv_suNg_field(Vtest_old);
     complete_sendrecv_suNg_field(Vtest_old);
@@ -69,7 +69,7 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
     diff_re = 0.;
     diff_im = 0.;
 
-    suNg_field_copy(Vtest_new, V);
+    copy_suNg_field(Vtest_new, V);
     complete_sendrecv_suNg_field(Vtest_new);
 
     for (c[0] = 0; c[0] < T; c[0]++) {
@@ -89,7 +89,7 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
                     _complex_div(tmp2, tmp, phase);
 
                     // restore old gauge field
-                    suNg_field_copy(V, Vtest_old);
+                    copy_suNg_field(V, Vtest_old);
 
                     start_sendrecv_suNg_field(V);
                     complete_sendrecv_suNg_field(V);
@@ -101,7 +101,7 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n) {
                     diff_im += fabs(cimag(tmp2 - tmp));
 
                     // restore new gauge field
-                    suNg_field_copy(V, Vtest_new);
+                    copy_suNg_field(V, Vtest_new);
 
                     start_sendrecv_suNg_field(V);
                     complete_sendrecv_suNg_field(V);

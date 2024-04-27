@@ -212,7 +212,7 @@ void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double *m, int n_mom, 
         zero_spinor_field(prop + i);
     }
     char label[100];
-    suNf_field_copy(u_gauge_old, u_gauge_f);
+    copy_suNf_field(u_gauge_old, u_gauge_f);
     init_propagator_eo(nm, m, precision);
     fix_T_bc(tau - dt); // Apply fixed boundaryconditions by zeroing links at time slice tau to direction 0.
     lprintf("MAIN", 0, "Point Source at (%d,0,0,0) \n", tau);
@@ -227,7 +227,7 @@ void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double *m, int n_mom, 
     }
     sprintf(label, "DIRICHLET_POINT dt=%d", dt);
     print_mesons(meson_correlators, 1., conf_num, nm, m, GLB_T, n_mom, label);
-    suNf_field_copy(u_gauge_f, u_gauge_old);
+    copy_suNf_field(u_gauge_f, u_gauge_old);
     free_spinor_field(source);
     free_spinor_field(prop);
     free_suNf_field(u_gauge_old);
@@ -253,7 +253,7 @@ void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_n
 
     int tau, k;
     suNg_field *u_gauge_old = alloc_suNg_field(&glattice);
-    suNg_field_copy(u_gauge_old, u_gauge);
+    copy_suNg_field(u_gauge_old, u_gauge);
 
     error(nm != 1, 1, "measure_diquark_semwall_background", "nm cannot be different from 1 !\n");
 
@@ -266,7 +266,7 @@ void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_n
         represent_gauge_field();
         calc_propagator_eo(prop_u, source, 4); // 4 for spin dilution
             // apply background and calculate second prop
-        suNg_field_copy(u_gauge, u_gauge_old);
+        copy_suNg_field(u_gauge, u_gauge_old);
 
         apply_background_field_zdir(u_gauge, -Q, n);
         represent_gauge_field();
@@ -274,7 +274,7 @@ void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_n
 
         measure_diquarks(meson_correlators, prop_u, prop_d, source, nm, tau);
 
-        suNg_field_copy(u_gauge, u_gauge_old);
+        copy_suNg_field(u_gauge, u_gauge_old);
         represent_gauge_field();
     }
     print_mesons(meson_correlators, nhits * GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, "DEFAULT_DIQUARK_SEMWALL_BACKGROUND");
@@ -396,14 +396,14 @@ void measure_spectrum_semwall_fixedbc(int dt, int nm, double *m, int nhits, int 
     }
 
     char label[100];
-    suNf_field_copy(u_gauge_old, u_gauge_f);
+    copy_suNf_field(u_gauge_old, u_gauge_f);
     init_propagator_eo(nm, m, precision);
     for (k = 0; k < nhits; ++k) {
         tau = create_diluted_source_equal_eo(source);
         fix_T_bc(tau - dt);
         calc_propagator_eo(prop, source, 4); // 4 for spin dilution
         measure_mesons(meson_correlators, prop, source, nm, tau);
-        suNf_field_copy(u_gauge_f, u_gauge_old);
+        copy_suNf_field(u_gauge_f, u_gauge_old);
     }
     sprintf(label, "DIRICHLET_SEMWALL dt=%d", dt);
     print_mesons(meson_correlators, nhits * GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, label);
@@ -426,7 +426,7 @@ void measure_spectrum_gfwall(int nm, double *m, int conf_num, double precision, 
     }
     int tau, k;
     tau = 0;
-    suNg_field_copy(u_gauge_old, u_gauge);
+    copy_suNg_field(u_gauge_old, u_gauge);
     // Fix the Gauge
     double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
                           1.8, // overrelax
@@ -448,7 +448,7 @@ void measure_spectrum_gfwall(int nm, double *m, int conf_num, double precision, 
     }
     print_mesons(meson_correlators, GLB_VOL3, conf_num, nm, m, GLB_T, 1, "DEFAULT_GFWALL");
 
-    suNg_field_copy(u_gauge, u_gauge_old);
+    copy_suNg_field(u_gauge, u_gauge_old);
     represent_gauge_field();
 
     free_propagator_eo();
@@ -468,7 +468,7 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, do
     }
     int tau, k;
     tau = 0;
-    suNg_field_copy(u_gauge_old, u_gauge);
+    copy_suNg_field(u_gauge_old, u_gauge);
 
     // Fix the Gauge
     double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
@@ -493,7 +493,7 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, do
     }
     print_mesons(meson_correlators, GLB_VOL3, conf_num, nm, m, GLB_T, 1, "DIRICHLET_GFWALL");
 
-    suNg_field_copy(u_gauge, u_gauge_old);
+    copy_suNg_field(u_gauge, u_gauge_old);
     represent_gauge_field();
 
     free_propagator_eo();
@@ -549,7 +549,7 @@ void measure_spectrum_discon_gfwall(int nm, double *m, int conf_num, double prec
     int tau, k;
     tau = 0;
 
-    suNg_field_copy(u_gauge_old, u_gauge);
+    copy_suNg_field(u_gauge_old, u_gauge);
     // Fix the Gauge
     double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
                           1.8, // overrelax
@@ -574,7 +574,7 @@ void measure_spectrum_discon_gfwall(int nm, double *m, int conf_num, double prec
     }
     print_mesons(discon_correlators, GLB_T, conf_num, nm, m, GLB_T, 1, "DISCON_GFWALL");
 
-    suNg_field_copy(u_gauge, u_gauge_old);
+    copy_suNg_field(u_gauge, u_gauge_old);
     represent_gauge_field();
 
     free_propagator_eo();
@@ -659,7 +659,7 @@ void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_m
     int k;
     char label[100];
     suNf_field *u_gauge_old = alloc_suNf_field(&glattice);
-    suNf_field_copy(u_gauge_old, u_gauge_f); // Save the gaugefield
+    copy_suNf_field(u_gauge_old, u_gauge_f); // Save the gaugefield
 
     double p = avr_plaquette();
     lprintf("MESON_MEASUREMENTS", 0, "<P> = %g\n", p);
@@ -694,7 +694,7 @@ void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_m
 
     sprintf(label, "DIRICHLET_FF_POINT dt=%d", dt);
     print_formfactor(conf_num, nm, m, n_mom, label, tf - ti);
-    suNf_field_copy(u_gauge_f, u_gauge_old); // Restore the gaugefield
+    copy_suNf_field(u_gauge_f, u_gauge_old); // Restore the gaugefield
 
     free_spinor_field(source);
     free_spinor_field(source_seq);

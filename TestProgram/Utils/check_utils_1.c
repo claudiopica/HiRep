@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 
     lprintf("MAIN", 0, "Copying wrkfield %d on wrkfield %d\n", 0, nwrk - 2);
 
-    suNg_field_copy(wrk[nwrk - 2], wrk[0]);
+    copy_suNg_field(wrk[nwrk - 2], wrk[0]);
 
     set_wrk_space(idx_wrk[nwrk - 2]);
     test = avr_plaquette_wrk();

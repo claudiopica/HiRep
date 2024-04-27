@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
         double p1 = calc_plaq(u_gauge);
         lprintf("TEST", 0, "u_gauge plaq %1.6f\n", p1);
 
-        suNg_field_copy(fixed_gauge, u_gauge);
+        copy_suNg_field(fixed_gauge, u_gauge);
 
         double p2 = calc_plaq(fixed_gauge);
         lprintf("TEST", 0, "fixed_gauge plaq %1.6f\n", p2);
@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
         p2 = calc_plaq(fixed_gauge);
         lprintf("TEST", 0, "fixed_gauge plaq %1.6f\n", p2);
 
-        suNg_field_copy(u_gauge, fixed_gauge); //u_gauge = fixed_gauge
+        copy_suNg_field(u_gauge, fixed_gauge); //u_gauge = fixed_gauge
         represent_gauge_field(); //u_gauge_f = represented fixed_gauge
 
         if (list == NULL) { break; }
