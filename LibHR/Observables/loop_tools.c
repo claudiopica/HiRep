@@ -14,7 +14,6 @@
 #include "io.h"
 #include "utils.h"
 #include "memory.h"
-#include "Update/copy_gfield.h"
 #include "Update/representation.h"
 #include "Update/avr_plaquette.h"
 #include "inverters.h"
@@ -300,7 +299,7 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
     }
     if (source_type == 1) {
         u_gauge_old = alloc_suNg_field(&glattice);
-        suNg_field_copy(u_gauge_old, u_gauge);
+        copy_suNg_field(u_gauge_old, u_gauge);
         zero_spinor_field(prop);
         //Fix the Gauge
         double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
@@ -394,7 +393,7 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
         } /* volume source + spin + color + eo  dilution  */
     }
     if (u_gauge_old != NULL) {
-        suNg_field_copy(u_gauge, u_gauge_old);
+        copy_suNg_field(u_gauge, u_gauge_old);
         represent_gauge_field();
         free_suNg_field(u_gauge_old);
     }

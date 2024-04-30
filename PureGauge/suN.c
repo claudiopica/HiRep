@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
             static suNg_field *Vwf = NULL;
             if (Vwf == NULL) { Vwf = alloc_suNg_field(&glattice); }
             double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
-            suNg_field_copy(Vwf, u_gauge);
+            copy_suNg_field(Vwf, u_gauge);
             WF_update_and_measure(flow.wf->ittype, Vwf, &(flow.wf->tmax), &(flow.wf->eps), &(flow.wf->delta), flow.wf->nmeas,
                                   DONTSTORE);
             elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds

@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "Generating a unit configuration\n");
 
     unit_gauge(u_gauge);
-    suNg_field_copy(u_gauge_old, u_gauge);
+    copy_suNg_field(u_gauge_old, u_gauge);
 
     represent_gauge_field();
 
@@ -184,7 +184,7 @@ int main(int argc, char *argv[]) {
     represent_gauge_field();
     gettimeofday(&start, 0);
 
-    suNf_field_copy(u_gauge_old_f, u_gauge_f);
+    copy_suNf_field(u_gauge_old_f, u_gauge_f);
 
     init_propagator_eo(nm, m, mes_var.precision);
 
@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
     for (l = 1; l <= mes_var.n_mom; ++l) {
         double p_in[4], p_out[4];
         for (tw = -mes_var.n_twist; tw < mes_var.n_twist + 1; tw++) {
-            suNf_field_copy(u_gauge_f, u_gauge_old_f);
+            copy_suNf_field(u_gauge_f, u_gauge_old_f);
             double twist = (double)tw * 0.5; //(double)tw/(double)(mes_var.n_twist+1);
             lprintf("TEST", 0, "<p> before twist %1.6f\n", avr_plaquette());
             twist_XYZ_bc(twist * mes_var.px_in, twist * mes_var.py_in, twist * mes_var.pz_in);
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
             }
 
             if (mes_var.ne) {
-                suNf_field_copy(u_gauge_f, u_gauge_old_f);
+                copy_suNf_field(u_gauge_f, u_gauge_old_f);
                 twist_XYZ_bc(twist * mes_var.px_out, twist * mes_var.py_out, twist * mes_var.pz_out);
 
                 p_out[0] = mom_out[0] * l;

@@ -3,7 +3,6 @@
 #include "utils.h"
 #include "libhr_core.h"
 #include "memory.h"
-#include "Update/copy_gfield.h"
 #include "IO/logger.h"
 #include "inverters.h"
 
@@ -213,7 +212,7 @@ double max_distance(suNg_field *V, suNg_field *Vprimel) {
 // following 1301.4388
 int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, double *delta) {
     double varepsilon, d;
-    suNg_field_copy(Vtmp, V);
+    copy_suNg_field(Vtmp, V);
 
     _MASTER_FOR(&glattice, ix) {
         for (int mu = 0; mu < 4; ++mu) {
@@ -295,7 +294,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     varepsilon = *epsilon * pow(*delta / d, 1. / 3.);
 
     if (d > *delta) {
-        suNg_field_copy(V, Vtmp);
+        copy_suNg_field(V, Vtmp);
         *epsilon_new = 0.5 * varepsilon;
         lprintf("WILSONFLOW", 20, "d > delta : must repeat the calculation with epsilon=%lf\n", *epsilon_new);
         return 1 == 0;

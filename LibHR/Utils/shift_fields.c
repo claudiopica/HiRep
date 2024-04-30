@@ -9,7 +9,6 @@ If any input is left null the routine acts only the other field.
 #include "error.h"
 #include "memory.h"
 #include "inverters.h"
-#include "Update/copy_gfield.h"
 #include "io.h"
 
 void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *sout, suNg_field *uout) {
@@ -28,7 +27,7 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
     if (total_shift == 0) {
         if (sin != NULL) { copy_spinor_field(sout, sin); }
 
-        if (uin != NULL) { suNg_field_copy(uout, uin); }
+        if (uin != NULL) { copy_suNg_field(uout, uin); }
     }
 
     if (sin != NULL) {
@@ -147,7 +146,7 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
         }
     }
     if (uin != NULL) {
-        if (total_shift == 1) { suNg_field_copy(uout, utmp[0]); }
+        if (total_shift == 1) { copy_suNg_field(uout, utmp[0]); }
 
         free_suNg_field(ubuf[0]);
         free_suNg_field(ubuf[1]);

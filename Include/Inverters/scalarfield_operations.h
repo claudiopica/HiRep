@@ -12,7 +12,6 @@
 extern "C" {
 #endif
 
-void scalar_field_copy(scalar_field *s1, scalar_field *s2);
 void flip_scalar_field(scalar_field *s);
 void set_scalar_field(scalar_field *s, double c);
 void gaussian_scalar_field(scalar_field *s);
