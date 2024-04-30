@@ -116,13 +116,8 @@ __host__ __device__ __forceinline__ void write_assign_atomic_gpu(int stride, SIT
                                                                  int dim) {
     const int field_dim = sizeof(FIELD_TYPE) / sizeof(REAL);
     const int n_components = sizeof(SITE_TYPE) / sizeof(REAL);
-#ifdef FIXED_STRIDE
     int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim + (ix % THREADSIZE) + (comp)*n_components * (THREADSIZE);
     const int _stride = THREADSIZE;
-#else
-    int iz = ix + ((comp)*n_components) * (THREADSIZE);
-    const int _stride = stride;
-#endif
     REAL *out_cpx = (REAL *)out;
     REAL *out_comp_cpx = (REAL *)s;
     for (int i = 0; i < n_components; ++i) {
