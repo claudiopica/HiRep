@@ -166,7 +166,11 @@ typedef struct hr_complex_t<int> hr_complex_int;
 typedef struct hr_complex_t<double> hr_complex;
 typedef struct hr_complex_t<float> hr_complex_flt;
 
+#ifndef HIP
 #define I (hr_complex_int(0, 1))
+#else
+constexpr hr_complex I = hr_complex_int(0, 1);
+#endif
 #define creal(a) ((a).re)
 #define cimag(a) ((a).im)
 #define conj(a) ((a).conj())
