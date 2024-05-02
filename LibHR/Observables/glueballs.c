@@ -4,7 +4,7 @@
 \***************************************************************************/
 
 #include "utils.h"
-#include "glueballs.h"
+#include "observables.h"
 #include "global.h"
 
 void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, hr_complex *gb_storage) {
