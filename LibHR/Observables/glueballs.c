@@ -3,14 +3,15 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-#include "observables.h"
-#include "libhr_core.h"
 #include "utils.h"
+#include "glueballs.h"
+#include "global.h"
 
 void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, hr_complex *gb_storage) {
     int i, nt;
     int wrk1, wrk2 = -1;
     hr_complex *point_gb;
+    reset_wrk_pointers();
 
     point_gb = gb_storage;
 
