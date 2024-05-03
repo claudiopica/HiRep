@@ -795,7 +795,6 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
 #include \"utils.h\"
 #include <string.h>\n"];
   WriteString[ar,"#define npaths ",pathindex,"\n"];
-  WriteString[ar,"static double PI=3.141592653589793238462643383279502884197;\n"];
   WriteString[ar,"static hr_complex *mom_def_Cp_tr_paths=NULL;\n"];
   WriteString[ar,"static hr_complex *mom_def_Cm_tr_paths=NULL;\n"];
   WriteString[ar,"static hr_complex *path_storage=NULL;\n"];
