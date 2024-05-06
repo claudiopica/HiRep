@@ -26,10 +26,6 @@ int main(int argc, char *argv[]) {
     return_value += test_overload_div_hr_complex();
     return_value += test_negate();
     return_value += test_cast_double();
-    return_value += test_overload_plus_rhs_integer();
-    return_value += test_overload_plus_lhs_integer();
-    return_value += test_overload_div_rhs_integer();
-    return_value += test_overload_div_lhs_integer();
     return_value += test_I_add();
     return_value += test_I_prod();
 

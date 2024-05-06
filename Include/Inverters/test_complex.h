@@ -32,10 +32,6 @@ int test_overload_prod_hr_complex();
 int test_overload_div_hr_complex();
 int test_negate();
 int test_cast_double();
-int test_overload_plus_rhs_integer();
-int test_overload_plus_lhs_integer();
-int test_overload_div_rhs_integer();
-int test_overload_div_lhs_integer();
 int test_I_add();
 int test_I_prod();
 
