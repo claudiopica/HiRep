@@ -162,11 +162,10 @@ auto visible inline __attribute__((always_inline)) operator/(const hr_complex_t<
                         (x.im * c.re - x.re * c.im) / (c.re * c.re + c.im * c.im));
 }
 
-typedef struct hr_complex_t<int> hr_complex_int;
 typedef struct hr_complex_t<double> hr_complex;
 typedef struct hr_complex_t<float> hr_complex_flt;
 
-#define I (hr_complex_int(0, 1))
+#define I (hr_complex_flt(0.0f, 1.0f))
 #define creal(a) ((a).re)
 #define cimag(a) ((a).im)
 #define conj(a) ((a).conj())

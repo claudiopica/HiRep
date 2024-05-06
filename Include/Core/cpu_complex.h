@@ -18,6 +18,5 @@
 
 typedef double complex hr_complex;
 typedef float complex hr_complex_flt;
-typedef int complex hr_complex_int;
 
 #endif
