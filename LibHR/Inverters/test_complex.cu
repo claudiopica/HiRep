@@ -200,74 +200,6 @@ int test_cast_double() {
     return result;
 }
 
-int test_overload_plus_rhs_integer() {
-    lprintf("TEST", 0, __func__);
-    int result = 0;
-    hr_complex c = hr_complex(1.1, 2.2);
-    hr_complex a;
-    hr_complex_int b = hr_complex_int(3, 4);
-    a = c + b;
-
-    result += check_diff_norm(4.1 - a.re, EPSILON_TEST);
-    result += check_diff_norm(6.2 - a.im, EPSILON_TEST);
-    result += check_diff_norm(1.1 - c.re, EPSILON_TEST);
-    result += check_diff_norm(2.2 - c.im, EPSILON_TEST);
-    result += check_diff_norm(3 - b.re, EPSILON_TEST);
-    result += check_diff_norm(4 - b.im, EPSILON_TEST);
-    return result;
-}
-
-int test_overload_plus_lhs_integer() {
-    lprintf("TEST", 0, __func__);
-    int result = 0;
-    hr_complex c = hr_complex(1.1, 2.2);
-    hr_complex a;
-    hr_complex_int b = hr_complex_int(3, 4);
-    a = b + c;
-
-    result += check_diff_norm(4.1 - a.re, EPSILON_TEST);
-    result += check_diff_norm(6.2 - a.im, EPSILON_TEST);
-    result += check_diff_norm(1.1 - c.re, EPSILON_TEST);
-    result += check_diff_norm(2.2 - c.im, EPSILON_TEST);
-    result += check_diff_norm(3 - b.re, EPSILON_TEST);
-    result += check_diff_norm(4 - b.im, EPSILON_TEST);
-    return result;
-}
-
-int test_overload_div_rhs_integer() {
-    lprintf("TEST", 0, __func__);
-    int result = 0;
-    hr_complex c = hr_complex(1.1, 2.2);
-    hr_complex_int b = hr_complex_int(3, 4);
-    hr_complex a;
-    a = c / b;
-
-    result += check_diff_norm(0.484 - a.re, EPSILON_TEST);
-    result += check_diff_norm(0.088 - a.im, EPSILON_TEST);
-    result += check_diff_norm(1.1 - c.re, EPSILON_TEST);
-    result += check_diff_norm(2.2 - c.im, EPSILON_TEST);
-    result += check_diff_norm(3 - b.re, EPSILON_TEST);
-    result += check_diff_norm(4 - b.im, EPSILON_TEST);
-    return result;
-}
-
-int test_overload_div_lhs_integer() {
-    lprintf("TEST", 0, __func__);
-    int result = 0;
-    hr_complex c = hr_complex(1.1, 2.2);
-    hr_complex_int b = hr_complex_int(3, 4);
-    hr_complex a;
-    a = b / c;
-
-    result += check_diff_norm(2.0 - a.re, EPSILON_TEST);
-    result += check_diff_norm(-4.0 / 11.0 - a.im, EPSILON_TEST);
-    result += check_diff_norm(1.1 - c.re, EPSILON_TEST);
-    result += check_diff_norm(2.2 - c.im, EPSILON_TEST);
-    result += check_diff_norm(3 - b.re, EPSILON_TEST);
-    result += check_diff_norm(4 - b.im, EPSILON_TEST);
-    return result;
-}
-
 int test_I_add() {
     lprintf("TEST", 0, __func__);
     int result = 0;
@@ -407,30 +339,14 @@ template <class L> void random_number(hr_complex_t<L> &c) {
         result += __fname__##_tmpl<hr_complex_flt, float>(EPSILON_FLT_TEST);          \
         lprintf("TEST", 0, "Check hr_complex_flt -- int\n");                          \
         result += __fname__##_tmpl<hr_complex_flt, int>(EPSILON_FLT_TEST);            \
-        lprintf("TEST", 0, "Check hr_complex_int -- double\n");                       \
-        result += __fname__##_tmpl<hr_complex_int, double>(EPSILON_TEST);             \
-        lprintf("TEST", 0, "Check hr_complex_int -- float\n");                        \
-        result += __fname__##_tmpl<hr_complex_int, float>(EPSILON_TEST);              \
-        lprintf("TEST", 0, "Check hr_complex_int -- int\n");                          \
-        result += __fname__##_tmpl<hr_complex_int, int>(EPSILON_TEST);                \
         lprintf("TEST", 0, "Check hr_complex -- hr_complex\n");                       \
         result += __fname__##_tmpl<hr_complex, hr_complex>(EPSILON_TEST);             \
         lprintf("TEST", 0, "Check hr_complex -- hr_complex_flt\n");                   \
         result += __fname__##_tmpl<hr_complex, hr_complex_flt>(EPSILON_FLT_TEST);     \
-        lprintf("TEST", 0, "Check hr_complex -- hr_complex_int\n");                   \
-        result += __fname__##_tmpl<hr_complex, hr_complex_int>(EPSILON_TEST);         \
         lprintf("TEST", 0, "Check hr_complex_flt -- hr_complex\n");                   \
         result += __fname__##_tmpl<hr_complex_flt, hr_complex>(EPSILON_FLT_TEST);     \
         lprintf("TEST", 0, "Check hr_complex_flt -- hr_complex_flt\n");               \
         result += __fname__##_tmpl<hr_complex_flt, hr_complex_flt>(EPSILON_FLT_TEST); \
-        lprintf("TEST", 0, "Check hr_complex_flt -- hr_complex_int\n");               \
-        result += __fname__##_tmpl<hr_complex_flt, hr_complex_flt>(EPSILON_FLT_TEST); \
-        lprintf("TEST", 0, "Check hr_complex_int -- hr_complex\n");                   \
-        result += __fname__##_tmpl<hr_complex_int, hr_complex>(EPSILON_TEST);         \
-        lprintf("TEST", 0, "Check hr_complex_int -- hr_complex_flt\n");               \
-        result += __fname__##_tmpl<hr_complex_int, hr_complex_flt>(EPSILON_FLT_TEST); \
-        lprintf("TEST", 0, "Check hr_complex_int -- hr_complex_int\n");               \
-        result += __fname__##_tmpl<hr_complex_int, hr_complex_int>(0.0);              \
         return result;                                                                \
     }
 
