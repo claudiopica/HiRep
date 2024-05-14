@@ -183,7 +183,7 @@ _DECLARE(fill_buffers_, (_FIELD_TYPE * f)) {
 #ifdef WITH_GPU
     if (f->comm_type & GPU_COMM) {
         _BUFFER_FOR(i) {
-            size_t number_of_sites = type->rbuf_len[i];
+            size_t number_of_sites = roundUp(type->rbuf_len[i], THREADSIZE);
             size_t buffer_length = _FIELD_DIM * number_of_sites * chunks_per_site;
             _REAL *random_array = (_REAL *)malloc(buffer_length * sizeof(_REAL));
             _F_NAME(random_, _REAL)(random_array, buffer_length);
@@ -211,7 +211,7 @@ _DECLARE(fill_buffers_with_zeroes_, (_FIELD_TYPE * f)) {
 #ifdef WITH_GPU
     if (f->comm_type & GPU_COMM) {
         _BUFFER_FOR(i) {
-            size_t number_of_sites = type->rbuf_len[i];
+            size_t number_of_sites = roundUp(type->rbuf_len[i], THREADSIZE);
             size_t buffer_length = _FIELD_DIM * number_of_sites * chunks_per_site;
             _REAL *buffer = (_REAL *)(_BUF_GPU_DFIELD_BLK(f, i, _FIELD_DIM));
             cudaMemset(buffer, 0, buffer_length * sizeof(_REAL));
@@ -228,4 +228,3 @@ _DECLARE(fill_buffers_with_zeroes_, (_FIELD_TYPE * f)) {
 #undef _FIELD_DIM
 #undef _MPI_REAL
 #undef _REAL
-#undef round_up_buflen
