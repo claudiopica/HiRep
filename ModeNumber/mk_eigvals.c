@@ -52,7 +52,7 @@ typedef struct input_eigval {
             { "absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1 },        \
             { "relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2 },        \
             { "quark quenched mass", "eva:mass = %lf", DOUBLE_T, &(varname).mass },           \
-	    { "Configuration list", "eva:configlist = %s", STRING_T, &(varname).configlist }, \
+            { "Configuration list", "eva:configlist = %s", STRING_T, &(varname).configlist }, \
             { NULL, NULL, INT_T, NULL }                                                       \
         }                                                                                     \
     }
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
     read_input(eig_var.read, get_input_filename());
     lprintf("MAIN", 0, "list file: [%s]\n", eig_var.configlist);
     if (strcmp(eig_var.configlist, "") != 0) {
-    	error((list = fopen(eig_var.configlist, "r")) == NULL, 1, "main [mk_eigvals.c]", "Failed to open list file\n");
+        error((list = fopen(eig_var.configlist, "r")) == NULL, 1, "main [mk_eigvals.c]", "Failed to open list file\n");
     }
     init_BCs(NULL);
     hevamass = eig_var.mass;
@@ -113,19 +113,17 @@ int main(int argc, char *argv[]) {
         read_gauge_field(cnfg_filename);
         represent_gauge_field();
 
-	timer_lap(&clock);
+        timer_lap(&clock);
 #ifdef UPDATE_EO
         max_eigval(&H2, &glat_even, &max);
 #else
-	max_eigval(&H2, &glattice, &max);
+        max_eigval(&H2, &glattice, &max);
 #endif
-        lprintf("MAIN", 0, "MAXCHECK: cnfg=%e  uppbound=%e diff=%e %s\n", 
-			max, mupp, mupp - max, (mupp - max) < 0 ? "[FAILED]" : "[OK]");
-        max *= 1.1;
+        lprintf("MAIN", 0, "MAXCHECK: cnfg=%e  uppbound=%e diff=%e %s\n", max, mupp, mupp - max,
+                (mupp - max) < 0 ? "[FAILED]" : "[OK]");
 
-        ie = eva(eig_var.nev, eig_var.nevt, 0, eig_var.kmax, 
-			eig_var.maxiter, max, eig_var.omega1, eig_var.omega2, &H2,
-                 eva_vec, eva_val, &status);
+        ie = eva(eig_var.nev, eig_var.nevt, 0, eig_var.kmax, eig_var.maxiter, max, eig_var.omega1, eig_var.omega2, &H2, eva_vec,
+                 eva_val, &status);
         while (ie != 0) { /* if failed restart EVA */
             lprintf("MAIN", 0, "Restarting EVA!\n");
             ie = eva(eig_var.nev, eig_var.nevt, 2, eig_var.kmax, eig_var.maxiter, max, eig_var.omega1, eig_var.omega2, &H2,
@@ -138,8 +136,8 @@ int main(int argc, char *argv[]) {
                     prod_re_spinor_field(&eva_ws[0], &eva_vec[n]) / sqnorm_spinor_field(&eva_vec[n]));
         }
 
-	double elapsed = timer_lap(&clock) * 1e-6;
-	lprintf("TIMING", 0, "Eigenvalue determination for configuration [%s] done [%lf sec]", cnfg_filename, elapsed);
+        double elapsed = timer_lap(&clock) * 1e-6;
+        lprintf("TIMING", 0, "Eigenvalue determination for configuration [%s] done [%lf sec]", cnfg_filename, elapsed);
         if (list == NULL) { break; }
     }
 

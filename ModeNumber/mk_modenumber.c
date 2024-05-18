@@ -45,7 +45,7 @@ typedef struct input_nu {
             { "number of stochastic spinors", "nu:nhits = %d", INT_T, &(varname).nhits },           \
             { "quark mass (overridden by file name)", "nu:mass = %lf", DOUBLE_T, &(varname).mass }, \
             { "list of eigenvalues", "nu:list = %s", STRING_T, (varname).list },                    \
-	    { "Configuration list", "nu:configlist = %s", STRING_T, &(varname).configlist },        \
+            { "Configuration list", "nu:configlist = %s", STRING_T, &(varname).configlist },        \
             { NULL, NULL, INT_T, NULL }                                                             \
         }                                                                                           \
     }
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     strcpy(tmp, nu_var.list);
     lprintf("MAIN", 0, "list file: [%s]\n", nu_var.configlist);
     if (strcmp(nu_var.configlist, "") != 0) {
-    	error((list = fopen(nu_var.configlist, "r")) == NULL, 1, "main [mk_modenumber.c]", "Failed to open list file\n");
+        error((list = fopen(nu_var.configlist, "r")) == NULL, 1, "main [mk_modenumber.c]", "Failed to open list file\n");
     }
     cptr = strtok(tmp, ";");
     neig = 0;
@@ -98,7 +98,7 @@ int main(int argc, char *argv[]) {
         read_gauge_field(cnfg_filename);
         represent_gauge_field();
 
-	timer_lap(&clock);
+        timer_lap(&clock);
         for (int k = 0; k < neig; k++) {
             double number = ModeNumber(M[k] * M[k]);
             int mvm = getMVM();
@@ -106,8 +106,8 @@ int main(int argc, char *argv[]) {
             lprintf("MODENUMBER", 0, "MVM = %d\n", mvm);
         }
 
-	double elapsed = timer_lap(&clock) * 1e-6;
-	lprintf("TIMING", 0, "Mode number determination for configuration [%s] done [%lf sec]", cnfg_filename, elapsed);
+        double elapsed = timer_lap(&clock) * 1e-6;
+        lprintf("TIMING", 0, "Mode number determination for configuration [%s] done [%lf sec]", cnfg_filename, elapsed);
         if (list == NULL) { break; }
     }
 
