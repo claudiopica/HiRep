@@ -1,7 +1,14 @@
-/*
+/***************************************************************************\
+ * Copyright (c) 2009-2024, Claudio Pica, Sofie Martins                      *
+ * All rights reserved.                                                      *
+ \***************************************************************************/
+
+/*******************************************************************************
+ *
  * NOCOMPILE= BC_T_SF_ROTATED || BC_T_SF
  * NOCOMPILE= BC_T_THETA || BC_X_THETA || BC_Y_THETA || BC_Z_THETA
- */
+ *
+ *******************************************************************************/
 
 #include "libhr.h"
 #include "modenumber.h"
@@ -15,15 +22,18 @@
 #error This code does not work with the fermion twisting !!!
 #endif
 
+static double hevamass;
+
 typedef struct input_nu {
     double inverr2;
     char approx[512];
     int nhits;
     double mass;
     char list[1024];
+    char configlist[256];
 
     /* for the reading function */
-    input_record_t read[6];
+    input_record_t read[7];
 
 } input_nu;
 
@@ -35,179 +45,31 @@ typedef struct input_nu {
             { "number of stochastic spinors", "nu:nhits = %d", INT_T, &(varname).nhits },           \
             { "quark mass (overridden by file name)", "nu:mass = %lf", DOUBLE_T, &(varname).mass }, \
             { "list of eigenvalues", "nu:list = %s", STRING_T, (varname).list },                    \
+	    { "Configuration list", "nu:configlist = %s", STRING_T, &(varname).configlist },        \
             { NULL, NULL, INT_T, NULL }                                                             \
         }                                                                                           \
     }
 
-char cnfg_filename[256] = "";
-char list_filename[256] = "";
-char input_filename[256] = "input_file";
-char output_filename[256] = "modenumber.out";
-enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
-
 input_nu nu_var = init_input_nu(nu_var);
-
-typedef struct {
-    char string[256];
-    int t, x, y, z;
-    int nc, nf;
-    double b, m;
-    int n;
-    int type;
-} filename_t;
-
-int parse_cnfg_filename(char *filename, filename_t *fn) {
-    int hm;
-    char *tmp = NULL;
-    char *basename;
-
-    basename = filename;
-    while ((tmp = strchr(basename, '/')) != NULL) {
-        basename = tmp + 1;
-    }
-
-#ifdef REPR_FUNDAMENTAL
-#define repr_name "FUN"
-#elif defined REPR_SYMMETRIC
-#define repr_name "SYM"
-#elif defined REPR_ANTISYMMETRIC
-#define repr_name "ASY"
-#elif defined REPR_ADJOINT
-#define repr_name "ADJ"
-#endif
-    hm = sscanf(basename, "%*[^_]_%dx%dx%dx%d%*[Nn]c%dr" repr_name "%*[Nn]f%db%lfm%lfn%d", &(fn->t), &(fn->x), &(fn->y),
-                &(fn->z), &(fn->nc), &(fn->nf), &(fn->b), &(fn->m), &(fn->n));
-    if (hm == 9) {
-        fn->m = -fn->m; /* invert sign of mass */
-        fn->type = DYNAMICAL_CNFG;
-        return DYNAMICAL_CNFG;
-    }
-#undef repr_name
-
-    double kappa;
-    hm = sscanf(basename, "%dx%dx%dx%d%*[Nn]c%d%*[Nn]f%db%lfk%lfn%d", &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc),
-                &(fn->nf), &(fn->b), &kappa, &(fn->n));
-    if (hm == 9) {
-        fn->m = .5 / kappa - 4.;
-        fn->type = DYNAMICAL_CNFG;
-        return DYNAMICAL_CNFG;
-    }
-
-    hm = sscanf(basename, "%*[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d", &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->b),
-                &(fn->n));
-    if (hm == 7) {
-        fn->type = QUENCHED_CNFG;
-        return QUENCHED_CNFG;
-    }
-
-    hm = sscanf(basename, "%dx%dx%dx%d%*[Nn]c%db%lfn%d", &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->b), &(fn->n));
-    if (hm == 7) {
-        fn->type = QUENCHED_CNFG;
-        return QUENCHED_CNFG;
-    }
-
-    fn->type = UNKNOWN_CNFG;
-    return UNKNOWN_CNFG;
-}
-
-void read_cmdline(int argc, char *argv[]) {
-    int i, ai = 0, ao = 0, ac = 0, al = 0, am = 0;
-    FILE *list = NULL;
-
-    for (i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-i") == 0) {
-            ai = i + 1;
-        } else if (strcmp(argv[i], "-o") == 0) {
-            ao = i + 1;
-        } else if (strcmp(argv[i], "-c") == 0) {
-            ac = i + 1;
-        } else if (strcmp(argv[i], "-l") == 0) {
-            al = i + 1;
-        } else if (strcmp(argv[i], "-m") == 0) {
-            am = i;
-        }
-    }
-
-    if (am != 0) {
-        print_compiling_info();
-        exit(0);
-    }
-
-    if (ao != 0) { strcpy(output_filename, argv[ao]); }
-    if (ai != 0) { strcpy(input_filename, argv[ai]); }
-
-    error((ac == 0 && al == 0) || (ac != 0 && al != 0), 1, "parse_cmdline [mk_modenumber.c]",
-          "Syntax: mk_modenumber { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
-
-    if (ac != 0) {
-        strcpy(cnfg_filename, argv[ac]);
-        strcpy(list_filename, "");
-    } else if (al != 0) {
-        strcpy(list_filename, argv[al]);
-        error((list = fopen(list_filename, "r")) == NULL, 1, "parse_cmdline [mk_modenumber.c]", "Failed to open list file\n");
-        error(fscanf(list, "%s", cnfg_filename) == 0, 1, "parse_cmdline [mk_modenumber.c]", "Empty list file\n");
-        fclose(list);
-    }
-}
-
-double hevamass = 0.;
-void HEVA(spinor_field *out, spinor_field *in) {
-    g5Dphi_sq(hevamass, out, in);
-}
 
 int main(int argc, char *argv[]) {
     char tmp[1024];
     FILE *list;
-    filename_t fpars;
     char *cptr;
     int neig;
     double M[1024];
 
     /* setup process id and communications */
-    read_cmdline(argc, argv);
     setup_process(&argc, &argv);
-
-    read_input(glb_var.read, input_filename);
-
-    /* logger setup */
-    /* disable logger for MPI processes != 0 */
-    logger_setlevel("INVERTER", 0);
-    logger_setlevel(0, 30);
-    if (PID != 0) { logger_disable(); }
-    if (PID == 0) {
-        sprintf(tmp, ">%s", output_filename);
-        logger_stdout(tmp);
-        sprintf(tmp, "err_%d", PID);
-        freopen(tmp, "w", stderr);
-    }
-
-    print_compiling_info_short();
-    lprintf("MAIN", 0, "PId =  %d [world_size: %d]\n\n", PID, WORLD_SIZE);
-    lprintf("MAIN", 0, "input file [%s]\n", input_filename);
-    lprintf("MAIN", 0, "output file [%s]\n", output_filename);
-    if (strcmp(list_filename, "") != 0) {
-        lprintf("MAIN", 0, "list file [%s]\n", list_filename);
-    } else {
-        lprintf("MAIN", 0, "cnfg file [%s]\n", cnfg_filename);
-    }
-
-    /* read & broadcast parameters */
-    parse_cnfg_filename(cnfg_filename, &fpars);
-
-    read_input(nu_var.read, input_filename);
-    GLB_T = fpars.t;
-    GLB_X = fpars.x;
-    GLB_Y = fpars.y;
-    GLB_Z = fpars.z;
-    error(fpars.type == UNKNOWN_CNFG, 1, "mk_modenumber.c", "Bad name for a configuration file");
-    error(fpars.nc != NG, 1, "mk_modenumber.c", "Bad NG");
-
-    lprintf("MAIN", 0, "Gauge group: SU(%d)\n", NG);
-    lprintf("MAIN", 0, "Fermion representation: " REPR_NAME " [dim=%d]\n", NF);
-
-    if (fpars.type == DYNAMICAL_CNFG) { nu_var.mass = fpars.m; }
-
+    setup_gauge_fields();
+    read_input(glb_var.read, get_input_filename());
+    read_input(nu_var.read, get_input_filename());
+    hevamass = nu_var.mass;
     strcpy(tmp, nu_var.list);
+    lprintf("MAIN", 0, "list file: [%s]\n", nu_var.configlist);
+    if (strcmp(nu_var.configlist, "") != 0) {
+    	error((list = fopen(nu_var.configlist, "r")) == NULL, 1, "main [mk_modenumber.c]", "Failed to open list file\n");
+    }
     cptr = strtok(tmp, ";");
     neig = 0;
     while (cptr != NULL) {
@@ -216,88 +78,43 @@ int main(int argc, char *argv[]) {
         cptr = strtok(NULL, ";");
     }
     error(neig == 0, 1, "mk_modenumber.c", "neig == 0 !!!");
-
-    /* setup communication geometry */
-    if (geometry_init() == 1) {
-        finalize_process();
-        return 0;
-    }
-
-    /* setup lattice geometry */
-    geometry_mpi_eo();
-    /* test_geometry_mpi_eo(); */
-
-    /* setup random numbers */
-    read_input(rlx_var.read, input_filename);
-    lprintf("MAIN", 0, "RLXD [%d,%d]\n", rlx_var.rlxd_level, rlx_var.rlxd_seed + MPI_PID);
-    rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed);
-
     init_BCs(NULL);
-
-    /* alloc global gauge fields */
-    u_gauge = alloc_suNg_field(&glattice);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-    u_gauge_f = alloc_suNf_field(&glattice);
-#endif
-
     init_modenumber(nu_var.mass, nu_var.inverr2, nu_var.nhits, nu_var.approx);
     for (int k = 0; k < neig; k++) {
         lprintf("MODENUMBER", 0, "M[%d] = %e\n", k, M[k]);
     }
 
-    if (PID == 0) {
-        sprintf(tmp, ">>%s", output_filename);
-        logger_stdout(tmp);
-    }
-
-    list = NULL;
-    if (strcmp(list_filename, "") != 0) {
-        error((list = fopen(list_filename, "r")) == NULL, 1, "main [mk_modenumber.c]", "Failed to open list file\n");
-    }
+    char cnfg_filename[256];
+    Timer clock;
+    timer_set(&clock);
 
     int i = 0;
     while (1) {
         if (list != NULL) {
             if (fscanf(list, "%s", cnfg_filename) == 0 || feof(list)) { break; }
         }
-
         i++;
-
         lprintf("MAIN", 0, "Configuration from %s\n", cnfg_filename);
-        /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
         read_gauge_field(cnfg_filename);
         represent_gauge_field();
 
-        lprintf("TEST", 0, "<p> %1.6f\n", avr_plaquette());
-
-        /* full_plaquette(); */
-
+	timer_lap(&clock);
         for (int k = 0; k < neig; k++) {
             double number = ModeNumber(M[k] * M[k]);
             int mvm = getMVM();
             lprintf("MODENUMBER", 0, "nu[ %e ] = %.2f\n", M[k], number);
             lprintf("MODENUMBER", 0, "MVM = %d\n", mvm);
-            if (PID == 0) {
-                sprintf(tmp, ">>%s", output_filename);
-                logger_stdout(tmp);
-            }
         }
 
+	double elapsed = timer_lap(&clock) * 1e-6;
+	lprintf("TIMING", 0, "Mode number determination for configuration [%s] done [%lf sec]", cnfg_filename, elapsed);
         if (list == NULL) { break; }
     }
 
     if (list != NULL) { fclose(list); }
-
     free_BCs();
-
     free_modenumber();
 
-    free_suNg_field(u_gauge);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_suNf_field(u_gauge_f);
-#endif
-
     finalize_process();
-
     return 0;
 }
