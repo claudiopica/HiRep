@@ -202,6 +202,13 @@ int main(int argc, char *argv[]) {
         lprintf("INV_SUMMARY", 0, "\n");
 #endif
 
+#ifdef WITH_GPU
+    copy_from_gpu(u_gauge);
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
+    copy_from_gpu(u_gauge_f);
+#endif
+#endif
+
         if ((i % flow.meas_freq) == 0) {
             /* plaquette */
 #ifdef WITH_SMEARING
