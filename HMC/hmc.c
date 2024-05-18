@@ -203,9 +203,9 @@ int main(int argc, char *argv[]) {
 #endif
 
 #ifdef WITH_GPU
-    copy_from_gpu(u_gauge);
+        copy_from_gpu(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-    copy_from_gpu(u_gauge_f);
+        copy_from_gpu(u_gauge_f);
 #endif
 #endif
 
