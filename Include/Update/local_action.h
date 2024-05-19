@@ -19,6 +19,14 @@ extern void (*local_hmc_action)(local_action_type type, scalar_field *loc_action
                                 suNg_scalar_field *momenta_s);
 extern void (*pf_local_action)(scalar_field *loc_action, spinor_field *pf);
 
+void local_hmc_action_cpu(local_action_type type, scalar_field *loc_action, suNg_av_field *momenta,
+                          suNg_scalar_field *momenta_s);
+void local_hmc_action_gpu(local_action_type type, scalar_field *loc_action, suNg_av_field *momenta,
+                          suNg_scalar_field *momenta_s);
+
+void pf_local_action_cpu(scalar_field *loc_action, spinor_field *pf);
+void pf_local_action_gpu(scalar_field *loc_action, spinor_field *pf);
+
 #ifdef __cplusplus
 }
 #endif
