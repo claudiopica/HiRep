@@ -600,22 +600,40 @@ double suNg_algebra_vector_max(suNg_algebra_vector *r);
         double *: ({ (*(double *)s1) > (*(double *)s1) ? (*(double *)s1) : (*(double *)s1); }), \
         float *: ({ (*(float *)s1) > (*(float *)s1) ? (*(float *)s1) : (*(float *)s1); }))
 
-#define zero(s1)                                                              \
-    _Generic((s1),                                                            \
-        spinor_field *: zero_spinor_field((spinor_field *)s1),                \
-        spinor_field_flt *: zero_spinor_field_flt((spinor_field_flt *)s1),    \
-        scalar_field *: zero_scalar_field((scalar_field *)s1),                \
-        suNg_field *: zero_suNg_field((suNg_field *)s1),                      \
-        suNf_field *: zero_suNf_field((suNf_field *)s1),                      \
-        suNfc_field *: zero_suNfc_field((suNfc_field *)s1),                   \
-        suNg_field_flt *: zero_suNg_field_flt((suNg_field_flt *)s1),          \
-        suNf_field_flt *: zero_suNf_field_flt((suNf_field_flt *)s1),          \
-        suNg_scalar_field *: zero_suNg_scalar_field((suNg_scalar_field *)s1), \
-        suNg_av_field *: zero_suNg_av_field((suNg_av_field *)s1),             \
-        gtransf *: zero_gtransf((gtransf *)s1),                               \
-        clover_term *: zero_clover_term((clover_term *)s1),                   \
-        clover_force *: zero_clover_force((clover_force *)s1),                \
-        staple_field *: zero_staple_field((staple_field *)s1))
+#ifdef REPR_IS_REAL
+#define __zero_suNfc(s1) suNfc * : ({ _suNfc_zero(*(suNfc *)s1); }),
+#else
+#define __zero_suNfc(s1)
+#endif
+
+#define zero(s1)                                                                          \
+    _Generic((s1),                                                                        \
+        spinor_field *: zero_spinor_field((spinor_field *)s1),                            \
+        spinor_field_flt *: zero_spinor_field_flt((spinor_field_flt *)s1),                \
+        scalar_field *: zero_scalar_field((scalar_field *)s1),                            \
+        suNg_field *: zero_suNg_field((suNg_field *)s1),                                  \
+        suNf_field *: zero_suNf_field((suNf_field *)s1),                                  \
+        suNfc_field *: zero_suNfc_field((suNfc_field *)s1),                               \
+        suNg_field_flt *: zero_suNg_field_flt((suNg_field_flt *)s1),                      \
+        suNf_field_flt *: zero_suNf_field_flt((suNf_field_flt *)s1),                      \
+        suNg_scalar_field *: zero_suNg_scalar_field((suNg_scalar_field *)s1),             \
+        suNg_av_field *: zero_suNg_av_field((suNg_av_field *)s1),                         \
+        gtransf *: zero_gtransf((gtransf *)s1),                                           \
+        clover_term *: zero_clover_term((clover_term *)s1),                               \
+        clover_force *: zero_clover_force((clover_force *)s1),                            \
+        staple_field *: zero_staple_field((staple_field *)s1),                            \
+        suNf_spinor *: ({ _spinor_zero_f(*(suNf_spinor *)s1); }),                         \
+        suNf_spinor_flt *: ({ _spinor_zero_f(*(suNf_spinor_flt *)s1); }),                 \
+        __zero_suNfc(s1) suNf *: ({ _suNf_zero(*(suNf *)s1); }),                          \
+        suNg *: ({ _suNg_zero(*(suNg *)s1); }),                                           \
+        suNf_flt *: ({ _suNf_zero(*(suNf_flt *)s1); }),                                   \
+        suNg_flt *: ({ _suNg_zero(*(suNg_flt *)s1); }),                                   \
+        suNf_vector *: ({ _vector_zero_f(*(suNf_vector *)s1); }),                         \
+        suNg_vector *: ({ _vector_zero_g(*(suNg_vector *)s1); }),                         \
+        suNg_algebra_vector *: ({ _algebra_vector_zero_g(*(suNg_algebra_vector *)s1); }), \
+        double *: ({ *(double  *)s1  =  0.0; }),                                             \
+        float *: ({ *(float  *)s1  =  0.0f; }),                                              \
+        ldl_t *: ({ memset(s1, 0, sizeof(ldl_t)); }))
 
 #define copy(s1, s2)                                                                                   \
     _Generic((s2),                                                                                     \
