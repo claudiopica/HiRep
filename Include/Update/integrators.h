@@ -18,6 +18,7 @@ typedef struct integrator_par {
 } integrator_par;
 
 void leapfrog_multistep(double tlen, integrator_par *int_par);
+void force_gradient_multistep(double tlen, integrator_par *int_par);
 void O2MN_multistep(double tlen, integrator_par *int_par);
 void O4MN_multistep(double tlen, integrator_par *int_par);
 
