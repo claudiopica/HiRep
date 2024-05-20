@@ -631,8 +631,8 @@ double suNg_algebra_vector_max(suNg_algebra_vector *r);
         suNf_vector *: ({ _vector_zero_f(*(suNf_vector *)s1); }),                         \
         suNg_vector *: ({ _vector_zero_g(*(suNg_vector *)s1); }),                         \
         suNg_algebra_vector *: ({ _algebra_vector_zero_g(*(suNg_algebra_vector *)s1); }), \
-        double *: ({ *(double  *)s1  =  0.0; }),                                             \
-        float *: ({ *(float  *)s1  =  0.0f; }),                                              \
+        double *: ({ *(double *)s1 = 0.0; }),                                             \
+        float *: ({ *(float *)s1 = 0.0f; }),                                              \
         ldl_t *: ({ memset(s1, 0, sizeof(ldl_t)); }))
 
 #define copy(s1, s2)                                                                                   \
