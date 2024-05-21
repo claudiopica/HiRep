@@ -97,13 +97,6 @@ _DECLARE(unsigned long int, getMVM, ()) {
 }
 
 /**
- * @brief Reset counter for number of applications of the Dirac operator
- */
-_DECLARE(void, resetMVM, ()) {
-    _VAR(MVMcounter, _SUFFIX) = 0;
-}
-
-/**
  * @brief Free fields allocated for intermediate storage of field data.
  */
 _DECLARE(static void, free_mem, ()) {
@@ -256,14 +249,20 @@ _DECLARE(static void, Dphi_boundary, (_FIELD_TYPE * out, _FIELD_TYPE *in)) {
 void _GPU_F_NAME_(Dphi, _SUFFIX)(_FIELD_TYPE *out, _FIELD_TYPE *in) {
     _CHECK_GEOMETRY_EO(in, out);
     if (_VAR(init, _SUFFIX)) { _GPU_F_NAME(init_Dirac, _SUFFIX)(); }
-    _F_NAME(sync_reduced_init_, _FIELD_TYPE)(in);
+
+    // TODO: only sync for reverse parity
+    if (!in->type->SAP || in->type->SAP == 2) { _F_NAME(sync_reduced_init_, _FIELD_TYPE)(in); }
+
 #ifdef WITH_MPI
-    _F_NAME(start_sendrecv_reduced_, _FIELD_TYPE)(in);
+    if (!in->type->SAP || in->type->SAP == 2) { _F_NAME(start_sendrecv_reduced_, _FIELD_TYPE)(in); }
 #endif
-    _GPU_F_NAME(Dphi_inner, _SUFFIX)(out, in);
+
+    if (!in->type->SAP || (in->type->parity == PARITY && in->type->SAP == 1)) { _GPU_F_NAME(Dphi_inner, _SUFFIX)(out, in); }
 #ifdef WITH_MPI
-    _F_NAME(complete_sendrecv_reduced_, _FIELD_TYPE)(in);
-    _GPU_F_NAME(Dphi_boundary, _SUFFIX)(out, in);
+    if (!in->type->SAP || in->type->SAP == 2) {
+        _F_NAME(complete_sendrecv_reduced_, _FIELD_TYPE)(in);
+        if (!in->type->SAP || in->type->parity == PARITY) { _GPU_F_NAME(Dphi_boundary, _SUFFIX)(out, in); }
+    }
 #endif
 }
 

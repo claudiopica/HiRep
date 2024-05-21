@@ -90,6 +90,7 @@ GLB_VAR(int, LID, = 0); /* Process ID inside a replica local to the node */
 GLB_VAR(int, CID, = 0); /* Cartesian ID inside a replica */
 GLB_VAR(int, COORD[4], = { 0 }); /* cartesian coordinates for this process */
 GLB_VAR(int, PSIGN, = 0); /* parity of this process */
+GLB_VAR(int, PARITY, = 0); /*  is local lattice red */
 
 /* Geometry indexes */
 GLB_VAR(int, *ipt, = NULL);

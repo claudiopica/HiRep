@@ -21,13 +21,13 @@ int flopsite = 8 * NF * (7 + 16 * NF);
 
 int singlestep;
 
-static void random_g(suNg_field *g) {
+static void random_g(gtransf *g) {
     _MASTER_FOR(&glattice, ix) {
         random_suNg(_FIELD_AT(g, ix));
     }
 }
 
-static void transform(suNg_field *gtransf, suNg_field *suNg_field) {
+static void transform(gtransf *gtransf, suNg_field *suNg_field) {
     _MASTER_FOR(&glattice, ix) {
         for (int mu = 0; mu < 4; mu++) {
             int iy = iup(ix, mu);
@@ -42,7 +42,7 @@ static void transform(suNg_field *gtransf, suNg_field *suNg_field) {
     complete_sendrecv_suNg_field(suNg_field);
 }
 
-static void transform_s(suNg_field *suNg_field, spinor_field *in) {
+static void transform_s(gtransf *suNg_field, spinor_field *in) {
     suNf_vector tmp1, tmp2, tmp3, tmp4;
     suNf gfx;
     _MASTER_FOR(&glattice, ix) {
@@ -64,7 +64,7 @@ static void transform_s(suNg_field *suNg_field, spinor_field *in) {
 
 int main(int argc, char *argv[]) {
     int i, j, k, l;
-    suNg_field *g;
+    gtransf *g;
     spinor_field *s1;
     double norm;
 

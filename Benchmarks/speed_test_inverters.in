@@ -1,0 +1,28 @@
+// Global variables 
+GLB_T = 16 
+GLB_X = 16
+GLB_Y = 16
+GLB_Z = 16
+
+NP_T = 1
+NP_X = 2 
+NP_Y = 2
+NP_Z = 1
+
+rlx_level = 1
+rlx_seed = 12345
+rlx_start = new
+rlx_state = rlx_statae
+
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = 0
+log:inverter = 0
+log:forcestat = 0
+
+csw = 1.905900
+
+
+gpuID = 0

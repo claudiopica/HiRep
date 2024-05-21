@@ -171,6 +171,8 @@ static void compute_psign() {
 
     origin_coord(c);
     PSIGN = (c[0] + c[1] + c[2] + c[3]) & 1;
+
+    PARITY = (COORD[0] + COORD[1] + COORD[2] + COORD[3]) & 1;
 }
 #endif
 
