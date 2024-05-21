@@ -29,23 +29,23 @@ int bytes_per_site_lina(int ninputs, int noutputs, int sitesize) {
 #endif
 }
 
-#define _PRINT_SETUP(_ninputs, _noutputs, _flopsite, _in)                                                  \
-    do {                                                                                                   \
-        int bytesite = bytes_per_site_lina(_ninputs, _noutputs, sizeof((&_in[0])->ptr));                   \
-        lprintf("LA TEST", 0, "Flop per size = %d\n", _flopsite);                                          \
-        lprintf("LA TEST", 0, "Byte per site = %d\n", bytesite);                                           \
-        lprintf("LA TEST", 0, "Data movement = %e MB\n", (double)bytesite / (1024. * 1024.) * GLB_VOLUME); \
+#define _PRINT_SETUP(_ninputs, _noutputs, _flopsite, _in)                                                   \
+    do {                                                                                                    \
+        int bytesite = bytes_per_site_lina(_ninputs, _noutputs, sizeof((&_in[0])->ptr));                    \
+        lprintf("LA TEST", 0, "Flop per size = %d\n", _flopsite);                                           \
+        lprintf("LA TEST", 0, "Byte per site = %d\n", bytesite);                                            \
+        lprintf("LA TEST", 0, "Data movement = %e MiB\n", (double)bytesite / (1024. * 1024.) * GLB_VOLUME); \
     } while (0);
 
 #define _WARMUP(_name, _elapsed, _n_reps, _clock, _in, _test, _ninputs)            \
     lprintf("WARMUP", 0, "Warmup application of %s %d times.\n", _name, n_warmup); \
     _elapsed = 0;                                                                  \
+    timer_lap(&_clock);                                                            \
     for (int i = 0; i < n_warmup; ++i) {                                           \
-        timer_lap(&_clock);                                                        \
         _test;                                                                     \
-        synchronize;                                                               \
-        _elapsed += timer_lap(&_clock) * 1.e-3;                                    \
     }                                                                              \
+    synchronize;                                                                   \
+    _elapsed = timer_lap(&_clock) * 1.e-3;                                         \
     int _n_reps = (int)(n_warmup * 1.01 * (time_target / _elapsed));               \
     bcast_int(&n_reps, 1);                                                         \
     lprintf("WARMUP", 0,                                                           \
@@ -62,8 +62,8 @@ int bytes_per_site_lina(int ninputs, int noutputs, int sitesize) {
         timer_lap(&_clock);                                                 \
         for (int i = 0; i < _n_reps; ++i) {                                 \
             _test;                                                          \
-            synchronize;                                                    \
         }                                                                   \
+        synchronize;                                                        \
         _elapsed = timer_lap(&_clock) * 1.e-3;                              \
         _n_reps = (int)((double)(_n_reps * 1.01 * time_target) / _elapsed); \
         bcast_int(&n_reps, 1);                                              \

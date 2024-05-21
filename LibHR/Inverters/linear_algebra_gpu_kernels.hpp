@@ -105,6 +105,19 @@ __global__ void max_gpu(SITE_TYPE *s1, double *resField, int N) {
         }
     }
 }
+
+/* s1=s2 */
+template <unsigned int FIELD_DIM, typename REAL, typename SITE_TYPE>
+__global__ void id_gpu(SITE_TYPE *s1, SITE_TYPE *s2, int N) {
+    SITE_TYPE site;
+    for (int ix = blockIdx.x * blockDim.x + threadIdx.x; ix < N; ix += blockDim.x * gridDim.x) {
+        for (int mu = 0; mu < FIELD_DIM; ++mu) {
+            read_gpu<REAL>(N, &site, s2, ix, mu, FIELD_DIM);
+            write_gpu<REAL>(N, &site, s1, ix, mu, FIELD_DIM);
+        }
+    }
+}
+
 /* s1+=r*s2 r real */
 template <unsigned int FIELD_DIM, typename REAL, typename SITE_TYPE>
 __global__ void mul_add_assign_gpu(SITE_TYPE *s1, REAL r, SITE_TYPE *s2, int N) {

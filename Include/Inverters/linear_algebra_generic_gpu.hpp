@@ -1131,6 +1131,61 @@ visible __forceinline__ void clc_add_assign(suNf_spinor_flt *r, hr_complex k1, s
     _spinor_clc_add_assign_f(*r, k1, *s1, k2, *s2);
 }
 
+visible __forceinline__ void zero(suNf_spinor *s) {
+    _spinor_zero_f(*s);
+}
+
+visible __forceinline__ void zero(suNf_spinor_flt *s) {
+    _spinor_zero_f(*s);
+}
+
+#ifdef REPR_IS_REAL
+visible __forceinline__ void zero(suNfc *u) {
+    _suNfc_zero(*u);
+}
+#endif
+
+visible __forceinline__ void zero(suNg *u) {
+    _suNg_zero(*u);
+}
+
+visible __forceinline__ void zero(suNf *u) {
+    _suNf_zero(*u);
+}
+
+visible __forceinline__ void zero(suNf_flt *u) {
+    _suNf_zero(*u);
+}
+
+visible __forceinline__ void zero(suNg_flt *u) {
+    _suNg_zero(*u);
+}
+
+visible __forceinline__ void zero(suNf_vector *v) {
+    _vector_zero_f(*v);
+}
+
+visible __forceinline__ void zero(suNg_vector *v) {
+    _vector_zero_g(*v);
+}
+
+visible __forceinline__ void zero(suNg_algebra_vector *v) {
+    _algebra_vector_zero_g(*v);
+}
+
+visible __forceinline__ void zero(double *d) {
+    *d = 0.0;
+}
+
+visible __forceinline__ void zero(float *f) {
+    *f = 0.0f;
+}
+
+visible __forceinline__ void zero(ldl_t *t) {
+    // TODO: find a better way to do this
+    memset(t, 0, sizeof(ldl_t));
+}
+
 #undef _DECLARE_LINA_HEADER
 
 #endif
