@@ -135,8 +135,8 @@ int test_write_read_gauge_field_f() {
     int return_val = 0;
     suNf_field *in, *gpu_format, *out;
 
-    in = alloc_suNf_field(&glattice);
-    out = alloc_suNf_field(&glattice);
+    in = alloc(in, 2, &glattice);
+    out = in + 1;
     gpu_format = alloc_suNf_field(&glattice);
 
     random_u_f(in);
@@ -160,7 +160,6 @@ int test_write_read_gauge_field_f() {
     check_diff_norm_zero(diff_norm);
 
     free_suNf_field(in);
-    free_suNf_field(out);
     free_suNf_field(gpu_format);
     return return_val;
 }
