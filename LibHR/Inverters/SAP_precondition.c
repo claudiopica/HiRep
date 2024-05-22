@@ -57,9 +57,9 @@ int MINRES_SAP(int nmr, spinor_operator_flt M, spinor_field_flt *eta, spinor_fie
 }
 
 int SAP_prec(int nmr, int ncy, inverter_ptr inv, mshift_par *par, spinor_operator M, spinor_field *eta, spinor_field *psi) {
+    int cgiter = 0;
 #if defined(DPHI_FLT) && defined(WITH_GPU) && defined(WITH_MPI)
     spinor_field_flt *rho, *Mp, *xi, *res, *eta_flt, *psi_flt;
-    int cgiter = 0;
     hr_complex alpha;
 
     rho = alloc(rho, 6, eta->type);
