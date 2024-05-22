@@ -2,6 +2,10 @@
 *
 * Test of Schwarz Alternating Procedure
 *
+* NOCOMPILE= !WITH_GPU
+* NOCOMPILE= !WITH_MPI
+* NOCOMPILE= !DPHI_FLT
+*
 ******************************************************************************/
 
 #include "libhr.h"

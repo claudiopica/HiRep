@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
     double csw_input = 1.905900;
-    set_csw(&csw_input); 
+    set_csw(&csw_input);
 #endif
 
     //read_gauge_field(test_cnfg_filename);
@@ -69,10 +69,10 @@ int main(int argc, char *argv[]) {
 
     timer_set(&clock);
 
-    /*************  CG MSHIFT  ***************/ 
+    /*************  CG MSHIFT  ***************/
     lprintf("CG_MSHIFT TEST", 0, "---------------------\n");
     lprintf("CG_MSHIFT TEST", 0, "Testing CG multi-shift\n");
-    lprintf("CG_MSHIFT TEST", 0, "---------------------\n");    
+    lprintf("CG_MSHIFT TEST", 0, "---------------------\n");
     copy(s1, check);
     zero(s2);
     zero(res);
@@ -87,14 +87,14 @@ int main(int argc, char *argv[]) {
     lprintf("CG_MSHIFT TEST", 0, "Inverter needed %d hopping term applications.\n", n_dirac);
     lprintf("CG_MSHIFT TEST", 0, "Last CG mshift converged in = %d iterations\n", cgiters);
 
-     /* check precision reached */
+    /* check precision reached */
     H2(s2, res);
     sub_assign(s2, s1);
     tau = sqnorm(s2) / sqnorm(s1);
     lprintf("CG_MSHIFT TEST", 0, "test cg_mshift = %e (given relative inverter precision: %e)\n", tau, par.err2);
     lprintf("CG_MSHIFT TEST", 0, "Done\n");
 
-    /*************  g5QMR  ***************/ 
+    /*************  g5QMR  ***************/
     lprintf("g5QMR TEST", 0, "---------------------\n");
     lprintf("g5QMR TEST", 0, "Testrun g5QMR\n");
     lprintf("g5QMR TEST", 0, "---------------------\n");
@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
     lprintf("g5QMR TEST", 0, "test g5QMR = %e (given relative inverter precision: %e)\n", tau, par.err2);
     lprintf("g5QMR TEST", 0, "Done\n");
 
-    /*************  BiCGstab  ***************/ 
+    /*************  BiCGstab  ***************/
     lprintf("BICGSTAB TEST", 0, "---------------------\n");
     lprintf("BICGSTAB TEST", 0, "Testing BiCGstab\n");
     lprintf("BICGSTAB TEST", 0, "---------------------\n");
@@ -148,7 +148,8 @@ int main(int argc, char *argv[]) {
     lprintf("BICGSTAB TEST", 0, "test BiCGstab = %e (given relative inverter precision: %e)\n", tau, par.err2);
     lprintf("BICGSTAB TEST", 0, "Done\n");
 
-    /*************  SAP  ***************/ 
+#if defined(DPHI_FLT) && defined(WITH_GPU) && defined(WITH_MPI)
+    /*************  SAP  ***************/
     lprintf("SAP TEST", 0, "---------------------\n");
     lprintf("SAP TEST", 0, "Testing SAP only\n");
     lprintf("SAP TEST", 0, "---------------------\n");
@@ -178,7 +179,7 @@ int main(int argc, char *argv[]) {
     lprintf("SAP TEST", 0, "test SAP = %e (given relative inverter precision: %e)\n", tau, par.err2);
     lprintf("SAP TEST", 0, "Done\n");
 
-    /*************  GCR  ***************/ 
+    /*************  GCR  ***************/
     lprintf("GCR TEST", 0, "---------------------\n");
     lprintf("GCR TEST", 0, "Testing GCR\n");
     lprintf("GCR TEST", 0, "---------------------\n");
@@ -209,7 +210,7 @@ int main(int argc, char *argv[]) {
     tau = sqnorm(s2) / sqnorm(s1);
     lprintf("SAP TEST", 0, "test SAP = %e (given relative inverter precision: %e)\n", tau, par.err2);
 
-    /*************  SAP+GCR  ***************/ 
+    /*************  SAP+GCR  ***************/
     lprintf("SAP+GCR TEST", 0, "---------------------\n");
     lprintf("SAP+GCR TEST", 0, "Testing SAP+GCR\n");
     lprintf("SAP+GCR TEST", 0, "---------------------\n");
@@ -237,8 +238,9 @@ int main(int argc, char *argv[]) {
     sub_assign(s2, s1);
     tau = sqnorm(s2) / sqnorm(s1);
     lprintf("SAP+GCR TEST", 0, "test SAP = %e (given relative inverter precision: %e)\n", tau, par.err2);
+#endif
 
-    /*************  Finalize  ***************/ 
+    /*************  Finalize  ***************/
 
     free_field(res);
     free(par.shift);
@@ -246,4 +248,3 @@ int main(int argc, char *argv[]) {
 
     return 0;
 }
-
