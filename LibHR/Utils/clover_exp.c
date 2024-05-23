@@ -248,7 +248,7 @@ visible static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus, int NN) {
 
 #if (NF == 2)
 
-visible static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus, int NN) {
+visible static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus, int lNN) {
     suNfc A0[3], A2[4], tmp1[4];
 
     int i = 0, j = 0;
@@ -271,8 +271,8 @@ visible static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus, int NN) {
         q[i] = 0.;
     }
     double qlast;
-    q[0] = inverse_fact(NN);
-    for (i = NN - 1; i >= 0; i--) {
+    q[0] = inverse_fact(lNN);
+    for (i = lNN - 1; i >= 0; i--) {
         qlast = q[2 * NF - 1];
         q[2 * NF - 1] = q[2 * NF - 2];
         for (j = 2 * NF - 2; j > 0; j--) {
@@ -328,11 +328,11 @@ visible void clover_exp_taylor(suNfc *Xin, suNfc *u) {
     }
 }
 
-visible void clover_exp(suNfc *Aplus, suNfc *expAplus, int NN) {
+visible void clover_exp(suNfc *Aplus, suNfc *expAplus, int lNN) {
 #if (NF == 2)
-    clover_exp_NF2(Aplus, expAplus, NN);
+    clover_exp_NF2(Aplus, expAplus, lNN);
 #elif (NF == 3)
-    clover_exp_NF3(Aplus, expAplus, NN);
+    clover_exp_NF3(Aplus, expAplus, lNN);
 #else
     clover_exp_taylor(Aplus, expAplus);
 #endif
@@ -340,7 +340,7 @@ visible void clover_exp(suNfc *Aplus, suNfc *expAplus, int NN) {
 
 #if (NF == 3)
 
-visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
+visible static void doublehornerNF3(double *C, suNfc *A, int lNNexp) {
     suNfc A2[4], A3[4];
     hr_complex p[2 * NF - 1];
 
@@ -368,20 +368,20 @@ visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
     int i, j, k;
     double q[2 * NF], qlast;
 
-    double **q2 = (double **)malloc((NNexp + 1) * sizeof(double *));
-    for (int l = 0; l < NNexp + 1; ++l) {
+    double **q2 = (double **)malloc((lNNexp + 1) * sizeof(double *));
+    for (int l = 0; l < lNNexp + 1; ++l) {
         q2[l] = (double *)malloc((2 * NF) * sizeof(double));
     }
 
     //  for(i=0; i<2*NF-1;i++)printf("p[%d] = %2.20e\n", i, creal(p[i]));
 
-    for (j = 0; j <= NNexp; j++) {
-        q[0] = inverse_fact(NNexp + 2);
+    for (j = 0; j <= lNNexp; j++) {
+        q[0] = inverse_fact(lNNexp + 2);
         for (k = 1; k < 2 * NF; k++) {
             q[k] = 0.;
         }
 
-        for (i = NNexp - j; i > -1; i--) {
+        for (i = lNNexp - j; i > -1; i--) {
             qlast = q[2 * NF - 1];
             q[2 * NF - 1] = q[2 * NF - 2];
             for (k = 2 * NF - 2; k > 0; k--) {
@@ -396,12 +396,12 @@ visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
     }
 
     for (i = 0; i < 2 * NF; i++) {
-        q[0] = q2[NNexp][i];
+        q[0] = q2[lNNexp][i];
         for (k = 1; k < 2 * NF; k++) {
             q[k] = 0.;
         }
 
-        for (j = NNexp - 1; j > -1; j--) {
+        for (j = lNNexp - 1; j > -1; j--) {
             qlast = q[2 * NF - 1];
             q[2 * NF - 1] = q[2 * NF - 2];
             for (k = 2 * NF - 2; k > 0; k--) {
@@ -416,7 +416,7 @@ visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
         }
     }
 
-    for (int l = 0; l < NNexp + 1; ++l) {
+    for (int l = 0; l < lNNexp + 1; ++l) {
         free(q2[l]);
     }
     free(q2);
@@ -426,7 +426,7 @@ visible static void doublehornerNF3(double *C, suNfc *A, int NNexp) {
 
 #if (NF == 2)
 
-visible static void doublehornerNF2(double *C, suNfc *A, int NNexp) {
+visible static void doublehornerNF2(double *C, suNfc *A, int lNNexp) {
     suNfc A2[4];
     hr_complex p[2 * NF - 1];
     _su2Nfc_times_su2Nfc_herm(A2, A, A);
@@ -442,20 +442,20 @@ visible static void doublehornerNF2(double *C, suNfc *A, int NNexp) {
     int i, j, k;
     double q[2 * NF], qlast;
 
-    double **q2 = (double **)malloc((NNexp + 1) * sizeof(double *));
-    for (int l = 0; l < NNexp + 1; ++l) {
+    double **q2 = (double **)malloc((lNNexp + 1) * sizeof(double *));
+    for (int l = 0; l < lNNexp + 1; ++l) {
         q2[l] = (double *)malloc((2 * NF) * sizeof(double));
     }
 
     //  for(i=0; i<2*NF-1;i++)printf("p[%d] = %2.20e\n", i, creal(p[i]));
 
-    for (j = 0; j <= NNexp; j++) {
-        q[0] = inverse_fact(NNexp + 2);
+    for (j = 0; j <= lNNexp; j++) {
+        q[0] = inverse_fact(lNNexp + 2);
         for (k = 1; k < 2 * NF; k++) {
             q[k] = 0.;
         }
 
-        for (i = NNexp - j; i > -1; i--) {
+        for (i = lNNexp - j; i > -1; i--) {
             qlast = q[2 * NF - 1];
             q[2 * NF - 1] = q[2 * NF - 2];
             for (k = 2 * NF - 2; k > 0; k--) {
@@ -470,12 +470,12 @@ visible static void doublehornerNF2(double *C, suNfc *A, int NNexp) {
     }
 
     for (i = 0; i < 2 * NF; i++) {
-        q[0] = q2[NNexp][i];
+        q[0] = q2[lNNexp][i];
         for (k = 1; k < 2 * NF; k++) {
             q[k] = 0.;
         }
 
-        for (j = NNexp - 1; j > -1; j--) {
+        for (j = lNNexp - 1; j > -1; j--) {
             qlast = q[2 * NF - 1];
             q[2 * NF - 1] = q[2 * NF - 2];
             for (k = 2 * NF - 2; k > 0; k--) {
@@ -490,18 +490,18 @@ visible static void doublehornerNF2(double *C, suNfc *A, int NNexp) {
         }
     }
 
-    for (int l = 0; l < NNexp + 1; ++l) {
+    for (int l = 0; l < lNNexp + 1; ++l) {
         free(q2[l]);
     }
     free(q2);
 }
 #endif
 
-visible void doublehorner(double *C, suNfc *A, int NNexp) {
+visible void doublehorner(double *C, suNfc *A, int lNNexp) {
 #if (NF == 3)
-    doublehornerNF3(C, A, NNexp);
+    doublehornerNF3(C, A, lNNexp);
 #elif (NF == 2)
-    doublehornerNF2(C, A, NNexp);
+    doublehornerNF2(C, A, lNNexp);
 #else
     // TODO: this does not work because error is not a host
     // device function. There is now a compile time
@@ -510,15 +510,15 @@ visible void doublehorner(double *C, suNfc *A, int NNexp) {
 #endif
 }
 
-visible void factorialCoef(double *C, int NNexp) {
+visible void factorialCoef(double *C, int lNNexp) {
     int i, j;
 
-    for (j = 0; j < NNexp; j++) {
-        for (i = 0; i < NNexp; i++) {
-            if (i + j <= NNexp) {
-                C[(NNexp)*i + j] = inverse_fact(i + j + 1);
+    for (j = 0; j < lNNexp; j++) {
+        for (i = 0; i < lNNexp; i++) {
+            if (i + j <= lNNexp) {
+                C[(lNNexp)*i + j] = inverse_fact(i + j + 1);
             } else {
-                C[(NNexp)*i + j] = 0.;
+                C[(lNNexp)*i + j] = 0.;
             }
         }
     }
