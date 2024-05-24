@@ -58,7 +58,10 @@ int MINRES_SAP(int nmr, spinor_operator_flt M, spinor_field_flt *eta, spinor_fie
 
 int SAP_prec(int nmr, int ncy, inverter_ptr inv, mshift_par *par, spinor_operator M, spinor_field *eta, spinor_field *psi) {
     int cgiter = 0;
-#if defined(DPHI_FLT) && defined(WITH_GPU) && defined(WITH_MPI)
+#ifndef WITH_NEW_GEOMETRY
+    error(1, 1, __func__, "SAP preconditioning not implemented for old geometry.\n");
+#endif
+#if defined(DPHI_FLT) && defined(WITH_MPI)
     spinor_field_flt *rho, *Mp, *xi, *res, *eta_flt, *psi_flt;
     hr_complex alpha;
 
@@ -69,7 +72,7 @@ int SAP_prec(int nmr, int ncy, inverter_ptr inv, mshift_par *par, spinor_operato
     eta_flt = res + 1;
     psi_flt = eta_flt + 1;
 
-    assign_sd2s_gpu(eta_flt, eta);
+    assign_sd2s(eta_flt, eta);
 
     zero(psi_flt);
 
@@ -111,7 +114,7 @@ int SAP_prec(int nmr, int ncy, inverter_ptr inv, mshift_par *par, spinor_operato
 
     _SWITCH_TO_GLOBAL(eta->type);
 
-    assign_s2sd_gpu(psi, psi_flt);
+    assign_s2sd(psi, psi_flt);
 
     // Free temporary spinors
     free_field(rho);

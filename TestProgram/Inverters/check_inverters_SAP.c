@@ -2,7 +2,6 @@
 *
 * Test of Schwarz Alternating Procedure
 *
-* NOCOMPILE= !WITH_GPU
 * NOCOMPILE= !WITH_MPI
 * NOCOMPILE= !DPHI_FLT
 *
@@ -56,7 +55,6 @@ int main(int argc, char *argv[]) {
 
     lprintf("SAP TEST", 0, "Converged in %d iterations\n", cgiters);
     D(s2, res);
-    printf("sqnorm res %0.15e\n", sqnorm(s1));
     sub_assign_spinor_field(s2, s1);
     tau = sqnorm_spinor_field(s2) / sqnorm_spinor_field(s1);
     lprintf("SAP TEST", 0, "test SAP = %e (req. %e)\n", tau, par.err2);

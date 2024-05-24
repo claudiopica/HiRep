@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
     lprintf("BICGSTAB TEST", 0, "test BiCGstab = %e (given relative inverter precision: %e)\n", tau, par.err2);
     lprintf("BICGSTAB TEST", 0, "Done\n");
 
-#if defined(DPHI_FLT) && defined(WITH_GPU) && defined(WITH_MPI)
+#if defined(DPHI_FLT) && defined(WITH_MPI)
     /*************  SAP  ***************/
     lprintf("SAP TEST", 0, "---------------------\n");
     lprintf("SAP TEST", 0, "Testing SAP only\n");
