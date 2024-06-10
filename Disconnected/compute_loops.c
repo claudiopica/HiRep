@@ -70,7 +70,7 @@ typedef struct _input_loops
 			{"Source type ", "disc:source_type = %d", INT_T, &(varname).source_type},         \
 			{"maximum component of momentum", "disc:n_mom = %d", INT_T, &(varname).n_mom},    \
 			{"Configuration list:", "disc:configlist = %s", STRING_T, &(varname).configlist}, \
-			{"csw", "disc:csw = %f", DOUBLE_T, &(varname).csw},                               \
+			{"csw", "disc:csw = %lf", DOUBLE_T, &(varname).csw},                               \
 			{NULL, NULL, INT_T, NULL}                                                         \
 		}                                                                                     \
 	}
