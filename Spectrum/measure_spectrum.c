@@ -83,9 +83,9 @@ typedef struct input_mesons {
             { "enable background electric field", "mes:background_field = %d", INT_T, &(varname).background_field },      \
             { "electric charge", "mes:Q = %lf", DOUBLE_T, &(varname).Q },                                                 \
             { "electric field nEz", "mes:nEz = %d", INT_T, &(varname).nEz },                                              \
-            { "csw coefficient", "mes:csw = %lg", DOUBLE_T, &(varname).csw },                                             \
-            { "smearing space", "mes:rho_s = %lg", DOUBLE_T, &(varname).rho_s },                                          \
-            { "smearing time", "mes:rho_t = %lg", DOUBLE_T, &(varname).rho_t },                                           \
+            { "csw coefficient", "mes:csw = %lf", DOUBLE_T, &(varname).csw },                                             \
+            { "smearing space", "mes:rho_s = %lf", DOUBLE_T, &(varname).rho_s },                                          \
+            { "smearing time", "mes:rho_t = %lf", DOUBLE_T, &(varname).rho_t },                                           \
             { "hopping expansion degree", "mes:degree_hopping = %d", INT_T, &(varname).degree_hopping },                  \
             { "hopping expansion hits", "mes:nhits_hopping = %d", INT_T, &(varname).nhits_hopping },                      \
             { "Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist },                            \

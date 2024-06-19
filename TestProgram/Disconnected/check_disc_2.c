@@ -89,7 +89,7 @@ typedef struct input_mesons {
             { "inverter precision", "disc:precision = %lf", DOUBLE_T, &(varname).precision }, \
             { "number of inversions per cnfg", "disc:nhits2 = %d", INT_T, &(varname).nhits }, \
             { "maximum component of momentum", "disc:n_mom = %d", INT_T, &(varname).n_mom },  \
-            { "csw coefficient", "mes:csw = %lg", DOUBLE_T, &(varname).csw },                 \
+            { "csw coefficient", "mes:csw = %lf", DOUBLE_T, &(varname).csw },                 \
             { NULL, NULL, INT_T, NULL }                                                       \
         }                                                                                     \
     }

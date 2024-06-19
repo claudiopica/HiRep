@@ -83,7 +83,7 @@ typedef struct input_mesons {
     {                                                                                                             \
         .read = {                                                                                                 \
             { "fermion mass", "mes:mass = %s", STRING_T, (varname).mstring },                                     \
-            { "csw coefficient", "mes:csw = %lg", DOUBLE_T, &(varname).csw },                                     \
+            { "csw coefficient", "mes:csw = %lf", DOUBLE_T, &(varname).csw },                                     \
             { "number of noisy sources per cnfg for 2pt fn", "mes:nhits_2pt = %d", INT_T, &(varname).nhits_2pt }, \
             { NULL, NULL, INT_T, NULL }                                                                           \
         }                                                                                                         \
