@@ -97,7 +97,7 @@ my @libs_core = ("libhr.a"); #this is for later programs to use
   print "default libhrobservables.a\n";
 }
 
-my @libs = ("libhrobservables.a", "libhr.a"); #order is important
+my @libs = ("libhrobservables.a", "libhr.a", "libhrobservables.a"); #order is important
 
 ###############################################################################
 # HMC
