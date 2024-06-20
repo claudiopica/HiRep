@@ -24,7 +24,7 @@ if ($diff==0 and $all==0 and @ARGV==0) { $index = 1; }
 my $clangformat = "clang-format";
 if (defined $ENV{CLANG_FORMAT}) {
   $clangformat = $ENV{CLANG_FORMAT};
-} elsif (system("command -v $clangformat")!=0) {
+} elsif (system("which $clangformat")!=0) {
   $clangformat = "npx clang-format";
 }
 
