@@ -54,4 +54,7 @@ Make/Utils/autosun/writeREPR
 LibHR/Update/approx_data.db
 LibHR/Utils/cinfo.c
 LibHR/Utils/cinfo.h
-rainstall-cmake.sh
+
+#docker/devcontainer
+.devcontainer/reinstall-cmake.sh
+.github/dependabot.yml

@@ -5,19 +5,27 @@
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
-
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
-
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
-
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "ln -sf /workspaces/HiRep-git/Make/git-hooks-pre-commit /workspaces/HiRep-git/.git/hooks/pre-commit"
-
+	"postCreateCommand": {
+		"git-hooks": "ln -sf /workspaces/HiRep-git/Make/git-hooks-pre-commit /workspaces/HiRep-git/.git/hooks/pre-commit"
+	}
 	// Configure tool-specific properties.
 	// "customizations": {},
-
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"eamodio.gitlens",
+				"ms-vscode-remote.remote-containers",
+				"ms-vscode.cpptools-extension-pack",
+				"ms-azuretools.vscode-dockert",
+				"ms-vscode.cpptools-themes"
+			]
+		}
+	}
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
 }
