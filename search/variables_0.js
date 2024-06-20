@@ -1,0 +1,4 @@
+var searchData=
+[
+  ['comm_5freq_0',['comm_req',['../d2/d0e/structsuNg__field.html#a5b3cad05efd9bbf0deec28a925b35193',1,'suNg_field::comm_req()'],['../d4/d1f/structsuNg__field__flt.html#a885d03d504c2bb49a838d13c17159a89',1,'suNg_field_flt::comm_req()'],['../d9/d4a/structsuNf__field.html#a09fb2fe5f0cfad8ea2766870c0f43433',1,'suNf_field::comm_req()'],['../d6/d54/structsuNf__field__flt.html#a5b085e7cea2a6e7d662f3d6677135662',1,'suNf_field_flt::comm_req()'],['../d0/da8/structspinor__field.html#aa9e90bd763c8a1bbb21ede8f03f344d9',1,'spinor_field::comm_req()'],['../d4/dce/structspinor__field__flt.html#ade0e017ea9a69f62c35b75941c9c59dc',1,'spinor_field_flt::comm_req()'],['../db/dc8/structsuNg__av__field.html#a9aa1b4248d50f8cddecac60eb5f73fef',1,'suNg_av_field::comm_req()'],['../d8/daf/structscalar__field.html#a0374271012b79fd5ac3f41102e4ab570',1,'scalar_field::comm_req()']]]
+];

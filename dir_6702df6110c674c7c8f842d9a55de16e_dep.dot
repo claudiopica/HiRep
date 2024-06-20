@@ -1,0 +1,17 @@
+digraph "Observables"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  compound=true
+  subgraph clusterdir_856524284ebe840938865dc061f982fb {
+    graph [ bgcolor="#daedff", pencolor="grey25", style="filled,dashed,", label="Include", fontname="Helvetica", fontsize="10", URL="dir_856524284ebe840938865dc061f982fb.html"]
+  dir_042917ff93cbe8fd08a35dc3a365551a [shape=box, label="IO", style="filled,", fillcolor="#4ea9ff", color="grey25", URL="dir_042917ff93cbe8fd08a35dc3a365551a.html"];
+  dir_0599d141b1a2e9e9007ecef8e4a97773 [shape=box, label="Core", style="filled,", fillcolor="#4ea9ff", color="grey25", URL="dir_0599d141b1a2e9e9007ecef8e4a97773.html"];
+  dir_6702df6110c674c7c8f842d9a55de16e [shape=box, label="Observables", style="filled,bold,", fillcolor="#daedff", color="grey25", URL="dir_6702df6110c674c7c8f842d9a55de16e.html"];
+  }
+  dir_6702df6110c674c7c8f842d9a55de16e->dir_042917ff93cbe8fd08a35dc3a365551a [headlabel="1", labeldistance=1.5 headhref="dir_000015_000010.html"];
+  dir_6702df6110c674c7c8f842d9a55de16e->dir_0599d141b1a2e9e9007ecef8e4a97773 [headlabel="16", labeldistance=1.5 headhref="dir_000015_000000.html"];
+}
