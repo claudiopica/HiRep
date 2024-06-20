@@ -1,18 +1,23 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/cpp
 {
-	"name": "C++",
+	"name": "HiRep",
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"containerEnv": { "TZ": "Europe/Rome" },
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": {
-		"git-hooks": "ln -sf /workspaces/HiRep-git/Make/git-hooks-pre-commit /workspaces/HiRep-git/.git/hooks/pre-commit"
-	}
+		"git-hooks": "ln -sf /workspaces/${localWorkspaceFolderBasename}/Make/git-hooks-pre-commit /workspaces/${localWorkspaceFolderBasename}/.git/hooks/pre-commit"
+	},
+	"postStartCommand": {
+		"setupenv": "printenv > .devcontainer/container.env"
+	},
 	// Configure tool-specific properties.
 	// "customizations": {},
 	"customizations": {
