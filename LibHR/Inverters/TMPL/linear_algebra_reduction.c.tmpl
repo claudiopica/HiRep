@@ -54,7 +54,7 @@ _DECLARE_LINEAR_ALGEBRA(double, prod_re, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
     }
     sum += c;
 #ifdef WITH_MPI
-    global_sum(&sum, 1);
+    if (!s1->type->SAP) { global_sum(&sum, 1); }
 #endif
     return sum;
 }
@@ -76,7 +76,7 @@ _DECLARE_LINEAR_ALGEBRA(double, prod_im, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
     }
     sum += c;
 #ifdef WITH_MPI
-    global_sum(&sum, 1);
+    if (!s1->type->SAP) { global_sum(&sum, 1); }
 #endif
     return sum;
 }
@@ -104,7 +104,7 @@ _DECLARE_LINEAR_ALGEBRA(hr_complex, prod, (_FIELD_TYPE * s1, _FIELD_TYPE *s2)) {
     }
     _complex_add_assign(sum, c);
 #ifdef WITH_MPI
-    global_sum((double *)&sum, 2);
+    if (!s1->type->SAP) { global_sum((double *)&sum, 2); }
 #endif
     return sum;
 }
@@ -125,7 +125,7 @@ _DECLARE_LINEAR_ALGEBRA(double, sqnorm, (_FIELD_TYPE * s1)) {
     }
     sum += c;
 #ifdef WITH_MPI
-    global_sum(&sum, 1);
+    if (!s1->type->SAP) { global_sum(&sum, 1); }
 #endif
 
     return sum;
@@ -143,7 +143,7 @@ _DECLARE_LINEAR_ALGEBRA(double, max, (_FIELD_TYPE * s1)) {
         }
     }
 #ifdef WITH_MPI
-    global_max(&maxval, 1);
+    if (!s1->type->SAP) { global_max(&maxval, 1); }
 #endif
 
     return maxval;

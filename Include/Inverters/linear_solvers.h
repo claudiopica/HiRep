@@ -28,8 +28,10 @@ typedef struct mshift_par {
 
 // We might want to add a "trial" spinor to the argument list
 typedef int (*inverter_ptr)(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
-void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
-
+int MINRES_SAP(int nmr, spinor_operator_flt M, spinor_field_flt *eta, spinor_field_flt *psi, spinor_field_flt *res);
+int SAP_prec(int nmr, int ncy, inverter_ptr inv, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+int sapgcr(mshift_par *par, spinor_operator M, spinor_field *eta, spinor_field *phi);
+int gcr(mshift_par *par, spinor_operator M, spinor_field *eta, spinor_field *phi);
 /*
  * performs the multi-shifted CG inversion:
  * out[i] = (M-(par->shift[i]))^-1 in
@@ -63,7 +65,7 @@ int HBiCGstab_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, 
 
 /*
 int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
-int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+int HBiCGstab_mshift(mshift_par *par,  M, spinor_field *in, spinor_field *out);
 */
 
 int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);

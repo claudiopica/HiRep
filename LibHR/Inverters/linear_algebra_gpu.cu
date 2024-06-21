@@ -10,14 +10,16 @@
 #include "geometry.h"
 #include "Utils/generics.h"
 
-#define _CUDA_FOR(s, ixp, body)                                                        \
-    do {                                                                               \
-        _PIECE_FOR((s)->type, (ixp)) {                                                 \
-            int N = (s)->type->master_end[(ixp)] - (s)->type->master_start[(ixp)] + 1; \
-            unsigned int grid_size = (N - 1) / BLOCK_SIZE_LINEAR_ALGEBRA + 1;          \
-            body;                                                                      \
-            CudaCheckError();                                                          \
-        }                                                                              \
+#define _CUDA_FOR(s, ixp, body)                                                            \
+    do {                                                                                   \
+        _PIECE_FOR((s)->type, (ixp)) {                                                     \
+            if (!(s)->type->SAP || (s)->type->parity == PARITY) {                          \
+                int N = (s)->type->master_end[(ixp)] - (s)->type->master_start[(ixp)] + 1; \
+                unsigned int grid_size = (N - 1) / BLOCK_SIZE_LINEAR_ALGEBRA + 1;          \
+                body;                                                                      \
+                CudaCheckError();                                                          \
+            }                                                                              \
+        }                                                                                  \
     } while (0)
 
 #define _GENERIC_DECLARATION(_type, _name, _args, _in_args) \

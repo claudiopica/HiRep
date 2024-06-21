@@ -480,10 +480,7 @@ hr_complex suNg_algebra_vector_prod(suNg_algebra_vector *r, suNg_algebra_vector 
 #define prod(s1, s2)                                                                                           \
     _Generic((s2),                                                                                             \
         spinor_field *: prod_spinor_field((spinor_field *)s1, (spinor_field *)s2),                             \
-        spinor_field_flt *: ({                                                                                 \
-            prod_re_spinor_field_flt((spinor_field_flt *)s1, (spinor_field_flt *)s2) +                         \
-                I *prod_im_spinor_field_flt((spinor_field_flt *)s1, (spinor_field_flt *)s2);                   \
-        }),                                                                                                    \
+        spinor_field_flt *: prod_spinor_field_flt((spinor_field_flt *)s1, (spinor_field_flt *)s2),             \
         scalar_field *: prod_scalar_field((scalar_field *)s1, (scalar_field *)s2),                             \
         suNg_field *: prod_suNg_field((suNg_field *)s1, (suNg_field *)s2),                                     \
         suNf_field *: prod_suNf_field((suNf_field *)s1, (suNf_field *)s2),                                     \

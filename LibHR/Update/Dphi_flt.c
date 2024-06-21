@@ -234,10 +234,15 @@ void Dphi_flt_cpu_(spinor_field_flt *restrict out, spinor_field_flt *restrict in
     /************************ loop over all lattice sites *************************/
     /* start communication of input spinor field */
 #ifdef WITH_MPI
-    start_sendrecv_spinor_field_flt(in);
+    if (!in->type->SAP || in->type->SAP == 2) { start_sendrecv_spinor_field_flt(in); }
 #endif
 
-    for (int repeat = 0; repeat < 2; repeat++) {
+    int repeat_max = 2;
+    int repeat_min = 0;
+    if (in->type->SAP == 1) { repeat_max--; }
+    if (in->type->SAP == 2) { repeat_min++; }
+
+    for (int repeat = repeat_min; repeat < repeat_max; repeat++) {
         //we repeat the loop over the master lattice twice
         //the second pass we invert the mask
         //this is achieved with comparing the condition to be different than repeat=0,1
@@ -423,7 +428,7 @@ void Dphi_flt_cpu_(spinor_field_flt *restrict out, spinor_field_flt *restrict in
         if (!repeat) {
             // lprintf("MAIN", 0, "Doing complete sendrecv repeat=%d\n",repeat);
             /* wait for spinor to be transfered */
-            complete_sendrecv_spinor_field_flt(in);
+            if (!in->type->SAP || in->type->SAP == 2) { complete_sendrecv_spinor_field_flt(in); }
         }
 #endif
     }
