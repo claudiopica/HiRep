@@ -121,10 +121,10 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile) {
     BCs_pars.fermion_twisting_theta[2] = hmc_var.hmc_p.theta[2];
     BCs_pars.fermion_twisting_theta[3] = hmc_var.hmc_p.theta[3];
 #endif
-#ifdef BC_T_SF_ROTATED
+#ifdef ROTATED_SF
     BCs_pars.chiSF_boundary_improvement_ds = hmc_var.hmc_p.SF_ds;
 #endif
-#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
+#if defined(BASIC_SF) || defined(ROTATED_SF)
     BCs_pars.gauge_boundary_improvement_ct = hmc_var.hmc_p.SF_ct;
     error(hmc_var.hmc_p.SF_background != 0 && hmc_var.hmc_p.SF_background != 1, 0, "init_mc_ghmc" __FILE__,
           "Wrong value of SF_background\n");
@@ -178,7 +178,6 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile) {
 
 double integrate_ghmc(int regenerate, ghmc_par *update_par) {
     static suNg_av_field *suN_momenta_copy;
-    static suNg_scalar_field *scalar_momenta_copy;
     static double deltaH;
     static suNg_field *u_gauge_copy = NULL;
     static scalar_field *la = NULL; /* local action field for Metropolis test */
@@ -186,18 +185,14 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
     static spinor_field **pf_copy = NULL;
 
     if (suN_momenta_copy == NULL) {
-        suN_momenta_copy = alloc_suNg_av_field(&glattice);
+        suN_momenta_copy = alloc(suN_momenta_copy, 1, &glattice);
 
-        u_gauge_copy = alloc_suNg_field(&glattice);
-        copy(u_gauge_copy, u_gauge);
-        start_sendrecv_suNg_field(u_gauge_copy);
-        complete_sendrecv_suNg_field(u_gauge_copy);
+        u_gauge_copy = alloc(u_gauge_copy, 1, &glattice);
+        copy_suNg_field(u_gauge_copy, u_gauge);
 
         if (u_scalar != NULL) {
-            u_scalar_copy = alloc_suNg_scalar_field(&glattice);
-            copy(u_scalar_copy, u_scalar);
-            start_sendrecv_suNg_scalar_field(u_scalar_copy);
-            complete_sendrecv_suNg_scalar_field(u_scalar_copy);
+            u_scalar_copy = alloc(u_scalar_copy, 1, &glattice);
+            copy_suNg_scalar_field(u_scalar_copy, u_scalar);
         }
         pf_copy = (spinor_field **)malloc(num_mon() * sizeof(spinor_field *));
         for (int i = 0; i < num_mon(); i++) {
@@ -205,7 +200,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
         }
     }
 
-    if (la == NULL) { la = alloc_scalar_field(1, &glattice); }
+    if (la == NULL) { la = alloc(la, 1, &glattice); }
 
     if (regenerate == 0) {
         /* generate new momenta */
@@ -213,14 +208,10 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
 
         gaussian_momenta(suN_momenta);
         copy(suN_momenta_copy, suN_momenta);
-        start_sendrecv_suNg_av_field(suN_momenta_copy);
-        complete_sendrecv_suNg_av_field(suN_momenta_copy);
 
         if (u_scalar != NULL) {
             gaussian_scalar_momenta(scalar_momenta);
-            copy(scalar_momenta_copy, scalar_momenta);
-            start_sendrecv_suNg_scalar_field(scalar_momenta_copy);
-            complete_sendrecv_suNg_scalar_field(scalar_momenta_copy);
+            // to be done scalar_av_field_copy(scalar_momenta_copy, scalar_momenta);
         }
         lprintf("HMC", 30, " done.\n");
     }
@@ -235,14 +226,17 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
             m->gaussian_pf(m);
 
             if (msf != NULL) {
-                if (pf_copy[i] == NULL) { pf_copy[i] = alloc_spinor_field(1, msf->type); }
+                if (pf_copy[i] == NULL) { pf_copy[i] = alloc(pf_copy[i], 1, msf->type); }
 
-                copy_spinor_field(pf_copy[i], msf);
+                copy(pf_copy[i], msf);
             }
         }
     }
 
-    /* compute starting action */
+/* compute starting action */
+#ifdef WITH_GPU
+//copy_from_gpu_sfield(scalar_momenta);
+#endif
     lprintf("HMC", 30, "Computing action density...\n");
     local_hmc_action(NEW, la, suN_momenta, scalar_momenta);
 
@@ -268,6 +262,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
     }
     local_hmc_action(DELTA, la, suN_momenta, scalar_momenta);
 
+    /* Metropolis test */
 #ifndef WITH_GPU
     _OMP_PRAGMA(single) {
         deltaH = 0.0;
@@ -288,16 +283,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
     // Restore the copies
 
     copy(suN_momenta, suN_momenta_copy);
-    start_sendrecv_suNg_av_field(suN_momenta);
-    complete_sendrecv_suNg_av_field(suN_momenta);
-    if (u_scalar != NULL) {
-        copy(scalar_momenta, scalar_momenta_copy);
-        start_sendrecv_suNg_scalar_field(scalar_momenta);
-        complete_sendrecv_suNg_scalar_field(scalar_momenta);
-    }
     copy(u_gauge, u_gauge_copy);
-    start_sendrecv_suNg_field(u_gauge);
-    complete_sendrecv_suNg_field(u_gauge);
     if (u_scalar != NULL) { copy(u_scalar, u_scalar_copy); }
 
     for (int i = 0; i < num_mon(); ++i) {
@@ -309,7 +295,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par) {
             error(pf_copy[i] == NULL, 0, "integrate_ghmc",
                   "The pseudo fermion must be allocated to be copied, wrong sequence in regenarate");
 
-            copy_spinor_field(msf, pf_copy[i]);
+            copy(msf, pf_copy[i]);
         }
     }
 
@@ -338,6 +324,8 @@ void set_integrator_type(ghmc_par *gpar, int type) {
         lprintf("set_integrator_type", 0, "Setting all the integrator type to O2MN");
     } else if (type == O4MN) {
         lprintf("set_integrator_type", 0, "Setting all the integrator type to O4MN");
+    } else if (type == FORCE_GRADIENT) {
+        lprintf("set_integrator_type", 0, "Setting all the integrator types to force gradient");
     } else {
         error(0 == 0, 0, "set_integrator_type", "Wrong integrator identifier");
     }
@@ -350,6 +338,8 @@ void set_integrator_type(ghmc_par *gpar, int type) {
             pint->integrator = &O2MN_multistep;
         } else if (type == O4MN) {
             pint->integrator = &O4MN_multistep;
+        } else if (type == FORCE_GRADIENT) {
+            pint->integrator = &force_gradient_multistep;
         }
 
         pint = pint->next;

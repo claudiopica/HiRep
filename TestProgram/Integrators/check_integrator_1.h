@@ -8,7 +8,7 @@
 
 #include "libhr.h"
 
-enum { LEAPFROG, O2MN, O4MN };
+enum { LEAPFROG, FORCE_GRADIENT, O2MN, O4MN };
 
 /* HMC variables */
 typedef struct input_hmc {
