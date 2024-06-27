@@ -1,17 +1,17 @@
 // Global variables input lattice
-GLB_T = 8
+GLB_T = 8 
 GLB_X = 8 
 GLB_Y = 8
 GLB_Z = 8
 file_in = cnfg/run1_8x8x8x8nc3rFUNnf2b12.000000m0.012500n64
 
 // Global variables output lattice
-GLB_T_OUT = 16
-GLB_X_OUT = 16
-GLB_Y_OUT = 16
-GLB_Z_OUT = 16
+GLB_T_OUT = 16 
+GLB_X_OUT = 8 
+GLB_Y_OUT = 8
+GLB_Z_OUT = 8
 CP_transform = 1 
-file_out = cnfg/run1_16x16x16x16nc3rFUNnf2b12.000000m0.012500n0
+file_out = cnfg/run1_16x8x8x8nc3rFUNnf2b12.000000m0.012500n0
 
 rlx_level = 1
 rlx_seed = 12345

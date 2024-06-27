@@ -78,10 +78,28 @@ static int *ipt_old;
     (((((_t) % (_T)) * (_X) + ((_x) % (_X))) * (_Y) + ((_y) % (_Y))) * (_Z) + ((_z) % (_Z)))
 #define ipt_box(_T, _X, _Y, _Z, _t, _x, _y, _z) ipt_old[_lexi_convert(_T, _X, _Y, _Z, _t, _x, _y, _z)];
 
-static int p_transformed_index(int t, int x, int y, int z, int T, int X, int Y, int Z) {
-    const int x_loc = X - 1 - (x % X);
-    const int y_loc = Y - 1 - (y % Y);
-    const int z_loc = Z - 1 - (z % Z);
+static int p_transformed_index(int t, int x, int y, int z, int T, int X, int Y, int Z, int p1, int p2, int p3, int mu) {
+    int x_loc = x;
+    int y_loc = y;
+    int z_loc = z;
+    if (mu == 0) {
+        if (p1) { x_loc = X - 1 - (x % X); }
+        if (p2) { y_loc = Y - 1 - (y % Y); }
+        if (p3) { z_loc = Z - 1 - (z % Z); }
+    } else {
+        if (p1) {
+            x_loc = X - 2 - (x % X);
+            if (x_loc < 0) { x_loc = X - 1; }
+        }
+        if (p2) {
+            y_loc = Y - 2 - (y % Y);
+            if (y_loc < 0) { y_loc = Y - 1; }
+        }
+        if (p3) {
+            z_loc = Z - 2 - (z % Z);
+            if (z_loc) { z_loc = Z - 1; }
+        }
+    }
     return ipt_box(T, X, Y, Z, t, x_loc, y_loc, z_loc);
 }
 
@@ -156,42 +174,26 @@ int main(int argc, char *argv[]) {
         for (int x = 0; x < X; x++) {
             for (int y = 0; y < Y; y++) {
                 for (int z = 0; z < Z; z++) {
-                    // Determine sublattice box coordinates
-                    // so that we can derive a geometric parity
-                    // and then perform a CP transform on odd
-                    // sublattices
                     int b0 = t / T_old;
                     int b1 = x / X_old;
                     int b2 = y / Y_old;
                     int b3 = z / Z_old;
+                    int p1 = b1 % 2;
+                    int p2 = b2 % 2;
+                    int p3 = b3 % 2;
                     int sublat_parity = 0;
                     if (CP_T) { sublat_parity = (b0 + b1 + b2 + b3) % 2; }
 
-                    int idx = 0;
-                    if (sublat_parity) {
-                        idx = p_transformed_index(t, x, y, z, T_old, X_old, Y_old, Z_old);
-                    } else {
-                        idx = ipt_box(T_old, X_old, Y_old, Z_old, t, x, y, z);
-                    }
-
-                    int idx_new = ipt(t, x, y, z);
-
                     for (int mu = 0; mu < 4; mu++) {
+                        int idx = p_transformed_index(t, x, y, z, T_old, X_old, Y_old, Z_old, p1, p2, p3, mu);
+                        int idx_new = ipt(t, x, y, z);
                         suNg in = *_4FIELD_AT_PTR(tmp, idx, mu, 0);
-                        suNg out, tmp;
-
-                        if (sublat_parity) {
-                            // C transform
-                            _suNg_star(tmp, in);
-                            if (mu != 0) {
-                                // P transform
-                                _suNg_minus(out, tmp);
-                            } else {
-                                out = tmp;
-                            }
-                        } else {
-                            out = in;
-                        }
+                        suNg out;
+                        out = in;
+                        if (mu == 0) { out = in; }
+                        if ((mu == 1) && p1) { _suNg_minus(out, in); }
+                        if (mu == 2 && p2) { _suNg_minus(out, in); }
+                        if (mu == 3 && p3) { _suNg_minus(out, in); }
                         *_4FIELD_AT(u_gauge, idx_new, mu) = out;
                     }
                 }
