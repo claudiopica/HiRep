@@ -14,7 +14,7 @@ rlx_level = 1
 rlx_seed = 13813
 rlx_start = new
 rlx_state = rand_state
-
+rlx_store = 0
 
 //Wilson flow parameters
 //WF integrators type 0=Euler 1=3rd order Runge-Kutta 2=Adaptive 3rd order Runge-Kutta

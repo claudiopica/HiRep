@@ -67,6 +67,7 @@ for (( i=0; i<ntests; i++ )) ; do
    echo "rlx_seed = 13813">>test_input
    echo "rlx_start = new">>test_input
    echo "rlx_state = rand_state">>test_input
+   echo "rlx_store = 0">>test_input
 
    (( ${test[$((i*14+13))]} > 18 )) && ((i--)) && continue;
    #cat test_input

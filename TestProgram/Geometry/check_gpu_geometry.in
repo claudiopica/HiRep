@@ -12,7 +12,8 @@ NP_Z = 1
 rlx_level = 1
 rlx_seed = 12345
 rlx_start = new
-rlx_state = rlx_statae
+rlx_state = rlx_state
+rlx_store = 0
 
 // Replicas
 N_REP = 1

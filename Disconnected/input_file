@@ -14,6 +14,7 @@ rlx_level = 1
 rlx_seed = 1
 rlx_start = new
 rlx_state = rand_state
+rlx_store = 0
 
 disc:mass = -0.6
 disc:precision = 1e-20

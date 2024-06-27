@@ -51,12 +51,12 @@ typedef struct input_glb {
 /* Global or common variables */
 typedef struct input_rlx {
     /* random numbers */
-    int rlxd_level, rlxd_seed;
+    int rlxd_level, rlxd_seed, rlxd_store;
     char rlxd_state[256];
     char rlxd_start[256];
 
     /* for the reading function */
-    input_record_t read[5];
+    input_record_t read[6];
 
 } input_rlx;
 
@@ -66,6 +66,7 @@ typedef struct input_rlx {
                   { "ranlux seed", "rlx_seed = %d", INT_T, &(varname).rlxd_seed },       \
                   { "ranlux state", "rlx_state = %s", STRING_T, &(varname).rlxd_state }, \
                   { "ranlux start", "rlx_start = %s", STRING_T, &(varname).rlxd_start }, \
+                  { "ranlux store", "rlx_store = %d", INT_T, &(varname).rlxd_store },    \
                   { NULL, NULL, INT_T, NULL } },                                         \
         .rlxd_state = "", .rlxd_level = 0                                                \
     }

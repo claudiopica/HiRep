@@ -19,7 +19,7 @@ rlx_level = 1
 rlx_seed = 83745
 rlx_start = new
 rlx_state = rand_state
-
+rlx_store = 0
 
 sf:precision = 1e-16
 sf:beta = 12.0

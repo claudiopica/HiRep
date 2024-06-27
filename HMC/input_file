@@ -12,8 +12,9 @@ N_REP = 1
 
 rlx_level = 1  
 rlx_seed = 60718  
-rlx_start = new
+rlx_start = continue 
 rlx_state = rlx_state
+rlx_store = 1 // Store random number state alongside each configuration for reproducibility (default 0=no, 1=yes)
 
 //Logger levels (default = -1)
 log:default = -1
