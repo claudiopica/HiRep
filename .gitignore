@@ -28,6 +28,7 @@ RenormalizationFactors/*
 Converter/*/*
 Converter/converter
 Converter/converter_openQCD
+Converter/stitch
 WilsonFlow/*
 Fortran/*
 Reweight/*
