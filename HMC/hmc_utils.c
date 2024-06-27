@@ -325,7 +325,6 @@ int save_conf(hmc_flow *rf, int id) {
     strcpy(confpath, add_dirname(rf->conf_dir, buf));
     write_gauge_field(confpath);
 
-
     if (rlx_var.rlxd_store) {
         char rlxpath[256];
         strcpy(rlxpath, add_rlx_ending(confpath));
