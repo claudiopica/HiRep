@@ -14,6 +14,7 @@ rlx_level = 1
 rlx_seed = 60718  
 rlx_start = new
 rlx_state = rlx_state
+rlx_store = 0
 
 //Logger levels (default = -1)
 log:default = -1

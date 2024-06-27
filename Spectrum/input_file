@@ -14,6 +14,7 @@ rlx_level = 1
 rlx_seed = 1
 rlx_start = new
 rlx_state = rand_state
+rlx_store = 0
 
 mes:csw = 1.0
 mes:precision = 1.e-14

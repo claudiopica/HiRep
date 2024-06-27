@@ -19,6 +19,7 @@ rlx_level = 1
 rlx_seed = 8374
 rlx_start = new
 rlx_state = rand_state
+rlx_store = 0
 
 mes:masses = 0
 mes:precision = 1e-24

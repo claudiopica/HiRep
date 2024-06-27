@@ -16,6 +16,7 @@ rlx_level = 1
 rlx_seed = 13813
 rlx_start = new
 rlx_state = rand_state
+rlx_store = 0
 
 //gauge fixing paramater
 gaugefix:maxit = 10000
