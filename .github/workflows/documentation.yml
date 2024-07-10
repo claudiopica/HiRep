@@ -30,7 +30,7 @@ jobs:
 
       - name: Restore Doxygen 1.9.4 from cache
         id: restore-doxygen
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: doxygen-1.9.4/bin
           key: doxygen-1.9.4
