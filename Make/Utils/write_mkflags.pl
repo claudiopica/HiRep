@@ -175,62 +175,62 @@ print $fh "REPR = $repr\n";
 # write gauge
 print $fh "GAUGE_GROUP = $gauge\n";
 # write T boundary condition
-print $fh "MACRO += $TBC\n";
+print $fh "MACRO += -D$TBC\n";
 # write X boundary condition
-print $fh "MACRO += $XBC\n";
+print $fh "MACRO += -D$XBC\n";
 # write Y boundary condition
-print $fh "MACRO += $YBC\n";
+print $fh "MACRO += -D$YBC\n";
 # write Z boundary condition
-print $fh "MACRO += $ZBC\n";
+print $fh "MACRO += -D$ZBC\n";
 # write twisted boundary condition
-$xyz_twist && print $fh "MACRO += GAUGE_SPATIAL_TWIST\n";
+$xyz_twist && print $fh "MACRO += -DGAUGE_SPATIAL_TWIST\n";
 # write sf half field boundary condition
-$sfhalfbc && print $fh "MACRO += HALFBG_SF\n";
+$sfhalfbc && print $fh "MACRO += -DHALFBG_SF\n";
 # write smearing
-$smearing && print $fh "MACRO += WITH_SMEARING\n";
+$smearing && print $fh "MACRO += -DWITH_SMEARING\n";
 # write clover
-$clover && print $fh "MACRO += WITH_CLOVER\n";
+$clover && print $fh "MACRO += -DWITH_CLOVER\n";
 # write expclover
-$expclover && print $fh "MACRO += WITH_EXPCLOVER\n";
+$expclover && print $fh "MACRO += -DWITH_EXPCLOVER\n";
 # write eo preconditioning
-$eoprec && print $fh "MACRO += UPDATE_EO\n";
+$eoprec && print $fh "MACRO += -DUPDATE_EO\n";
 # write quaternions 
-$quat && print $fh "MACRO += WITH_QUATERNIONS\n";
+$quat && print $fh "MACRO += -DWITH_QUATERNIONS\n";
 # write ndebug
-$ndebug && print $fh "MACRO += NDEBUG\n";
+$ndebug && print $fh "MACRO += -DNDEBUG\n";
 # write dphi float
-$dfloat && print $fh "MACRO += DPHI_FLT\n";
+$dfloat && print $fh "MACRO += -DDPHI_FLT\n";
 # write check spinor
-$scheck && print $fh "MACRO += CHECK_SPINOR_MATCHING\n";
+$scheck && print $fh "MACRO += -DCHECK_SPINOR_MATCHING\n";
 # write mpitiming
-$mpit && print $fh "MACRO += MPI_TIMING\n";
+$mpit && print $fh "MACRO += -DMPI_TIMING\n";
 # write io flush
-$iof && print $fh "MACRO += IO_FLUSH\n";
+$iof && print $fh "MACRO += -DIO_FLUSH\n";
 # write unroll representation
-$unrollr && print $fh "MACRO += UNROLL_GROUP_REPRESENT\n";
+$unrollr && print $fh "MACRO += -DUNROLL_GROUP_REPRESENT\n";
 # write timing
-$timing && print $fh "MACRO += TIMING\n";
+$timing && print $fh "MACRO += -DTIMING\n";
 # write timing
-$btiming && print $fh "MACRO += TIMING_WITH_BARRIERS\n";
+$btiming && print $fh "MACRO += -DTIMING_WITH_BARRIERS\n";
 # write memory
-$mem && print $fh "MACRO += AMALLOC_MEASURE\n";
+$mem && print $fh "MACRO += -DAMALLOC_MEASURE\n";
 # write force
-$force && print $fh "MACRO += MEASURE_FORCE\n";
+$force && print $fh "MACRO += -DMEASURE_FORCE\n";
 # write avx2
-$avx2 && print $fh "MACRO += AVX2_HIREP\n";
+$avx2 && print $fh "MACRO += -DAVX2_HIREP\n";
 # write vect
-$vect && print $fh "MACRO += SIMD_VECTOR_HIREP\n";
+$vect && print $fh "MACRO += -DSIMD_VECTOR_HIREP\n";
 # write fuse
-$fuse && print $fh "MACRO += WITH_FUSE_MASTER_FOR\n";
+$fuse && print $fh "MACRO += -DWITH_FUSE_MASTER_FOR\n";
 # write hwloc
-$hwloc && print $fh "MACRO += HWLOC\n";
+$hwloc && print $fh "MACRO += -DHWLOC\n";
 if ($hwloc) {
     $ldflags .=" -lhwloc";
 }
 # write mpi
-$mpi && print $fh "MACRO += WITH_MPI\n";
+$mpi && print $fh "MACRO += -DWITH_MPI\n";
 # write GPU
-$gpu && print $fh "MACRO += WITH_GPU\n";
+$gpu && print $fh "MACRO += -DWITH_GPU\n";
 # openMP
 if($omp) {
     $cflags .=" -fopenmp";
