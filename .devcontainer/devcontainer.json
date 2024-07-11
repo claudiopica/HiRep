@@ -14,7 +14,7 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": {
 		"git-hooks": "ln -sf /workspaces/${localWorkspaceFolderBasename}/Make/git-hooks-pre-commit /workspaces/${localWorkspaceFolderBasename}/.git/hooks/pre-commit",
-		"python3": "ln -s /usr/bin/python3 /usr/bin/python"
+		"python3": "sudo ln -s /usr/bin/python3 /usr/bin/python"
 	},
 	"postStartCommand": {
 		"setupenv": "printenv > .devcontainer/container.env"
