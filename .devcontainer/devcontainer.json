@@ -1,0 +1,37 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/cpp
+{
+	"name": "HiRep",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"containerEnv": { "TZ": "Europe/Rome" },
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": {
+		"git-hooks": "ln -sf /workspaces/${localWorkspaceFolderBasename}/Make/git-hooks-pre-commit /workspaces/${localWorkspaceFolderBasename}/.git/hooks/pre-commit",
+		"python3": "sudo ln -s /usr/bin/python3 /usr/bin/python"
+	},
+	"postStartCommand": {
+		"setupenv": "printenv > .devcontainer/container.env"
+	},
+	// Configure tool-specific properties.
+	// "customizations": {},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"eamodio.gitlens",
+				"ms-vscode-remote.remote-containers",
+				"ms-vscode.cpptools-extension-pack",
+				"ms-azuretools.vscode-dockert",
+				"ms-vscode.cpptools-themes"
+			]
+		}
+	}
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

@@ -1,0 +1,1 @@
+docker exec -it -w /workspaces/$(basename `pwd`) -u vscode --env-file="$(pwd)/.devcontainer/container.env" $(awk -F'=' '$1=="HOSTNAME" { print $2 }' "$(pwd)/.devcontainer/container.env") zsh
