@@ -1,0 +1,4 @@
+<map id="error_gpu.h" name="error_gpu.h">
+<area shape="rect" id="node1" title="Error checking for GPU." alt="" coords="5,5,101,32"/>
+<area shape="rect" id="node2" href="$d3/d93/gpu_8h.html" title="Basic gpu imports and structs. Include this in files that define GPU logic." alt="" coords="24,80,83,107"/>
+</map>

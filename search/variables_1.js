@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['gpu_5fptr_0',['gpu_ptr',['../d2/d0e/structsuNg__field.html#a03e0d4bad7fdaad70dce74146f8cc71b',1,'suNg_field::gpu_ptr()'],['../d6/d10/structsuNg__scalar__field.html#aed11ed8d4e7f165b3e4c5a7954a6d7d6',1,'suNg_scalar_field::gpu_ptr()'],['../d4/d1f/structsuNg__field__flt.html#a6abf95c3e413043300be307c0637a205',1,'suNg_field_flt::gpu_ptr()'],['../d9/d4a/structsuNf__field.html#a458df33827c44f55aec839100ab52c01',1,'suNf_field::gpu_ptr()'],['../d6/d54/structsuNf__field__flt.html#a00d443332ba810837e122923801dfca6',1,'suNf_field_flt::gpu_ptr()'],['../d0/da8/structspinor__field.html#a5d53b857af43fe10d73a7e95a37f1f03',1,'spinor_field::gpu_ptr()'],['../d4/dce/structspinor__field__flt.html#a4d124859e80c61dcb938c6b7ee6b48cf',1,'spinor_field_flt::gpu_ptr()'],['../db/dc8/structsuNg__av__field.html#a70a4c6f592b103ce29ae8a57033cc0a0',1,'suNg_av_field::gpu_ptr()'],['../d8/daf/structscalar__field.html#ab47e8ea4497b0815ea4acb5d740563d6',1,'scalar_field::gpu_ptr()']]],
+  ['gsize_5fspinor_1',['gsize_spinor',['../df/da2/structgeometry__descriptor.html#a57dce3bf71b21629b94236625e0f3f1f',1,'geometry_descriptor']]]
+];

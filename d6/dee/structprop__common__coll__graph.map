@@ -1,0 +1,4 @@
+<map id="prop_common" name="prop_common">
+<area shape="rect" id="node1" title="Bundle of propagators with zero momentum." alt="" coords="5,124,120,151"/>
+<area shape="rect" id="node2" href="$d0/da8/structspinor__field.html" title="Spinor field array containing SU(N_f) spinors in chosen fermion representation." alt="" coords="14,5,111,32"/>
+</map>

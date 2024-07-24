@@ -1,0 +1,13 @@
+<map id="global.h" name="global.h">
+<area shape="rect" id="node1" title="Global parameters and arrays." alt="" coords="534,5,609,32"/>
+<area shape="rect" id="node2" href="$d8/d4c/check__options_8h.html" title="Validation checks of the input parameters specified in the input file and error messages that give in..." alt="" coords="5,80,132,107"/>
+<area shape="rect" id="node3" href="$d4/d1d/core__utils_8h.html" title="Macros to declare global variables." alt="" coords="156,80,253,107"/>
+<area shape="rect" id="node4" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="277,80,372,107"/>
+<area shape="rect" id="node5" title=" " alt="" coords="397,80,471,107"/>
+<area shape="rect" id="node6" href="$d9/da0/flags_8h.html" title="Global flags that indicate for example that a certain field has been updated." alt="" coords="496,80,561,107"/>
+<area shape="rect" id="node7" href="$d4/d1a/hr__mpi_8h.html" title="Setup for mpi." alt="" coords="745,155,824,181"/>
+<area shape="rect" id="node8" href="$d3/d93/gpu_8h.html" title="Basic gpu imports and structs. Include this in files that define GPU logic." alt="" coords="586,80,645,107"/>
+<area shape="rect" id="node9" href="$d8/d5a/input__par_8h_source.html" title=" " alt="" coords="593,155,705,181"/>
+<area shape="rect" id="node10" title=" " alt="" coords="856,155,959,181"/>
+<area shape="rect" id="node11" href="$d3/ded/spinor__field_8h.html" title="The elementary site structures defined in suN.h are used in this file to define field structures that..." alt="" coords="770,80,879,107"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="global_gpu.h" name="global_gpu.h">
+<area shape="rect" id="node1" title="Global variables need to be declared once in the main program and then again as extern variables in t..." alt="" coords="104,5,209,32"/>
+<area shape="rect" id="node2" href="$d4/d1d/core__utils_8h.html" title="Macros to declare global variables." alt="" coords="5,80,103,107"/>
+<area shape="rect" id="node3" href="$d3/d93/gpu_8h.html" title="Basic gpu imports and structs. Include this in files that define GPU logic." alt="" coords="127,80,186,107"/>
+<area shape="rect" id="node4" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="211,80,305,107"/>
+</map>

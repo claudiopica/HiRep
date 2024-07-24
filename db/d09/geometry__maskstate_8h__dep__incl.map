@@ -1,0 +1,4 @@
+<map id="geometry_maskstate.h" name="geometry_maskstate.h">
+<area shape="rect" id="node1" title="Mask structs that can give information on whether neighbors of a given site are located in the buffer..." alt="" coords="5,5,179,32"/>
+<area shape="rect" id="node2" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="45,80,139,107"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="hr_complex.h" name="hr_complex.h">
+<area shape="rect" id="node1" title="Type definitions and macros for complex numbers." alt="" coords="441,5,552,32"/>
+<area shape="rect" id="node2" href="$d3/d99/avr__plaquette_8h.html" title="Plaquette evaluation functions." alt="" coords="5,80,129,107"/>
+<area shape="rect" id="node3" href="$d6/d08/global__sum_8h.html" title="Functions for global reduction operations across nodes." alt="" coords="154,80,263,107"/>
+<area shape="rect" id="node4" href="$db/d97/glueballs_8h_source.html" title=" " alt="" coords="287,80,381,107"/>
+<area shape="rect" id="node5" href="$d8/d1f/libhr__core_8h_source.html" title=" " alt="" coords="405,80,503,107"/>
+<area shape="rect" id="node6" href="$dc/d9c/linear__algebra_8h.html" title="Linear algebra operations on spinors both for CPU and with GPU." alt="" coords="433,155,560,181"/>
+<area shape="rect" id="node7" href="$d3/d6f/linear__solvers_8h_source.html" title=" " alt="" coords="578,80,703,107"/>
+<area shape="rect" id="node8" href="$d0/df3/trunc__hairpin_8h_source.html" title=" " alt="" coords="728,80,847,107"/>
+<area shape="rect" id="node9" href="$d3/df8/wilsonflow_8h_source.html" title=" " alt="" coords="871,80,973,107"/>
+</map>

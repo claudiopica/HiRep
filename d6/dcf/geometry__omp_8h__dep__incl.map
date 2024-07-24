@@ -1,0 +1,5 @@
+<map id="geometry_omp.h" name="geometry_omp.h">
+<area shape="rect" id="node1" title="This file contains useful macros that perform OpenMP reduction operations and are necessary to define..." alt="" coords="5,5,139,32"/>
+<area shape="rect" id="node2" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="25,155,119,181"/>
+<area shape="rect" id="node3" href="$d3/d77/geometry__fuse_8h.html" title="FIXME: Add docs." alt="" coords="58,80,190,107"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="new_geometry.h" name="new_geometry.h">
+<area shape="rect" id="node1" title="Functions needed for the new geometry implementation that will replace the current geometry in the fu..." alt="" coords="19,5,148,32"/>
+<area shape="rect" id="node2" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="36,155,131,181"/>
+<area shape="rect" id="node3" href="$d9/d46/geometry__init_8h.html" title="Initialization functions, that determine all important parameters of the geometry,..." alt="" coords="21,80,146,107"/>
+<area shape="rect" id="node4" href="$d9/de8/gpu__geometry_8h_source.html" title=" " alt="" coords="171,80,297,107"/>
+</map>
