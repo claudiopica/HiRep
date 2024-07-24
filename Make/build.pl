@@ -251,6 +251,7 @@ my @libs = ("libhrobservables.a", "libhr.a", "libhrobservables.a"); #order is im
                      "archive_ascii.c", "archive_fortran.c", "archive_openQCD.c", ],
     "converter_openQCD" => [ "converter_openQCD.c", "archive_eolexi.c", "archive_milc.c", "archive_more_mpieo.c", 
                              "archive_ascii.c", "archive_fortran.c", "archive_openQCD.c", ],
+    "stitch" => [ "stitch.c", ]
   );
 
   add_exes($topdir, \%exes, \@libs);
