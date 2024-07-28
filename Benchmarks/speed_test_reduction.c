@@ -11,7 +11,6 @@
 int main(int argc, char *argv[]) {
     int n_warmup = 100;
     double time_target = 5000.;
-    int ninputs = 1;
     int n_reps = 0;
     Timer clock;
 

@@ -138,17 +138,17 @@ int main(int argc, char *argv[]) {
 
 #ifdef DPHI_FLT
 
-    _TEST_GPU_OP_FLT(errors, "Dphi_flt", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt(-hmass, &in_flt[1], in_flt);
-                     Dphi_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
+    _TEST_GPU_OP(errors, "Dphi_flt", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt(-hmass, &in_flt[1], in_flt);
+                 Dphi_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
 
-    _TEST_GPU_OP_FLT(errors, "Dphi_flt_", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt_(&in_flt[1], , in_flt);
-                     Dphi_flt_cpu_(&in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
+    _TEST_GPU_OP(errors, "Dphi_flt_", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt_(&in_flt[1], in_flt);
+                 Dphi_flt_cpu_(&in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
 
-    _TEST_GPU_OP_FLT(errors, "g5Dphi_flt", ninputs + noutputs + 1, in_flt, in_flt + 1, g5Dphi_flt(-hmass, &in_flt[1], in_flt);
-                     g5Dphi_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
+    _TEST_GPU_OP(errors, "g5Dphi_flt", ninputs + noutputs + 1, in_flt, in_flt + 1, g5Dphi_flt(-hmass, &in_flt[1], in_flt);
+                 g5Dphi_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
 
-    _TEST_GPU_OP_FLT(errors, "Q^2 flt", ninputs + noutputs + 1, in_flt, in_flt + 1, g5Dphi_sq_flt(-hmass, &in_flt[1], in_flt);
-                     g5Dphi_sq_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_SQ_FLT_TEST);
+    _TEST_GPU_OP(errors, "Q^2 flt", ninputs + noutputs + 1, in_flt, in_flt + 1, g5Dphi_sq_flt(-hmass, &in_flt[1], in_flt);
+                 g5Dphi_sq_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_SQ_FLT_TEST);
 #endif
 
 #ifdef WITH_CLOVER
@@ -190,8 +190,8 @@ int main(int argc, char *argv[]) {
 
 #ifdef DPHI_FLT
 
-    _TEST_GPU_OP_FLT(errors, "Dphi_flt_ (OE)", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt_(&in_flt[1], in_flt);
-                     Dphi_flt_cpu_(&in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
+    _TEST_GPU_OP(errors, "Dphi_flt_ (OE)", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt_(&in_flt[1], in_flt);
+                 Dphi_flt_cpu_(&in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
 
 #endif
 
@@ -203,8 +203,8 @@ int main(int argc, char *argv[]) {
 
 #ifdef DPHI_FLT
 
-    _TEST_GPU_OP_FLT(errors, "Dphi_flt_ (EO)", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt_(&in_flt[1], in_flt);
-                     Dphi_flt_cpu_(&in_flt[1], in_flt);, "GPU_TEST", EPSILON_TEST);
+    _TEST_GPU_OP(errors, "Dphi_flt_ (EO)", ninputs + noutputs + 1, in_flt, in_flt + 1, Dphi_flt_(&in_flt[1], in_flt);
+                 Dphi_flt_cpu_(&in_flt[1], in_flt);, "GPU_TEST", EPSILON_TEST);
 
 #endif
 
@@ -225,13 +225,13 @@ int main(int argc, char *argv[]) {
 
 #ifdef DPHI_FLT
 
-    _TEST_GPU_OP_FLT(errors, "Dphi_eopre_flt", ninputs + noutputs + 1, in_flt, in_flt + 1,
-                     Dphi_eopre_flt(-hmass, &in_flt[1], in_flt);
-                     Dphi_eopre_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
+    _TEST_GPU_OP(errors, "Dphi_eopre_flt", ninputs + noutputs + 1, in_flt, in_flt + 1,
+                 Dphi_eopre_flt(-hmass, &in_flt[1], in_flt);
+                 Dphi_eopre_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
 
-    _TEST_GPU_OP_FLT(errors, "Q_eopre_flt", ninputs + noutputs + 1, in_flt, in_flt + 1,
-                     g5Dphi_eopre_flt(-hmass, &in_flt[1], in_flt);
-                     g5Dphi_eopre_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
+    _TEST_GPU_OP(errors, "Q_eopre_flt", ninputs + noutputs + 1, in_flt, in_flt + 1,
+                 g5Dphi_eopre_flt(-hmass, &in_flt[1], in_flt);
+                 g5Dphi_eopre_flt_cpu(-hmass, &in_flt[1], in_flt);, "GPU_TEST", EPSILON_FLT_TEST);
 
 #endif
 

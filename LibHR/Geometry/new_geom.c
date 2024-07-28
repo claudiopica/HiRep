@@ -763,6 +763,8 @@ static void gd_set_copy(geometry_descriptor *gd) {
     gd->copy_to = NULL;
     gd->copy_len = NULL;
     gd->copy_shift = 0;
+    gd->SAP = 0;
+    gd->parity = 0;
 }
 
 static void gd_free() {

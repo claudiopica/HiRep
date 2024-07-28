@@ -127,6 +127,8 @@ typedef struct geometry_descriptor {
 #ifdef WITH_NEW_GEOMETRY
     gd_type desc;
 #endif
+    int SAP;
+    int parity;
 } geometry_descriptor;
 
 #ifdef __cplusplus
