@@ -1,5 +1,5 @@
 /****************************************************************************
-
+*
 *
 *******************************************************************************/
 #include "check_integrator_1.h"
@@ -10,8 +10,12 @@
 hmc_flow flow = init_hmc_flow(flow);
 
 int main(int argc, char *argv[]) {
+#ifdef WITH_GPU
+    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
+#endif
+
     int return_value = 0;
-    double res, elapsed_lf, elapsed_o2, elapsed_o4;
+    double res, elapsed_lf, elapsed_o2, elapsed_o4, elapsed_fg;
     /* setup process communications */
     setup_process(&argc, &argv);
 
@@ -68,7 +72,7 @@ int main(int argc, char *argv[]) {
         if (res > 1.0e-12) { return_value++; }
     }
     if (1 == 1) {
-        double rt0[SCALING_RANGE], rt1[SCALING_RANGE], rt2[SCALING_RANGE];
+        double rt0[SCALING_RANGE], rt1[SCALING_RANGE], rt2[SCALING_RANGE], rt3[SCALING_RANGE];
 
         for (int i = 0; i < SCALING_RANGE; i++) {
             set_integrator_type(&(flow.hmc_v->hmc_p), LEAPFROG);
@@ -93,11 +97,18 @@ int main(int argc, char *argv[]) {
             timeval_subtract(&etime, &end, &start);
             elapsed_o4 = etime.tv_sec * 1000. + etime.tv_usec * 0.001;
 
+            set_integrator_type(&(flow.hmc_v->hmc_p), FORCE_GRADIENT);
+            gettimeofday(&start, 0);
+            rt3[i] = integrate_ghmc(1, &(flow.hmc_v->hmc_p));
+            gettimeofday(&end, 0);
+            timeval_subtract(&etime, &end, &start);
+            elapsed_fg = etime.tv_sec * 1000. + etime.tv_usec * 0.001;
+
             lprintf(
                 "MAIN", 0,
-                "Delta H for first level monomial nsteps: %d dt: %lf LF: %1.16e %1.16e msec  O2: %1.16e %1.16e msec  O4: %1.16e %1.16e msec\n\n",
+                "Delta H for first level monomial nsteps: %d dt: %lf LF: %1.16e %1.16e msec  O2: %1.16e %1.16e msec  O4: %1.16e %1.16e msec  FG: %1.16e %1.16e msec\n\n",
                 i * 10 + 20, 1.0 / ((double)(i * 10 + 20)), fabs(rt0[i]), elapsed_lf, fabs(rt1[i]), elapsed_o2, fabs(rt2[i]),
-                elapsed_o4);
+                elapsed_o4, fabs(rt3[i]), elapsed_fg);
         }
 
         double scaling_deviation1;
