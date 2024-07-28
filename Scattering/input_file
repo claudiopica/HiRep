@@ -17,6 +17,7 @@ rlx_level = 1
 rlx_seed = 83745
 rlx_start = new
 rlx_state = rand_state
+rlx_store = 0
 
 mes:masses = -0.605
 mes:csw = 1.23

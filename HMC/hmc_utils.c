@@ -123,6 +123,12 @@ static char *add_dirname(char *dirname, char *filename) {
     return strcat(buf, filename);
 }
 
+static char *add_rlx_ending(char *string) {
+    static char buf[256];
+    strcpy(buf, string);
+    return strcat(buf, ".rlx");
+}
+
 /* convert string to lowercase */
 static void slower(char *str) {
     while (*str) {
@@ -315,8 +321,15 @@ int save_conf(hmc_flow *rf, int id) {
     char buf[256];
 
     mk_gconf_name(buf, rf, id);
-    write_gauge_field(add_dirname(rf->conf_dir, buf));
+    char confpath[256];
+    strcpy(confpath, add_dirname(rf->conf_dir, buf));
+    write_gauge_field(confpath);
 
+    if (rlx_var.rlxd_store) {
+        char rlxpath[256];
+        strcpy(rlxpath, add_rlx_ending(confpath));
+        write_ranlxd_state(rlxpath);
+    }
     return 0;
 }
 
