@@ -105,7 +105,6 @@ int main(int argc, char *argv[]) {
         }
 
         lprintf("MAIN", 0, "Configuration from %s\n", cnfg_filename);
-        /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
         read_gauge_field(cnfg_filename);
         represent_gauge_field();
 
@@ -121,20 +120,11 @@ int main(int argc, char *argv[]) {
 
     if (list != NULL) { fclose(list); }
 
-    finalize_process();
-
-    free_BCs();
-
-    free_suNg_field(u_gauge);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_suNf_field(u_gauge_f);
-#endif
+    double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+    lprintf("TIMING", 0, "Inversions and contractions for configuration  [%s] done [%lf sec]\n", cnfg_filename, elapsed_sec);
 
     /* close communications */
     finalize_process();
-
-    double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
-    lprintf("TIMING", 0, "Inversions and contractions for configuration  [%s] done [%lf sec]\n", cnfg_filename, elapsed_sec);
 
     return 0;
 }

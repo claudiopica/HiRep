@@ -321,6 +321,9 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
         {
             create_z2_volume_source(source);
             calc_propagator(prop, source, 1); // No dilution
+#ifdef WITH_GPU
+            copy_from_gpu(prop);
+#endif
 
             lprintf("CORR", 0, "Start to perform the contractions ... \n");
             measure_bilinear_loops_spinorfield(prop, source, k, n_mom, swc, ret);

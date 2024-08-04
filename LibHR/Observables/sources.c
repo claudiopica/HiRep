@@ -71,6 +71,9 @@ static int random_tau() {
 void create_point_source(spinor_field *source, int tau, int color) {
     int beta, ix;
     for (beta = 0; beta < 4; ++beta) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[beta]);
+#endif
         zero_spinor_field(&source[beta]);
     }
     if (COORD[0] == tau / T && COORD[1] == 0 && COORD[2] == 0 && COORD[3] == 0) {
@@ -92,6 +95,9 @@ void create_full_point_source(spinor_field *source, int tau) {
     int col, beta, idx, ix;
 
     for (beta = 0; beta < 4 * NF; ++beta) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[beta]);
+#endif
         zero_spinor_field(&source[beta]);
     }
 
@@ -116,6 +122,9 @@ void create_full_point_source(spinor_field *source, int tau) {
 void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, int color) {
     int beta, ix;
     for (beta = 0; beta < 4; ++beta) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[beta]);
+#endif
         zero_spinor_field(&source[beta]);
     }
     if (zerocoord[0] <= t && t < zerocoord[0] + T && zerocoord[1] <= x && x < zerocoord[1] + X && zerocoord[2] <= y &&
@@ -183,6 +192,9 @@ void create_diluted_source_equal_atau_eo(spinor_field *source, int tau) {
     int i;
     // int tau = random_tau();
     for (i = 0; i < 4; ++i) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[i]);
+#endif
         zero_spinor_field(&source[i]);
     }
     if (zerocoord[0] <= tau && tau < zerocoord[0] + T) { // Check that tau is in this thread.
@@ -212,6 +224,9 @@ int create_diluted_source_equal(spinor_field *source) {
     int i;
     int tau = random_tau();
     for (i = 0; i < 4; ++i) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[i]);
+#endif
         zero_spinor_field(&source[i]);
     }
 
@@ -245,6 +260,9 @@ void create_diluted_source_equal_atau(spinor_field *source, int tau) {
     suNf_vector *v1, *v2;
     int i;
     for (i = 0; i < 4; ++i) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[i]);
+#endif
         zero_spinor_field(&source[i]);
     }
 
@@ -302,6 +320,9 @@ void create_noise_source_equal_eo(spinor_field *source) {
     int i;
 
     for (i = 0; i < 4; ++i) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[i]);
+#endif
         zero_spinor_field(&source[i]);
     }
 
@@ -338,6 +359,9 @@ void create_noise_source_equal_oe(spinor_field *source) {
     int i;
 
     for (i = 0; i < 4; ++i) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[i]);
+#endif
         zero_spinor_field(&source[i]);
     }
 
@@ -374,6 +398,9 @@ void create_diluted_source_equal_atau_col(spinor_field *source, int tau, int col
     hr_complex *v1;
     int i;
     for (i = 0; i < 4; ++i) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[i]);
+#endif
         zero_spinor_field(&source[i]);
     }
     if (zerocoord[0] <= tau && tau < zerocoord[0] + T) { // Check that tau is in this thread.
@@ -404,6 +431,9 @@ void create_noise_source_equal_col_dil(spinor_field *source, int col) {
     int i;
 
     for (i = 0; i < 4; ++i) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[i]);
+#endif
         zero_spinor_field(&source[i]);
     }
 
@@ -436,6 +466,9 @@ void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color) {
     int beta;
 
     for (beta = 0; beta < 4; ++beta) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[beta]);
+#endif
         zero_spinor_field(&source[beta]);
     }
 
@@ -467,6 +500,9 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field *prop) 
     suNf_propagator sp0, sp1;
 
     for (beta = 0; beta < 4 * NF; ++beta) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[beta]);
+#endif
         zero_spinor_field(&source[beta]);
     }
 
@@ -509,6 +545,9 @@ void create_sequential_source_stoch(spinor_field *source, int tf, spinor_field *
     suNf_propagator sp0, sp1;
 
     for (beta = 0; beta < 4; ++beta) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[beta]);
+#endif
         zero_spinor_field(&source[beta]);
     }
 
@@ -570,6 +609,9 @@ void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, in
     double pdotx;
 
     for (beta = 0; beta < 4; ++beta) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[beta]);
+#endif
         zero_spinor_field(&source[beta]);
     }
     lprintf("Source", 0, "mom = (%d,%d,%d,%d)", pt, px, py, pz);
@@ -606,6 +648,9 @@ void add_momentum(spinor_field *out, spinor_field *in, int px, int py, int pz) {
     double pdotx;
 
     for (beta = 0; beta < 4; ++beta) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&out[beta]);
+#endif
         zero_spinor_field(&out[beta]);
     }
     lprintf("Adding momentum to the source", 0, "mom = (%d,%d,%d)", px, py, pz);
@@ -647,6 +692,9 @@ void create_diluted_volume_source(spinor_field *source, int parity_component, in
     int beta, b;
 
     for (beta = 0; beta < 4; ++beta) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[beta]);
+#endif
         zero_spinor_field(&source[beta]);
     }
 

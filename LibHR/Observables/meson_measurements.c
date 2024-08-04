@@ -13,6 +13,7 @@
 #include "random.h"
 #include "inverters.h"
 
+// TODO: port these (over copies...)
 static void fix_T_bc(int tau) {
     int index;
     int ix, iy, iz;
@@ -97,6 +98,12 @@ void measure_spectrum_pt(int tau, int nm, double *m, int n_mom, int conf_num, do
     for (k = 0; k < NF; ++k) {
         create_point_source(source, tau, k);
         calc_propagator(prop + 4 * k, source, 4); // 4 for spin components
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop + 4 * k + beta);
+        }
+#endif
+        if (k == 0) { printf("prop no 1 @ idx 5: %0.15e\n", creal((*_FIELD_AT(prop, 5)).c[0].c[0])); }
         if (n_mom > 1) {
             measure_point_mesons_momenta(meson_correlators, prop + 4 * k, source, nm, tau, n_mom);
         } else {
@@ -168,6 +175,11 @@ void measure_spectrum_pt_ext(int tau, int nm, double *m, int n_mom, int conf_num
     for (k = 0; k < NF; ++k) {
         create_point_source(source, tau, k);
         calc_propagator(prop_p, source, 4); // 4 for spin components
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop_p + beta);
+        }
+#endif
         if (n_mom > 0) {
             measure_point_mesons_momenta_ext(meson_correlators, prop_p, source, nm, tau, n_mom, 0);
         } else {
@@ -175,6 +187,11 @@ void measure_spectrum_pt_ext(int tau, int nm, double *m, int n_mom, int conf_num
         }
         flip_T_bc(tau);
         calc_propagator(prop_a, source, 4); // 4 for spin components
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop_a + beta);
+        }
+#endif
         flip_T_bc(tau);
         for (l = 0; l < 4 * nm; ++l) {
             add_assign_spinor_field(&prop_p[l], &prop_a[l]);
@@ -219,6 +236,11 @@ void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double *m, int n_mom, 
     for (k = 0; k < NF; ++k) {
         create_point_source(source, tau, k);
         calc_propagator(prop, source, 4); // 4 for spin components
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop + beta);
+        }
+#endif
         if (n_mom > 0) {
             measure_point_mesons_momenta(meson_correlators, prop, source, nm, tau, n_mom);
         } else {
@@ -272,6 +294,12 @@ void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_n
         represent_gauge_field();
         calc_propagator_eo(prop_d, source, 4); // 4 for spin dilution
 
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop_u + beta);
+            copy_from_gpu(prop_d + beta);
+        }
+#endif
         measure_diquarks(meson_correlators, prop_u, prop_d, source, nm, tau);
 
         copy_suNg_field(u_gauge, u_gauge_old);
@@ -308,6 +336,11 @@ void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double
         tau = create_diluted_source_equal_eo(source);
 
         calc_propagator_eo(prop, source, 4); // 4 for spin dilution
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop + beta);
+        }
+#endif
 
         measure_mesons(meson_correlators, prop, source, nm, tau);
     }
@@ -372,6 +405,12 @@ void measure_spectrum_semwall_ext(int nm, double *m, int nhits, int conf_num, do
             add_assign_spinor_field(&prop_p[l], &prop_a[l]);
             mul_spinor_field(&prop_p[l], 0.5, &prop_p[l]);
         }
+#ifdef WITH_GPU
+        for (int beta = 0; beta < dilution; beta++) {
+            copy_from_gpu(prop_p + beta);
+            copy_from_gpu(prop_a + beta);
+        }
+#endif
         measure_mesons_ext(meson_correlators, prop_p, source, nm, tau, 1);
         for (l = 0; l < dilution * nm; ++l) {
             sub_assign_spinor_field(&prop_p[l], &prop_a[l]);
@@ -402,6 +441,11 @@ void measure_spectrum_semwall_fixedbc(int dt, int nm, double *m, int nhits, int 
         tau = create_diluted_source_equal_eo(source);
         fix_T_bc(tau - dt);
         calc_propagator_eo(prop, source, 4); // 4 for spin dilution
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop + beta);
+        }
+#endif
         measure_mesons(meson_correlators, prop, source, nm, tau);
         copy_suNf_field(u_gauge_f, u_gauge_old);
     }
@@ -444,6 +488,11 @@ void measure_spectrum_gfwall(int nm, double *m, int conf_num, double precision, 
     for (k = 0; k < NF; ++k) {
         create_gauge_fixed_wall_source(source, tau, k);
         calc_propagator(prop, source, 4); // 4 for spin dilution
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop + beta);
+        }
+#endif
         measure_mesons(meson_correlators, prop, source, nm, tau);
     }
     print_mesons(meson_correlators, GLB_VOL3, conf_num, nm, m, GLB_T, 1, "DEFAULT_GFWALL");
@@ -489,6 +538,11 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, do
     for (k = 0; k < NF; ++k) {
         create_gauge_fixed_wall_source(source, tau, k);
         calc_propagator(prop, source, 4); // 4 for spin dilution
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop + beta);
+        }
+#endif
         measure_mesons(meson_correlators, prop, source, nm, tau);
     }
     print_mesons(meson_correlators, GLB_VOL3, conf_num, nm, m, GLB_T, 1, "DIRICHLET_GFWALL");
@@ -526,6 +580,11 @@ void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num,
         for (beta = 0; beta < 4; beta++) {
             source[beta].type = &glattice;
         }
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop + beta);
+        }
+#endif
         measure_mesons(discon_correlators, prop, source, nm, 0);
         sprintf(label, "src %d DISCON_SEMWALL", k);
         print_mesons(discon_correlators, GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, label);
@@ -568,7 +627,14 @@ void measure_spectrum_discon_gfwall(int nm, double *m, int conf_num, double prec
         for (k = 0; k < NF; ++k) {
             create_gauge_fixed_wall_source(source, tau, k);
             calc_propagator(prop, source, 4); // 4 for spin dilution
+#ifdef WITH_GPU
+            for (int beta = 0; beta < 4; beta++) {
+                copy_from_gpu(prop + beta);
+            }
+#endif
             create_point_source(source, tau, k); // to get the contraction right
+            // Warning: should the sources ever be fully ported instead of just copied,
+            // there needs to be a copy from the GPU here.
             measure_mesons(discon_correlators, prop, source, nm, 0);
         }
     }
@@ -598,6 +664,11 @@ void measure_spectrum_discon_volume(int nm, double *m, int conf_num, double prec
     for (p = 0; p < dil; p++) {
         create_diluted_volume_source(source, p, dil);
         calc_propagator(prop, source, 4); // spin dilution
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop + beta);
+        }
+#endif
         measure_mesons(discon_correlators, prop, source, nm, 0);
     }
     print_mesons(discon_correlators, 1., conf_num, nm, m, GLB_T, 1, "DISCON_VOLUME");
@@ -639,7 +710,12 @@ void measure_formfactor_pt(int ti, int tf, int nm, double *m, int n_mom, int con
     }
     create_sequential_source(source_seq, tf, prop_i);
     calc_propagator(prop_seq, source_seq, 4 * NF);
-
+#ifdef WITH_GPU
+    for (int beta = 0; beta < 4 * NF; beta++) {
+        copy_from_gpu(prop_i + beta);
+        copy_from_gpu(prop_seq + beta);
+    }
+#endif
     measure_formfactors(prop_seq, prop_i, source_seq, nm, ti, tf, n_mom, pt); // eats two propagators
     print_formfactor(conf_num, nm, m, n_mom, "DEFAULT_FF_POINT", tf - ti);
     free_spinor_field(source);
@@ -689,6 +765,13 @@ void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_m
     }
     create_sequential_source(source_seq, tf, prop_i); // prop_i = S(x,0);
     calc_propagator(prop_seq, source_seq, 4 * NF); // prop_seq = S(y,x) S(x,0) delta(x, (2,0,0,0) )
+
+#ifdef WITH_GPU
+    for (int beta = 0; beta < 4 * NF; beta++) {
+        copy_from_gpu(prop_i + beta);
+        copy_from_gpu(prop_seq + beta);
+    }
+#endif
 
     measure_formfactors(prop_seq, prop_i, source, nm, ti, tf, n_mom, pt); // eats two propagators
 
