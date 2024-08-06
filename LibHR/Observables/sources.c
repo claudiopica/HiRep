@@ -155,6 +155,9 @@ int create_diluted_source_equal_eo(spinor_field *source) {
     int i;
     int tau = random_tau();
     for (i = 0; i < 4; ++i) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[i]);
+#endif
         zero_spinor_field(&source[i]);
     }
 

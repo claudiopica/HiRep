@@ -327,6 +327,9 @@ void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double
         lprintf("MAIN", 0, "data_storage_element allocated !\n");
     }
     for (int i = 0; i < 4 * nm; i++) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(prop + i);
+#endif
         zero_spinor_field(prop + i);
     }
 
