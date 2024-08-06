@@ -103,6 +103,9 @@ void create_sequential_source_point(spinor_field *source, int tf, spinor_field *
     suNf_propagator sp0, sp1;
 
     for (beta = 0; beta < 4 * NF; ++beta) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(&source[beta]);
+#endif
         zero_spinor_field(&source[beta]);
     }
 
@@ -136,6 +139,7 @@ int main(int argc, char *argv[]) {
 
     logger_map("DEBUG", "debug");
 
+    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
     setup_process(&argc, &argv);
 
     setup_gauge_fields();
@@ -183,6 +187,13 @@ int main(int argc, char *argv[]) {
         calc_propagator(prop_1 + 4 * k, source, 4); // 4 for spin components
         create_point_source(source, mes_var.ti, k);
         calc_propagator(prop_2 + 4 * k, source, 4); // 4 for spin components
+
+#ifdef WITH_GPU
+        for (int beta = 0; beta < 4; beta++) {
+            copy_from_gpu(prop_1 + beta);
+            copy_from_gpu(prop_2 + beta);
+        }
+#endif
     }
     tmp = check_g5herm(prop_1, mes_var.ti, prop_2);
     return_value += tmp;
