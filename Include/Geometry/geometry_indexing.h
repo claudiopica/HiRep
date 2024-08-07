@@ -16,4 +16,10 @@
 #define iup(site, dir) iup[(site) * 4 + (dir)]
 #define idn(site, dir) idn[(site) * 4 + (dir)]
 
+#ifdef WITH_GPU
+#define _PTR(_field) (_field)->gpu_ptr
+#else
+#define _PTR(_field) (_field)->ptr
+#endif
+
 #endif

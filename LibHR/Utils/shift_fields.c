@@ -25,9 +25,9 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
 
     int total_shift = shift[0] + shift[1] + shift[2] + shift[3];
     if (total_shift == 0) {
-        if (sin != NULL) { copy_spinor_field(sout, sin); }
+        if (sin != NULL) { copy_spinor_field_cpu(sout, sin); }
 
-        if (uin != NULL) { copy_suNg_field(uout, uin); }
+        if (uin != NULL) { copy_suNg_field_cpu(uout, uin); }
     }
 
     if (sin != NULL) {
@@ -58,8 +58,8 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
     if (sin != NULL) {
         sbuf[0] = alloc_spinor_field(1, &glattice);
         sbuf[1] = alloc_spinor_field(1, &glattice);
-        zero_spinor_field(sbuf[0]);
-        zero_spinor_field(sbuf[1]);
+        zero_spinor_field_cpu(sbuf[0]);
+        zero_spinor_field_cpu(sbuf[1]);
     } else {
         sbuf[0] = sbuf[1] = NULL;
     }

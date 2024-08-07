@@ -99,6 +99,12 @@ int main(int argc, char *argv[]) {
     g[0] = g[1] = g[2] = g[3] = 0;
     pta_qprop_QMR_eo(g, pta_qprop, 1, &mass, 1e-28);
 
+#ifdef WITH_GPU
+    for (int k = 0; k < 4 * NF; k++) {
+        copy_from_gpu(pta_qprop[0] + k);
+    }
+#endif
+
     id_correlator(pta_triplets[A], g[0], pta_qprop[0]);
     g0_correlator(pta_triplets[Xt], g[0], pta_qprop[0]);
     g5_correlator(pta_triplets[Pi], g[0], pta_qprop[0]);

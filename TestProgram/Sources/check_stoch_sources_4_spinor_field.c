@@ -99,6 +99,7 @@ int main(int argc, char *argv[]) {
     int col, tau, eo, j;
     int k, counter;
     hr_complex av_, sd_;
+    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
 
     logger_map("DEBUG", "debug");
     logger_setlevel(0, 200);

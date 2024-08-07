@@ -263,11 +263,17 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
     if (source_type == 0) {
         source = alloc_spinor_field(1, &glattice);
         prop = alloc_spinor_field(1, &glattice);
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(prop);
+#endif
         zero_spinor_field(prop);
     } else {
         source = alloc_spinor_field(4, &glattice);
         prop = alloc_spinor_field(4, &glattice);
         for (int i = 0; i < 4; i++) {
+#ifdef WITH_GPU
+            zero_spinor_field_cpu(prop + i);
+#endif
             zero_spinor_field(prop + i);
         }
     }
@@ -300,6 +306,9 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
     if (source_type == 1) {
         u_gauge_old = alloc_suNg_field(&glattice);
         copy_suNg_field(u_gauge_old, u_gauge);
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(prop);
+#endif
         zero_spinor_field(prop);
         //Fix the Gauge
         double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
@@ -321,7 +330,9 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
         {
             create_z2_volume_source(source);
             calc_propagator(prop, source, 1); // No dilution
-
+#ifdef WITH_GPU
+            copy_from_gpu(prop);
+#endif
             lprintf("CORR", 0, "Start to perform the contractions ... \n");
             measure_bilinear_loops_spinorfield(prop, source, k, n_mom, swc, ret);
             lprintf("CORR", 0, "Contraction done\n");
@@ -337,6 +348,11 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
                     calc_propagator(prop, source, 4); //4 for spin dilution
                     create_point_source(source, tau, l); //to get the contraction right
                     //measure_mesons(discon_correlators, prop, source, 1, 0);
+#ifdef WITH_GPU
+                    for (int beta = 0; beta < 4; beta++) {
+                        copy_from_gpu(prop + beta);
+                    }
+#endif
                     measure_bilinear_loops_4spinorfield(prop, source, k, tau, l, -1, swc, ret);
                 }
             }
@@ -350,6 +366,11 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
             for (tau = 0; tau < GLB_T; ++tau) {
                 create_diluted_source_equal_atau(source, tau);
                 calc_propagator(prop, source, 4); //4 for spin dilution
+#ifdef WITH_GPU
+                for (int beta = 0; beta < 4; beta++) {
+                    copy_from_gpu(prop + beta);
+                }
+#endif
                 measure_bilinear_loops_4spinorfield(prop, source, k, tau, -1, -1, swc, ret);
             }
 
@@ -359,8 +380,12 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
             for (tau = 0; tau < GLB_T; ++tau) {
                 for (col = 0; col < NF; ++col) {
                     create_diluted_source_equal_atau_col(source, tau, col);
-
                     calc_propagator(prop, source, 4); //4 for spin dilution
+#ifdef WITH_GPU
+                    for (int beta = 0; beta < 4; beta++) {
+                        copy_from_gpu(prop + beta);
+                    }
+#endif
                     measure_bilinear_loops_4spinorfield(prop, source, k, tau, col, -1, swc, ret);
                 }
             }
@@ -374,6 +399,11 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
                         create_diluted_source_equal_atau_col(source, tau, col);
                         zero_even_or_odd_site_spinorfield(source, n_spinor, eo);
                         calc_propagator(prop, source, 4); //4 for spin dilution
+#ifdef WITH_GPU
+                        for (int beta = 0; beta < 4; beta++) {
+                            copy_from_gpu(prop + beta);
+                        }
+#endif
                         measure_bilinear_loops_4spinorfield(prop, source, k, tau, col, eo, swc, ret);
                     }
                 }
@@ -387,6 +417,11 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
                     create_noise_source_equal_col_dil(source, col);
                     zero_even_or_odd_site_spinorfield(source, n_spinor, eo); //set even or odd site to zero
                     calc_propagator(prop, source, 4); //4 for spin dilution
+#ifdef WITH_GPU
+                    for (int beta = 0; beta < 4; beta++) {
+                        copy_from_gpu(prop + beta);
+                    }
+#endif
                     measure_bilinear_loops_4spinorfield(prop, source, k, -1, col, eo, swc, ret);
                 }
             }

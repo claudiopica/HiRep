@@ -168,6 +168,7 @@ int main(int argc, char *argv[]) {
     double abs_tol = 5e-2;
     double rel_tol_scalar_loop = 1e-3;
     struct timeval start, end, etime;
+    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
 
     hr_complex g[16][4][4];
     hr_complex tmp[4][4];
@@ -205,11 +206,8 @@ int main(int argc, char *argv[]) {
 
     /* setup process id and communications */
     setup_process(&argc, &argv);
-
     setup_gauge_fields();
-
     read_input(mes_ip.read, get_input_filename());
-
     strcpy(pame, mes_ip.mstring);
     mass = atof(strtok(pame, ";"));
 
@@ -217,12 +215,12 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "disc:nhits = %i\n", mes_ip.nhits);
     lprintf("MAIN", 0, "Inverter precision = %e\n", mes_ip.precision);
     lprintf("MAIN", 0, "Number of momenta = %d\n", mes_ip.n_mom);
+
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
     set_csw(&mes_ip.csw);
 #endif
 
     gettimeofday(&start, 0);
-
     unit_u(u_gauge);
     represent_gauge_field();
 #ifdef REPR_FUNDAMENTAL
@@ -230,13 +228,9 @@ int main(int argc, char *argv[]) {
 #endif
 
     lprintf("MAIN", 0, "source type is fixed to 2:Time and spin dilution \n");
-
     lprintf("MAIN", 0, "Measuring D(t) =  sum_x psibar(x) Gamma psi(x)\n");
-
     lprintf("MAIN", 0, "Zerocoord{%d,%d,%d,%d}\n", zerocoord[0], zerocoord[1], zerocoord[2], zerocoord[3]);
-
     error(!(GLB_X == GLB_Y && GLB_X == GLB_Z), 1, "main", "This test works only for GLB_X=GLB_Y=GLB_Z");
-
     lprintf("CORR", 0, "Number of noise vector : nhits = %i \n", mes_ip.nhits);
     measure_loops(&mass, mes_ip.nhits, 0, mes_ip.precision, source_type, mes_ip.n_mom, STORE, &out_corr);
 

@@ -81,11 +81,17 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 
     /* noisy background */
     gaussian_spinor_field(in);
+#ifdef WITH_GPU
+    copy_from_gpu(in);
+#endif
     if (COORD[0] == C0[0] && COORD[1] == C0[1] && COORD[2] == C0[2] && COORD[3] == C0[3]) {
         for (source = 0; source < NF * 4 * 2; ++source) {
             *((double *)_FIELD_AT(in, x0) + source) = 0.; /* zero in source */
         }
     }
+#ifdef WITH_GPU
+    copy_to_gpu(in);
+#endif
     norm = sqrt(sqnorm_spinor_field(in));
     mul_spinor_field(in, 1. / norm, in);
 
@@ -113,11 +119,18 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
     g5_assign_spinor_field(in);
 
     /* now loop over sources */
+
     for (source = 0; source < 4 * NF; ++source) {
         /* put in source on an EVEN site */
+#ifdef WITH_GPU
+        copy_from_gpu(in);
+#endif
         if (COORD[0] == C0[0] && COORD[1] == C0[1] && COORD[2] == C0[2] && COORD[3] == C0[3]) {
             *((double *)_FIELD_AT(in, x0) + 2 * source) = 1.;
         }
+#ifdef WITH_GPU
+        copy_to_gpu(in);
+#endif
         g5_assign_spinor_field(in);
 
         for (i = 0; i < QMR_par.n; ++i) {
@@ -152,7 +165,7 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 
             mul_spinor_field(&qprop_mask, (4. + mass[i]), &resd[i]);
             qprop_mask.type = &glat_odd;
-            qprop_mask.ptr = pta_qprop[i][source].ptr + glat_odd.master_shift;
+            _PTR(&qprop_mask) = _PTR(&(pta_qprop[i][source])) + glat_odd.master_shift;
 
             Dphi_(&qprop_mask, &resd[i]);
             minus_spinor_field(&qprop_mask, &qprop_mask);
@@ -174,9 +187,15 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 
         /* remove source */
         g5_assign_spinor_field(in);
+#ifdef WITH_GPU
+        copy_from_gpu(in);
+#endif
         if (COORD[0] == C0[0] && COORD[1] == C0[1] && COORD[2] == C0[2] && COORD[3] == C0[3]) {
             *((double *)_FIELD_AT(in, x0) + 2 * source) = 0.;
         }
+#ifdef WITH_GPU
+        copy_to_gpu(in);
+#endif
     }
 
     lprintf("PROPAGATOR", 10, "QMR_eo MVM = %d\n", cgiter);
@@ -243,11 +262,17 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 
     /* noisy background */
     gaussian_spinor_field(in);
+#ifdef WITH_GPU
+    copy_from_gpu(in);
+#endif
     if (COORD[0] == C0[0] && COORD[1] == C0[1] && COORD[2] == C0[2] && COORD[3] == C0[3]) {
         for (source = 0; source < NF * 4 * 2; ++source) {
             *((double *)_FIELD_AT(in, x0) + source) = 0.; /* zero in source */
         }
     }
+#ifdef WITH_GPU
+    copy_to_gpu(in);
+#endif
     norm = sqrt(sqnorm_spinor_field(in));
     mul_spinor_field(in, 1. / norm, in);
 
@@ -257,11 +282,18 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
     g5_assign_spinor_field(in);
 
     /* now loop over sources */
+
     for (source = 0; source < 4 * NF; ++source) {
+#ifdef WITH_GPU
+        copy_from_gpu(in);
+#endif
         /* put in source */
         if (COORD[0] == C0[0] && COORD[1] == C0[1] && COORD[2] == C0[2] && COORD[3] == C0[3]) {
             *((double *)_FIELD_AT(in, x0) + 2 * source) = 1.;
         }
+#ifdef WITH_GPU
+        copy_to_gpu(in);
+#endif
         g5_assign_spinor_field(in);
 
         cgiter += g5QMR_mshift(&QMR_par, &D_pta, in, resd);
@@ -296,9 +328,15 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 
         /* remove source */
         g5_assign_spinor_field(in);
+#ifdef WITH_GPU
+        copy_from_gpu(in);
+#endif
         if (COORD[0] == C0[0] && COORD[1] == C0[1] && COORD[2] == C0[2] && COORD[3] == C0[3]) {
             *((double *)_FIELD_AT(in, x0) + 2 * source) = 0.;
         }
+#ifdef WITH_GPU
+        copy_to_gpu(in);
+#endif
     }
 
     lprintf("PROPAGATOR", 10, "QMR MVM = %d\n", cgiter);
@@ -344,10 +382,16 @@ void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
     cgiter = 0;
 
     for (source = 0; source < 4 * NF; ++source) {
+#ifdef WITH_GPU
+        copy_from_gpu(in);
+#endif
         /* put in source */
         if (COORD[0] == C0[0] && COORD[1] == C0[1] && COORD[2] == C0[2] && COORD[3] == C0[3]) {
             *((double *)_FIELD_AT(in, x0) + 2 * source) = 1.;
         }
+#ifdef WITH_GPU
+        copy_to_gpu(in);
+#endif
 
 #ifndef NDEBUG
         norm = sqnorm_spinor_field(in);
@@ -365,10 +409,16 @@ void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
             cgiter += MINRES(&MINRESpar, &H_pta, in, &pta_qprop[i][source], &pta_qprop[i - 1][source]);
         }
 
+#ifdef WITH_GPU
+        copy_from_gpu(in);
+#endif
         /* remove source */
         if (COORD[0] == C0[0] && COORD[1] == C0[1] && COORD[2] == C0[2] && COORD[3] == C0[3]) {
             *((double *)_FIELD_AT(in, x0) + 2 * source) = 0.;
         }
+#ifdef WITH_GPU
+        copy_to_gpu(in);
+#endif
     }
 
     lprintf("PROPAGATOR", 10, "MINRES MVM = %d", cgiter);

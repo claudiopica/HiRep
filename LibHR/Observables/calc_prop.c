@@ -189,6 +189,9 @@ static void calc_propagator_eo_core(spinor_field *psi, spinor_field *eta, int so
 #else
     spinor_field eta_mask;
     eta_mask.type = &glat_even;
+#ifdef WITH_GPU
+    eta_mask.gpu_ptr = eta->gpu_ptr;
+#endif
     eta_mask.ptr = eta->ptr;
     copy_spinor_field(tmp_even, &eta_mask);
 #endif
@@ -228,6 +231,9 @@ static void calc_propagator_eo_core(spinor_field *psi, spinor_field *eta, int so
         qprop_mask.type = &glat_even;
         mul_spinor_field(&qprop_mask, (4. + mass[i]), &resd_even[i]);
         qprop_mask.type = &glat_odd;
+#ifdef WITH_GPU
+        qprop_mask.gpu_ptr = psi[i].gpu_ptr + glat_odd.master_shift;
+#endif
         qprop_mask.ptr = psi[i].ptr + glat_odd.master_shift;
         zero_spinor_field(&qprop_mask);
         Dphi_(&qprop_mask, &resd_even[i]);
@@ -258,10 +264,16 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solve
    */
     qprop_mask_eta = *eta;
     qprop_mask_eta.type = &glat_odd;
+#ifdef WITH_GPU
+    qprop_mask_eta.gpu_ptr = eta->gpu_ptr + glat_odd.master_shift;
+#endif
     qprop_mask_eta.ptr = eta->ptr + glat_odd.master_shift;
     mul_spinor_field(tmp_odd, (1. / (4. + mass[0])), &qprop_mask_eta);
     Dphi_(tmp_even, tmp_odd);
     qprop_mask_eta.type = &glat_even;
+#ifdef WITH_GPU
+    qprop_mask_eta.gpu_ptr = eta->gpu_ptr;
+#endif
     qprop_mask_eta.ptr = eta->ptr;
     sub_spinor_field(tmp_even, &qprop_mask_eta, tmp_even);
 #ifdef GAUSSIAN_NOISE
@@ -320,6 +332,9 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solve
     mul_spinor_field(&qprop_mask_psi, (4. + mass[0]), resd_even);
 
     qprop_mask_psi.type = &glat_odd;
+#ifdef WITH_GPU
+    qprop_mask_psi.gpu_ptr = psi->gpu_ptr + glat_odd.master_shift;
+#endif
     qprop_mask_psi.ptr = psi->ptr + glat_odd.master_shift;
     Dphi_(&qprop_mask_psi, resd_even);
 
@@ -366,6 +381,9 @@ static void calc_propagator_clover(spinor_field *dptr, spinor_field *sptr) {
     dptr_e = *dptr;
     dptr_e.type = &glat_even;
     dptr_o = *dptr;
+#ifdef WITH_GPU
+    dptr_o.gpu_ptr += glat_odd.master_shift;
+#endif
     dptr_o.ptr += glat_odd.master_shift;
     dptr_o.type = &glat_odd;
 
@@ -374,6 +392,9 @@ static void calc_propagator_clover(spinor_field *dptr, spinor_field *sptr) {
     sptr_e = *stmp;
     sptr_e.type = &glat_even;
     sptr_o = *stmp;
+#ifdef WITH_GPU
+    sptr_o.gpu_ptr += glat_odd.master_shift;
+#endif
     sptr_o.ptr += glat_odd.master_shift;
     sptr_o.type = &glat_odd;
 
@@ -549,12 +570,18 @@ static void calc_propagator_eo_tw_core(spinor_field *psi, spinor_field *eta, int
 
     qprop_mask_eta = *eta;
     qprop_mask_eta.type = &glat_odd;
+#ifdef WITH_GPU
+    qprop_mask_eta.gpu_ptr = eta->gpu_ptr + glat_odd.master_shift;
+#endif
     qprop_mask_eta.ptr = eta->ptr + glat_odd.master_shift;
 
     Dxx_tw_inv(mass[0], tw_mass, tmp_odd, &qprop_mask_eta, DIRECT);
 
     Dphi_(tmp_even, tmp_odd);
     qprop_mask_eta.type = &glat_even;
+#ifdef WITH_GPU
+    qprop_mask_eta.gpu_ptr = eta->gpu_ptr;
+#endif
     qprop_mask_eta.ptr = eta->ptr;
 
     sub_assign_spinor_field(tmp_even, &qprop_mask_eta);
@@ -596,18 +623,30 @@ static void calc_propagator_eo_tw_core(spinor_field *psi, spinor_field *eta, int
     mul_spinor_field(&qprop_mask_psi, -((4. + mass[0]) * (4. + mass[0]) + tw_mass * tw_mass), resd_even);
 
     qprop_mask_psi.type = &glat_odd;
+#ifdef WITH_GPU
+    qprop_mask_psi.gpu_ptr = psi->gpu_ptr + glat_odd.master_shift;
+#endif
     qprop_mask_psi.ptr = psi->ptr + glat_odd.master_shift;
     qprop_mask_eta.type = &glat_odd;
+#ifdef WITH_GPU
+    qprop_mask_eta.gpu_ptr = eta->gpu_ptr + glat_odd.master_shift;
+#endif
     qprop_mask_eta.ptr = eta->ptr + glat_odd.master_shift;
 
     Dxx_tw_inv(mass[0], tw_mass, &qprop_mask_psi, &qprop_mask_eta, DIRECT);
 
     qprop_mask_psi.type = &glat_even;
+#ifdef WITH_GPU
+    qprop_mask_psi.gpu_ptr = psi->gpu_ptr;
+#endif
     qprop_mask_psi.ptr = psi->ptr;
     Dphi_(tmp_odd, &qprop_mask_psi);
     Dxx_tw_inv(mass[0], tw_mass, tmp_odd, tmp_odd, DIRECT);
 
     qprop_mask_psi.type = &glat_odd;
+#ifdef WITH_GPU
+    qprop_mask_psi.gpu_ptr = psi->gpu_ptr + glat_odd.master_shift;
+#endif
     qprop_mask_psi.ptr = psi->ptr + glat_odd.master_shift;
 
     sub_assign_spinor_field(&qprop_mask_psi, tmp_odd);

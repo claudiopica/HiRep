@@ -20,12 +20,6 @@
 #include "memory.h"
 #include "utils.h"
 
-#ifdef WITH_GPU
-#define _PTR(_field) _field->gpu_ptr
-#else
-#define _PTR(_field) _field->ptr
-#endif
-
 #ifdef BC_T_SF_ROTATED
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */

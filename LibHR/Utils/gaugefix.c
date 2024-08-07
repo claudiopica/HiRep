@@ -22,6 +22,10 @@ void unit_gauge(suNg_field *gauge) {
             }
         }
     }
+#ifdef WITH_GPU
+    copy_to_gpu(gauge);
+    gauge->comm_type = ALL_COMMS;
+#endif
     start_sendrecv_suNg_field(gauge);
     complete_sendrecv_suNg_field(gauge);
 }
@@ -56,6 +60,10 @@ static void gUgmu(suNg_field *gauge) {
             }
         }
     }
+#ifdef WITH_GPU
+    copy_to_gpu(gauge);
+    gauge->comm_type = ALL_COMMS;
+#endif
     start_sendrecv_suNg_field(gauge);
     complete_sendrecv_suNg_field(gauge);
 }
@@ -76,13 +84,22 @@ void random_gauge_transform(suNg_field *gauge) {
             }
         }
     }
-
+#ifdef WITH_GPU
+    copy_to_gpu(gauge);
+    gauge->comm_type = ALL_COMMS;
+#endif
     start_sendrecv_suNg_field(g);
     complete_sendrecv_suNg_field(g);
     gUgmu(gauge);
 }
 
 double calc_plaq(suNg_field *V) {
+#ifdef WITH_GPU
+    copy_from_gpu(V);
+    V->comm_type = CPU_COMM;
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
+#endif
     int mu, nu;
     int iy, iz;
     suNg *v1, *v2, *v3, *v4, w1, w2, w3;
@@ -121,6 +138,10 @@ double calc_plaq(suNg_field *V) {
         }
     }
 
+#ifdef WITH_GPU
+    V->comm_type = GPU_COMM;
+#endif
+
     global_sum(&E, 1);
     return E / (6. * NG) / GLB_VOLUME;
 }
@@ -142,6 +163,9 @@ void reunit(suNg_field *fixed_gauge) {
             }
         }
     }
+#ifdef WITH_GPU
+    copy_to_gpu(fixed_gauge);
+#endif
     start_sendrecv_suNg_field(fixed_gauge);
     complete_sendrecv_suNg_field(fixed_gauge);
 }
@@ -173,6 +197,10 @@ double gaugefix_action(int fix_dir, suNg_field *gauge) {
     for (mu = 0; mu < 4; mu++) {
         if (mu != fix_dir) { ndir++; }
     }
+#ifdef WITH_GPU
+    copy_to_gpu(gauge);
+    gauge->comm_type = ALL_COMMS;
+#endif
     global_sum(&action, 1);
     action *= 1. / (NG * ndir * GLB_T * GLB_X * GLB_Y * GLB_Z);
     return action;
@@ -301,6 +329,10 @@ void su2_hit(int fix_dir, int parity, double overrelax, suNg_field *fixed_gauge,
             }
         }
     }
+#ifdef WITH_GPU
+    copy_to_gpu(g);
+    g->comm_type = ALL_COMMS;
+#endif
     start_sendrecv_suNg_field(g);
     complete_sendrecv_suNg_field(g);
 }
@@ -320,6 +352,12 @@ double gaugefixstep(int fix_dir, double overrelax, suNg_field *fixed_gauge) {
 
 double gaugefix(int fix_dir, double overrelax, int max_it, double fix_tol, suNg_field *fixed_gauge) {
     lprintf("GAUGE FIXING", 30, "Reunitarizing every %d steps.\n", REUNIT);
+#ifdef WITH_GPU
+    copy_from_gpu(fixed_gauge);
+    fixed_gauge->comm_type = ALL_COMMS;
+    start_sendrecv_suNg_field(fixed_gauge);
+    complete_sendrecv_suNg_field(fixed_gauge);
+#endif
     int it;
     double new_act, old_act = 0., diff_act;
     init_g();
@@ -348,5 +386,12 @@ double gaugefix(int fix_dir, double overrelax, int max_it, double fix_tol, suNg_
 
     new_act = gaugefix_action(fix_dir, fixed_gauge);
     free_g();
+
+#ifdef WITH_GPU
+    copy_to_gpu(fixed_gauge);
+    fixed_gauge->comm_type = GPU_COMM;
+#endif
+    start_sendrecv_suNg_field(fixed_gauge);
+    complete_sendrecv_suNg_field(fixed_gauge);
     return new_act;
 }

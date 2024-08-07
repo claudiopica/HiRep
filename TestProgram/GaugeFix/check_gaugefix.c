@@ -8,6 +8,16 @@
 #include "libhr.h"
 
 static double calc_plaq_diff(suNg_field *V, suNg_field *W) {
+#ifdef WITH_GPU
+    copy_from_gpu(V);
+    V->comm_type = CPU_COMM;
+    start_sendrecv_suNg_field(V);
+    complete_sendrecv_suNg_field(V);
+    copy_from_gpu(W);
+    W->comm_type = CPU_COMM;
+    start_sendrecv_suNg_field(W);
+    complete_sendrecv_suNg_field(W);
+#endif
     int mu, nu;
     int iy, iz;
     suNg *v1, *v2, *v3, *v4, w1, w2, w3;
@@ -58,6 +68,11 @@ static double calc_plaq_diff(suNg_field *V, suNg_field *W) {
         }
     }
 
+#ifdef WITH_GPU
+    V->comm_type = GPU_COMM;
+    W->comm_type = GPU_COMM;
+#endif
+
     global_sum(&E, 1);
     return E / (6. * NG) / GLB_VOLUME;
 }
@@ -66,11 +81,29 @@ static void random_g(gtransf *g) {
     _MASTER_FOR(g->type, ix) {
         random_suNg(_FIELD_AT(g, ix));
     }
+#ifdef WITH_GPU
+    copy_to_gpu(g);
+#endif
 }
 
 static void transform_u(suNg_field *out, suNg_field *in, gtransf *g) {
     int iy, mu;
     suNg v;
+
+#ifdef WITH_GPU
+    copy_from_gpu(g);
+    g->comm_type = CPU_COMM;
+    start_sendrecv_gtransf(g);
+    complete_sendrecv_gtransf(g);
+    copy_from_gpu(in);
+    in->comm_type = CPU_COMM;
+    start_sendrecv_suNg_field(in);
+    complete_sendrecv_suNg_field(in);
+    copy_from_gpu(out);
+    out->comm_type = CPU_COMM;
+    start_sendrecv_suNg_field(out);
+    complete_sendrecv_suNg_field(out);
+#endif
 
     _MASTER_FOR(&glattice, ix) {
         for (mu = 0; mu < 4; mu++) {
@@ -79,6 +112,21 @@ static void transform_u(suNg_field *out, suNg_field *in, gtransf *g) {
             _suNg_times_suNg(*_4FIELD_AT(out, ix, mu), *_FIELD_AT(g, ix), v);
         }
     }
+
+#ifdef WITH_GPU
+    copy_to_gpu(g);
+    g->comm_type = GPU_COMM;
+    start_sendrecv_gtransf(g);
+    complete_sendrecv_gtransf(g);
+    copy_to_gpu(in);
+    in->comm_type = GPU_COMM;
+    start_sendrecv_suNg_field(in);
+    complete_sendrecv_suNg_field(in);
+    copy_to_gpu(out);
+    out->comm_type = GPU_COMM;
+    start_sendrecv_suNg_field(out);
+    complete_sendrecv_suNg_field(out);
+#endif
 }
 
 int main(int argc, char *argv[]) {
@@ -86,12 +134,11 @@ int main(int argc, char *argv[]) {
     double p1, p2;
     double pdiff;
     double act;
+    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
 
     /* setup process communications */
     setup_process(&argc, &argv);
-
     setup_gauge_fields();
-
     gtransf *g = alloc_gtransf(&glattice);
     suNg_field *fixed_gauge = alloc_suNg_field(&glattice);
 
@@ -106,7 +153,7 @@ int main(int argc, char *argv[]) {
     start_sendrecv_gtransf(g);
     complete_sendrecv_gtransf(g);
 
-    p1 = calc_plaq(u_gauge);
+    p1 = avr_plaquette();
     lprintf("TEST", 0, "original gauge plaq %1.14f\n", p1);
 
     transform_u(fixed_gauge, u_gauge, g);
@@ -114,7 +161,7 @@ int main(int argc, char *argv[]) {
     complete_sendrecv_suNg_field(fixed_gauge);
 
     p2 = calc_plaq(fixed_gauge);
-    lprintf("TEST", 0, "plaq after random gauge tranforamtion %1.14f\n", p2);
+    lprintf("TEST", 0, "plaq after random gauge transformation %1.14f\n", p2);
     if (fabs(p1 - p2) > 1e-14) { return_value += 1; }
 
     pdiff = calc_plaq_diff(u_gauge, fixed_gauge);
@@ -130,12 +177,12 @@ int main(int argc, char *argv[]) {
     lprintf("TEST", 0, "action  %1.14f\n", act);
 
     p2 = calc_plaq(fixed_gauge);
-    lprintf("TEST", 0, "plaq after random gauge transformation  and gauge fixing %1.14f\n", p2);
+    lprintf("TEST", 0, "plaq after random gauge transformation and gauge fixing %1.14f\n", p2);
     if (fabs(p1 - p2) > 1e-14) { return_value += 1; }
 
     pdiff = calc_plaq_diff(u_gauge, fixed_gauge);
     if (fabs(pdiff) > 1e-14) { return_value += 1; }
-    lprintf("TEST", 0, "sum of difference of plaquettes original/gauge transformed  and gauge fixed field %1.14f\n", pdiff);
+    lprintf("TEST", 0, "sum of difference of plaquettes original/gauge transformed and gauge fixed field %1.14f\n", pdiff);
 
     lprintf("TEST", 0, "Perform test gauge invariance of the gauge fixing with a unit gauge field\n");
     // initialise unit gauge field
@@ -156,7 +203,7 @@ int main(int argc, char *argv[]) {
     complete_sendrecv_suNg_field(fixed_gauge);
 
     p2 = calc_plaq(fixed_gauge);
-    lprintf("TEST", 0, "plaq after random gauge tranforamtion %1.14f\n", p2);
+    lprintf("TEST", 0, "plaq after random gauge transformation %1.14f\n", p2);
     if (fabs(p1 - p2) > 1e-14) { return_value += 1; }
 
     pdiff = calc_plaq_diff(u_gauge, fixed_gauge);
@@ -172,12 +219,12 @@ int main(int argc, char *argv[]) {
     lprintf("TEST", 0, "action  %1.14f\n", act);
 
     p2 = calc_plaq(fixed_gauge);
-    lprintf("TEST", 0, "plaq after random gauge transformation  and gauge fixing %1.14f\n", p2);
+    lprintf("TEST", 0, "plaq after random gauge transformation and gauge fixing %1.14f\n", p2);
     if (fabs(p1 - p2) > 1e-14) { return_value += 1; }
 
     pdiff = calc_plaq_diff(u_gauge, fixed_gauge);
     if (fabs(pdiff) > 1e-14) { return_value += 1; }
-    lprintf("TEST", 0, "sum of difference of plaquettes original/gauge transformed  and gauge fixed field %1.14f\n", pdiff);
+    lprintf("TEST", 0, "sum of difference of plaquettes original/gauge transformed and gauge fixed field %1.14f\n", pdiff);
 
     global_sum_int(&return_value, 1);
     lprintf("MAIN", 0, "return_value= %d\n ", return_value);

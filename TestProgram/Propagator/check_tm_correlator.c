@@ -1,15 +1,19 @@
+/***************************************************************************\
+* Copyright (c) 2008-2024, Antonio Rago, Fernando Romero Lopez              *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
 /******************************************************************************
  *
- *
- * File check_scattering_length.c
  * Checks of the tm correlator
- * Author: Antonio Rago & Fernando Romero Lopez
+ * 
  * NOCOMPILE= BC_X_ANTIPERIODIC
  * NOCOMPILE= BC_Y_ANTIPERIODIC
  * NOCOMPILE= BC_Z_ANTIPERIODIC
  * NOCOMPILE= BC_T_SF
  * NOCOMPILE= BC_T_SF_ROTATED
  * NOCOMPILE= FERMION_THETA
+ * 
  ******************************************************************************/
 
 #include "libhr.h"
@@ -245,9 +249,8 @@ int main(int argc, char *argv[]) {
     int ts;
 
     error(!(GLB_X == GLB_Y && GLB_X == GLB_Z), 1, "main", "This test works only for GLB_X=GLB_Y=GLB_Z");
-
+    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
     setup_process(&argc, &argv);
-
     setup_gauge_fields();
 
     spinor_field *source = alloc_spinor_field(4, &glattice);
@@ -260,9 +263,7 @@ int main(int argc, char *argv[]) {
 
     m = atof(cor_var.mstring);
     mu = atof(cor_var.mustring);
-
     init_propagator_eo(1, &m, cor_var.precision);
-
     lprintf("MAIN", 0, "mass is : %e\n", m);
 
     struct timeval start, end, etime;
@@ -275,7 +276,6 @@ int main(int argc, char *argv[]) {
 #endif
 
     gettimeofday(&start, 0);
-
     hr_complex Piseq[GLB_T];
     hr_complex Pith[GLB_T];
 
@@ -286,24 +286,28 @@ int main(int argc, char *argv[]) {
 
     meson_observable mo;
     init_mo(&mo, "pi", GLB_T);
-
     reset_mo(&mo);
 
     for (int j = 0; j < 4; j++) {
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(prop + j);
+#endif
         zero_spinor_field(prop + j);
     }
 
     ts = 0 * random_tau();
-
     lprintf("MAIN", 0, "ts = %d \n", ts);
-
     create_point_source(source, ts, 1);
-
     calc_propagator_tw(&m, 0.0, prop, source, 4);
-
     create_point_source(source, ts, 1);
-
     calc_propagator(propmu0, source, 4);
+
+#ifdef WITH_GPU
+    for (int beta = 0; beta < 4; beta++) {
+        copy_from_gpu(prop + beta);
+        copy_from_gpu(propmu0 + beta);
+    }
+#endif
 
     return_value = compare_prop(propmu0, prop, 1.e-14);
 
@@ -315,6 +319,12 @@ int main(int argc, char *argv[]) {
     }
 
     calc_propagator_tw(&m, mu, prop, source, 4);
+
+#ifdef WITH_GPU
+    for (int beta = 0; beta < 4; beta++) {
+        copy_from_gpu(prop + beta);
+    }
+#endif
 
     // "standard" two points : pi and rho
     measure_mesons_core(prop, prop, source, &mo, 1, ts, 1, 0, GLB_T);
