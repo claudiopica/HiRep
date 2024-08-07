@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
     complete_sendrecv_suNg_field(fixed_gauge);
 
     p2 = calc_plaq(fixed_gauge);
-    lprintf("TEST", 0, "plaq after random gauge tranformation %1.14f\n", p2);
+    lprintf("TEST", 0, "plaq after random gauge transformation %1.14f\n", p2);
     if (fabs(p1 - p2) > 1e-14) { return_value += 1; }
 
     pdiff = calc_plaq_diff(u_gauge, fixed_gauge);
