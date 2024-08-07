@@ -167,6 +167,7 @@ int main(int argc, char *argv[]) {
     double abs_tol = 1.5e-1;
     double rel_tol_scalar_loop = 1e-2;
     struct timeval start, end, etime;
+    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
 
     hr_complex g[16][4][4];
     hr_complex tmp[4][4];
@@ -204,19 +205,14 @@ int main(int argc, char *argv[]) {
 
     /* setup process id and communications */
     setup_process(&argc, &argv);
-
     setup_gauge_fields();
-
     read_input(mes_ip.read, get_input_filename());
-
     strcpy(pame, mes_ip.mstring);
     mass = atof(strtok(pame, ";"));
-
     lprintf("MAIN", 0, "disc:masses = %f\n", mass);
     lprintf("MAIN", 0, "disc:nhits = %i\n", mes_ip.nhits);
     lprintf("MAIN", 0, "Inverter precision = %e\n", mes_ip.precision);
     unit_u(u_gauge);
-
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
     set_csw(&mes_ip.csw);
 #endif
@@ -224,19 +220,13 @@ int main(int argc, char *argv[]) {
 #ifdef REPR_FUNDAMENTAL
     apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
 #endif
-
     lprintf("MAIN", 0, "source type is fixed to 1:  Gauge fixed source  with time, spin  dilution\n");
-
     lprintf("MAIN", 0, "Measuring D(t) =  sum_x psibar(x) Gamma psi(x)\n");
     init_discon_correlators();
     lprintf("MAIN", 0, "Zerocoord{%d,%d,%d,%d}\n", zerocoord[0], zerocoord[1], zerocoord[2], zerocoord[3]);
-
     error(!(GLB_X == GLB_Y && GLB_X == GLB_Z), 1, "main", "This test works only for GLB_X=GLB_Y=GLB_Z");
-
     lprintf("CORR", 0, "Number of noise vector : nhits = %i \n", mes_ip.nhits);
-
     measure_loops(&mass, mes_ip.nhits, 0, mes_ip.precision, source_type, mes_ip.n_mom, STORE, &out_corr);
-
     mean_loops = (hr_complex *)calloc(n_Gamma, sizeof(hr_complex));
     for (int k = 0; k < mes_ip.nhits; k++) {
         for (int l = 0; l < NF; l++) {
@@ -256,12 +246,9 @@ int main(int argc, char *argv[]) {
     //  /* CALCOLO ESPLICITO */
     ex_loops = (hr_complex *)calloc(16, sizeof(hr_complex));
     free_loops(ex_loops);
-
     return_value += compare_disc(ex_loops, mean_loops, mes_channel_names, abs_tol, rel_tol_scalar_loop);
-
     global_sum_int(&return_value, 1);
     lprintf("MAIN", 0, "return_value= %d\n ", return_value);
-
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);
     lprintf("MAIN", 0, "Configuration : analysed in [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);

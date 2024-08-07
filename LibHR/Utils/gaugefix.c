@@ -197,6 +197,10 @@ double gaugefix_action(int fix_dir, suNg_field *gauge) {
     for (mu = 0; mu < 4; mu++) {
         if (mu != fix_dir) { ndir++; }
     }
+#ifdef WITH_GPU
+    copy_to_gpu(gauge);
+    gauge->comm_type = ALL_COMMS;
+#endif
     global_sum(&action, 1);
     action *= 1. / (NG * ndir * GLB_T * GLB_X * GLB_Y * GLB_Z);
     return action;
@@ -325,6 +329,10 @@ void su2_hit(int fix_dir, int parity, double overrelax, suNg_field *fixed_gauge,
             }
         }
     }
+#ifdef WITH_GPU
+    copy_to_gpu(g);
+    g->comm_type = ALL_COMMS;
+#endif
     start_sendrecv_suNg_field(g);
     complete_sendrecv_suNg_field(g);
 }

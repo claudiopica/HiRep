@@ -167,6 +167,7 @@ int main(int argc, char *argv[]) {
     double abs_tol = 1e-1;
     double rel_tol_scalar_loop = 1e-3;
     struct timeval start, end, etime;
+    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
 
     hr_complex g[16][4][4];
     hr_complex tmp[4][4];
