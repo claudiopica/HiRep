@@ -31,6 +31,11 @@ static void alloc_ws_rotate(void) {
 
 static void rotate_ptr(int n, spinor_field *pkk[], hr_complex vl[]) {
     if (initr == 0) { alloc_ws_rotate(); }
+#ifdef WITH_GPU
+    for (int i = 0; i < n; i++) {
+        copy_from_gpu(pkk[i]);
+    }
+#endif
 
     error((n < 1) || (n > MAX_ROTATE), 1, "rotate [eva.c]", "Parameter n is out of range");
 
@@ -61,6 +66,12 @@ static void rotate_ptr(int n, spinor_field *pkk[], hr_complex vl[]) {
             *_FIELD_AT(pkk[k], ix) = psi[k];
         }
     }
+
+#ifdef WITH_GPU
+    for (int i = 0; i < n; i++) {
+        copy_to_gpu(pkk[i]);
+    }
+#endif
 }
 
 static void project(spinor_field *pk, spinor_field *pl) {
