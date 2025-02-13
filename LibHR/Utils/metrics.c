@@ -106,35 +106,67 @@ int bytes_per_site(operator_type type) {
     int bytesite = 0;
     switch (type) {
     case DPHI_CORE:
+#ifdef WITH_GPU
+        bytesite = 36 * sizeof(suNf_vector) + 8 * sizeof(suNf);
+#else
         bytesite = 40 * sizeof(suNf_vector) + 8 * sizeof(suNf);
+#endif
         break;
 
     case DPHI_CORE_FLT:
+#ifdef WITH_GPU
+        bytesite = 36 * sizeof(suNf_vector_flt) + 8 * sizeof(suNf_flt);
+#else
         bytesite = 40 * sizeof(suNf_vector_flt) + 8 * sizeof(suNf_flt);
+#endif
         break;
 
     case CPHI:
+#ifdef WITH_GPU
+        bytesite = 44 * sizeof(suNf_vector) + 8 * sizeof(suNf) + 2 * sizeof(suNfc);
+#else
         bytesite = 52 * sizeof(suNf_vector) + 8 * sizeof(suNf) + 2 * sizeof(suNfc);
+#endif
         break;
 
     case CPHI_FLT:
+#ifdef WITH_GPU
+        bytesite = 44 * sizeof(suNf_vector_flt) + 8 * sizeof(suNf_flt) + 2 * sizeof(suNfc);
+#else
         bytesite = 52 * sizeof(suNf_vector_flt) + 8 * sizeof(suNf_flt) + 2 * sizeof(suNfc);
+#endif
         break;
 
     case CPHI_CORE:
+#ifdef WITH_GPU
+        bytesite = 8 * sizeof(suNf_vector) + sizeof(ldl_t);
+#else
         bytesite = 12 * sizeof(suNf_vector) + sizeof(ldl_t);
+#endif
         break;
 
     case CPHI_FLT_CORE:
+#ifdef WITH_GPU
+        bytesite = 8 * sizeof(suNf_vector_flt) + sizeof(ldl_t);
+#else
         bytesite = 12 * sizeof(suNf_vector_flt) + sizeof(ldl_t);
+#endif
         break;
 
     case CPHI_INV:
+#ifdef WITH_GPU
+        bytesite = 2 * sizeof(suNf_spinor) + sizeof(ldl_t);
+#else
         bytesite = 3 * sizeof(suNf_spinor) + sizeof(ldl_t);
+#endif
         break;
 
     case CPHI_INV_FLT:
+#ifdef WITH_GPU
+        bytesite = 2 * sizeof(suNf_spinor_flt) + sizeof(ldl_t);
+#else
         bytesite = 3 * sizeof(suNf_spinor_flt) + sizeof(ldl_t);
+#endif
         break;
 
     case CUDA_REDUCTION:
