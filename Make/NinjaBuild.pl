@@ -366,6 +366,11 @@ sub read_conf {
             
             # set linker
             unshift @{$options{'LINK'}}, "$nvcc --forward-unknown-to-host-compiler -ccbin"; 
+
+            my @arch = grep(/-arch/,@{$options{'GPUFLAGS'}}); # Check if architecture is specified by user
+            if (!@arch) {
+                push(@{$options{'GPUFLAGS'}},"-arch=all"); # If not specified by user compile fat binary
+            }
         } else {
             push(@{$options{'GPUFLAGS'}},"-xhip -fgpu-rdc");
             push(@{$options{'LDFLAGS'}},"-lstdc++ --hip-link");
@@ -374,6 +379,8 @@ sub read_conf {
             push(@{$options{'MACRO'}},"__HIP_PLATFORM_HCC__");
         }
         push(@{$options{'GPUFLAGS'}},"-std=c++17");
+
+
     }
 
     # add standard definitions to MACRO
