@@ -379,8 +379,6 @@ sub read_conf {
             push(@{$options{'MACRO'}},"__HIP_PLATFORM_HCC__");
         }
         push(@{$options{'GPUFLAGS'}},"-std=c++17");
-
-
     }
 
     # add standard definitions to MACRO
