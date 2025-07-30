@@ -987,8 +987,8 @@ typedef struct
 
 wilson_lines *polyleg(int ix, int d);
 
-void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *gb_storage);
-void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_complex ** polyf);
+void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *gb_storage, int logreport);
+void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_complex ** polyf, int logreport);
     "];
     WriteString[ar, "\n\n"];
 (*
@@ -1443,7 +1443,7 @@ WriteString[ar,"    for(int i=0;i<total_n_glue_op;i++)
 
 (*This is the evaluation and collection on the root node of the 1pt functions*)
   WriteString[ar, "
-void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *gb_storage)
+void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *gb_storage, int logreport)
 {
 #if total_n_glue_op>0
     int n1, n2;
@@ -1563,6 +1563,8 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *g
     gb1_bf = gb_storage;
 #endif
 
+if(logreport == 0 )
+{
 "];
 
 startbase=0;
@@ -1607,7 +1609,7 @@ Do[
       , {charge, -1, 1, 2}];
     , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
   , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
-  WriteString[ar, "}\n"];
+  WriteString[ar, "}\n}\n"];
 (*Report function on the operator evaluated*)
   WriteString[ar, "void report_gb_group_setup()\n{\n"];
   Do[
@@ -1744,7 +1746,7 @@ WriteString[ar,"    for(int i=0;i<total_n_tor_op;i++)
 }\n"];
 
 WriteString[ar,"
-void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_complex ** polyf)
+void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_complex ** polyf, int logreport)
 {
     int n1, n2, n3, i;
     static hr_complex *tor1_bf;
@@ -1860,7 +1862,8 @@ void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_
 #else
     tor1_bf = tor_storage;
 #endif
-
+if(logreport ==0)
+{
 "];
 
 startbase=0;
@@ -1942,7 +1945,7 @@ WriteString[ar,"
         }
    for (n1 = 0; n1 < GLB_T; n1++)
         lprintf(\"Measure ML\", 0, \" Polyakov Cor dt=%d ( %.10e %.10e )\\n\", n1, creal(pcor[n1]), cimag(pcor[n1]));
-}\n"];
+}\n}\n"];
 (*Report function on the operator evaluated*)
 WriteString[ar,"void report_tor_group_setup()\n{\n"];
 Do[Do[Do[If[ListQ[Torindex[px,py,pz,irrepidx,charge]],If[Complement[Flatten[Torindex[px,py,pz,irrepidx,charge]],{0}]!={},WriteString[ar,"lprintf(\"INIT Measure ML\",0,\"\\n1pt_tor Irrep multiplets Total P=(",px,",",py,",",pz,") Irrep=",IrrepName[px,py,pz][[irrepidx]]," Charge=",stcharge[charge],"\");\n"];

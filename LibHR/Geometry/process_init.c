@@ -164,13 +164,11 @@ int setup_process(int *argc, char ***argv) {
     read_input(logger_var.read, input_filename);
     logger_set_input(&logger_var);
 
-#ifndef LOG_ALLPIDS
     if (PID != 0) {
+#ifndef LOG_ALLPIDS
         logger_disable();
-    } /* disable logger for MPI processes != 0 */
-    else
-#endif
-    {
+#endif /* disable logger for MPI processes != 0 */
+    } else {
         FILE *stderrp;
         char sbuf[270];
         sprintf(sbuf, ">>%s_%d", output_filename, PID);

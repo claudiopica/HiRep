@@ -8,6 +8,7 @@
 
 #include "Utils/wilsonflow.h"
 #include "IO/input_par.h"
+#include "Observables/glueballs.h"
 
 #define GENERIC_MAX(x, y) ((x) > (y) ? (x) : (y))
 
@@ -36,6 +37,30 @@ typedef struct input_pg {
             { "nor", "nor = %d", INT_T, &(varname).nor },                          \
             { NULL, NULL, INT_T, NULL }                                            \
         }                                                                          \
+    }
+
+/* suN glueballs variables */
+typedef struct input_pg_glueballs {
+    double APEsmear;
+    int nblkstart, nblkend;
+    cor_list corrs;
+
+    char cml_corrs[2048];
+    char configlist[512];
+    /* for the reading function */
+    input_record_t read[5];
+
+} input_pg_glueballs;
+
+#define init_input_pg_glueballs(varname)                                                                                       \
+    {                                                                                                                          \
+        .read = {                                                                                                              \
+            { "Correlator definition", "MG correlators = %s", STRING_T, &((varname).cml_corrs[0]) },                           \
+            { "APEsmear parameter", "APEsmear = %lf", DOUBLE_T, &(varname).APEsmear },                                         \
+            { "start index of spatial blocking level to measure glueballs", "nblkstart = %d", INT_T, &((varname).nblkstart) }, \
+            { "end index of spatial blocking level to measure glueballs", "nblkend = %d", INT_T, &((varname).nblkend) },       \
+            { NULL, NULL, INT_T, NULL }                                                                                        \
+        }                                                                                                                      \
     }
 
 /* Polyakov variables */
@@ -123,5 +148,26 @@ typedef struct pg_flow {
 
 int init_mc(pg_flow *rf, char *ifile);
 int save_conf(pg_flow *rf, int id);
+
+typedef struct pg_flow_glueballs_measure {
+    char configlist[256]; /* directory to store gconfs */
+
+    input_pg_glueballs *pg_v;
+
+    input_WF *wf;
+
+    input_poly *poly;
+
+    /* for the reading function */
+    input_record_t read[2];
+
+} pg_flow_glueballs_measure;
+
+#define init_pg_flow_glueballs_measure(varname)                                                                               \
+    {                                                                                                                         \
+        .read = { { "Configuration list", "configlist = %s", STRING_T, &(varname).configlist }, { NULL, NULL, INT_T, NULL } } \
+    }
+
+int init_mk_glueballs(pg_flow_glueballs_measure *gf, char *ifile);
 
 #endif /* SUN_UTILS_H */

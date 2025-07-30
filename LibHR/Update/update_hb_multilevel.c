@@ -335,7 +335,7 @@ void update_hb_multilevel_gb_measure(int lev) {
             one_point_gb[i] /= norm;
         }
 
-        collect_1pt_glueball_functions(lcor, nblocking, one_point_gb);
+        collect_1pt_glueball_functions(lcor, nblocking, one_point_gb, 0);
 #endif
 
 #if total_n_tor_op > 0
@@ -357,7 +357,7 @@ void update_hb_multilevel_gb_measure(int lev) {
 
         lprintf("HB MULTILEVEL", 0, "1polyf %lf\n", creal(polyf[2][3]));
 
-        collect_1pt_torellon_functions(lcor, one_point_tor, polyf);
+        collect_1pt_torellon_functions(lcor, one_point_tor, polyf, 0);
 #endif
 
         gettimeofday(&start, 0);
@@ -376,7 +376,7 @@ static void measure_tune(int nblocking, long double *partial_norm, hr_complex *g
 
     lprintf("MEASURE_TUNE", 0, "\nGlueball operator tune measure\n");
 
-    collect_1pt_glueball_functions(lcor, nblocking, glue_in);
+    collect_1pt_glueball_functions(lcor, nblocking, glue_in, 0);
 
     for (int j = 0; j < nglue; j++) {
         glue_in[j] = 0;
@@ -390,7 +390,7 @@ static void measure_tune(int nblocking, long double *partial_norm, hr_complex *g
 
     lprintf("MEASURE_TUNE", 0, "\nTorellon operator tune measure\n");
 
-    collect_1pt_torellon_functions(lcor, tor_in, NULL);
+    collect_1pt_torellon_functions(lcor, tor_in, NULL, 0);
     for (int j = 0; j < ntor; j++) {
         tor_in[j] = 0.;
     }

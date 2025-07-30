@@ -1207,7 +1207,7 @@ void eval_all_glueball_ops(int t, hr_complex *numerical_op_out) {
     }
 }
 
-void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *gb_storage) {
+void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *gb_storage, int logreport) {
 #if total_n_glue_op > 0
     int n1, n2;
 #endif
@@ -1314,227 +1314,229 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *g
     gb1_bf = gb_storage;
 #endif
 
-    lprintf("Measure ML", 0, "\n1pt function P=(-1,0,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 2 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 0 1 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 0; i < 2; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+    if (logreport == 0) {
+        lprintf("Measure ML", 0, "\n1pt function P=(-1,0,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 2 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 0 1 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 0; i < 2; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,-1,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 2 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 2; i < 3; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,-1,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 2 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 2; i < 3; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,-1) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 3 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 3; i < 4; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,0,-1) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 3 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 3; i < 4; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=A1plusOhP Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 4 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 4; i < 5; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=A1plusOhP Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 4 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 4; i < 5; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=A2plusOhP Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 5 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 5; i < 6; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=A2plusOhP Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 5 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 5; i < 6; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=EplusOhP Irrep ev=1/2 Charge=+ nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 6 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 6; i < 7; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=EplusOhP Irrep ev=1/2 Charge=+ nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 6 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 6; i < 7; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=EplusOhP Irrep ev=2/2 Charge=+ nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 7 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 7; i < 8; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=EplusOhP Irrep ev=2/2 Charge=+ nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 7 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 7; i < 8; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=T1plusOhP Irrep ev=1/3 Charge=- nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 8 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 8; i < 9; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=T1plusOhP Irrep ev=1/3 Charge=- nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 8 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 8; i < 9; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=T1plusOhP Irrep ev=2/3 Charge=- nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 9 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 9; i < 10; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=T1plusOhP Irrep ev=2/3 Charge=- nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 9 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 9; i < 10; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=T1plusOhP Irrep ev=3/3 Charge=- nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 10 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 10; i < 11; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=T1plusOhP Irrep ev=3/3 Charge=- nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 10 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 10; i < 11; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,1) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 11 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 11; i < 12; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,0,1) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 11 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 11; i < 12; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,1,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 12 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 12; i < 13; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,1,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 12 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 12; i < 13; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,1,0) Irrep=A2Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 13 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 13; i < 14; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(0,1,0) Irrep=A2Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 13 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 13; i < 14; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(1,0,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
-    lprintf("Measure ML", 0, "Op id= 14 (repeated nblocking times)\n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++) {
-                for (i = 14; i < 15; i++) {
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )",
-                            creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+        lprintf("Measure ML", 0, "\n1pt function P=(1,0,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1 * nblocking);
+        lprintf("Measure ML", 0, "Op id= 14 (repeated nblocking times)\n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (n2 = 0; n2 < nblocking; n2++) {
+                    for (i = 14; i < 15; i++) {
+                        lprintf("Measure ML", 0, " ( %.10e %.10e )",
+                                creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                                cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+                    }
                 }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
     }
 }

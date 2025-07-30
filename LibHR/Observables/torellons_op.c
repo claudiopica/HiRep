@@ -2947,7 +2947,7 @@ void eval_all_torellon_ops(int t, hr_complex *numerical_tor_out, hr_complex **po
     }
 }
 
-void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_complex **polyf) {
+void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_complex **polyf, int logreport) {
     int n1, n2, n3, i;
     static hr_complex *tor1_bf;
     static int n_total_active_slices = 0;
@@ -3048,174 +3048,175 @@ void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_
 #else
     tor1_bf = tor_storage;
 #endif
-
-    lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=A1plusOhP Irrep ev=1/1 Charge=+ nop=%d\n", 1);
-    lprintf("Measure ML", 0, "Tor id= 0 \n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (i = 0; i < 1; i++) {
-                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
-                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+    if (logreport == 0) {
+        lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=A1plusOhP Irrep ev=1/1 Charge=+ nop=%d\n", 1);
+        lprintf("Measure ML", 0, "Tor id= 0 \n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (i = 0; i < 1; i++) {
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+                }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=EplusOhP Irrep ev=1/2 Charge=+ nop=%d\n", 1);
-    lprintf("Measure ML", 0, "Tor id= 1 \n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (i = 1; i < 2; i++) {
-                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
-                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+        lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=EplusOhP Irrep ev=1/2 Charge=+ nop=%d\n", 1);
+        lprintf("Measure ML", 0, "Tor id= 1 \n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (i = 1; i < 2; i++) {
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+                }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=EplusOhP Irrep ev=2/2 Charge=+ nop=%d\n", 1);
-    lprintf("Measure ML", 0, "Tor id= 2 \n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (i = 2; i < 3; i++) {
-                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
-                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+        lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=EplusOhP Irrep ev=2/2 Charge=+ nop=%d\n", 1);
+        lprintf("Measure ML", 0, "Tor id= 2 \n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (i = 2; i < 3; i++) {
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+                }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=T1plusOhP Irrep ev=1/3 Charge=+ nop=%d\n", 1);
-    lprintf("Measure ML", 0, "Tor id= 3 \n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (i = 3; i < 4; i++) {
-                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
-                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+        lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=T1plusOhP Irrep ev=1/3 Charge=+ nop=%d\n", 1);
+        lprintf("Measure ML", 0, "Tor id= 3 \n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (i = 3; i < 4; i++) {
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+                }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=T1plusOhP Irrep ev=2/3 Charge=+ nop=%d\n", 1);
-    lprintf("Measure ML", 0, "Tor id= 4 \n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (i = 4; i < 5; i++) {
-                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
-                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+        lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=T1plusOhP Irrep ev=2/3 Charge=+ nop=%d\n", 1);
+        lprintf("Measure ML", 0, "Tor id= 4 \n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (i = 4; i < 5; i++) {
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+                }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=T1plusOhP Irrep ev=3/3 Charge=+ nop=%d\n", 1);
-    lprintf("Measure ML", 0, "Tor id= 5 \n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (i = 5; i < 6; i++) {
-                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
-                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+        lprintf("Measure ML", 0, "\n1ptTor function P=(0,0,0) Irrep=T1plusOhP Irrep ev=3/3 Charge=+ nop=%d\n", 1);
+        lprintf("Measure ML", 0, "Tor id= 5 \n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (i = 5; i < 6; i++) {
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+                }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1ptTor function P=(0,1,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1);
-    lprintf("Measure ML", 0, "Tor id= 6 \n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (i = 6; i < 7; i++) {
-                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
-                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+        lprintf("Measure ML", 0, "\n1ptTor function P=(0,1,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 1);
+        lprintf("Measure ML", 0, "Tor id= 6 \n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (i = 6; i < 7; i++) {
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+                }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    lprintf("Measure ML", 0, "\n1ptTor function P=(1,1,1) Irrep=A1Dic3 Irrep ev=1/1 Charge=+ nop=%d\n", 1);
-    lprintf("Measure ML", 0, "Tor id= 7 \n");
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        if (listactive[n1] > -1) {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (i = 7; i < 8; i++) {
-                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
-                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+        lprintf("Measure ML", 0, "\n1ptTor function P=(1,1,1) Irrep=A1Dic3 Irrep ev=1/1 Charge=+ nop=%d\n", 1);
+        lprintf("Measure ML", 0, "Tor id= 7 \n");
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            if (listactive[n1] > -1) {
+                lprintf("Measure ML", 0, " t=%d", n1);
+                for (i = 7; i < 8; i++) {
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+                }
+                lprintf("Measure ML", 0, "\n");
             }
-            lprintf("Measure ML", 0, "\n");
         }
-    }
 
-    if (polyf == NULL) { return; }
+        if (polyf == NULL) { return; }
 
-    hr_complex *lpoly = NULL;
-    hr_complex *gpoly = NULL;
-    hr_complex *pcor = NULL;
-    if (lpoly == NULL) {
-        lpoly = malloc(T * sizeof(hr_complex));
+        hr_complex *lpoly = NULL;
+        hr_complex *gpoly = NULL;
+        hr_complex *pcor = NULL;
+        if (lpoly == NULL) {
+            lpoly = malloc(T * sizeof(hr_complex));
 #ifdef WITH_MPI
-        gpoly = malloc(GLB_T * sizeof(hr_complex));
+            gpoly = malloc(GLB_T * sizeof(hr_complex));
 #else
-        gpoly = lpoly;
+            gpoly = lpoly;
 #endif
-        pcor = malloc(GLB_T * sizeof(hr_complex));
-    }
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        pcor[n1] = 0.;
-    }
+            pcor = malloc(GLB_T * sizeof(hr_complex));
+        }
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            pcor[n1] = 0.;
+        }
 
-    for (n1 = 0; n1 < Y; n1++) {
-        for (n2 = 0; n2 < Z; n2++) {
-            for (n3 = 0; n3 < T; n3++) {
-                lpoly[n3] = polyf[0][(n1 + Y * (n2 + Z * n3))];
-            }
+        for (n1 = 0; n1 < Y; n1++) {
+            for (n2 = 0; n2 < Z; n2++) {
+                for (n3 = 0; n3 < T; n3++) {
+                    lpoly[n3] = polyf[0][(n1 + Y * (n2 + Z * n3))];
+                }
 #ifdef WITH_MPI
-            MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
+                MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
 #endif
-            for (i = 0; i < lcor->n_entries; i++) {
-                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] +=
-                    conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (3.0 * lcor->list[i].n_pairs * Y * Z);
+                for (i = 0; i < lcor->n_entries; i++) {
+                    pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] +=
+                        conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (3.0 * lcor->list[i].n_pairs * Y * Z);
+                }
             }
         }
-    }
-    for (n1 = 0; n1 < X; n1++) {
-        for (n2 = 0; n2 < Z; n2++) {
-            for (n3 = 0; n3 < T; n3++) {
-                lpoly[n3] = polyf[1][(n1 + X * (n2 + Z * n3))];
-            }
+        for (n1 = 0; n1 < X; n1++) {
+            for (n2 = 0; n2 < Z; n2++) {
+                for (n3 = 0; n3 < T; n3++) {
+                    lpoly[n3] = polyf[1][(n1 + X * (n2 + Z * n3))];
+                }
 #ifdef WITH_MPI
-            MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
+                MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
 #endif
 
-            for (i = 0; i < lcor->n_entries; i++) {
-                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] +=
-                    conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (3.0 * lcor->list[i].n_pairs * X * Z);
+                for (i = 0; i < lcor->n_entries; i++) {
+                    pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] +=
+                        conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (3.0 * lcor->list[i].n_pairs * X * Z);
+                }
             }
         }
-    }
-    for (n1 = 0; n1 < X; n1++) {
-        for (n2 = 0; n2 < Y; n2++) {
-            for (n3 = 0; n3 < T; n3++) {
-                lpoly[n3] = polyf[2][(n1 + X * (n2 + Y * n3))];
-            }
+        for (n1 = 0; n1 < X; n1++) {
+            for (n2 = 0; n2 < Y; n2++) {
+                for (n3 = 0; n3 < T; n3++) {
+                    lpoly[n3] = polyf[2][(n1 + X * (n2 + Y * n3))];
+                }
 #ifdef WITH_MPI
-            MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
+                MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
 #endif
-            for (i = 0; i < lcor->n_entries; i++) {
-                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] +=
-                    conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (3.0 * lcor->list[i].n_pairs * X * Y);
+                for (i = 0; i < lcor->n_entries; i++) {
+                    pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] +=
+                        conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (3.0 * lcor->list[i].n_pairs * X * Y);
+                }
             }
         }
-    }
-    for (n1 = 0; n1 < GLB_T; n1++) {
-        lprintf("Measure ML", 0, " Polyakov Cor dt=%d ( %.10e %.10e )\n", n1, creal(pcor[n1]), cimag(pcor[n1]));
+        for (n1 = 0; n1 < GLB_T; n1++) {
+            lprintf("Measure ML", 0, " Polyakov Cor dt=%d ( %.10e %.10e )\n", n1, creal(pcor[n1]), cimag(pcor[n1]));
+        }
     }
 }
 void report_tor_group_setup() {

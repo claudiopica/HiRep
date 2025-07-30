@@ -122,6 +122,7 @@ my @libs = ("libhrobservables.a", "libhr.a", "libhrobservables.a"); #order is im
     "suN_multilevel" => [ "suN_multilevel.c", "suN_utils_multilevel.c", ],
     "suN_multilevel_measure" => [ "suN_multilevel_measure.c", "suN_utils_multilevel.c", ],
     "suN_multilevel_measure_tune" => [ "suN_multilevel_measure_tune.c", "suN_utils_multilevel.c", ],
+    "mk_glueballs" => [ "mk_glueballs.c", "suN_utils.c", ],
   );
 
   add_exes($topdir, \%exes, \@libs);

@@ -9,6 +9,8 @@
 
 extern char *strtok_r(char *, const char *, char **);
 
+static input_pg_glueballs pg_var_glueballs = init_input_pg_glueballs(pg_var_glueballs);
+
 static input_pg pg_var = init_input_pg(pg_var);
 
 static input_WF WF_var = init_input_WF(WF_var);
@@ -201,6 +203,73 @@ int save_conf(pg_flow *gf, int id) {
 #else
     write_gauge_field(add_dirname(gf->conf_dir, buf));
 #endif
+
+    return 0;
+}
+
+int init_mk_glueballs(pg_flow_glueballs_measure *gf, char *ifile) {
+    gf->pg_v = &pg_var_glueballs;
+    gf->wf = &WF_var;
+    gf->poly = &poly_var;
+
+    read_input(pg_var_glueballs.read, ifile);
+
+    lprintf("INIT MK Glueballs", 0, "The input reader of MG correlators is ignored and will be implemented in a future");
+
+    pg_var_glueballs.corrs.n_entries = GLB_T;
+    pg_var_glueballs.corrs.n_corrs = GLB_T;
+    pg_var_glueballs.corrs.list = malloc(sizeof(cor_points) * GLB_T);
+    for (int i = 0; i < GLB_T; i++) {
+        pg_var_glueballs.corrs.list[i].id = i;
+        pg_var_glueballs.corrs.list[i].n_pairs = 1;
+        pg_var_glueballs.corrs.list[i].t1 = i;
+        pg_var_glueballs.corrs.list[i].t1 = (i + 1) % GLB_T;
+    }
+    initialize_spatial_active_slices(NULL);
+
+    lprintf("INIT MK Glueballs", 0, "Blocking iteration on the observables (start/end)=(%d/%d)\n", pg_var_glueballs.nblkstart,
+            pg_var_glueballs.nblkend);
+
+    lprintf("INIT MK Glueballs", 0, "Ape smearing par=%lf\n", pg_var_glueballs.APEsmear);
+
+    read_input(gf->read, ifile);
+
+    /* glueballs 1pt group structure */
+    report_gb_group_setup();
+
+    /* Torellons 1pt group structure */
+    report_tor_group_setup();
+
+    BCs_pars_t BCs_pars = { .fermion_twisting_theta = { 0., 0., 0., 0. },
+                            .gauge_boundary_improvement_cs = 1.,
+                            .gauge_boundary_improvement_ct = 1.,
+                            .chiSF_boundary_improvement_ds = 1.,
+                            .SF_BCs = 0 };
+    init_BCs(&BCs_pars);
+
+#ifdef PURE_GAUGE_ANISOTROPY
+    init_pure_gauge_anisotropy(&(pg_var_ml.anisotropy));
+#endif
+
+    WF_var.anisotropy = 1.0;
+
+    read_input(WF_var.read, ifile);
+
+    WF_initialize();
+
+    lprintf("INIT WF", 0, "WF make=%s\n", WF_var.make);
+    lprintf("INIT WF", 0, "WF max integration time=%lf\n", WF_var.tmax);
+    lprintf("INIT WF", 0, "WF number of measures=%d\n", WF_var.nmeas);
+    lprintf("INIT WF", 0, "WF initial epsilon=%lf\n", WF_var.eps);
+    lprintf("INIT WF", 0, "WF delta=%lf\n", WF_var.delta);
+    lprintf("INIT WF", 0, "WF anisotropy=%lf\n", WF_var.anisotropy);
+
+#ifdef PURE_GAUGE_ANISOTROPY
+    WF_set_bare_anisotropy(&(WF_var.anisotropy));
+#endif
+
+    read_input(poly_var.read, ifile);
+    lprintf("INIT WF", 0, "Polyakov make=%s\n", poly_var.make);
 
     return 0;
 }
