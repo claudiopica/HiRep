@@ -255,10 +255,6 @@ void finalize_process() {
 
     if (u_gauge_f_flt != NULL) { free_suNf_field_flt(u_gauge_f_flt); }
 
-    // #ifndef WITH_NEW_GEOMETRY
-    //   free_geometry_mpi_eo();
-    // #endif
-
 #ifdef WITH_GPU
     CHECK_CUDA(cudaSetDevice(LID));
     CHECK_CUDA(cudaStreamDestroy(non_default_stream));
@@ -266,7 +262,6 @@ void finalize_process() {
         CHECK_CUDA(cudaStreamDestroy(memory_streams[i]));
     }
 #endif
-
 #ifdef WITH_MPI
     finalize_hr_comms();
     /* MPI variables */
