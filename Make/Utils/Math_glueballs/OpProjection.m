@@ -550,7 +550,7 @@ PathUniqueIndex[ain_]:= PathUniqueIdentifier[ain][[2]];
 (*Interface function to create the c strings of the numerical values of the coefficientsand functions in GenerateCchecks*)
 << SymbolicC`;
 MyCForm[ain_] := Module[{res, res1},
-   res = ToCCodeString[CExpression[ain]];
+   res = StringReplace[ToCCodeString[CExpression[ain]], {"\n" -> " "}];
    res];
 
 (*
