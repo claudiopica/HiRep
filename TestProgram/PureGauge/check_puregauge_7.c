@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
         eval_all_torellon_ops(nt, dop + nt * total_n_tor_op, polyf);
     }
 
-    collect_1pt_torellon_functions(&corrs, dop, polyf);
+    collect_1pt_torellon_functions(&corrs, dop, polyf, 0);
 
     for (n = 0; n < T * total_n_tor_op; n++) {
         dop[n] /= NG * GLB_VOLUME;
@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
         eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op, polyf);
     }
 
-    collect_1pt_torellon_functions(&corrs, dop1, polyf);
+    collect_1pt_torellon_functions(&corrs, dop1, polyf, 0);
 
     for (n = 0; n < T * total_n_tor_op; n++) {
         dop1[n] /= NG * GLB_VOLUME;
