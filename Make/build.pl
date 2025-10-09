@@ -142,7 +142,7 @@ my @libs = ("libhrobservables.a", "libhr.a", "libhrobservables.a"); #order is im
     "measure_formfactor" => [ "measure_formfactor.c", ],
     "measure_spectrum" => [ "measure_spectrum.c", ],
     "mk_sfcorrelators" => [ "mk_sfcorrelators.c", ],
-    # "trunc_mesons" => [ "trunc_mesons.c", ],
+    "mk_obs" => [ "mk_obs.c", ],
     "mk_mesons" => [ "mk_mesons.c", ],
   );
 

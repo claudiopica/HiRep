@@ -1,0 +1,37 @@
+// Global variables
+GLB_T = 16
+GLB_X = 16
+GLB_Y = 16
+GLB_Z = 16
+NP_T = 2
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+N_REP = 1
+
+rlx_level = 1
+rlx_seed = 43215
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+//Polyakov
+polyakov:make = true
+
+//Eigenvalues
+eva:make = true
+eva:nevt = 5
+eva:nev = 1
+eva:kmax = 50
+eva:maxiter = 100
+eva:omega1 = 1.e-3
+eva:omega2 = 1.e-3
+eva:mass = 1.0
+
+
+// Run control variables
+configlist = listconfs.txt 
+
