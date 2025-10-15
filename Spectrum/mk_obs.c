@@ -30,8 +30,8 @@ typedef struct input_eigval {
     /* for the reading function */
     input_record_t read[9];
 #endif
-
 } input_eigval;
+
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 #define init_input_eigval(varname)                                                            \
     {                                                                                         \
@@ -65,16 +65,6 @@ typedef struct input_eigval {
     }
 #endif
 
-input_eigval eigval_var = init_input_eigval(eigval_var);
-
-static void H2eva(spinor_field *out, spinor_field *in) {
-    g5Dphi_sq(eigval_var.evamass, out, in);
-}
-
-#define init_flow_obs_measure(varname)                                                                                        \
-    {                                                                                                                         \
-        .read = { { "Configuration list", "configlist = %s", STRING_T, &(varname).configlist }, { NULL, NULL, INT_T, NULL } } \
-    }
 typedef struct input_poly {
     char make[256];
 
@@ -86,6 +76,9 @@ typedef struct input_poly {
     {                                                                                                            \
         .read = { { "make Polyakov", "polyakov:make = %s", STRING_T, (varname).make }, { NULL, NULL, 0, NULL } } \
     }
+
+static input_poly poly_var = init_input_poly(poly_var);
+static input_eigval eigval_var = init_input_eigval(eigval_var);
 
 typedef struct obs_measure {
     char configlist[256]; /* directory to store gconfs */
@@ -103,13 +96,14 @@ typedef struct obs_measure {
     {                                                                                                                         \
         .read = { { "Configuration list", "configlist = %s", STRING_T, &(varname).configlist }, { NULL, NULL, INT_T, NULL } } \
     }
-
-static input_poly poly_var = init_input_poly(poly_var);
-static input_eigval ev_var = init_input_eigval(ev_var);
 static flow_obs_measure var_obs = init_flow_obs_measure(var_obs);
 
+static void H2eva(spinor_field *out, spinor_field *in) {
+    g5Dphi_sq(eigval_var.evamass, out, in);
+}
+
 int init_mk_obs(flow_obs_measure *gf, char *ifile) {
-    gf->evs = &ev_var;
+    gf->evs = &eigval_var;
     gf->poly = &poly_var;
     read_input(var_obs.read, ifile);
 
@@ -128,7 +122,7 @@ int init_mk_obs(flow_obs_measure *gf, char *ifile) {
     read_input(eigval_var.read, ifile);
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-    set_csw(&ev_var.evacsw);
+    set_csw(&eigval_var.evacsw);
 #endif
 
     return 0;
