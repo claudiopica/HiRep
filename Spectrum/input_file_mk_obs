@@ -30,7 +30,7 @@ eva:maxiter = 100
 eva:omega1 = 1.e-3
 eva:omega2 = 1.e-3
 eva:mass = 1.0
-
+eva:csw = 1.0
 
 // Run control variables
 configlist = listconfs.txt 

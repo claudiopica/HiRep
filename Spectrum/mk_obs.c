@@ -22,12 +22,33 @@ typedef struct input_eigval {
     double omega1; /* absolute precision */
     double omega2; /* relative precision */
     double evamass; /* mass to use in Dirac operator */
-
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    double csw;
+    /* for the reading function */
+    input_record_t read[10];
+#else
     /* for the reading function */
     input_record_t read[9];
+#endif
 
 } input_eigval;
-
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+#define init_input_eigval(varname)                                                            \
+    {                                                                                         \
+        .read = {                                                                             \
+            { "make lowest eigenvalues", "eva:make = %s", STRING_T, (varname).make },         \
+            { "search space dimension", "eva:nevt = %d", INT_T, &(varname).nevt },            \
+            { "number of accurate eigenvalues", "eva:nev = %d", INT_T, &(varname).nev },      \
+            { "max degree of polynomial", "eva:kmax = %d", INT_T, &(varname).kmax },          \
+            { "max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter }, \
+            { "absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1 },        \
+            { "relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2 },        \
+            { "Dirac op mass", "eva:mass = %lf", DOUBLE_T, &(varname).evamass },              \
+            { "Csw value", "eva:csw = %lf", DOUBLE_T, &(varname).evamass },                   \
+            { NULL, NULL, INT_T, NULL }                                                       \
+        }                                                                                     \
+    }
+#else
 #define init_input_eigval(varname)                                                            \
     {                                                                                         \
         .read = {                                                                             \
@@ -42,6 +63,7 @@ typedef struct input_eigval {
             { NULL, NULL, INT_T, NULL }                                                       \
         }                                                                                     \
     }
+#endif
 
 input_eigval eigval_var = init_input_eigval(eigval_var);
 
@@ -104,6 +126,10 @@ int init_mk_obs(flow_obs_measure *gf, char *ifile) {
     init_BCs(&BCs_pars);
 
     read_input(eigval_var.read, ifile);
+
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    set_csw(&ev_var.csw);
+#endif
 
     return 0;
 }
