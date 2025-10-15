@@ -23,7 +23,7 @@ typedef struct input_eigval {
     double omega2; /* relative precision */
     double evamass; /* mass to use in Dirac operator */
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-    double csw;
+    double evacsw;
     /* for the reading function */
     input_record_t read[10];
 #else
@@ -44,7 +44,7 @@ typedef struct input_eigval {
             { "absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1 },        \
             { "relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2 },        \
             { "Dirac op mass", "eva:mass = %lf", DOUBLE_T, &(varname).evamass },              \
-            { "Csw value", "eva:csw = %lf", DOUBLE_T, &(varname).evamass },                   \
+            { "Csw value", "eva:csw = %lf", DOUBLE_T, &(varname).evacsw },                    \
             { NULL, NULL, INT_T, NULL }                                                       \
         }                                                                                     \
     }
@@ -128,7 +128,7 @@ int init_mk_obs(flow_obs_measure *gf, char *ifile) {
     read_input(eigval_var.read, ifile);
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-    set_csw(&ev_var.csw);
+    set_csw(&ev_var.evacsw);
 #endif
 
     return 0;
