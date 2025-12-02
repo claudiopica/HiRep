@@ -1,0 +1,17 @@
+#ifndef GAUSS_SMEARING
+#define GAUSS_SMEARING
+
+#include "spinor_field.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* HYP smearing */
+void gaussian_smearing(spinor_field *restrict out, spinor_field *restrict in, double alpha);
+
+
+#ifdef __cplusplus
+}
+#endif
+#endif
