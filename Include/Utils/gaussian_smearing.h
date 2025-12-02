@@ -7,7 +7,6 @@
 extern "C" {
 #endif
 
-/* HYP smearing */
 void gaussian_smearing(spinor_field *restrict out, spinor_field *restrict in, double alpha);
 
 
