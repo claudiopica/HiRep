@@ -440,6 +440,245 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
             etime.tv_sec, etime.tv_usec);
 }
 
+
+void measure_loops_smeared(double *m, int nhits, int conf_num, double precision, int source_type, int n_mom, int n_smr,
+                           double alpha, storage_switch swc, data_storage_array **ret) {
+    int k, l;
+    int n_spinor;
+    int eo, tau, col;
+    struct timeval start, end, etime;
+
+    if (source_type == 0) { lprintf("CORR", 0, "Pure volume source  will be used  \n"); }
+    if (source_type == 1) { lprintf("CORR", 0, "Gauge fixed source  with time and spin dilution will be used \n"); }
+    if (source_type == 2) { lprintf("CORR", 0, "Time and spin dilution  will be used \n"); }
+    if (source_type == 3) { lprintf("CORR", 0, "Time, spin and color dilution  will be used \n"); }
+    if (source_type == 4) { lprintf("CORR", 0, "Time, spin , color and eo dilution  will be used \n"); }
+    if (source_type == 5) { lprintf("CORR", 0, "Spin , color and eo dilution  will be used \n"); }
+    if (source_type == 6) { lprintf("CORR", 0, "Time and spin dilution with Gaussian smearing will be used \n\n"); }
+
+    gettimeofday(&start, 0);
+    init_propagator_eo(1, m, precision);
+
+    spinor_field *source;
+    spinor_field *source1;
+    spinor_field *prop;
+    // spinor_field *prop1;
+    suNg_field *u_gauge_old = NULL;
+
+    if (source_type == 0) {
+        source = alloc_spinor_field(1, &glattice);
+        prop = alloc_spinor_field(1, &glattice);
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(prop);
+#endif
+        zero_spinor_field(prop);
+    } else {
+        source = alloc_spinor_field(4, &glattice);
+        prop = alloc_spinor_field(4, &glattice);
+        for (int i = 0; i < 4; i++) {
+#ifdef WITH_GPU
+            zero_spinor_field_cpu(prop + i);
+#endif
+            zero_spinor_field(prop + i);
+        }
+
+        if (source_type == 6) {
+            source1 = alloc_spinor_field(4, &glattice);
+            // prop1 = alloc_spinor_field(4, &glattice);
+        }
+    }
+
+    if (swc == STORE && *ret == NULL) {
+        if (source_type == 0) {
+            int idx[5] = { nhits, pow(n_mom, 3), 16, GLB_T, 2 };
+            *ret = allocate_data_storage_array(1);
+            allocate_data_storage_element(*ret, 0, 5, idx); // ( 1 ) * (nhits*nmom^3*ngamma*GLB_T * 2 reals )
+        } else if (source_type == 2) {
+            int idx[4] = { nhits, 16, GLB_T, 2 };
+            *ret = allocate_data_storage_array(1);
+            allocate_data_storage_element(*ret, 0, 4, idx); // ( 1 ) * (nhits*ngamma*GLB_T * 2 reals )
+        } else if (source_type == 1 || source_type == 3) {
+            int idx[5] = { nhits, NF, 16, GLB_T, 2 };
+            *ret = allocate_data_storage_array(1);
+            allocate_data_storage_element(*ret, 0, 5, idx); // ( 1 ) * (nhits*NF*ngamma*GLB_T * 2 reals )
+        } else if (source_type == 4) {
+            int idx[6] = { nhits, 2, NF, 16, GLB_T, 2 };
+            *ret = allocate_data_storage_array(1);
+            allocate_data_storage_element(*ret, 0, 6, idx); // ( 1 ) * (nhits*2(eo)*NF*ngamma*GLB_T * 2 reals )
+        } else if (source_type == 5) {
+            int idx[6] = { nhits, 2, NF, 16, GLB_T, 2 };
+            *ret = allocate_data_storage_array(1);
+            allocate_data_storage_element(*ret, 0, 6, idx); // ( 1 ) * (nhits*2(eo)*NF*ngamma*GLB_T * 2 reals )
+        } else if (source_type == 6) {
+            int idx[4] = { nhits, 16, GLB_T, 2 };
+            *ret = allocate_data_storage_array(1);
+            allocate_data_storage_element(*ret, 0, 4, idx); // ( 1 ) * (nhits*ngamma*GLB_T * 2 reals )
+        } else {
+            error(1, 1, "measure_loops [loop_tools.c]", "Source_type not implemented");
+        }
+    }
+    if (source_type == 1) {
+        u_gauge_old = alloc_suNg_field(&glattice);
+        copy_suNg_field(u_gauge_old, u_gauge);
+#ifdef WITH_GPU
+        zero_spinor_field_cpu(prop);
+#endif
+        zero_spinor_field(prop);
+        //Fix the Gauge
+        double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
+                              1.8, //overrelax
+                              10000, //maxit
+                              1e-12, //tolerance
+                              u_gauge //gauge
+        );
+        lprintf("GFWALL", 0, "Gauge fixed action  %1.6f\n", act);
+        double p2 = calc_plaq(u_gauge);
+        lprintf("TEST", 0, "fixed_gauge plaq %1.6f\n", p2);
+        full_plaquette();
+        represent_gauge_field();
+    }
+
+    for (k = 0; k < nhits; k++) {
+        lprintf("MAIN", 0, "k = %d/%d source_type=%d\n", k + 1, nhits, source_type);
+        if (source_type == 0) /* generation of a volume source with Z2xZ2 noise */
+        {
+            create_z2_volume_source(source);
+            calc_propagator(prop, source, 1); // No dilution
+#ifdef WITH_GPU
+            copy_from_gpu(prop);
+#endif
+            lprintf("CORR", 0, "Start to perform the contractions ... \n");
+            measure_bilinear_loops_spinorfield(prop, source, k, n_mom, swc, ret);
+            lprintf("CORR", 0, "Contraction done\n");
+        }
+
+        if (source_type == 1) // experimental Gauge Fixed Wall sources
+        {
+            //error(1, 1, "measure_loops [loop_tools.c]", "Source_type ==1 (gauge fixed wall sources) is broken and untested.");
+
+            for (tau = 0; tau < GLB_T; tau++) {
+                for (l = 0; l < NF; l++) {
+                    create_gauge_fixed_wall_source(source, tau, l);
+                    calc_propagator(prop, source, 4); //4 for spin dilution
+                    create_point_source(source, tau, l); //to get the contraction right
+                    //measure_mesons(discon_correlators, prop, source, 1, 0);
+#ifdef WITH_GPU
+                    for (int beta = 0; beta < 4; beta++) {
+                        copy_from_gpu(prop + beta);
+                    }
+#endif
+                    measure_bilinear_loops_4spinorfield(prop, source, k, tau, l, -1, swc, ret);
+                }
+            }
+
+            //This gets the norm of the 2pt wrong by a factor GLB_VOL3 but the norm of the disconnected right
+            //print_mesons(discon_correlators, 1.0, conf_num, 1, m, GLB_T, 1, "DISCON_GFWALL");
+
+        } /* gfwall */
+
+        if (source_type == 2) {
+            for (tau = 0; tau < GLB_T; ++tau) {
+                create_diluted_source_equal_atau(source, tau);
+                calc_propagator(prop, source, 4); //4 for spin dilution
+#ifdef WITH_GPU
+                for (int beta = 0; beta < 4; beta++) {
+                    copy_from_gpu(prop + beta);
+                }
+#endif
+                measure_bilinear_loops_4spinorfield(prop, source, k, tau, -1, -1, swc, ret);
+            }
+
+        } /* time + spin dilution  */
+
+        if (source_type == 3) {
+            for (tau = 0; tau < GLB_T; ++tau) {
+                for (col = 0; col < NF; ++col) {
+                    create_diluted_source_equal_atau_col(source, tau, col);
+                    calc_propagator(prop, source, 4); //4 for spin dilution
+#ifdef WITH_GPU
+                    for (int beta = 0; beta < 4; beta++) {
+                        copy_from_gpu(prop + beta);
+                    }
+#endif
+                    measure_bilinear_loops_4spinorfield(prop, source, k, tau, col, -1, swc, ret);
+                }
+            }
+        } /* time  + spin + color dilution  */
+
+        if (source_type == 4) {
+            n_spinor = 4;
+            for (tau = 0; tau < GLB_T; ++tau) {
+                for (col = 0; col < NF; ++col) {
+                    for (eo = 0; eo < 2; ++eo) {
+                        create_diluted_source_equal_atau_col(source, tau, col);
+                        zero_even_or_odd_site_spinorfield(source, n_spinor, eo);
+                        calc_propagator(prop, source, 4); //4 for spin dilution
+#ifdef WITH_GPU
+                        for (int beta = 0; beta < 4; beta++) {
+                            copy_from_gpu(prop + beta);
+                        }
+#endif
+                        measure_bilinear_loops_4spinorfield(prop, source, k, tau, col, eo, swc, ret);
+                    }
+                }
+            }
+        } /* time + spin + color +eo  dilution  */
+
+        if (source_type == 5) {
+            n_spinor = 4;
+            for (col = 0; col < NF; ++col) {
+                for (eo = 0; eo < 2; ++eo) {
+                    create_noise_source_equal_col_dil(source, col);
+                    zero_even_or_odd_site_spinorfield(source, n_spinor, eo); //set even or odd site to zero
+                    calc_propagator(prop, source, 4); //4 for spin dilution
+#ifdef WITH_GPU
+                    for (int beta = 0; beta < 4; beta++) {
+                        copy_from_gpu(prop + beta);
+                    }
+#endif
+                    measure_bilinear_loops_4spinorfield(prop, source, k, -1, col, eo, swc, ret);
+                }
+            }
+        } /* volume source + spin + color + eo  dilution  */
+
+        if (source_type == 6) {
+            for (tau = 0; tau < GLB_T; ++tau) {
+                create_diluted_source_equal_atau(source, tau);
+
+                for (int ismr = 0; ismr < n_smr; ismr++) {
+                    for (int beta = 0; beta < 4; beta++) {
+                        gaussian_smearing(&source1[beta], &source[beta], alpha);
+                        gaussian_smearing(&source[beta], &source1[beta], alpha);
+                    }
+                }
+                calc_propagator(prop, source, 4); //4 for spin dilution
+#ifdef WITH_GPU
+                for (int beta = 0; beta < 4; beta++) {
+                    copy_from_gpu(prop + beta);
+                }
+#endif
+                measure_bilinear_loops_4spinorfield(prop, source, k, tau, -1, -1, swc, ret);
+            }
+
+        } /* time + spin dilution + gaussian smearing */
+    }
+    if (u_gauge_old != NULL) {
+        copy_suNg_field(u_gauge, u_gauge_old);
+        represent_gauge_field();
+        free_suNg_field(u_gauge_old);
+    }
+    free_spinor_field(source);
+    free_spinor_field(prop);
+    free_propagator_eo();
+    gettimeofday(&end, 0);
+    timeval_subtract(&etime, &end, &start);
+    lprintf("TIMING", 0, "Sources generation, invert and contract for %i sources done [%ld sec %ld usec]\n", nhits,
+            etime.tv_sec, etime.tv_usec);
+}
+
+
+
+
 void measure_bilinear_loops_spinorfield(spinor_field *prop, spinor_field *source, int src_id, int n_mom, storage_switch swc,
                                         data_storage_array **ret) {
     int px, py, pz, ip;

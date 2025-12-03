@@ -266,6 +266,7 @@ my @libs = ("libhrobservables.a", "libhr.a", "libhrobservables.a"); #order is im
   my $topdir = "Disconnected";
   my %exes = (
     "compute_loops" => [ "compute_loops.c", ],
+    "compute_loops_smeared" => [ "compute_loops_smeared.c", ],
   );
 
   add_exes($topdir, \%exes, \@libs);
