@@ -140,16 +140,15 @@ int main(int argc, char *argv[]) {
 
         lprintf("MAIN", 0, "Configuration from %s\n", cnfg_filename);
 
-        // read_gauge_field(cnfg_filename);
-        unit_u(u_gauge);
+        read_gauge_field(cnfg_filename);
+        copy_suNg_field(HYP,u_gauge);
 
         represent_gauge_field();
 
         lprintf("TEST", 0, "<p> %1.6f\n", avr_plaquette());
         full_plaquette();
 
-        HYP_smearing(HYP, u_gauge, HYP_var.weight);
-        u_gauge = HYP;
+        HYP_smearing(u_gauge, HYP, HYP_var.weight);
 
         lprintf("TEST", 0, "<p> %1.6f\n", avr_plaquette());
         full_plaquette();
