@@ -236,6 +236,13 @@ void measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *sourc
         lprintf("TIMING", 0, "Contractions for source %d done and all timeslices [%ld sec %ld usec]\n", src_id, etime.tv_sec,
                 etime.tv_usec);
     }
+
+    for (int i = 0; i < NGamma; i++) {
+        free(corr_re[i]);
+        free(corr_im[i]);
+        free(corr[i]);
+    }
+    free(corr);
 }
 
 void measure_loops(double *m, int nhits, int conf_num, double precision, int source_type, int n_mom, storage_switch swc,
@@ -310,7 +317,7 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
 #endif
         zero_spinor_field(prop);
         //Fix the Gauge
-        double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
+        double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb gauge else Landau
                               1.8, //overrelax
                               10000, //maxit
                               1e-12, //tolerance
