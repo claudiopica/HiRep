@@ -2,8 +2,6 @@
 #include "update.h"
 #include "./staples_gpu.hpp"
 
-// TODO: In case of MEASURE_FORCE0 -> have a reduction operation
-// but this also works best after the linear algebra update.
 __global__ void _force0_gpu(suNg *gauge, suNg_algebra_vector *force, double coeff, int *iup_gpu, int *idn_gpu,
                             double *plaq_weight, int N, int block_start) {
     for (int id = blockIdx.x * blockDim.x + threadIdx.x; id < N * 4; id += gridDim.x * blockDim.x) {

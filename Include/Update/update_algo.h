@@ -49,14 +49,6 @@ void init_ghmc(ghmc_par *par);
 void free_ghmc();
 int update_ghmc();
 int reverse_update_ghmc();
-#ifdef MEASURE_FORCEHMC
-//TODO: these two are only used in
-// in HMC/hmc_forces.c
-// move to local header and move the implementation there
-void corret_pf_dist_hmc();
-void calc_one_force(int n_force);
-#endif
-
 #ifdef __cplusplus
 }
 #endif

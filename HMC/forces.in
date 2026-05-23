@@ -3,16 +3,16 @@ GLB_T = 8
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
-NP_T = 1
-NP_X = 1
-NP_Y = 1
-NP_Z = 1
+NP_T = 2
+NP_X = 2
+NP_Y = 2
+NP_Z = 2
 
 N_REP = 1
 
 rlx_level = 1  
 rlx_seed = 60718  
-//rlx_start = continue 
+rlx_start = new 
 rlx_state = rlx_state
 rlx_store = 1 // Store random number state alongside each configuration for reproducibility (default 0=no, 1=yes)
 
@@ -20,6 +20,8 @@ rlx_store = 1 // Store random number state alongside each configuration for repr
 log:default = -1
 log:inverter = -1
 log:forcestat = -1
+
+forces:configlist = list_confs.txt
 
 // HMC variables
 tlen = 1.0
@@ -51,30 +53,7 @@ save freq = 1
 meas freq = 1
 conf dir = cnfg
 gauge start = random 
-last conf = +1
-
-//Mesons
-mes:make = false
-mes:precision = 1.e-24
-mes:nhits = 3
-mes:mass = -0.60
-mes:csw = 1.0
-
-//Polyakov
-poly:make = false
-
-//Measure monomial forces for tuning
-forces:measure = false
-
-//Eigenvalues
-eva:make = false
-eva:nevt = 5
-eva:nev = 1
-eva:kmax = 50
-eva:maxiter = 100
-eva:omega1 = 1.e-3
-eva:omega2 = 1.e-3
-eva:mass = 1.0
+last conf = +5
 
 // Monomials
 monomial {

@@ -222,8 +222,6 @@ $timing && print $fh "MACRO += TIMING\n";
 $btiming && print $fh "MACRO += TIMING_WITH_BARRIERS\n";
 # write memory
 $mem && print $fh "MACRO += AMALLOC_MEASURE\n";
-# write force
-$force && print $fh "MACRO += MEASURE_FORCE\n";
 # write avx2
 $avx2 && print $fh "MACRO += AVX2_HIREP\n";
 # write vect
