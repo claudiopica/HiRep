@@ -85,7 +85,7 @@ static suNg_av_field *force_sum = NULL;
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 
-__device__ static void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu) {
+__device__ static __forceinline__ void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu) {
     if (mu == 0 && nu == 1) {
         for (int i = 0; i < NF; i++) {
             s->c[0].c[i] = -I * u->c[1].c[i];
@@ -173,7 +173,8 @@ __device__ static void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu) 
     }
 }
 
-__device__ static suNf fmat_create(suNf_spinor *a_lhs, suNf_spinor *a_rhs, suNf_spinor *b_lhs, suNf_spinor *b_rhs) {
+__device__ static __forceinline__ suNf fmat_create(suNf_spinor *a_lhs, suNf_spinor *a_rhs, suNf_spinor *b_lhs,
+                                                   suNf_spinor *b_rhs) {
     suNf fmat;
     _suNf_zero(fmat);
     for (int i = 0; i < NF; i++) {
@@ -425,7 +426,7 @@ __global__ static void _force_clover_fermion(suNf *cl_force, suNf_spinor *Xs, su
 
 #ifdef WITH_EXPCLOVER
 
-visible static void A_times_spinor(suNf_spinor *out, suNfc *Aplus, suNfc *Aminus, suNf_spinor *in) {
+visible static __forceinline__ void A_times_spinor(suNf_spinor *out, suNfc *Aplus, suNfc *Aminus, suNf_spinor *in) {
     suNf_vector aux;
 
     // Comp 0 1
