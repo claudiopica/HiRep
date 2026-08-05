@@ -73,15 +73,17 @@ typedef struct input_renormalization {
     int px_in;
     int py_in;
     int pz_in;
+    double csw;
 
     /* for the reading function */
-    input_record_t read[15];
+    input_record_t read[16];
 } input_renormalization;
 
 #define init_input_renormalization(varname)                                                         \
     {                                                                                               \
         .read = {                                                                                   \
             { "quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring },            \
+            { "csw coefficient", "mes:csw = %lf", DOUBLE_T, &(varname).csw },                       \
             { "Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist },      \
             { "inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision },        \
             { "non-excepional configuration or not?", "mes:ne = %d", INT_T, &(varname).ne },        \
@@ -189,6 +191,10 @@ int main(int argc, char *argv[]) {
     read_input(mes_var.read, get_input_filename());
     strcpy(list_filename, mes_var.configlist);
 
+    #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    set_csw(&mes_var.csw);
+    #endif
+
     lprintf("MAIN", 0, "PId =  %d [world_size: %d]\n\n", PID, WORLD_SIZE);
     lprintf("MAIN", 0, "input file [%s]\n", input_filename);
     lprintf("MAIN", 0, "output file [%s]\n", output_filename);
@@ -208,7 +214,7 @@ int main(int argc, char *argv[]) {
     nm = 1;
 
     lprintf("MAIN", 0, "Inverter precision = %e\n", mes_var.precision);
-    m[0] = -atof(mes_var.mstring);
+    m[0] = atof(mes_var.mstring);
     for (k = 0; k < nm; k++) {
         lprintf("MAIN", 0, "Mass[%d] = %f\n", k, m[k]);
     }
@@ -342,7 +348,7 @@ int main(int argc, char *argv[]) {
                 lprintf("LOOK", 10, "%g%g%g%g %g%g%g%g twist %g", p_in[0], p_in[1], p_in[2], p_in[3], p_out[0], p_out[1],
                         p_out[2], p_out[3], twist);
                 measure_renormalization(prop_in, prop_out, nm, p_in[0], p_in[1], p_in[2], p_in[3], p_out[0], p_out[1], p_out[2],
-                                        p_out[3]);
+                                        p_out[3],DONTSTORE, NULL);
                 char label[256];
                 sprintf(label, "NPR mom_idx %d twist %d ", num, tw);
                 print_renormalization(i, nm, m, label, p_in[0], p_in[1], p_in[2], p_in[3], p_out[0], p_out[1], p_out[2],

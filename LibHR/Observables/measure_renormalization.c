@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "utils.h"
 #include "inverters.h"
+#include <string.h>
 
 enum {
     _Sin = 0,
@@ -40,6 +41,17 @@ int tr_measure_channels[NCHANNELSR] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 static suNf_propagator *tr_corr[NCHANNELSR];
 
 static int init = 0;
+
+/* Only public way to get a channel's index from outside this file -- the
+ * enum above stays private, matching this header's existing convention of
+ * declaring only function signatures. */
+int renorm_channel_index(const char *name) {
+    int i;
+    for (i = 0; i < NCHANNELSR; i++) {
+        if (strcmp(tr_channel_names[i], name) == 0) return i;
+    }
+    return -1;
+}
 
 static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi_out, int nm, int pt_in, int px_in, int py_in,
                                          int pz_in, int pt_out, int px_out, int py_out, int pz_out) {
@@ -342,10 +354,42 @@ static void init_tr_corrs(int nm) {
 }
 
 void measure_renormalization(spinor_field *psi_in, spinor_field *psi_out, int nm, int pt_in, int px_in, int py_in, int pz_in,
-                             int pt_out, int px_out, int py_out, int pz_out) {
+                             int pt_out, int px_out, int py_out, int pz_out, storage_switch swc, data_storage_array **ret) {
     init_tr_corrs(nm);
     lprintf("measure_renormalization", 50, "measure default renormalization");
     measure_renormalization_core(psi_in, psi_out, nm, pt_in, px_in, py_in, pz_in, pt_out, px_out, py_out, pz_out);
+
+    /* Same STORE convention as measure_spectrum_pt (meson_measurements.c):
+     * global_sum + 1/GLB_VOLUME-normalise a LOCAL COPY of each tr_corr[k][i]
+     * into *ret -- doesn't mutate tr_corr itself, so print_renormalization's
+     * own separate normalisation pass on the shared static data (when
+     * called afterwards, as check_RIMOM.c does) is completely unaffected. */
+    if (swc == STORE) {
+        int PROP_N = 4 * NF;
+        int shape[5] = { NCHANNELSR, nm, PROP_N, PROP_N, 2 };
+        int k, i, r, c;
+        double loc[2];
+
+        *ret = allocate_data_storage_array(1);
+        allocate_data_storage_element(*ret, 0, 5, shape);
+
+        for (k = 0; k < NCHANNELSR; k++) {
+            for (i = 0; i < nm; i++) {
+                suNf_propagator tmp = tr_corr[k][i];
+                for (r = 0; r < PROP_N; r++) {
+                    for (c = 0; c < PROP_N; c++) {
+                        loc[0] = creal(_PROP_IDX(tmp, r, c));
+                        loc[1] = cimag(_PROP_IDX(tmp, r, c));
+                        global_sum(loc, 2);
+                        int idx[5] = { k, i, r, c, 0 };
+                        *data_storage_element(*ret, 0, idx) = loc[0] / (double)GLB_VOLUME;
+                        idx[4] = 1;
+                        *data_storage_element(*ret, 0, idx) = loc[1] / (double)GLB_VOLUME;
+                    }
+                }
+            }
+        }
+    }
 }
 
 static void print_renormalization_core(int channel, int conf, int nm, double *mass, char *label, int pt_in, int px_in,
@@ -361,7 +405,7 @@ static void print_renormalization_core(int channel, int conf, int nm, double *ma
                 for (b = 0; b < NF; b++) {
                     for (beta = 0; beta < 4; beta++) {
                         lprintf("MAIN", 0, " ( %1.12g , %1.12g ) ", creal(_PROP_AT(tr_corr[channel][i], a, alpha, beta, b)),
-                                creal(_PROP_AT(tr_corr[channel][i], a, alpha, beta, b)));
+                                cimag(_PROP_AT(tr_corr[channel][i], a, alpha, beta, b)));
                     }
                 }
             }
