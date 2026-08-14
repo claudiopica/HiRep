@@ -8,8 +8,7 @@ on:
     branches:
       - HiRep-CUDA
   workflow_dispatch:
-    branches:
-      - HiRep-CUDA
+
 
 # cancel previous workflow
 concurrency:
@@ -65,6 +64,7 @@ jobs:
           CUDA_INCLUDE: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2/include"
           MPI_INCLUDE: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest/include"
           GITHUB_WORKSPACE: /home/git_runner/actions-runner-hirep/_work/HiRep/HiRep/HiRep
+          HIREP_MPIRUN: /opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest/bin/mpirun
           UCX_MEMTYPE_CACHE: "n"
         run: export UCX_MEMTYPE_CACHE=n && export GITHUB_WORKSPACE=/home/git_runner/actions-runner-hirep/_work/HiRep/HiRep/HiRep && ./HiRep/TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters LinearAlgebra Memory" --gpu --newgeo --fixedstr --no-color --mpicc gcc --cflags "-Wall -O1" --include "-I${MPI_INCLUDE}  -I${CUDA_INCLUDE} -I${CUDA_MATH_LIBS}/targets/x86_64-linux/include/" --ldflags "-L${MPI_HOME}/lib -L${NVHPC_CUDA_HOME}/lib64 -L${CUDA_HPC}/compilers/lib -L${CUDA_HPC}/math_libs/lib64 -lmpi" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.omp }} ${{ matrix.ecsw }}
 
