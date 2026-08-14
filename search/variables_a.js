@@ -1,0 +1,6 @@
+var searchData=
+[
+  ['total_5fgauge_5fmaster_5fpieces_0',['total_gauge_master_pieces',['../df/da2/structgeometry__descriptor.html#a2c529340a17a2c7df1e116e8da1aaf56',1,'geometry_descriptor']]],
+  ['total_5fspinor_5fmaster_5fpieces_1',['total_spinor_master_pieces',['../df/da2/structgeometry__descriptor.html#ab14f8c2352f13eb0299aee4812ed4cf6',1,'geometry_descriptor']]],
+  ['type_2',['type',['../d2/d0e/structsuNg__field.html#a591a9ca6dc55326c92a0a47b84e8b74f',1,'suNg_field::type'],['../d6/d10/structsuNg__scalar__field.html#ac48e3eba00813f6f2c185e13b1810c93',1,'suNg_scalar_field::type'],['../d4/d1f/structsuNg__field__flt.html#af51ed6f159ae50e0995db488a5134798',1,'suNg_field_flt::type'],['../d9/d4a/structsuNf__field.html#a09e454ece6041f8941d46e31491e8109',1,'suNf_field::type'],['../d6/d54/structsuNf__field__flt.html#a19d59a34fc3649f6e3d4c14d94ec9862',1,'suNf_field_flt::type'],['../d0/da8/structspinor__field.html#ae90f88ae7a6cf8ded9dfd314a7bfffb9',1,'spinor_field::type'],['../d4/dce/structspinor__field__flt.html#a5eef09edd51d6aa88c652d7db6e06797',1,'spinor_field_flt::type'],['../db/dc8/structsuNg__av__field.html#a0e39b2c982329742e72f562dd859afc9',1,'suNg_av_field::type'],['../d8/daf/structscalar__field.html#a80d071f82a6defbcddd9a2f24cc69800',1,'scalar_field::type']]]
+];

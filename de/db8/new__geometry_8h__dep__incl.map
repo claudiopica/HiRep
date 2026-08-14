@@ -1,0 +1,11 @@
+<map id="new_geometry.h" name="new_geometry.h">
+<area shape="rect" id="Node000001" title="Functions needed for the new geometry implementation that will replace the current geometry in the fu..." alt="" coords="19,5,148,31"/>
+<area shape="rect" id="Node000002" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="36,152,131,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="50,40,28,57,11,80,8,90,9,100,21,119,40,136,61,150,58,154,37,140,17,123,4,102,3,90,6,77,24,54,46,36"/>
+<area shape="rect" id="Node000035" href="$d9/d46/geometry__init_8h.html" title="Initialization functions, that determine all important parameters of the geometry,..." alt="" coords="21,79,146,104"/>
+<area shape="poly" id="edge2_Node000001_Node000035" title=" " alt="" coords="86,44,86,79,81,79,81,44"/>
+<area shape="rect" id="Node000036" href="$d9/de8/gpu__geometry_8h_source.html" title=" " alt="" coords="171,79,297,104"/>
+<area shape="poly" id="edge4_Node000001_Node000036" title=" " alt="" coords="121,34,211,76,208,81,119,39"/>
+<area shape="poly" id="edge3_Node000035_Node000002" title=" " alt="" coords="86,118,86,152,81,152,81,118"/>
+<area shape="poly" id="edge5_Node000036_Node000002" title=" " alt="" coords="199,112,109,154,107,149,196,107"/>
+</map>
