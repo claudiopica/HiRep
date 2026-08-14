@@ -7,6 +7,9 @@ on:
   push:
     branches:
       - HiRep-CUDA
+  workflow_dispatch:
+    branches:
+      - HiRep-CUDA
 
 # cancel previous workflow
 concurrency:
