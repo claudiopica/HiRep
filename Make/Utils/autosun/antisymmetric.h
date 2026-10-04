@@ -2,7 +2,7 @@ namespace representation
 {
 int DIM;
 const int PHI_FLAVORS = 4;
-typedef complex TYPE;
+typedef complex_t TYPE;
 
 smatrix *iT;
 string name;
@@ -37,8 +37,8 @@ void representation::init() {
     for (A = 1; A < N; A++) {
         for (B = 0; B < A; B++) {
             e[C].size = N;
-            e[C].set(A, B, complex(sqrt(.5), 0.0));
-            e[C].set(B, A, complex(-sqrt(.5), 0.0));
+            e[C].set(A, B, complex_t(sqrt(.5), 0.0));
+            e[C].set(B, A, complex_t(-sqrt(.5), 0.0));
             C++;
         }
     }
@@ -49,9 +49,9 @@ void representation::init() {
             tmp.mult(e[A], group::T[C]);
             for (B = 0; B < DIM; B++) {
                 tmp1.mult(tmp, e[B]);
-                complex ctmp;
+                complex_t ctmp;
                 trace(ctmp, tmp1);
-                ctmp *= complex(0.0, -2.0);
+                ctmp *= complex_t(0.0, -2.0);
                 iT[C].set(A, B, ctmp);
             }
         }

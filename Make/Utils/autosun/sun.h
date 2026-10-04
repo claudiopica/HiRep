@@ -36,8 +36,8 @@ void group::init(int n) {
     for (a = 0; a < N; a++) {
         for (b = a + 1; b < N; b++) {
             T[A].size = N;
-            T[A].set(a, b, complex(.0, 1.));
-            T[A].set(b, a, complex(.0, -1.));
+            T[A].set(a, b, complex_t(.0, 1.));
+            T[A].set(b, a, complex_t(.0, -1.));
             A++;
         }
     }
@@ -51,20 +51,20 @@ void group::init(int n) {
         for (b = 0; b < N; b++) {
             if (a > b) {
                 T[A].size = N;
-                T[A].set(a, b, complex(1., .0));
-                T[A].set(b, a, complex(1., .0));
+                T[A].set(a, b, complex_t(1., .0));
+                T[A].set(b, a, complex_t(1., .0));
                 A++;
             } else if (a < b) {
                 T[A].size = N;
-                T[A].set(a, b, complex(.0, 1.));
-                T[A].set(b, a, complex(.0, -1.));
+                T[A].set(a, b, complex_t(.0, 1.));
+                T[A].set(b, a, complex_t(.0, -1.));
                 A++;
             } else if (a == b && a != 0) {
                 T[A].size = N;
                 for (int k = 0; k < a; k++) {
-                    T[A].set(k, k, complex(sqrt(2. / (a * (a + 1.))), .0));
+                    T[A].set(k, k, complex_t(sqrt(2. / (a * (a + 1.))), .0));
                 }
-                T[A].set(a, a, complex(-a * sqrt(2. / (a * (a + 1.))), .0));
+                T[A].set(a, a, complex_t(-a * sqrt(2. / (a * (a + 1.))), .0));
                 A++;
             }
         }
@@ -93,7 +93,7 @@ string infinitesimal_evolution(const char *vname, const char *hname, const char 
     pmatrix V(group::N);
     rvariable dt(dtname);
 
-    dt.scale(complex(0.0, 1.0));
+    dt.scale(complex_t(0.0, 1.0));
     H.scale(dt);
 
     for (int A = 0; A < group::DIM; A++) {
@@ -116,7 +116,7 @@ string ExpX(const char *dtname, const char *hname, const char *uname) {
     pmatrix M(group::N);
     rvariable dt(dtname);
 
-    dt.scale(complex(0.0, 1.0));
+    dt.scale(complex_t(0.0, 1.0));
     H.scale(dt);
 
     for (int A = 0; A < group::DIM; A++) {
@@ -176,7 +176,7 @@ string fundamental_algebra_represent(const char *mname, const char *hname) {
     string RET;
     rvector H(group::DIM, hname);
     pmatrix M(group::N);
-    pconstant I(complex(0.0, 1.0));
+    pconstant I(complex_t(0.0, 1.0));
 
     for (int A = 0; A < group::DIM; A++) {
         pmatrix iT(group::T[A]);
@@ -195,7 +195,7 @@ string fundamental_algebra_project(const char *hname, const char *mname) {
     pvector H(group::DIM);
     pmatrix *M;
     //	pmatrix adjM(group::N);
-    pconstant I(complex(0.0, 1.0));
+    pconstant I(complex_t(0.0, 1.0));
 
 #ifdef _GAUGE_SON_
     M = new rmatrix(group::N, mname);

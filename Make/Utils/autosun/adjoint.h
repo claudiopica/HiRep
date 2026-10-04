@@ -49,7 +49,7 @@ void representation::init() {
             tmp.add_mult(group::T[C], e[A]);
 
             for (B = 0; B < DIM; B++) {
-                complex ctmp;
+                complex_t ctmp;
                 tmp1.mult(tmp, e[B]);
                 trace(ctmp, tmp1);
                 ctmp.re = -ctmp.im;
@@ -115,15 +115,15 @@ string debug_group_represent(const char *vname, const char *uname) {
 		if(a > b)\n\
 		{\n\
 			setzero(e[A]);\n\
-			e[A](a,b) = COMPLEX(.5,0.);\n\
-			e[A](b,a) = COMPLEX(.5,0.);\n\
+			e[A](a,b) = complex_t(.5,0.);\n\
+			e[A](b,a) = complex_t(.5,0.);\n\
 			A++;\n\
 		}\n\
 		else if(a < b)\n\
 		{\n\
 			setzero(e[A]);\n\
-			e[A](a,b) = COMPLEX(0.,.5);\n\
-			e[A](b,a) = COMPLEX(0.,-.5);\n\
+			e[A](a,b) = complex_t(0.,.5);\n\
+			e[A](b,a) = complex_t(0.,-.5);\n\
 			A++;\n\
 		}\n\
 		else if(a == b && a != 0)\n\

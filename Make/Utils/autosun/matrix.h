@@ -1,33 +1,33 @@
-class smatrix : public sparsematrix<complex> {
+class smatrix : public sparsematrix<complex_t> {
 public:
     smatrix()
-        : sparsematrix<complex>() {
+        : sparsematrix<complex_t>() {
     }
     smatrix(int N)
-        : sparsematrix<complex>(N) {
+        : sparsematrix<complex_t>(N) {
     }
 
-    using sparsematrix<complex>::operator=;
+    using sparsematrix<complex_t>::operator=;
 
-    complex &getzero() const {
-        static complex zero(0.0, 0.0);
+    complex_t &getzero() const {
+        static complex_t zero(0.0, 0.0);
         return zero;
     }
 };
 
-class svector : public sparsevector<complex> {
+class svector : public sparsevector<complex_t> {
 public:
     svector()
-        : sparsevector<complex>() {
+        : sparsevector<complex_t>() {
     }
     svector(int N)
-        : sparsevector<complex>(N) {
+        : sparsevector<complex_t>(N) {
     }
 
-    using sparsevector<complex>::operator=;
+    using sparsevector<complex_t>::operator=;
 
-    complex &getzero() const {
-        static complex zero(0.0, 0.0);
+    complex_t &getzero() const {
+        static complex_t zero(0.0, 0.0);
         return zero;
     }
 };
