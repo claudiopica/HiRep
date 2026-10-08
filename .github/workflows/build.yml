@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       # Ensures that jobs are not cancelled is one job fails
@@ -43,11 +43,21 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install dependencies
-        uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev libomp-dev ninja-build
-          version: 1.0
-
+        run: |
+          install() {
+            sudo apt-get update &&
+            sudo apt-get install -y --fix-missing -o Acquire::Retries=5 \
+              openmpi-bin libopenmpi-dev libomp-dev ninja-build
+          }
+          if ! install; then
+            echo "Azure mirror failed, falling back to archive.ubuntu.com"
+            grep -rl 'mirror+file:/etc/apt/apt-mirrors.txt' /etc/apt \
+              | xargs -r sudo sed -i 's|mirror+file:/etc/apt/apt-mirrors.txt|http://archive.ubuntu.com/ubuntu/|'
+            sudo apt-get clean
+            install
+          fi
+          command -v mpicc.openmpi
+          
       - name: Configure HiRep
         run: ./Make/write_mkflags.pl -f Make/MkFlags.ini --cc ${{ matrix.compiler }} --env "OMPI_CC=${{ matrix.compiler }}" --mpicc mpicc.openmpi --cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.omp }} ${{ matrix.ecsw }}
       - name: Build
