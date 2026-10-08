@@ -2,7 +2,7 @@ namespace representation
 {
 int DIM;
 const int PHI_FLAVORS = 4;
-typedef complex TYPE;
+typedef complex_t TYPE;
 
 smatrix *iT;
 string name;
@@ -32,7 +32,7 @@ void representation::init() {
 
     for (A = 0; A < group::DIM; A++) {
         iT[A] = group::T[A];
-        iT[A].scale(complex(0.0, 1.0));
+        iT[A].scale(complex_t(0.0, 1.0));
     }
 
     iTnorm = group::Tnorm;

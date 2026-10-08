@@ -2,7 +2,7 @@ namespace representation
 {
 int DIM;
 const int PHI_FLAVORS = 4;
-typedef complex TYPE;
+typedef complex_t TYPE;
 
 smatrix *iT;
 string name;
@@ -37,12 +37,12 @@ void representation::init() {
     for (A = 0; A < N; A++) {
         for (B = 0; B < A; B++) {
             e[C].size = N;
-            e[C].set(A, B, complex(sqrt(.5), 0.));
-            e[C].set(B, A, complex(sqrt(.5), 0.));
+            e[C].set(A, B, complex_t(sqrt(.5), 0.));
+            e[C].set(B, A, complex_t(sqrt(.5), 0.));
             C++;
         }
         e[C].size = N;
-        e[C].set(A, A, complex(1., 0.));
+        e[C].set(A, A, complex_t(1., 0.));
         C++;
     }
 
@@ -51,10 +51,10 @@ void representation::init() {
         for (A = 0; A < DIM; A++) {
             tmp.mult(e[A], group::T[C]);
             for (B = 0; B < DIM; B++) {
-                complex ctmp;
+                complex_t ctmp;
                 tmp1.mult(tmp, e[B]);
                 trace(ctmp, tmp1);
-                ctmp *= complex(0., 2.);
+                ctmp *= complex_t(0., 2.);
                 iT[C].set(A, B, ctmp);
             }
         }
@@ -110,12 +110,12 @@ string debug_group_represent(const char *vname, const char *uname) {
 	for(int a = 0; a < NCOLORS; a++) {\n\
 		for(int b = 0; b < a; b++) {\n\
 			setzero(e[A]);\n\
-			e[A](a,b) = COMPLEX(sqrt(.5),0.);\n\
-			e[A](b,a) = COMPLEX(sqrt(.5),0.);\n\
+			e[A](a,b) = complex_t(sqrt(.5),0.);\n\
+			e[A](b,a) = complex_t(sqrt(.5),0.);\n\
 			A++;\n\
 		}\n\
 		setzero(e[A]);\n\
-		e[A](a,a) = COMPLEX(1.,0.);\n\
+		e[A](a,a) = complex_t(1.,0.);\n\
 		A++;\n\
 	}\n\
 	for(A = 0; A < SYMMETRIC<NCOLORS>::DIM; A++) {\n\

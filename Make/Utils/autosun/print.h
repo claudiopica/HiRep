@@ -125,8 +125,8 @@ void printfile(ostream &out, istream &tmpl) {
                 out << "float";
             } else if (sizeof(representation::TYPE) == sizeof(double)) {
                 out << "double";
-            } else if (sizeof(representation::TYPE) == sizeof(complex)) {
-                out << "COMPLEX";
+            } else if (sizeof(representation::TYPE) == sizeof(complex_t)) {
+                out << "complex_t";
             }
         } else if (tag.find("REPR::GROUP_REPRESENT") == 0) {
 #ifndef NDEBUG
@@ -212,8 +212,8 @@ void printfile(ostream &out, istream &tmpl) {
             cerr << "Writing gaussian_vector..... ";
 #endif
 
-            if (sizeof(representation::TYPE) == sizeof(complex)) {
-                out << "COMPLEX(gaussian_rg(.5), gaussian_rg(.5))";
+            if (sizeof(representation::TYPE) == sizeof(complex_t)) {
+                out << "complex_t(gaussian_rg(.5), gaussian_rg(.5))";
             } else {
                 out << "gaussian_rg(.5)";
             }

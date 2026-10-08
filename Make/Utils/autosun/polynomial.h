@@ -45,21 +45,21 @@ public:
     }
 };
 
-class polynomial : public orderedlist<rmonomial, complex> {
+class polynomial : public orderedlist<rmonomial, complex_t> {
 public:
     polynomial()
-        : orderedlist<rmonomial, complex>() {
+        : orderedlist<rmonomial, complex_t>() {
     }
-    polynomial(const rmonomial &index, const complex &value)
-        : orderedlist<rmonomial, complex>(index, value) {
+    polynomial(const rmonomial &index, const complex_t &value)
+        : orderedlist<rmonomial, complex_t>(index, value) {
     }
 
-    complex &getzero() const {
-        static complex zero = complex(0.0, 0.0);
+    complex_t &getzero() const {
+        static complex_t zero = complex_t(0.0, 0.0);
         return zero;
     }
 
-    using orderedlist<rmonomial, complex>::operator=;
+    using orderedlist<rmonomial, complex_t>::operator=;
 
     polynomial &operator+=(const polynomial &b) {
         for (KEYTYPE i = 0; i < b.length; i++) {
@@ -221,7 +221,7 @@ public:
         : polynomial() {
         rmonomial index;
         index.add(string(name), 1);
-        orderedlist<rmonomial, complex>::add(index, complex(1.0, 0.0));
+        orderedlist<rmonomial, complex_t>::add(index, complex_t(1.0, 0.0));
     }
 
     using polynomial::operator=;
@@ -233,10 +233,10 @@ public:
         : polynomial() {
         rmonomial index1;
         index1.add("creal(" + string(name) + ")", 1);
-        orderedlist<rmonomial, complex>::add(index1, complex(1.0, 0.0));
+        orderedlist<rmonomial, complex_t>::add(index1, complex_t(1.0, 0.0));
         rmonomial index2;
         index2.add("cimag(" + string(name) + ")", 1);
-        orderedlist<rmonomial, complex>::add(index2, complex(0.0, 1.0));
+        orderedlist<rmonomial, complex_t>::add(index2, complex_t(0.0, 1.0));
     }
 
     using polynomial::operator=;
@@ -247,12 +247,12 @@ public:
     pconstant(const double z)
         : polynomial() {
         rmonomial index;
-        orderedlist<rmonomial, complex>::add(index, complex(z, 0.0));
+        orderedlist<rmonomial, complex_t>::add(index, complex_t(z, 0.0));
     }
-    pconstant(const complex &z)
+    pconstant(const complex_t &z)
         : polynomial() {
         rmonomial index;
-        orderedlist<rmonomial, complex>::add(index, z);
+        orderedlist<rmonomial, complex_t>::add(index, z);
     }
 
     using polynomial::operator=;
