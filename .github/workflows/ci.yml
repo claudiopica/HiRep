@@ -44,7 +44,7 @@ jobs:
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev libomp-dev ninja-build
-          version: 1.0
+          version: 1.1
 
       - name: Setup link to mpirun alternative
         run: sudo ln -fs /usr/bin/mpirun.openmpi /usr/bin/mpirun
