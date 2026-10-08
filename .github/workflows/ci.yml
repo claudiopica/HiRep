@@ -55,7 +55,7 @@ jobs:
             install
           fi
           command -v mpicc.openmpi
-          
+
       - name: Setup link to mpirun alternative
         run: sudo ln -fs /usr/bin/mpirun.openmpi /usr/bin/mpirun
 
@@ -68,7 +68,7 @@ jobs:
         run: pip3 install gcovr==7.2 && python3 -m gcovr -x -o coverage.xml build/
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           files: ./coverage.xml
