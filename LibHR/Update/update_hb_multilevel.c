@@ -250,6 +250,10 @@ static void update_mh(int lev) {
 
 void init_hb_multilevel(int lev, double lbeta, int lnhb, int lnor, int *lml_up, int *lml_skip, int lnblockingstart,
                         int lnblockingend, double lsmear_val, cor_list *llcor) {
+#ifdef WITH_GPU
+    error(1, 1, "init_hb_multilevel [update_hb_multilevel.c]",
+          "The multilevel heatbath is not implemented on GPU. Compile without WITH_GPU.");
+#endif
     _OMP_PRAGMA(master) {
         max_mh_level = lev;
         beta = lbeta;

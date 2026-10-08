@@ -277,6 +277,9 @@ static void update_all(double *beta, int type) {
 #endif
 
 void update(double *beta, int nhb, int nor) {
+#ifdef WITH_GPU
+    error(1, 1, "update [update_hb.c]", "The heatbath is not implemented on GPU. Compile without WITH_GPU.");
+#endif
     if (dyn_gauge == NULL) { init_hb_boundary(); }
 
     for (int n = 0; n < nhb; n++) {
