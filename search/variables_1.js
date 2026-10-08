@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['gpu_5fptr_0',['gpu_ptr',['../d2/d0e/structsuNg__field.html#a11791ce80e83e506397bb6b75e49d6a8',1,'suNg_field::gpu_ptr'],['../d6/d10/structsuNg__scalar__field.html#af727371e889da40b4e00800acc9494dd',1,'suNg_scalar_field::gpu_ptr'],['../d4/d1f/structsuNg__field__flt.html#a19e47fd85889a040a161d51c7528dc4e',1,'suNg_field_flt::gpu_ptr'],['../d9/d4a/structsuNf__field.html#ae1b4b31dd5c8cedf5931a19d2304fd7c',1,'suNf_field::gpu_ptr'],['../d6/d54/structsuNf__field__flt.html#ae1e98018d71285d0c1938194cdb90acb',1,'suNf_field_flt::gpu_ptr'],['../d0/da8/structspinor__field.html#a638fc3484f9742681538af8837901feb',1,'spinor_field::gpu_ptr'],['../d4/dce/structspinor__field__flt.html#a95643f4d5a827f4530f15b0dec84b7d6',1,'spinor_field_flt::gpu_ptr'],['../db/dc8/structsuNg__av__field.html#a06505a7aeee3cf5cc82e9467f7a1f995',1,'suNg_av_field::gpu_ptr'],['../d8/daf/structscalar__field.html#a7f700bd786f7fc96da22b9e2b6c90e93',1,'scalar_field::gpu_ptr']]],
+  ['gsize_5fspinor_1',['gsize_spinor',['../df/da2/structgeometry__descriptor.html#a2f3736da2c61ca4dce5eeb48b2ef01a9',1,'geometry_descriptor']]]
+];

@@ -1,0 +1,7 @@
+<map id="mon_lw_par" name="mon_lw_par">
+<area shape="rect" id="Node000001" title=" " alt="" coords="96,93,197,119"/>
+<area shape="rect" id="Node000002" href="$db/d5c/structforce__gauge__par.html" title=" " alt="" coords="5,5,136,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,39,138,91,134,95,88,43"/>
+<area shape="rect" id="Node000005" href="$d4/d5c/structfield__gauge__par.html" title=" " alt="" coords="160,5,285,31"/>
+<area shape="poly" id="edge2_Node000001_Node000005" title=" " alt="" coords="208,44,186,71,162,95,158,91,182,68,204,40"/>
+</map>

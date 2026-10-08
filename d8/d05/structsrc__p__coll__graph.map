@@ -1,0 +1,5 @@
+<map id="src_p" name="src_p">
+<area shape="rect" id="Node000001" title="Propagator sources with momentum p." alt="" coords="26,167,82,192"/>
+<area shape="rect" id="Node000002" href="$d0/da8/structspinor__field.html" title="Spinor field array containing SU(N_f) spinors in chosen fermion representation." alt="" coords="5,5,103,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,44,57,166,51,166,51,44"/>
+</map>

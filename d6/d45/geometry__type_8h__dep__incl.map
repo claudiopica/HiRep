@@ -1,0 +1,8 @@
+<map id="geometry_type.h" name="geometry_type.h">
+<area shape="rect" id="Node000001" title="This file contains a geometry type for the new geometry." alt="" coords="5,5,139,31"/>
+<area shape="rect" id="Node000002" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="25,152,119,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="57,43,40,79,39,99,45,118,64,150,60,153,40,120,34,99,35,78,53,41"/>
+<area shape="rect" id="Node000035" href="$dc/d56/geometry__descriptor_8h.html" title="Geometry descriptor struct, that contains all necessary information for multi&#45;node/ multi&#45;GPU calcula..." alt="" coords="49,79,217,104"/>
+<area shape="poly" id="edge2_Node000001_Node000035" title=" " alt="" coords="93,40,125,77,121,80,89,43"/>
+<area shape="poly" id="edge3_Node000035_Node000002" title=" " alt="" coords="116,116,84,154,80,150,112,113"/>
+</map>
