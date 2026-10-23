@@ -13,6 +13,7 @@
 #include "Utils/eva_deflation.h"
 #include "Utils/gauge_anisotropy.h"
 #include "Utils/gaugefix.h"
+#include "Utils/gaussian_smearing.h"
 #include "Utils/HYP_smearing.h"
 #include "Utils/mat_utils.h"
 #include "Utils/eigval.h"
