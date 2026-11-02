@@ -164,7 +164,7 @@ static void Zeta(suNg_field *Zu, const suNg_field *U, const double alpha) {
 }
 
 void WilsonFlow1(suNg_field *V, const double epsilon) {
-    zero(V);
+    zero(ws_gf);
     Zeta(ws_gf, V, epsilon);
 
     _MASTER_FOR(&glattice, ix) {
@@ -494,6 +494,10 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
     double dt = *tmax / nmeas;
     double epsilon_new = *eps;
     double epsilon_meas = 0;
+
+#ifdef WITH_GPU
+    error(1, 1, "WF_update_and_measure [wilsonflow.c]", "The wilsonflow is not implemented on GPU. Compile without WITH_GPU.");
+#endif
 
     WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
 
