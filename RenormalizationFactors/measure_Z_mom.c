@@ -323,7 +323,6 @@ int main(int argc, char *argv[]) {
         for (l = 1; l <= mes_var.n_mom; ++l) {
             double p_in[4], p_out[4];
             for (tw = -mes_var.n_twist; tw < mes_var.n_twist + 1; tw++) {
-                copy_suNf_field(u_gauge_f, u_gauge_old_f);
                 restore_untwisted_links(u_gauge_old_f);
                 double twist = (double)tw * 0.5; //(double)tw/(double)(mes_var.n_twist+1);
                 lprintf("TEST", 0, "<p> before twist %1.6f\n", avr_plaquette());
@@ -341,7 +340,6 @@ int main(int argc, char *argv[]) {
                 }
 
                 if (mes_var.ne) {
-                    copy_suNf_field(u_gauge_f, u_gauge_old_f);
                     restore_untwisted_links(u_gauge_old_f);
                     twist_XYZ_bc(twist * mes_var.px_out, twist * mes_var.py_out, twist * mes_var.pz_out);
 

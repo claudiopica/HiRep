@@ -453,7 +453,6 @@ int main(int argc, char *argv[])
     double p_in[4], p_out[4];
     for (tw = -mes_var.n_twist; tw < mes_var.n_twist + 1; tw++)
     {
-      copy_suNf_field(u_gauge_f, u_gauge_old_f);
       restore_untwisted_links(u_gauge_old_f);
       double twist = (double)tw * 0.5; //(double)tw/(double)(mes_var.n_twist+1);
       lprintf("TEST", 0, "<p> before twist %1.6f\n", avr_plaquette());
@@ -473,7 +472,6 @@ int main(int argc, char *argv[])
 
       if (mes_var.ne)
       {
-        copy_suNf_field(u_gauge_f, u_gauge_old_f);
         restore_untwisted_links(u_gauge_old_f);
         twist_XYZ_bc(twist * mes_var.px_out, twist * mes_var.py_out, twist * mes_var.pz_out);
 
@@ -506,12 +504,21 @@ int main(int argc, char *argv[])
        * input files -- in that case we still need the regular
        * (DONTSTORE) measure_renormalization() call below for the normal
        * print_renormalization() output. */
-      if (!mes_var.ne && tw == 0)
+      // if (!mes_var.ne && tw == 0)
+      if (!mes_var.ne)
       {
         data_storage_array *out_corr = NULL;
         suNf_propagator Sin_acc, Sout_acc, id_acc, g5_acc;
         int zcheck;
-
+       
+        /* Momentum seen by the Dirac operator: twist_XYZ_bc multiplies U_mu by
+         * exp(i*pi*theta_mu/L_mu), theta_mu = twist * p_mu^in (T untwisted),
+         * i.e. a shift of theta_mu/2 in units of 2*pi/L_mu. */
+        double p_eff[4];
+        p_eff[0] = p_in[0];
+        p_eff[1] = p_in[1] + 0.5 * twist * mes_var.px_in;
+        p_eff[2] = p_in[2] + 0.5 * twist * mes_var.py_in;
+        p_eff[3] = p_in[3] + 0.5 * twist * mes_var.pz_in;
         measure_renormalization(prop_in, prop_out, nm, p_in[0], p_in[1], p_in[2], p_in[3], p_out[0], p_out[1], p_out[2], p_out[3],
                                 STORE, &out_corr);
 
@@ -521,7 +528,7 @@ int main(int argc, char *argv[])
         propagator_from_storage(out_corr, idx_g5, 0, &g5_acc);
         free_data_storage(out_corr);
 
-        zcheck = check_tree_level_z(&Sin_acc, &Sout_acc, &id_acc, &g5_acc, p_in, 1e-6);
+        zcheck = check_tree_level_z(&Sin_acc, &Sout_acc, &id_acc, &g5_acc, p_eff, 1e-6);
         lprintf("CHECK_Z", 0, "mom_idx %d twist %d: tree-level Z check %s\n", num, tw,
                 zcheck ? "PASSED" : "FAILED");
         if (!zcheck) return_value = 1;

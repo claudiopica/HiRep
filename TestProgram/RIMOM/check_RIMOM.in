@@ -2,8 +2,8 @@ GLB_T = 16
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
-NP_T = 2
-NP_X = 1
+NP_T = 1
+NP_X = 2
 NP_Y = 1
 NP_Z = 1
 
@@ -24,7 +24,7 @@ rlx_store = 0
 
 mes:masses = 1.1
 mes:precision = 1e-20
-mes:ne = 1
+mes:ne = 0
 mes:n_mom = 4
 mes:n_twist = 2
 mes:pt_out = 0
