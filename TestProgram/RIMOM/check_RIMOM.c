@@ -279,6 +279,34 @@ static void propagator_from_storage(data_storage_array *dat, int channel, int ma
   }
 }
 
+/* Gamma (x 1_colour) for a channel name made of "g0".."g3","g5" tokens,
+ * e.g. "g5g0g1" = g5*g0*g1, or "id" = 1. Built from the single-gamma macros
+ * only (applied right to left), so it is independent of the composite
+ * _g5g0g1_propagator etc. that measure_renormalization.c uses.
+ * Returns 0 on success, -1 for an unknown name. */
+static int build_gamma(suNf_propagator *G, const char *name) {
+    suNf_propagator cur, tmp;
+    _propagator_one(cur);
+    if (strcmp(name, "id") != 0) {
+        int n = (int)strlen(name);
+        if (n == 0 || n % 2 != 0) return -1;
+        for (int k = n - 2; k >= 0; k -= 2) {
+            if (name[k] != 'g') return -1;
+            switch (name[k + 1]) {
+            case '0': _g0_propagator(tmp, cur); break;
+            case '1': _g1_propagator(tmp, cur); break;
+            case '2': _g2_propagator(tmp, cur); break;
+            case '3': _g3_propagator(tmp, cur); break;
+            case '5': _g5_propagator(tmp, cur); break;
+            default: return -1;
+            }
+            cur = tmp;
+        }
+    }
+    *G = cur;
+    return 0;
+}
+
 /* Tr[ sum_mu gamma_mu sin(p_mu) * Sinv ] */
 static hr_complex trace_gamma_sin_dot_Sinv(suNf_propagator *Sinv, double sp[4])
 {
@@ -295,12 +323,43 @@ static hr_complex trace_gamma_sin_dot_Sinv(suNf_propagator *Sinv, double sp[4])
   return sp[0] * tr0 + sp[1] * tr1 + sp[2] * tr2 + sp[3] * tr3;
 }
 
+/* Tree-level check of one local channel: the amputated vertex
+ * Lambda = Sout^-1 G Sin^-1 must equal Gamma exactly, hence
+ * Z_Gamma = 4 NF Zq / Tr[Lambda Gamma^-1] = 1. Also checks the full matrix
+ * (max|Lambda - Gamma|), which catches pieces the trace projection misses. */
+static int check_local_channel(suNf_propagator *Sin_inv, suNf_propagator *Sout_inv, suNf_propagator *vertex,
+                               const char *name, hr_complex zq, double tol) {
+    suNf_propagator G, Ginv, tmp, lambda, lg;
+    hr_complex tr;
+    if (build_gamma(&G, name) != 0 || propagator_inverse(&Ginv, &G) != 0) {
+        lprintf("CHECK_Z", 0, "%s: cannot build Gamma from the channel name\n", name);
+        return 0;
+    }
+    _propagator_mul(tmp, (*Sout_inv), (*vertex));
+    _propagator_mul(lambda, tmp, (*Sin_inv));
+    _propagator_mul(lg, lambda, Ginv);
+    _propagator_trace(tr, lg);
+    hr_complex z = 4.0 * (double)NF * zq / tr;
+
+    double dev = 0.;
+    for (int r = 0; r < PROP_N; r++) {
+        for (int s = 0; s < PROP_N; s++) {
+            dev = fmax(dev, cabs(_PROP_IDX(lambda, r, s) - _PROP_IDX(G, r, s)));
+        }
+    }
+    int pass = (cabs(z - 1.0) < tol) && (dev < tol);
+    lprintf("CHECK_Z", 0, "Z_%-7s = %.10f %+.10fi  max|Lambda-Gamma| = %.2e  %s\n", name, creal(z), cimag(z), dev,
+            pass ? "ok" : "FAILED");
+    return pass;
+}
+
+
 /* Sin/Sout/id_prop/g5_prop: already normalised (came straight out of
  * propagator_from_storage). p_lat: (pt,px,py,pz) for this momentum point,
  * twist already folded in. tol: e.g. 1e-6. Returns 1 (pass) or 0 (fail);
  * prints Zq/Z_S/Z_P either way. */
 static int check_tree_level_z(suNf_propagator *Sin, suNf_propagator *Sout,
-                              suNf_propagator *id_prop, suNf_propagator *g5_prop,
+                              suNf_propagator *id_prop, suNf_propagator *g5_prop, data_storage_array *dat,
                               double p_lat[4], double tol)
 {
   int mu, ok = 1;
@@ -360,12 +419,16 @@ static int check_tree_level_z(suNf_propagator *Sin, suNf_propagator *Sout,
   lprintf("CHECK_Z", 0, "Z_P = %.10f %+.10fi  (expect 1+0i)\n", creal(z_p), cimag(z_p));
   if (cabs(z_p - 1.0) > tol) ok = 0;
 
-  /* Z_V, Z_A: same amputate-and-trace pattern, reading e.g. "g0".."g3" and
-   * "g5g0".."g5g3" via renorm_channel_index() + propagator_from_storage(),
-   * against gamma_mu / gamma5 gamma_mu respectively, averaged over mu --
-   * not yet added; extend the call site below the same way (look up each
-   * index once near idx_Sin etc.) if you want the full S,P,V,A set
-   * checked. */
+  /* all 16 local bilinears: tree-level Z_Gamma = 1 (V, A, T included) */
+  static const char *local_names[] = { "id",   "g5",   "g0",   "g1",   "g2",     "g3",     "g0g1",  "g0g2",
+                                       "g0g3", "g5g0", "g5g1", "g5g2", "g5g3",   "g5g0g1", "g5g0g2", "g5g0g3" };
+  for (int c = 0; c < 16; c++) {
+    suNf_propagator vertex;
+    int ch = renorm_channel_index(local_names[c]);
+    error(ch < 0, 1, "check_tree_level_z", "unknown channel name");
+    propagator_from_storage(dat, ch, 0, &vertex);
+    if (!check_local_channel(&Sin_inv, &Sout_inv, &vertex, local_names[c], zq, tol)) ok = 0;
+  }
 
   return ok;
 }
@@ -440,6 +503,15 @@ int main(int argc, char *argv[])
 
   /* setup process communications */
   setup_process(&argc, &argv);
+
+  const char *t[] = { "id", "g5", "g0", "g5g0", "g0g1", "g5g0g1" };
+    for (int k = 0; k < 6; k++) {
+      suNf_propagator G, G2; hr_complex tr;
+      build_gamma(&G, t[k]);
+      _propagator_mul(G2, G, G);
+      _propagator_trace(tr, G2);
+      lprintf("CHECK_G", 0, "%-7s Tr[G G]/(4NF) = %+.3f\n", t[k], creal(tr) / (4.0 * NF));
+    }
 
   setup_gauge_fields();
 
@@ -619,9 +691,11 @@ int main(int argc, char *argv[])
         propagator_from_storage(out_corr, idx_Sout, 0, &Sout_acc);
         propagator_from_storage(out_corr, idx_id, 0, &id_acc);
         propagator_from_storage(out_corr, idx_g5, 0, &g5_acc);
-        free_data_storage(out_corr);
 
-        zcheck = check_tree_level_z(&Sin_acc, &Sout_acc, &id_acc, &g5_acc, p_eff, 1e-6);
+
+        zcheck = check_tree_level_z(&Sin_acc, &Sout_acc, &id_acc, &g5_acc,out_corr,p_eff, 1e-6);
+        
+        free_data_storage(out_corr);
         lprintf("CHECK_Z", 0, "mom_idx %d twist %d: tree-level Z check %s\n", num, tw,
                 zcheck ? "PASSED" : "FAILED");
         if (!zcheck) return_value = 1;
