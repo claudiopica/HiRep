@@ -57,6 +57,21 @@ static void twist_XYZ_bc(double theta_x, double theta_y, double theta_z) {
     }
 }
 
+
+/* Restore the untwisted links into u_gauge_f, including the MPI boundary
+ * buffers: copy_suNf_field only copies local sites, while twist_XYZ_bc also
+ * multiplies the buffers. Without the sendrecv, the buffers keep the previous
+ * twist and the Dirac operator is no longer gamma5-hermitian across process
+ * boundaries (wrong results, solver can hang). */
+static void restore_untwisted_links(suNf_field *u_untwisted) {
+    copy_suNf_field(u_gauge_f, u_untwisted);
+#ifdef WITH_MPI
+    start_sendrecv_suNf_field(u_gauge_f);
+    complete_sendrecv_suNf_field(u_gauge_f);
+#endif
+}
+
+
 /* Renormalization parameters */
 typedef struct input_renormalization {
     char mstring[256];
@@ -309,6 +324,7 @@ int main(int argc, char *argv[]) {
             double p_in[4], p_out[4];
             for (tw = -mes_var.n_twist; tw < mes_var.n_twist + 1; tw++) {
                 copy_suNf_field(u_gauge_f, u_gauge_old_f);
+                restore_untwisted_links(u_gauge_old_f);
                 double twist = (double)tw * 0.5; //(double)tw/(double)(mes_var.n_twist+1);
                 lprintf("TEST", 0, "<p> before twist %1.6f\n", avr_plaquette());
                 twist_XYZ_bc(twist * mes_var.px_in, twist * mes_var.py_in, twist * mes_var.pz_in);
@@ -326,6 +342,7 @@ int main(int argc, char *argv[]) {
 
                 if (mes_var.ne) {
                     copy_suNf_field(u_gauge_f, u_gauge_old_f);
+                    restore_untwisted_links(u_gauge_old_f);
                     twist_XYZ_bc(twist * mes_var.px_out, twist * mes_var.py_out, twist * mes_var.pz_out);
 
                     p_out[0] = mom_out[0] * l;
