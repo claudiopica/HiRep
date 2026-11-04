@@ -46,7 +46,48 @@ static void twist_XYZ_bc(double theta_x, double theta_y, double theta_z)
           *u = utmp;
         }
 }
+/* Rotate n spinor fields by the gauge transformation g(x) left behind by
+ * random_gauge_transform() (gaugefix.c keeps it in the global g, slot mu=0):
+ * eta(x) -> R[g(x)] eta(x), R = fermion representation. Together with
+ * U -> g U g^dag this makes every propagator column transform as
+ * psi(x) -> R[g(x)] psi(x). */
+static void gauge_rotate_spinor_fields(spinor_field *s, int n) {
+    extern suNg_field *g;
+    for (int k = 0; k < n; k++) {
+        _MASTER_FOR(&glattice, ix) {
+            suNf gf;
+            suNf_vector v;
+            _group_represent2(&gf, _4FIELD_AT(g, ix, 0));
+            suNf_spinor *sp = _FIELD_AT(&s[k], ix);
+            for (int alpha = 0; alpha < 4; alpha++) {
+                _suNf_multiply(v, gf, sp->c[alpha]);
+                sp->c[alpha] = v;
+            }
+        }
+        start_sendrecv_spinor_field(&s[k]);
+        complete_sendrecv_spinor_field(&s[k]);
+    }
+}
 
+/* Momentum sources (optionally rotated by g), propagators, all channels.
+ * Exceptional kinematics: prop_out = prop_in. Returns the STORE output
+ * (caller frees with free_data_storage). */
+static data_storage_array *measure_all_channels(spinor_field *source, spinor_field *prop_in, spinor_field *prop_out,
+                                                int nm, double *m, double p[4], int rotate, const char *label) {
+    data_storage_array *out = NULL;
+    for (int k = 0; k < NF; ++k) {
+        create_gauge_fixed_momentum_source(source, p[0], p[1], p[2], p[3], k);
+        if (rotate) gauge_rotate_spinor_fields(source, 4);
+        calc_propagator(prop_in + 4 * k, source, 4);
+    }
+    for (int j = 0; j < 4 * NF; j++) {
+        copy_spinor_field(&prop_out[j], &prop_in[j]);
+    }
+    measure_renormalization(prop_in, prop_out, nm, p[0], p[1], p[2], p[3], p[0], p[1], p[2], p[3], STORE, &out);
+    // calling print renormalizatoin reset the accumulators.
+    print_renormalization(0, nm, m, (char *)label, p[0], p[1], p[2], p[3], p[0], p[1], p[2], p[3]);
+    return out;
+}
 /* Renormalization parameters */
 typedef struct _input_renormalization
 {
@@ -329,6 +370,57 @@ static int check_tree_level_z(suNf_propagator *Sin, suNf_propagator *Sout,
   return ok;
 }
 
+static int check_gauge_covariance(spinor_field *source, spinor_field *prop_in, spinor_field *prop_out, int nm, double *m,
+                                  double p[4], double tol) {
+    /* random links: not gauge-equivalent to U=1, so U != U^dag matters */
+    random_u(u_gauge);
+    represent_gauge_field();
+    lprintf("CHECK_GT", 0, "random configuration, plaquette %1.6f\n", avr_plaquette());
+
+    data_storage_array *outA = measure_all_channels(source, prop_in, prop_out, nm, m, p, 0,"GT check A");
+
+    double plaq_before = avr_plaquette();
+    random_gauge_transform(u_gauge); /* U -> g U g^dag, g left in gaugefix.c's global g */
+    represent_gauge_field();
+    lprintf("CHECK_GT", 0, "after random gauge transformation, plaquette %1.6f (must be unchanged)\n",
+            avr_plaquette());
+    if (fabs(avr_plaquette() - plaq_before) > 1e-12) {
+        lprintf("CHECK_GT", 0, "plaquette changed: the gauge transformation is broken\n");
+        free_data_storage(outA);
+        return 0;
+    }
+
+    data_storage_array *outB = measure_all_channels(source, prop_in, prop_out, nm, m, p, 1,"GT check B");
+
+
+        static const char *names[] = { "g5",   "id",     "g0",     "g1",     "g2",     "g3",     "g0g1", "g0g2",
+                                   "g0g3", "g5g0",   "g5g1",   "g5g2",   "g5g3",   "g5g0g1", "g5g0g2",
+                                   "g5g0g3", "cg0",  "cg1",    "cg2",    "cg3" }; /* not Sin/Sout: gauge variant */
+    int ok = 1;
+    for (int c = 0; c < (int)(sizeof(names) / sizeof(names[0])); c++) {
+        int ch = renorm_channel_index(names[c]);
+        error(ch < 0, 1, "check_gauge_covariance", "unknown channel name");
+        suNf_propagator A, B;
+        propagator_from_storage(outA, ch, 0, &A);
+        propagator_from_storage(outB, ch, 0, &B);
+        double diff = 0., norm = 0.;
+        for (int r = 0; r < PROP_N; r++) {
+            for (int s = 0; s < PROP_N; s++) {
+                diff = fmax(diff, cabs(_PROP_IDX(A, r, s) - _PROP_IDX(B, r, s)));
+                norm = fmax(norm, cabs(_PROP_IDX(A, r, s)));
+            }
+        }
+        int pass = (diff <= tol * norm);
+        lprintf("CHECK_GT", 0, "%-7s max|A-B|/max|A| = %.3e  %s\n", names[c], diff / norm, pass ? "ok" : "FAILED");
+        if (!pass) ok = 0;
+    }
+    free_data_storage(outB);
+    free_data_storage(outA);
+    return ok;
+}
+
+
+
 
 int main(int argc, char *argv[])
 {
@@ -558,13 +650,18 @@ int main(int argc, char *argv[])
   // The analytical (tree-level) check is now done inline above, per momentum
   // point, via check_tree_level_z() -- reading the 3-point functions
   // measure_renormalization(..., STORE, &out_corr) fills directly.
+ {
+    double p_gt[4] = { mom_in[0], mom_in[1], mom_in[2], mom_in[3] };
+    if (!check_gauge_covariance(source, prop_in, prop_out, nm,m, p_gt, 1e-8)) return_value = 1;
+  }
+
 
   global_sum_int(&return_value,1);
 
   if (return_value == 0)
     lprintf("MAIN", 0, "check_RIMOM: PASS (all tree-level Z factors = 1 to tolerance)\n");
   else
-    lprintf("MAIN", 0, "check_RIMOM: FAIL (see CHECK_Z lines above for which quantity and momentum)\n");
+    lprintf("MAIN", 0, "check_RIMOM: FAIL (see CHECK_Z/CHECK GT lines above for which quantity and momentum)\n");
 
   free_spinor_field(source);
   free_spinor_field(prop_in);
