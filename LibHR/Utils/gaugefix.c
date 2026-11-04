@@ -36,10 +36,14 @@ static void init_g() {
     if (!init) {
         g = alloc_suNg_field(&glattice);
         unit_gauge(g);
+        init = 1;
     }
 }
 static void free_g() {
-    if (init) { free_suNg_field(g); }
+    if (init) { 
+      free_suNg_field(g);
+      init = 0;
+    }
 }
 
 static void gUgmu(suNg_field *gauge) {
