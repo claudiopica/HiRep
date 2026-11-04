@@ -60,6 +60,23 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
     hr_complex eipinx, eipoutx;
     suNf_propagator Sin, Sout, Sout_dag, Stmp1, Stmp2, Stmp3, Stmp4, Sf;
 
+    // make sure all the halos are exchanged. They are important for the conserved current.
+    for (a = 0; a < 4 * NF; a++) {
+      start_sendrecv_spinor_field(&psi_in[a]);
+      complete_sendrecv_spinor_field(&psi_in[a]);
+      start_sendrecv_spinor_field(&psi_out[a]);
+      complete_sendrecv_spinor_field(&psi_out[a]);
+    }
+
+    // the conserved vector current will need the phase in x+mu 
+    const int glb[4] = { GLB_T, GLB_X, GLB_Y, GLB_Z };
+    const int pin[4] = { pt_in, px_in, py_in, pz_in }, pout[4] = { pt_out, px_out, py_out, pz_out };
+    hr_complex eipin_mu[4], eipout_mu[4];
+    for (int mu = 0; mu < 4; mu++) {
+      eipin_mu[mu]  = cexp(-I * 2.0 * PI * pin[mu]  / glb[mu]);
+      eipout_mu[mu] = cexp(-I * 2.0 * PI * pout[mu] / glb[mu]);
+    }
+
     for (i = 0; i < nm; i++) {
         for (t = 0; t < T; t++) {
             for (x = 0; x < X; x++) {
@@ -190,6 +207,8 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                                 _propagator_assign(Sf, *_FIELD_AT(&psi_out[4 * a + beta], ixmu), a, beta); //S(p,z+mu)
                             }
                         }
+                        _propagator_mulc_assign(Sf, eipoutx * eipout_mu[0]);   // e^{-ip_out(x+mu)} 
+                        
                         _propagator_dagger(Stmp1, Sf); //S^(p, z+mu)
                         _propagator_mul(Stmp3, Stmp1, Stmp2); // S^(p, z+mu) g5 (1 + g0) U^(z) S(p,z)
                         _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z+mu) g5 (1 + g0) U^(z) S(p,z)
@@ -202,6 +221,8 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                                 _propagator_assign(Sf, *_FIELD_AT(&psi_in[4 * a + beta], ixmu), a, beta); //S(p,z+mu)
                             }
                         }
+                        _propagator_mulc_assign(Sf, eipinx * eipin_mu[0]);     // e^{-ip_in(x+mu)}
+                        
                         _suNf_inverse_prop_multiply(Stmp1, *u1, Sf); //U^(z) S(p,z+mu)
                         Stmp3 = Stmp1; //U^(z) S(p,z+mu)
                         _g0_propagator(Stmp2, Stmp1); // g0 U^(z) S(p,z+mu)
@@ -228,6 +249,8 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                                 _propagator_assign(Sf, *_FIELD_AT(&psi_out[4 * a + beta], ixmu), a, beta); //S(p,z+mu)
                             }
                         }
+                        _propagator_mulc_assign(Sf, eipoutx * eipout_mu[1]);   // e^{-ip_out(x+mu)} 
+
                         _propagator_dagger(Stmp1, Sf); //S^(p, z+mu)
                         _propagator_mul(Stmp3, Stmp1, Stmp2); // S^(p, z+mu) g5 (1 + g1) U^(z) S(p,z)
                         _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z+mu) g5 (1 + g1) U^(z) S(p,z)
@@ -240,6 +263,8 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                                 _propagator_assign(Sf, *_FIELD_AT(&psi_in[4 * a + beta], ixmu), a, beta); //S(p,z+mu)
                             }
                         }
+                        _propagator_mulc_assign(Sf, eipinx * eipin_mu[1]);     // e^{-ip_in(x+mu)}
+                                                                               
                         _suNf_inverse_prop_multiply(Stmp1, *u1, Sf); //U^(z) S(p,z+mu)
                         Stmp3 = Stmp1; //U^(z) S(p,z+mu)
                         _g1_propagator(Stmp2, Stmp1); // g1 U^(z) S(p,z+mu)
@@ -266,6 +291,8 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                                 _propagator_assign(Sf, *_FIELD_AT(&psi_out[4 * a + beta], ixmu), a, beta); //S(p,z+mu)
                             }
                         }
+                        _propagator_mulc_assign(Sf, eipoutx * eipout_mu[2]);   // e^{-ip_out(x+mu)}
+
                         _propagator_dagger(Stmp1, Sf); //S^(p, z+mu)
                         _propagator_mul(Stmp3, Stmp1, Stmp2); // S^(p, z+mu) g5 (1 + g2) U^(z) S(p,z)
                         _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z+mu) g5 (1 + g2) U^(z) S(p,z)
@@ -278,6 +305,8 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                                 _propagator_assign(Sf, *_FIELD_AT(&psi_in[4 * a + beta], ixmu), a, beta); //S(p,z+mu)
                             }
                         }
+                        _propagator_mulc_assign(Sf, eipinx * eipin_mu[2]);     // e^{-ip_in(x+mu)} 
+
                         _suNf_inverse_prop_multiply(Stmp1, *u1, Sf); //U^(z) S(p,z+mu)
                         Stmp3 = Stmp1; //U^(z) S(p,z+mu)
                         _g2_propagator(Stmp2, Stmp1); // g2 U^(z) S(p,z+mu)
@@ -304,6 +333,8 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                                 _propagator_assign(Sf, *_FIELD_AT(&psi_out[4 * a + beta], ixmu), a, beta); //S(p,z+mu)
                             }
                         }
+                        _propagator_mulc_assign(Sf, eipoutx * eipout_mu[3]);   // e^{-ip_out(x+mu)}
+
                         _propagator_dagger(Stmp1, Sf); //S^(p, z+mu)
                         _propagator_mul(Stmp3, Stmp1, Stmp2); // S^(p, z+mu) g5 (1 + g3) U^(z) S(p,z)
                         _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z+mu) g5 (1 + g3) U^(z) S(p,z)
@@ -316,6 +347,8 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                                 _propagator_assign(Sf, *_FIELD_AT(&psi_in[4 * a + beta], ixmu), a, beta); //S(p,z+mu)
                             }
                         }
+                        _propagator_mulc_assign(Sf, eipinx * eipin_mu[3]);   // e^{-ip_in(x+mu)}
+
                         _suNf_inverse_prop_multiply(Stmp1, *u1, Sf); //U^(z) S(p,z+mu)
                         Stmp3 = Stmp1; //U^(z) S(p,z+mu)
                         _g3_propagator(Stmp2, Stmp1); // g3 U^(z) S(p,z+mu)

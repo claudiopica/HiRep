@@ -1,5 +1,6 @@
 /*******************************************************************************
  * NOCOMPILE= BASIC_SF
+ * NOCOMPILE= BC_T_SF
  * NOCOMPILE= ROTATED_SF
  * NOCOMPILE= FERMION_THETA
  * Computation of Renomalization constants (Z_a,Z_q,Z_s,Z_ps,Z_t,Z_m,Z_v)  
