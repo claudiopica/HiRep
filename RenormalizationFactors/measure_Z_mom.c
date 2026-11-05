@@ -9,8 +9,23 @@
  *
  * NOCOMPILE= BC_T_SF_ROTATED || BC_T_SF || WITH_QUATERNIONS
  * NOCOMPILE= REPR_ADJOINT
- * NOCOMPILE= BC_T_THETA || BC_X_THETA || BC_Y_THETA || BC_Z_THETA
- * 
+ * NOCOMPILE= BC_T_THETA
+ * NOCOMPILE= !BC_X_THETA
+ * NOCOMPILE= !BC_Y_THETA
+ * NOCOMPILE= !BC_Z_THETA
+ *
+ * Twisted boundary conditions are applied through eitheta (FERMION_THETA),
+ * the standard HiRep mechanism used by Dphi on CPU and GPU. The links are
+ * never modified. The code must therefore be compiled with theta BCs in
+ * X, Y and Z (write_mkflags.pl -x T -y T -z T) and refuses to compile
+ * otherwise. The twist is set per momentum/twist by set_twist() below;
+ * any theta given in the input/BCs is overwritten.
+ * Equivalence with the previous link-twisting implementation is checked by
+ * TestProgram/RIMOM/check_RIMOM_twist.c.
+ *
+ * The conserved-current vertices (cg0..cg3) in measure_renormalization.c
+ * include eitheta on the point-split link (vertex_link).
+ *
  *******************************************************************************/
 
 #include "libhr.h"
@@ -20,57 +35,24 @@
 #error This code does not work with the Schroedinger functional !!!
 #endif
 
-#ifdef FERMION_THETA
-#error This code does not work with the fermion twisting !!!
+#if !defined(BC_X_THETA) || !defined(BC_Y_THETA) || !defined(BC_Z_THETA)
+#error measure_Z_mom needs theta boundary conditions in X, Y and Z (write_mkflags.pl -x T -y T -z T)
+#endif
+#ifdef BC_T_THETA
+#error measure_Z_mom: twisting in T is not supported
 #endif
 
-static void twist_XYZ_bc(double theta_x, double theta_y, double theta_z) {
-    int index;
-    int ix, iy, iz, it;
-    suNf *u;
-    suNf utmp;
-    hr_complex eith_x, eith_y, eith_z;
-    eith_x = cexp(I * PI * theta_x / (double)GLB_X);
-    eith_y = cexp(I * PI * theta_y / (double)GLB_Y);
-    eith_z = cexp(I * PI * theta_z / (double)GLB_Z);
-    //  eith_x.re = cos(PI*theta_x/(double)GLB_X); eith_x.im = sin(PI*theta_x/(double)GLB_X);
-    //eith_y.re = cos(PI*theta_y/(double)GLB_Y); eith_y.im = sin(PI*theta_y/(double)GLB_Y);
-    //eith_z.re = cos(PI*theta_z/(double)GLB_Z); eith_z.im = sin(PI*theta_z/(double)GLB_Z);
-
-    for (it = 0; it < T_EXT; ++it) {
-        for (ix = 0; ix < X_EXT; ++ix) {
-            for (iy = 0; iy < Y_EXT; ++iy) {
-                for (iz = 0; iz < Z_EXT; ++iz) {
-                    index = ipt_ext(it, ix, iy, iz);
-                    u = pu_gauge_f(index, 1);
-                    _suNf_mulc(utmp, eith_x, *u);
-                    *u = utmp;
-                    u = pu_gauge_f(index, 2);
-                    _suNf_mulc(utmp, eith_y, *u);
-                    *u = utmp;
-                    u = pu_gauge_f(index, 3);
-                    _suNf_mulc(utmp, eith_z, *u);
-                    *u = utmp;
-                }
-            }
-        }
-    }
+/* Twisted BCs psi(x + L_mu) = exp(i pi theta_mu) psi(x) in the spatial
+ * directions [theta in units of pi, same convention as the former
+ * twist_XYZ_bc, i.e. p_eff = p + theta/2 in units of 2 pi / L].
+ * Dphi multiplies each forward hop in direction mu by eitheta[mu] and each
+ * backward hop by its conjugate. */
+static void set_twist(double theta_x, double theta_y, double theta_z) {
+    eitheta[0] = 1.0;
+    eitheta[1] = cexp(I * PI * theta_x / (double)GLB_X);
+    eitheta[2] = cexp(I * PI * theta_y / (double)GLB_Y);
+    eitheta[3] = cexp(I * PI * theta_z / (double)GLB_Z);
 }
-
-
-/* Restore the untwisted links into u_gauge_f, including the MPI boundary
- * buffers: copy_suNf_field only copies local sites, while twist_XYZ_bc also
- * multiplies the buffers. Without the sendrecv, the buffers keep the previous
- * twist and the Dirac operator is no longer gamma5-hermitian across process
- * boundaries (wrong results, solver can hang). */
-static void restore_untwisted_links(suNf_field *u_untwisted) {
-    copy_suNf_field(u_gauge_f, u_untwisted);
-#ifdef WITH_MPI
-    start_sendrecv_suNf_field(u_gauge_f);
-    complete_sendrecv_suNf_field(u_gauge_f);
-#endif
-}
-
 
 /* Renormalization parameters */
 typedef struct input_renormalization {
@@ -225,6 +207,7 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "Gauge group: SU(%d)\n", NG);
 #endif
     lprintf("MAIN", 0, "Fermion representation: " REPR_NAME " [dim=%d]\n", NF);
+    lprintf("MAIN", 0, "Twisted BCs via eitheta (FERMION_THETA)\n");
 
     nm = 1;
 
@@ -253,7 +236,6 @@ int main(int argc, char *argv[]) {
     prop_in = alloc_spinor_field(4 * nm * NF, &glattice);
     prop_out = alloc_spinor_field(4 * nm * NF, &glattice);
 
-    suNf_field *u_gauge_old_f = alloc_suNf_field(&glattice);
     suNg_field *u_gauge_old = alloc_suNg_field(&glattice);
 
     while (1) {
@@ -304,8 +286,6 @@ int main(int argc, char *argv[]) {
         represent_gauge_field();
         gettimeofday(&start, 0);
 
-        copy_suNf_field(u_gauge_old_f, u_gauge_f);
-
         init_propagator_eo(nm, m, mes_var.precision);
 
         int l, j, tw, num;
@@ -323,11 +303,10 @@ int main(int argc, char *argv[]) {
         for (l = 1; l <= mes_var.n_mom; ++l) {
             double p_in[4], p_out[4];
             for (tw = -mes_var.n_twist; tw < mes_var.n_twist + 1; tw++) {
-                restore_untwisted_links(u_gauge_old_f);
                 double twist = (double)tw * 0.5; //(double)tw/(double)(mes_var.n_twist+1);
-                lprintf("TEST", 0, "<p> before twist %1.6f\n", avr_plaquette());
-                twist_XYZ_bc(twist * mes_var.px_in, twist * mes_var.py_in, twist * mes_var.pz_in);
-                lprintf("TEST", 0, "<p> after twist %1.6f\n", avr_plaquette());
+                set_twist(twist * mes_var.px_in, twist * mes_var.py_in, twist * mes_var.pz_in);
+                lprintf("TWIST", 10, "theta/pi = (%g, %g, %g)\n", twist * mes_var.px_in, twist * mes_var.py_in,
+                        twist * mes_var.pz_in);
 
                 p_in[0] = mom_in[0] * l;
                 p_in[1] = mom_in[1] * l;
@@ -340,8 +319,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 if (mes_var.ne) {
-                    restore_untwisted_links(u_gauge_old_f);
-                    twist_XYZ_bc(twist * mes_var.px_out, twist * mes_var.py_out, twist * mes_var.pz_out);
+                    set_twist(twist * mes_var.px_out, twist * mes_var.py_out, twist * mes_var.pz_out);
 
                     p_out[0] = mom_out[0] * l;
                     p_out[1] = mom_out[1] * l;
@@ -371,6 +349,7 @@ int main(int argc, char *argv[]) {
                 num++;
             }
         }
+        set_twist(0., 0., 0.);
         gettimeofday(&end, 0);
         timeval_subtract(&etime, &end, &start);
         lprintf("MAIN", 0, "Configuration #%d: analysed in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
@@ -388,7 +367,6 @@ int main(int argc, char *argv[]) {
 
     free_suNg_field(u_gauge);
     free_suNg_field(u_gauge_old);
-    free_suNf_field(u_gauge_old_f);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
     free_suNf_field(u_gauge_f);
 #endif

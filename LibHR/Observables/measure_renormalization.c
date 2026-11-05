@@ -53,6 +53,22 @@ int renorm_channel_index(const char *name) {
     return -1;
 }
 
+/* Link entering the point-split (conserved-current) vertex at x in direction mu.
+ * With FERMION_THETA the twisted BCs live in eitheta, not in u_gauge_f, so the
+ * phase must be put back here exactly as Dphi does: eitheta[mu] U(x) on the
+ * link, hence its conjugate on U^dagger(x). Without FERMION_THETA this is the
+ * bare link (eitheta is not used by Dphi then). */
+static inline suNf *vertex_link(int ix, int mu, suNf *buf) {
+    suNf *u = _4FIELD_AT(u_gauge_f, ix, mu);
+#ifdef FERMION_THETA
+    _suNf_mulc(*buf, eitheta[mu], *u);
+    return buf;
+#else
+    (void)buf;
+    return u;
+#endif
+}
+
 static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi_out, int nm, int pt_in, int px_in, int py_in,
                                          int pz_in, int pt_out, int px_out, int py_out, int pz_out) {
     int i, ix, t, x, y, z, a, beta;
@@ -184,7 +200,8 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                         _propagator_add(tr_corr[_g5g0g3r][i], tr_corr[_g5g0g3r][i], Stmp3);
 
                         //cg0
-                        suNf *u1 = _4FIELD_AT(u_gauge_f, ix, 0); //U_mu (x)
+                        suNf u_tw;
+                        suNf *u1 = vertex_link(ix, 0, &u_tw); //U_mu (x), incl. eitheta twist
                         int ixmu = iup(ix, 0); //x + mu
 
                         // g5 S^(p, z+mu) g5 (1 + g0) U^(z) S(p,z)
@@ -222,7 +239,7 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                         _propagator_sub(tr_corr[_cg0r][i], tr_corr[_cg0r][i], Stmp4);
 
                         //cg1
-                        u1 = _4FIELD_AT(u_gauge_f, ix, 1); //U_mu (x)
+                        u1 = vertex_link(ix, 1, &u_tw); //U_mu (x), incl. eitheta twist
                         ixmu = iup(ix, 1); //x + mu
 
                         // g5 S^(p, z+mu) g5 (1 + g1) U^(z) S(p,z)
@@ -260,7 +277,7 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                         _propagator_sub(tr_corr[_cg1r][i], tr_corr[_cg1r][i], Stmp4);
 
                         //cg2
-                        u1 = _4FIELD_AT(u_gauge_f, ix, 2); //U_mu (x)
+                        u1 = vertex_link(ix, 2, &u_tw); //U_mu (x), incl. eitheta twist
                         ixmu = iup(ix, 2); //x + mu
 
                         // g5 S^(p, z+mu) g5 (1 + g2) U^(z) S(p,z)
@@ -298,7 +315,7 @@ static void measure_renormalization_core(spinor_field *psi_in, spinor_field *psi
                         _propagator_sub(tr_corr[_cg2r][i], tr_corr[_cg2r][i], Stmp4);
 
                         //cg3
-                        u1 = _4FIELD_AT(u_gauge_f, ix, 3); //U_mu (x)
+                        u1 = vertex_link(ix, 3, &u_tw); //U_mu (x), incl. eitheta twist
                         ixmu = iup(ix, 3); //x + mu
 
                         // g5 S^(p, z+mu) g5 (1 + g3) U^(z) S(p,z)
