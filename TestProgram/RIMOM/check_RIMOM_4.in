@@ -1,0 +1,38 @@
+GLB_T = 8
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
+NP_T = 1
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+// Random generator
+rlx_level = 1
+rlx_seed = 13813
+rlx_start = new
+rlx_state = rand_state
+rlx_store = 0
+
+// optional: real configuration (lattice size above must match), Landau gauge fixing
+//mes:configfile = /path/to/run1_8x8x8x8nc2rFUNnf2b...
+//mes:gaugefix = 1
+
+mes:mass = 0.1
+mes:precision = 1e-20
+mes:csw = 1.5
+mes:tol = 1e-8
+mes:n_mom = 2
+mes:n_twist = 2
+mes:pt = 0
+mes:px = 1
+mes:py = 1
+mes:pz = 0

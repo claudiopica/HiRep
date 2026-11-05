@@ -1,0 +1,34 @@
+GLB_T = 8
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 1
+NP_X = 2
+NP_Y = 1
+NP_Z = 1
+
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+// Random generator
+rlx_level = 1
+rlx_seed = 13813
+rlx_start = new
+rlx_state = rand_state
+rlx_store = 0
+
+mes:masses = 1.1
+mes:precision = 1e-20
+mes:ne = 0
+// n_mom and n_twist are only used by check_RIMOM_1 (read here to keep one input format)
+mes:n_mom = 4
+mes:n_twist = 2
+mes:pt_in = 0
+mes:px_in = 1
+mes:py_in = 1
+mes:pz_in = -1
