@@ -2,11 +2,22 @@
  * NOCOMPILE= BASIC_SF
  * NOCOMPILE= BC_T_SF
  * NOCOMPILE= ROTATED_SF
- * NOCOMPILE= FERMION_THETA
+ * NOCOMPILE= BC_T_THETA
+ * NOCOMPILE= FERMION_THETA && !BC_X_THETA
+ * NOCOMPILE= FERMION_THETA && !BC_Y_THETA
+ * NOCOMPILE= FERMION_THETA && !BC_Z_THETA
  *
  * Self-test of the RI'-MOM vertex code (LibHR/Observables/measure_renormalization.c)
  * as used by RenormalizationFactors/measure_Z_mom.c (gauge-fixed momentum
- * sources, twisted links, exceptional kinematics p_in = p_out).
+ * sources, twisted BCs, exceptional kinematics p_in = p_out).
+ *
+ * Twisted BCs are applied as in the build at hand (apply_twist):
+ *  - theta build (-x T -y T -z T, FERMION_THETA): through eitheta, as in
+ *    measure_Z_mom.c. This is the production path, including the eitheta
+ *    factor on the conserved-current link (vertex_link).
+ *  - otherwise: by multiplying the spatial links (former measure_Z_mom.c
+ *    method).
+ * All checks below must pass in both builds.
  *
  * 1. Tree level (CHECK_Z). On the free field U = 1 (Landau gauge fixed), for
  *    each momentum l*p_in, l = 1..n_mom, and twist tw = -n_twist..n_twist:
@@ -93,9 +104,17 @@ char output_filename[256] = "renormalization.out";
 input_renormalization mes_var = init_input_renormalization(mes_var);
 
 /*******************************************************************************
- * Twisted links (same convention as measure_Z_mom.c)
+ * Twisted BCs: psi(x + L_mu) = exp(i*pi*theta_mu) psi(x) in the spatial
+ * directions, i.e. a momentum shift of theta_mu/2 in units of 2*pi/L_mu.
  *******************************************************************************/
 
+#ifdef FERMION_THETA
+#if !defined(BC_X_THETA) || !defined(BC_Y_THETA) || !defined(BC_Z_THETA)
+#error check_RIMOM with theta BCs needs them in X, Y and Z (write_mkflags.pl -x T -y T -z T)
+#endif
+#endif
+
+#ifndef FERMION_THETA
 /* Multiply the spatial links of u_gauge_f, local sites and MPI buffers, by
  * exp(i*pi*theta_mu/L_mu): a momentum shift of theta_mu/2 in units of 2*pi/L_mu. */
 static void twist_XYZ_bc(double theta_x, double theta_y, double theta_z) {
@@ -134,6 +153,23 @@ static void restore_untwisted_links(suNf_field *u_untwisted) {
 #ifdef WITH_MPI
     start_sendrecv_suNf_field(u_gauge_f);
     complete_sendrecv_suNf_field(u_gauge_f);
+#endif
+}
+#endif /* !FERMION_THETA */
+
+/* Set the twist theta (units of pi) in X, Y, Z; T is never twisted.
+ * theta build: eitheta, the links stay untwisted (u_untwisted unused).
+ * otherwise:   restore the untwisted links, then multiply them. */
+static void apply_twist(suNf_field *u_untwisted, double theta_x, double theta_y, double theta_z) {
+#ifdef FERMION_THETA
+    (void)u_untwisted;
+    eitheta[0] = 1.0;
+    eitheta[1] = cexp(I * PI * theta_x / (double)GLB_X);
+    eitheta[2] = cexp(I * PI * theta_y / (double)GLB_Y);
+    eitheta[3] = cexp(I * PI * theta_z / (double)GLB_Z);
+#else
+    restore_untwisted_links(u_untwisted);
+    twist_XYZ_bc(theta_x, theta_y, theta_z);
 #endif
 }
 
@@ -431,8 +467,7 @@ static int run_tree_level_scan(spinor_field *source, spinor_field *prop_in, spin
              * the Dirac operator sees p_eff = l*p_in + theta/2 */
             double twist = 0.5 * tw;
             double p[4], p_eff[4];
-            restore_untwisted_links(u_untwisted);
-            twist_XYZ_bc(twist * mom[1], twist * mom[2], twist * mom[3]);
+            apply_twist(u_untwisted, twist * mom[1], twist * mom[2], twist * mom[3]);
             lprintf("TEST", 0, "<p> after twist %1.6f (must stay 1)\n", avr_plaquette());
             for (int mu = 0; mu < 4; mu++) {
                 p[mu] = l * mom[mu];
@@ -454,7 +489,7 @@ static int run_tree_level_scan(spinor_field *source, spinor_field *prop_in, spin
     timeval_subtract(&etime, &end, &start);
     lprintf("MAIN", 0, "Unit configuration analysed in [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
 
-    restore_untwisted_links(u_untwisted);
+    apply_twist(u_untwisted, 0., 0., 0.);
     free_suNf_field(u_untwisted);
     return ok;
 }
@@ -543,12 +578,10 @@ static int check_twist_equivalence(spinor_field *source, spinor_field *prop_in, 
         pB[mu] = 2. * n[mu];
     }
 
-    restore_untwisted_links(u_untwisted);
-    twist_XYZ_bc(+n[1], +n[2], +n[3]);
+    apply_twist(u_untwisted, +n[1], +n[2], +n[3]);
     data_storage_array *outA = measure_all_channels(source, prop_in, prop_out, nm, m, pA, 0, "TW check A (p=n, theta=+n)");
 
-    restore_untwisted_links(u_untwisted);
-    twist_XYZ_bc(-n[1], -n[2], -n[3]);
+    apply_twist(u_untwisted, -n[1], -n[2], -n[3]);
     data_storage_array *outB = measure_all_channels(source, prop_in, prop_out, nm, m, pB, 0, "TW check B (p=2n, theta=-n)");
 
     static const char *propagators[2] = { "Sin", "Sout" };
@@ -557,7 +590,7 @@ static int check_twist_equivalence(spinor_field *source, spinor_field *prop_in, 
 
     free_data_storage(outB);
     free_data_storage(outA);
-    restore_untwisted_links(u_untwisted);
+    apply_twist(u_untwisted, 0., 0., 0.);
     free_suNf_field(u_untwisted);
     return ok;
 }
@@ -585,6 +618,11 @@ int main(int argc, char *argv[]) {
     lprintf("MAIN", 0, "Gauge group: SU(%d)\n", NG);
 #endif
     lprintf("MAIN", 0, "Fermion representation: " REPR_NAME " [dim=%d]\n", NF);
+#ifdef FERMION_THETA
+    lprintf("MAIN", 0, "Twisted BCs via eitheta (FERMION_THETA)\n");
+#else
+    lprintf("MAIN", 0, "Twisted BCs via twisted links\n");
+#endif
 
     error(mes_var.ne != 0, 1, "check_RIMOM",
           "mes:ne = 1 (non-exceptional kinematics) is not supported by this test: the checks need p_in = p_out. "
