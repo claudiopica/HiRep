@@ -1,0 +1,11 @@
+<map id="gamma_spinor.h" name="gamma_spinor.h">
+<area shape="rect" id="Node000001" title="Macros for gamma x spinor." alt="" coords="52,5,183,31"/>
+<area shape="rect" id="Node000002" href="$d8/d1f/libhr__core_8h_source.html" title=" " alt="" coords="5,152,104,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,40,67,58,52,80,47,98,47,118,53,151,48,152,41,118,42,98,47,78,63,54,83,36"/>
+<area shape="rect" id="Node000028" href="$d6/d71/propagator_8h_source.html" title=" " alt="" coords="143,152,247,177"/>
+<area shape="poly" id="edge2_Node000001_Node000028" title=" " alt="" coords="150,36,171,54,188,77,195,97,198,117,199,152,193,152,193,118,190,98,183,80,167,58,146,40"/>
+<area shape="rect" id="Node000030" href="$d8/d1e/spin__matrix_8h.html" title="Type definitions and macros for spin_matrix." alt="" coords="62,79,173,104"/>
+<area shape="poly" id="edge3_Node000001_Node000030" title=" " alt="" coords="120,44,120,79,115,79,115,44"/>
+<area shape="poly" id="edge4_Node000030_Node000002" title=" " alt="" coords="100,116,67,154,63,150,96,113"/>
+<area shape="poly" id="edge5_Node000030_Node000028" title=" " alt="" coords="142,111,184,150,180,154,138,115"/>
+</map>

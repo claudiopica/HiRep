@@ -1,0 +1,5 @@
+<map id="setup.h" name="setup.h">
+<area shape="rect" id="Node000001" title="Setup and finalize to run at the beginning and the end of every program." alt="" coords="17,5,88,31"/>
+<area shape="rect" id="Node000002" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="5,79,100,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="55,44,55,79,50,79,50,44"/>
+</map>

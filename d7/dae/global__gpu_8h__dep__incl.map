@@ -1,0 +1,5 @@
+<map id="global_gpu.h" name="global_gpu.h">
+<area shape="rect" id="Node000001" title="Global variables need to be declared once in the main program and then again as extern variables in t..." alt="" coords="5,5,111,31"/>
+<area shape="rect" id="Node000002" href="$d8/d1f/libhr__core_8h_source.html" title=" " alt="" coords="9,79,107,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="61,44,61,79,55,79,55,44"/>
+</map>

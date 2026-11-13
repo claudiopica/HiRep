@@ -1,0 +1,9 @@
+<map id="init_gpu.c" name="init_gpu.c">
+<area shape="rect" id="Node000001" title="Functions initialize the GPU for the simulation and print collective information on cluster drivers,..." alt="" coords="131,5,217,31"/>
+<area shape="rect" id="Node000002" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="5,79,100,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,33,85,74,83,69,153,28"/>
+<area shape="rect" id="Node000048" href="$d8/d1f/libhr__core_8h_source.html" title=" " alt="" coords="125,79,223,104"/>
+<area shape="poly" id="edge2_Node000001_Node000048" title=" " alt="" coords="177,31,177,65,171,65,171,31"/>
+<area shape="rect" id="Node000060" href="$dc/dac/io_8h_source.html" title=" " alt="" coords="248,79,295,104"/>
+<area shape="poly" id="edge3_Node000001_Node000060" title=" " alt="" coords="191,29,246,68,243,72,188,33"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="geometry_descriptor.h" name="geometry_descriptor.h">
+<area shape="rect" id="Node000001" title="Geometry descriptor struct, that contains all necessary information for multi&#45;node/ multi&#45;GPU calcula..." alt="" coords="76,5,244,31"/>
+<area shape="rect" id="Node000002" href="$d3/d58/eigval_8h_source.html" title=" " alt="" coords="5,79,80,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="131,40,63,81,60,76,128,35"/>
+<area shape="rect" id="Node000010" href="$dd/d29/eva__deflation_8h_source.html" title=" " alt="" coords="161,152,284,177"/>
+<area shape="poly" id="edge2_Node000001_Node000010" title=" " alt="" coords="150,44,141,74,141,89,145,103,155,118,168,131,198,150,195,154,165,135,151,121,140,105,136,89,136,73,144,43"/>
+<area shape="rect" id="Node000011" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="155,79,250,104"/>
+<area shape="poly" id="edge3_Node000001_Node000011" title=" " alt="" coords="176,41,198,77,193,80,172,44"/>
+<area shape="rect" id="Node000037" href="$d3/ded/spinor__field_8h.html" title="The elementary site structures defined in suN.h are used in this file to define field structures that..." alt="" coords="275,79,384,104"/>
+<area shape="poly" id="edge4_Node000001_Node000037" title=" " alt="" coords="201,34,303,76,301,81,199,38"/>
+<area shape="poly" id="edge5_Node000037_Node000010" title=" " alt="" coords="302,114,242,154,239,150,300,109"/>
+</map>

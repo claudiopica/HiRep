@@ -1,0 +1,9 @@
+<map id="field_memory.h" name="field_memory.h">
+<area shape="rect" id="Node000001" title="Field allocation, GPU geometry conversion and host&#45;device/device&#45;host copy functions." alt="" coords="110,5,233,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,76,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,33,75,74,73,70,149,28"/>
+<area shape="rect" id="Node000003" href="$d3/ded/spinor__field_8h.html" title="The elementary site structures defined in suN.h are used in this file to define field structures that..." alt="" coords="100,79,243,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="174,31,174,65,169,65,169,31"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="267,79,462,104"/>
+<area shape="poly" id="edge3_Node000001_Node000010" title=" " alt="" coords="203,28,321,71,320,76,201,33"/>
+</map>

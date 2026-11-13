@@ -1,0 +1,6 @@
+<map id="mo_p" name="mo_p">
+<area shape="rect" id="Node000001" title="Bundle of meson_observables with momentum p." alt="" coords="55,217,114,242"/>
+<area shape="rect" id="Node000002" href="$d6/d0c/structmeson__observable__s.html" title=" " alt="" coords="5,12,164,37"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="87,51,87,217,82,217,82,51"/>
+<area shape="poly" id="edge2_Node000002_Node000002" title=" " alt="" coords="123,6,147,3,168,5,184,12,191,25,182,39,163,45,137,46,110,40,111,35,138,40,162,40,179,34,185,24,181,16,167,10,147,8,124,11"/>
+</map>

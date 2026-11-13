@@ -1,0 +1,5 @@
+<map id="hr_sendrecv.h" name="hr_sendrecv.h">
+<area shape="rect" id="Node000001" title="Header for custom communications, configurable over compilation flags." alt="" coords="5,5,117,31"/>
+<area shape="rect" id="Node000002" href="$d4/d67/geometry_8h.html" title="This file contains information on the geometry of the local lattice, block decomposed geometry,..." alt="" coords="14,79,109,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="64,44,64,79,59,79,59,44"/>
+</map>
