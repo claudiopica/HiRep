@@ -181,6 +181,7 @@ my @libs = ("libhrobservables.a", "libhr.a", "libhrobservables.a"); #order is im
                   "Memory", "Sources", "RIMOM", "Utils", "Propagator", 
                   "Integrators", "StoredConfs", "SpinorField", "WilsonLoops", 
                   "Update", "Mesons", "Geometry", "LinearAlgebra", "ComplexNumbers",
+                  "ModeNumber",
                 #  "RotatedSF", # this is broken
                 #  "Deflate", # this is broken
   );
@@ -188,11 +189,13 @@ my @libs = ("libhrobservables.a", "libhr.a", "libhrobservables.a"); #order is im
   my %exclude = ( Integrators => [ "check_integrator_utils_1.c", ], 
                   Utils => [ "check_utils_3_gb_functions.c", "check_utils_3_tor_functions.c", ],
                   Geometry => [ "check_format_convert_gpu.c", ], 
+                  ModeNumber => [ "modenumber_wilson.c", ],
   );
 
   my %extra_sources = ( "check_integrator_1" => [ "check_integrator_utils_1.c"],
                         "check_update_1" => [ "../../HMC/hmc_utils.c" ],
                         "check_update_2" => [ "../../HMC/hmc_utils.c" ],
+                        "check_modenumber_1" => [ "modenumber_wilson.c", "../../ModeNumber/modenumber.c" ],
   #                      "check_utils_3" => [ "check_utils_3_gb_functions.c","check_utils_3_tor_functions.c"],
   );
 
