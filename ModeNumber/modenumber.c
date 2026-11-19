@@ -104,8 +104,15 @@ void free_modenumber() {
     init = 0;
 }
 
+/* D_m^dagger D_m on the full lattice, with D_m the same (improved) operator as the
+   sea quarks (Giusti-Luscher, arXiv:0812.3638, eq. 2.5 and sect. 5.2).
+   csw must have been set with set_csw() before the first call. */
 static void H2X(spinor_field *out, spinor_field *in) {
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    g5Cphi_sq(mass, out, in);
+#else
     g5Dphi_sq(mass, out, in);
+#endif
 }
 
 /*

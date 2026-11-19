@@ -29,21 +29,24 @@ typedef struct input_nu {
     char approx[512];
     int nhits;
     double mass;
+    double csw; /* clover coefficient: required with WITH_CLOVER / WITH_EXPCLOVER */
     char list[1024];
     char configlist[256];
 
     /* for the reading function */
-    input_record_t read[7];
+    input_record_t read[8];
 
 } input_nu;
 
 #define init_input_nu(varname)                                                                      \
     {                                                                                               \
+        .csw = NAN,                                                                                 \
         .read = {                                                                                   \
             { "squared error for inverter", "nu:inverr2 = %lf", DOUBLE_T, &(varname).inverr2 },     \
             { "Chebyshev approximation file", "nu:approx = %s", STRING_T, (varname).approx },       \
             { "number of stochastic spinors", "nu:nhits = %d", INT_T, &(varname).nhits },           \
-            { "quark mass (overridden by file name)", "nu:mass = %lf", DOUBLE_T, &(varname).mass }, \
+            { "bare quark mass am0", "nu:mass = %lf", DOUBLE_T, &(varname).mass },                   \
+            { "clover coefficient", "nu:csw = %lf", DOUBLE_T, &(varname).csw },                      \
             { "list of eigenvalues", "nu:list = %s", STRING_T, (varname).list },                    \
             { "Configuration list", "nu:configlist = %s", STRING_T, &(varname).configlist },        \
             { NULL, NULL, INT_T, NULL }                                                             \
@@ -64,6 +67,11 @@ int main(int argc, char *argv[]) {
     setup_gauge_fields();
     read_input(nu_var.read, get_input_filename());
     hevamass = nu_var.mass;
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    error(isnan(nu_var.csw), 1, "main [mk_modenumber.c]", "nu:csw missing from the input file (required for clover)\n");
+    set_csw(&nu_var.csw);
+    lprintf("MAIN", 0, "csw = %.10f\n", get_csw());
+#endif
     strcpy(tmp, nu_var.list);
     lprintf("MAIN", 0, "list file: [%s]\n", nu_var.configlist);
     if (strcmp(nu_var.configlist, "") != 0) {

@@ -34,16 +34,18 @@ typedef struct input_eigval {
     int maxiter; /* max number of subiterations */
     double omega1; /* absolute precision */
     double omega2; /* relative precision */
-    double mass; /* quenched mass */
+    double mass; /* bare quark mass am0 */
+    double csw; /* clover coefficient: required with WITH_CLOVER / WITH_EXPCLOVER */
     char configlist[256];
 
     /* for the reading function */
-    input_record_t read[9];
+    input_record_t read[10];
 
 } input_eigval;
 
 #define init_input_eigval(varname)                                                            \
     {                                                                                         \
+        .csw = NAN,                                                                           \
         .read = {                                                                             \
             { "search space dimension", "eva:nevt = %d", INT_T, &(varname).nevt },            \
             { "number of accurate eigenvalues", "eva:nev = %d", INT_T, &(varname).nev },      \
@@ -51,7 +53,8 @@ typedef struct input_eigval {
             { "max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter }, \
             { "absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1 },        \
             { "relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2 },        \
-            { "quark quenched mass", "eva:mass = %lf", DOUBLE_T, &(varname).mass },           \
+            { "bare quark mass am0", "eva:mass = %lf", DOUBLE_T, &(varname).mass },           \
+            { "clover coefficient", "eva:csw = %lf", DOUBLE_T, &(varname).csw },              \
             { "Configuration list", "eva:configlist = %s", STRING_T, &(varname).configlist }, \
             { NULL, NULL, INT_T, NULL }                                                       \
         }                                                                                     \
@@ -73,6 +76,12 @@ int main(int argc, char *argv[]) {
     }
     init_BCs(NULL);
     hevamass = eig_var.mass;
+    set_dirac_mass(hevamass); /* H2() uses the library's static Dirac mass, which was never set (stayed 0) */
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+    error(isnan(eig_var.csw), 1, "main [mk_eigvals.c]", "eva:csw missing from the input file (required for clover)\n");
+    set_csw(&eig_var.csw);
+    lprintf("MAIN", 0, "csw = %.10f\n", get_csw());
+#endif
 
     lprintf("MAIN", 0, "EVA Parameters:\n");
     lprintf("MAIN", 0, "search space dimension  (eva:nevt) = %d\n", eig_var.nevt);
