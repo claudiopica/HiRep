@@ -15,6 +15,12 @@
 #endif
 
 #ifdef WITH_GPU
+#define forceinline __forceinline__
+#else
+#define forceinline __attribute__((always_inline)) inline
+#endif
+
+#ifdef WITH_GPU
 
 #include <stdio.h>
 #ifndef HIP
