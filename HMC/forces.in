@@ -1,0 +1,127 @@
+// Global variables 
+GLB_T = 8
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 2
+NP_X = 2
+NP_Y = 2
+NP_Z = 2
+
+N_REP = 1
+
+rlx_level = 1  
+rlx_seed = 60718  
+rlx_start = new 
+rlx_state = rlx_state
+rlx_store = 1 // Store random number state alongside each configuration for reproducibility (default 0=no, 1=yes)
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = -1
+
+forces:configlist = list_confs.txt
+
+// HMC variables
+tlen = 1.0
+csw = 1.1329500 
+
+// Schroedinger functional
+//SF_background must be 1 (background) or 0 (no background)
+SF_background = 1 
+SF_ct = 1.
+
+//needed only for BC_T_SF_ROTATED
+SF_zf = 1.
+SF_ds = 1.
+SF_sign = 1
+
+//needed only for STOUT_SMEARED
+rho_s = 0.0
+rho_t = 0.0
+
+//needed only if compiled with BC_<DIR>_THETA
+theta_T = 0.0
+theta_X = 0.0
+theta_Y = 0.0
+theta_Z = 0.0
+
+// Run control variables
+run name = run1
+save freq = 1
+meas freq = 1
+conf dir = cnfg
+gauge start = random 
+last conf = +5
+
+// Monomials
+monomial {
+	id = 0
+	type = gauge
+	beta = 12.0
+	level = 1
+}
+
+monomial {
+         id = 1
+         type = hmc
+         mass = -0.148
+         mt_prec = 1e-14
+         force_prec = 1e-14
+         mre_past = 15
+         level = 0
+}
+
+//monomial {
+//       id = 0
+//       type = lw_gauge
+//       c0 = 1.666667
+//       beta = 1.45
+//       level = 2
+//}
+//
+//
+//monomial {
+//       id = 1
+//       type = tm_alt
+//       mass = -0.60
+//       mu = 0.15
+//       mt_prec = 1e-18
+//       force_prec = 1e-18
+//       mre_past = 4
+//       level = 1
+//}
+//
+//monomial {
+//       id = 2
+//       type = hasenbusch_tm_alt
+//       mass = -0.60
+//       mu = 0.
+//       dmu = 0.15
+//       mt_prec = 1e-18
+//       force_prec = 1e-18
+//       mre_past = 4
+//       level = 0
+//}
+
+// Integrators
+
+
+integrator {
+        level = 1
+        type = o2mn
+        steps = 2
+}
+
+integrator {
+        level = 0
+        type = o2mn
+        steps = 25
+}
+
+//integrator {
+//        level = 2
+//        type = o2mn
+//        steps = 6
+//}

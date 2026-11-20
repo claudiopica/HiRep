@@ -106,6 +106,7 @@ my @libs = ("libhrobservables.a", "libhr.a", "libhrobservables.a"); #order is im
   my $topdir = "HMC";
   my %exes = (
     "hmc" => [ "hmc.c", "hmc_utils.c", ],
+    "hmc_forces" => [ "hmc_forces.c", "hmc_utils.c", ],
   );
 
   add_exes($topdir, \%exes, \@libs);

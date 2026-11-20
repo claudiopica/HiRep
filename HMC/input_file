@@ -63,6 +63,9 @@ mes:csw = 1.0
 //Polyakov
 poly:make = false
 
+//Measure monomial forces for tuning
+forces:measure = false
+
 //Eigenvalues
 eva:make = false
 eva:nevt = 5

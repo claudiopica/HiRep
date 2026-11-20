@@ -23,5 +23,6 @@
 #include "Update/update_algo.h"
 #include "Update/twisted_bc.h"
 #include "Update/gauge_observables.h"
+#include "Update/forces_summary.h"
 
 #endif

@@ -9,271 +9,65 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "Random/ranlux.h"
-#include "geometry.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "dirac.h"
-#include "logger.h"
+#include "libhr.h"
 #include "hmc_utils.h"
-#include "memory.h"
-#include "communications.h"
-#include "observables.h"
-#include "utils.h"
-#include "spectrum.h"
-#include "print_compile_options.h"
-#include "representation.h"
-#include "linear_algebra.h"
-#include "setup.h"
 
 /* flow control variable */
 hmc_flow flow = init_hmc_flow(flow);
 
-char input_filename[256] = "input_file";
-char output_filename[256] = "out_0";
-char error_filename[256] = "err_0";
-char cnfg_filename[256] = "";
+typedef struct input_force_list {
+    char configlist[256];
+    input_record_t read[2];
+} input_force_list;
+
+#define init_configlist(varname)                                                                  \
+    {                                                                                             \
+        .read = {                                                                                 \
+            { "Configuration list:", "forces:configlist = %s", STRING_T, &(varname).configlist }, \
+            { NULL, NULL, INT_T, NULL }                                                           \
+        }                                                                                         \
+    }
+
+input_force_list listinput = init_configlist(listinput);
 char list_filename[256] = "";
-
-static void read_cmdline(int argc, char *argv[]) {
-    int i, ai = 0, ao = 0, am = 0, requested = 1, ac = 0, al = 0;
-    FILE *list = NULL;
-
-    for (i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-i") == 0) {
-            ai = i + 1;
-            requested += 2;
-        } else if (strcmp(argv[i], "-o") == 0) {
-            ao = i + 1;
-            requested += 2;
-        } else if (strcmp(argv[i], "-m") == 0) {
-            am = i;
-            requested += 1;
-        } else if (strcmp(argv[i], "-c") == 0) {
-            ac = i + 1;
-            requested += 2;
-        } else if (strcmp(argv[i], "-l") == 0) {
-            al = i + 1;
-            ;
-            requested += 2;
-        }
-    }
-
-    if (am != 0) {
-        print_compiling_info();
-        exit(0);
-    }
-
-    error(argc != requested, 1, "read_cmdline [hmc.c]",
-          "Arguments: -l <list file> | -c <cnfg file> [-i <input file>] [-o <output file>]  [-m]");
-
-    if (ao != 0) { strcpy(output_filename, argv[ao]); }
-    if (ai != 0) { strcpy(input_filename, argv[ai]); }
-    if (ac != 0) {
-        strcpy(cnfg_filename, argv[ac]);
-        strcpy(list_filename, "");
-    } else if (al != 0) {
-        strcpy(list_filename, argv[al]);
-        error((list = fopen(list_filename, "r")) == NULL, 1, "parse_cmdline [mk_mesons.c]", "Failed to open list file\n");
-        error(fscanf(list, "%s", cnfg_filename) == 0, 1, "parse_cmdline [mk_mesons.c]", "Empty list file\n");
-        fclose(list);
-    }
-}
-
-enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
-
-typedef struct {
-    char string[256];
-    int t, x, y, z;
-    int nc, nf;
-    double b, m;
-    int n;
-    int type;
-} filename_t;
-
-int parse_cnfg_filename(char *filename, filename_t *fn) {
-    int hm;
-    char *tmp = NULL;
-    char *basename;
-
-    basename = filename;
-    while ((tmp = strchr(basename, '/')) != NULL) {
-        basename = tmp + 1;
-    }
-
-#ifdef REPR_FUNDAMENTAL
-#define repr_name "FUN"
-#elif defined REPR_SYMMETRIC
-#define repr_name "SYM"
-#elif defined REPR_ANTISYMMETRIC
-#define repr_name "ASY"
-#elif defined REPR_ADJOINT
-#define repr_name "ADJ"
-#endif
-    hm = sscanf(basename, "%*[^_]_%dx%dx%dx%d%*[Nn]c%dr" repr_name "%*[Nn]f%db%lfm%lfn%d", &(fn->t), &(fn->x), &(fn->y),
-                &(fn->z), &(fn->nc), &(fn->nf), &(fn->b), &(fn->m), &(fn->n));
-    if (hm == 9) {
-        fn->m = -fn->m; /* invert sign of mass */
-        fn->type = DYNAMICAL_CNFG;
-        return DYNAMICAL_CNFG;
-    }
-#undef repr_name
-
-    double kappa;
-    hm = sscanf(basename, "%dx%dx%dx%d%*[Nn]c%d%*[Nn]f%db%lfk%lfn%d", &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc),
-                &(fn->nf), &(fn->b), &kappa, &(fn->n));
-    if (hm == 9) {
-        fn->m = .5 / kappa - 4.;
-        fn->type = DYNAMICAL_CNFG;
-        return DYNAMICAL_CNFG;
-    }
-
-    hm = sscanf(basename, "%dx%dx%dx%d%*[Nn]c%db%lfn%d", &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->b), &(fn->n));
-    if (hm == 7) {
-        fn->type = QUENCHED_CNFG;
-        return QUENCHED_CNFG;
-    }
-
-    hm = sscanf(basename, "%*[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d", &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->b),
-                &(fn->n));
-    if (hm == 7) {
-        fn->type = QUENCHED_CNFG;
-        return QUENCHED_CNFG;
-    }
-
-    fn->type = UNKNOWN_CNFG;
-    return UNKNOWN_CNFG;
-}
+char cnfg_filename[256] = "";
 
 int main(int argc, char *argv[]) {
-    char sbuf[128];
-
-#ifndef MEASURE_FORCE
-    read_cmdline(argc, argv);
-    setup_process(&argc, &argv);
-    read_input(logger_var.read, input_filename);
-    logger_set_input(&logger_var);
-    if (PID != 0) {
-        logger_disable();
-    } /* disable logger for MPI processes != 0 */
-    else {
-        FILE *stderrp;
-        sprintf(sbuf, ">>%s", output_filename);
-        logger_stdout(sbuf);
-        stderrp = freopen(error_filename, "w", stderr);
-        error(stderrp == NULL, 1, "main [hmc.c]", "Cannot redirect the stderr");
-    }
-    print_compiling_info_short();
-    error(1, 1, "MAIN", "Need to set MEASURE_FORCE macro for program to measure forces\n");
-}
-#else
-    FILE *list;
-    filename_t fpars;
-
-    /* setup process communications */
-    setup_process(&argc, &argv);
-
-    /* Init Monte Carlo */
-    init_mc(&flow, input_filename);
-    parse_cnfg_filename(cnfg_filename, &fpars);
-    list = NULL;
-    if (strcmp(list_filename, "") != 0) {
-        error((list = fopen(list_filename, "r")) == NULL, 1, "main [mk_mesons.c]", "Failed to open list file\n");
-    }
-
+    FILE *list = NULL;
     int i = 0;
-    while (1) {
-        double times[num_mon()];
-        if (force_ave == NULL) {
-            force_ave = (double *)malloc(num_mon() * sizeof(double));
-            force_max = (double *)malloc(num_mon() * sizeof(double));
-            n_inv_iter = (int *)malloc(num_mon() * sizeof(int));
-        }
-        for (int k = 0; k < num_mon(); k++) {
-            force_ave[k] = 0.0;
-            force_max[k] = 0.0;
-            n_inv_iter[k] = 0;
-        }
 
+    setup_process(&argc, &argv);
+    setup_gauge_fields();
+    init_mc_ghmc(&flow, get_input_filename());
+
+    read_input(listinput.read, get_input_filename());
+    strcpy(list_filename, listinput.configlist);
+
+    lprintf("MAIN", 0, "list_filename = %s %s\n", list_filename, listinput.configlist);
+    if (strcmp(list_filename, "") != 0) {
+        error((list = fopen(list_filename, "r")) == NULL, 1, "main [measure_spectrum.c]", "Failed to open list file\n");
+    }
+
+    while (++i) {
         if (list != NULL) {
             if (fscanf(list, "%s", cnfg_filename) == 0 || feof(list)) { break; }
         }
 
-        i++;
-
         lprintf("MAIN", 0, "Configuration from %s\n", cnfg_filename);
         read_gauge_field(cnfg_filename);
         represent_gauge_field();
-
         lprintf("TEST", 0, "<p> %1.6f\n", avr_plaquette());
-        full_plaquette();
 
         Timer clock;
         timer_set(&clock);
 
-        correct_pf_dist_hmc();
-
-        double elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
-        lprintf("MAIN", 0, "Configuration %d: Time to correct pseudofermion dist: %lf msec\n", i, elapsed_msec);
-
-        elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
-        calc_one_force(0);
-        elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
-        lprintf("MAIN", 0, "Time to calculate gauge force: %lf msec\n", elapsed_msec);
-        times[0] = elapsed_msec;
-
-        elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
-        calc_one_force(1);
-        elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
-        lprintf("MAIN", 0, "Time to calculate fermion force: %lf msec %ld usec\n", elapsed_msec);
-        times[1] = etime.tv_sec + (double)(etime.tv_usec) / 1.0e6;
-        for (int k = 2; k < num_mon(); k++) {
-            elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
-            calc_one_force(k);
-            elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
-            lprintf("MAIN", 0, "Time to calculate HB force %d: %lf msec\n", k, elapsed_msec);
-            times[k] = elapsed_msec;
-        }
-
-        lprintf(
-            "FORCE_SUMMARY", 10,
-            "Fermion: is the first monomial defined in the input file and Hasen: are the following ones upto number of monomials\n");
-        lprintf("FORCE_SUMMARY", 0, "%d ave Gauge: %1.6f, Fermion: %1.6f", i, force_ave[0], force_ave[1]);
-
-        for (int k = 2; k < num_mon(); ++k) {
-            lprintf("FORCE_SUMMARY", 0, ", Hasen %d: %1.6f", k - 2, force_ave[k]);
-        }
-        lprintf("FORCE_SUMMARY", 0, "\n");
-        lprintf("FORCE_SUMMARY", 0, "%d max Gauge: %1.6f, Fermion: %1.6f", i, force_max[0], force_max[1]);
-        for (int k = 2; k < num_mon(); ++k) {
-            lprintf("FORCE_SUMMARY", 0, ", Hasen %d: %1.6f", k - 2, force_max[k]);
-        }
-        lprintf("FORCE_SUMMARY", 0, "\n");
-        lprintf("INV_SUMMARY", 0, "%d Iterations in fermion: %d ", i, n_inv_iter[0]);
-        for (int k = 2; k < num_mon(); ++k) {
-            lprintf("INV_SUMMARY", 0, " Hasenbusch %d: %d", k - 2, n_inv_iter[k - 1]);
-        }
-        lprintf("INV_SUMMARY", 0, "\n");
-
-        lprintf("TIME_SUMMARY", 0, "%d Time in gauge: %g fermion: %g", i, times[0], times[1]);
-        for (int k = 2; k < num_mon(); ++k) {
-            lprintf("TIME_SUMMARY", 0, " Hasenbusch %d: %1.6f", k - 2, times[k]);
-        }
+        // Measure forces
+        print_force_summary();
+        double elapsed = timer_lap(&clock) * 1.e-6;
+        lprintf("MAIN", 0, "Configuration #%d: analysed in [%lf sec]\n", i, elapsed);
+        if (list == NULL) { break; }
     }
 
-    free(force_ave);
-    free(force_max);
-    free(n_inv_iter);
-
-    /* close communications */
     finalize_process();
-
     return 0;
 }
-#endif

@@ -231,14 +231,6 @@ GLB_VAR(double, *rect_weight_gpu, = NULL);
 GLB_VAR(hr_complex, eitheta[4], = { 1.0, 1.0, 1.0, 1.0 });
 #endif
 
-#ifdef MEASURE_FORCE
-#define MEASURE_FORCE0
-#define MEASURE_FORCEHMC
-GLB_VAR(double, *force_ave, = NULL);
-GLB_VAR(double, *force_max, = NULL);
-GLB_VAR(int, *n_inv_iter, = NULL);
-#endif
-
 /* Fields four fermion interactions */
 /* Auxiliary fields for four fermion interactions */
 GLB_VAR(scalar_field, *ff_sigma, = NULL);

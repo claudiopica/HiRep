@@ -207,11 +207,6 @@ void force_hmc_ff(double dt, void *vpar) {
 
 #endif
 
-#ifdef MEASURE_FORCEHMC
-        lprintf("FORCE", 50, "|Xs| = %1.8e |Ys| = %1.8e\n", sqrt(sqnorm_spinor_field(Xs)), sqrt(sqnorm_spinor_field(Ys)));
-        double forcestat[2] = { 0., 0. }; /* used for computation of avr and max force */
-#endif
-
         if (gauge_field_active) {
             /* reset force stat counters */
             start_sendrecv_spinor_field(Xs);
@@ -236,12 +231,7 @@ void force_hmc_ff(double dt, void *vpar) {
                     _OMP_PRAGMA(barrier)
                 }
 
-#ifdef MEASURE_FORCEHMC
-                //      _SITE_FOR_SUM(&glattice,xp,x,forcestat[0],forcestat[1]) {
-                _SITE_FOR_SUM(&glattice, xp, x, forcestat[0], forcestat[1]) {
-#else
                 _SITE_FOR(&glattice, xp, x) {
-#endif
                     for (int mu = 0; mu < 4; ++mu) {
                         int y;
                         suNf_spinor *chi1, *chi2;
@@ -300,29 +290,10 @@ void force_hmc_ff(double dt, void *vpar) {
                         }
 #endif
 
-#ifdef MEASURE_FORCEHMC
-                        double nsq;
-                        _algebra_vector_sqnorm_g(nsq, f);
-                        forcestat[0] += sqrt(nsq);
-                        for (y = 0; y < NG * NG - 1; ++y) {
-                            if (forcestat[1] < fabs(*(((double *)&f) + y))) { forcestat[1] = fabs(*(((double *)&f) + y)); }
-                        }
-#endif
                     } //directions for
                 } //SITE_FOR
             } //PIECE FOR
         } //if
-
-#ifdef MEASURE_FORCEHMC
-        global_sum(forcestat, 1);
-        forcestat[0] *= dt * (_REPR_NORM2 / _FUND_NORM2) / ((double)(4 * GLB_T * GLB_X * GLB_Y * GLB_Z));
-        global_max(forcestat + 1, 1);
-        forcestat[1] *= dt * (_REPR_NORM2 / _FUND_NORM2);
-        force_ave[par->id + 1] += forcestat[0];
-        force_max[par->id + 1] += forcestat[1];
-        n_inv_iter[par->id] += n_iters;
-        lprintf("FORCE_HMC", 20, "avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n", forcestat[0], forcestat[1], dt);
-#endif
     }
 }
 
