@@ -72,9 +72,9 @@ jobs:
           mpicc -show
           nvcc --version
           nvidia-smi -L
-
-          cd "$GITHUB_WORKSPACE/HiRep"
-          ./TestProgram/run_tests.sh \
+          hirep_dir="$GITHUB_WORKSPACE/HiRep"
+          cd "$hirep_dir"
+          GITHUB_WORKSPACE="$hirep_dir" ./TestProgram/run_tests.sh \
             "Algebra DiracOperator Geometry Inverters LinearAlgebra Memory" \
             --gpu --newgeo --fixedstr --no-color \
             --mpicc gcc --cflags "-Wall -O1" \
