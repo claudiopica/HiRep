@@ -79,5 +79,6 @@ jobs:
             --gpu --newgeo --fixedstr --no-color \
             --mpicc gcc --cflags "-Wall -O1" \
             --include "-I$MPI_INCLUDE -I$CUDA_INCLUDE -I$OQCD_MATH_INCLUDE" \
-            --ldflags "-L$MPI_HOME/lib -L$NVHPC_CUDA_HOME/lib64 -L$NVHPC_HOME/compilers/lib -L$OQCD_MATH_LIBDIR -lmpi" \
+            --gpuflags "-arch=sm_86" \
+            --ldflags "-arch=sm_86 -L$MPI_HOME/lib -L$NVHPC_CUDA_HOME/lib64 -L$NVHPC_HOME/compilers/lib -L$OQCD_MATH_LIBDIR -lmpi" \
             -n "$NC" -r "$REPR" "$MPI_FLAG" "$OMP_FLAG" "$ECSW_FLAG"
