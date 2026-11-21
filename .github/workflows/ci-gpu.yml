@@ -49,22 +49,35 @@ jobs:
           - nc: 3
             repr: ADJ
           - omp: "-omp"
-
     steps:
-      - name: Run Tests
-        env: 
-          OMPI_MCA_mca_base_component_show_load_errors: 0
-          CUDA_HPC: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7"
-          MPI_HOME: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest"
-          NVHPC_CUDA_HOME: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2"
-          LD_LIBRARY_PATH: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/compilers/lib:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest/lib::/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2/lib64:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/math_libs/lib64"
-          PATH: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2/bin:/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/compilers/bin"
-          CUDA_MATH_LIBS: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/math_libs/12.2"
-          OPAL_PREFIX: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/mpi"
-          CUDA_INCLUDE: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/cuda/12.2/include"
-          MPI_INCLUDE: "/opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest/include"
-          GITHUB_WORKSPACE: /home/git_runner/actions-runner-hirep/_work/HiRep/HiRep/HiRep
-          HIREP_MPIRUN: /opt/nvidia/hpc_sdk/Linux_x86_64/23.7/comm_libs/12.2/openmpi4/latest/bin/mpirun
-          UCX_MEMTYPE_CACHE: "n"
-        run: export UCX_MEMTYPE_CACHE=n && export GITHUB_WORKSPACE=/home/git_runner/actions-runner-hirep/_work/HiRep/HiRep/HiRep && ./HiRep/TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters LinearAlgebra Memory" --gpu --newgeo --fixedstr --no-color --mpicc gcc --cflags "-Wall -O1" --include "-I${MPI_INCLUDE}  -I${CUDA_INCLUDE} -I${CUDA_MATH_LIBS}/targets/x86_64-linux/include/" --ldflags "-L${MPI_HOME}/lib -L${NVHPC_CUDA_HOME}/lib64 -L${CUDA_HPC}/compilers/lib -L${CUDA_HPC}/math_libs/lib64 -lmpi" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.omp }} ${{ matrix.ecsw }}
+      - name: Run HiRep GPU tests
+        shell: bash
+        env:
+          NC: ${{ matrix.nc }}
+          REPR: ${{ matrix.repr }}
+          MPI_FLAG: ${{ matrix.mpi }}
+          OMP_FLAG: ${{ matrix.omp }}
+          ECSW_FLAG: ${{ matrix.ecsw }}
+        run: |
+          set -eo pipefail
+          source /etc/openqcd/plymouth-env.sh
 
+          export UCX_MEMTYPE_CACHE=n
+          export HIREP_MPIRUN="$MPI_HOME/bin/mpiexec"
+          export CUDA_HPC="$NVHPC_HOME"
+          export CUDA_INCLUDE="$NVHPC_CUDA_HOME/include"
+          export MPI_INCLUDE="$MPI_HOME/include"
+
+          mpichversion
+          mpicc -show
+          nvcc --version
+          nvidia-smi -L
+
+          cd "$GITHUB_WORKSPACE/HiRep"
+          ./TestProgram/run_tests.sh \
+            "Algebra DiracOperator Geometry Inverters LinearAlgebra Memory" \
+            --gpu --newgeo --fixedstr --no-color \
+            --mpicc gcc --cflags "-Wall -O1" \
+            --include "-I$MPI_INCLUDE -I$CUDA_INCLUDE -I$OQCD_MATH_INCLUDE" \
+            --ldflags "-L$MPI_HOME/lib -L$NVHPC_CUDA_HOME/lib64 -L$NVHPC_HOME/compilers/lib -L$OQCD_MATH_LIBDIR -lmpi" \
+            -n "$NC" -r "$REPR" "$MPI_FLAG" "$OMP_FLAG" "$ECSW_FLAG"
