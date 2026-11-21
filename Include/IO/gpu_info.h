@@ -87,7 +87,7 @@ void print_compute_info(cudaDeviceProp, input_gpu);
  *
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  */
-void print_supported_features(cudaDeviceProp);
+void print_supported_features(cudaDeviceProp, int device_id);
 /**
  * @brief Prints all information on hardware, meaning memory, 
  *        compute and features (no driver and runtime info).

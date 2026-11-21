@@ -37,7 +37,7 @@ void init_gpu(input_gpu gpu_var_init) {
     print_device_count_info(gpu_var_init);
     print_software_info(device_prop);
     print_hardware_info(device_prop, gpu_var_init);
-    print_supported_features(device_prop);
+    print_supported_features(device_prop, gpu_var_init.gpuID);
 
     // Select a card (no MPI) or bind cards to processes (MPI)
     select_GPU(gpu_var_init);

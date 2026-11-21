@@ -15,7 +15,9 @@
 #include "gpu.h"
 #ifdef WITH_MPI
 #include "mpi.h"
-#ifndef HIP
+#include <stdlib.h>
+#include <string.h>
+#if !defined(HIP) && defined(OMPI_MAJOR_VERSION)
 #include <mpi-ext.h> // Needed for CUDA-awareness check, see https://docs.open-mpi.org/en/v5.0.x/man-openmpi/man3/MPIX_Query_cuda_support.3.html
 #endif
 #endif
@@ -30,6 +32,12 @@ const char *sComputeMode[] = {
 };
 
 #ifndef HIP /* ----- CUDA ----- */
+static int query_cuda_attribute(enum cudaDeviceAttr attribute, int device_id) {
+    int value = 0;
+    CHECK_CUDA(cudaDeviceGetAttribute(&value, attribute, device_id));
+    return value;
+}
+
 /**
  * @brief Query number of GPUs and print related information
  *
@@ -153,7 +161,8 @@ void print_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) {
 void print_compute_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) {
     // Print formatted
     lprintf("GPU_INIT", 10, "Multiprocessors: %d\n", device_prop.multiProcessorCount);
-    lprintf("GPU_INIT", 10, "GPU Clock Speed: %.2f GHz\n", device_prop.clockRate * 1e-6f);
+    lprintf("GPU_INIT", 10, "GPU Clock Speed: %.2f GHz\n",
+            query_cuda_attribute(cudaDevAttrClockRate, gpu_var_init.gpuID) * 1e-6f);
     lprintf("GPU_INIT", 10, "Total number of register per block: %dB\n", device_prop.regsPerBlock);
     lprintf("GPU_INIT", 10, "Warp size: %dB\n", device_prop.warpSize);
     error(device_prop.warpSize != 32, 1, "init_gpu", "Error: warp size 32 assumed in global sum\n");
@@ -163,8 +172,9 @@ void print_compute_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) {
     lprintf("GPU_INIT", 10, "Maximum size of each dimension of a grid (x,y,z): (%d,%d,%d)\n", device_prop.maxGridSize[0],
             device_prop.maxGridSize[1], device_prop.maxGridSize[2]);
     lprintf("GPU_INIT", 10, "Concurrent copy and execution: %s with %d copy engine(s)\n",
-            device_prop.deviceOverlap ? "Yes" : "No", device_prop.asyncEngineCount);
-    lprintf("GPU_INIT", 10, "Run time limit on kernels: %s\n", device_prop.kernelExecTimeoutEnabled ? "Yes" : "No");
+            device_prop.asyncEngineCount > 0 ? "Yes" : "No", device_prop.asyncEngineCount);
+    lprintf("GPU_INIT", 10, "Run time limit on kernels: %s\n",
+            query_cuda_attribute(cudaDevAttrKernelExecTimeout, gpu_var_init.gpuID) ? "Yes" : "No");
     lprintf("GPU_INIT", 10, "Concurrent kernel execution: %s\n", device_prop.concurrentKernels ? "Yes" : "No");
 }
 
@@ -174,15 +184,17 @@ void print_compute_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) {
  *
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  */
-void print_supported_features(cudaDeviceProp device_prop) {
+void print_supported_features(cudaDeviceProp device_prop, int device_id) {
     lprintf("GPU_INIT", 10, "Device has ECC support enabled:                %s\n", device_prop.ECCEnabled ? "Yes" : "No");
     lprintf("GPU_INIT", 10, "Device is using TCC driver mode:               %s\n", device_prop.tccDriver ? "Yes" : "No");
     lprintf("GPU_INIT", 10, "Device supports Unified Addressing (UVA):      %s\n",
             device_prop.unifiedAddressing ? "Yes" : "No");
     lprintf("GPU_INIT", 10, "Device PCI Bus ID / PCI location ID:           %d / %d\n", device_prop.pciBusID,
             device_prop.pciDeviceID);
+    int compute_mode = query_cuda_attribute(cudaDevAttrComputeMode, device_id);
+    if (compute_mode < 0 || compute_mode > 3) { compute_mode = 4; }
     lprintf("GPU_INIT", 10, "Compute Mode:\n");
-    lprintf("GPU_INIT", 10, "  < %s >\n", sComputeMode[device_prop.computeMode]);
+    lprintf("GPU_INIT", 10, "  < %s >\n", sComputeMode[compute_mode]);
 
 // Multi-GPU calculations are not supported for the old geometry
 #if defined(WITH_GPU) && defined(WITH_MPI) && !defined(WITH_NEW_GEOMETRY)
@@ -192,19 +204,21 @@ void print_supported_features(cudaDeviceProp device_prop) {
 #endif
 
 #ifdef WITH_MPI
-    int cuda_aware_support = 0;
-// TODO: This possibly only works for OpenMPI (SAM)
 #if defined(OMPI_HAVE_MPI_EXT_CUDA) && OMPI_HAVE_MPI_EXT_CUDA
-    cuda_aware_support = MPIX_Query_cuda_support();
+    error(!MPIX_Query_cuda_support(), 1, __func__, "MPI implementation does not support CUDA device buffers");
+    lprintf("GPU_INIT", 10, "MPI CUDA-aware support verified by the runtime query.\n");
+#elif defined(MPICH) && defined(MPIX_GPU_SUPPORT_CUDA)
+    int cuda_aware_support = 0;
+    int mpi_status = MPIX_GPU_query_support(MPIX_GPU_SUPPORT_CUDA, &cuda_aware_support);
+    error(mpi_status != MPI_SUCCESS, 1, __func__, "MPICH CUDA support query failed");
+    error(!cuda_aware_support, 1, __func__, "MPI implementation does not support CUDA device buffers");
+    lprintf("GPU_INIT", 10, "MPI CUDA-aware support verified by the runtime query.\n");
 #else
-#error "Your MPI was not installed with CUDA support. This is unsupported in HiRep.\n"
+    const char *cuda_aware_mpi = getenv("HIREP_CUDA_AWARE_MPI");
+    error(cuda_aware_mpi == NULL || strcmp(cuda_aware_mpi, "1") != 0, 1, __func__,
+          "Set HIREP_CUDA_AWARE_MPI=1 after verifying that MPI supports CUDA device buffers");
+    lprintf("GPU_INIT", 10, "MPI CUDA-aware support assumed from HIREP_CUDA_AWARE_MPI=1.\n");
 #endif
-
-    if (cuda_aware_support) {
-        lprintf("GPU_INIT", 10, "MPI implementation CUDA-aware? yes.\n");
-    } else {
-        error(1, 1, __func__, "MPI implementation CUDA-aware? no. Exiting. \n");
-    }
 #endif
 }
 
@@ -223,12 +237,13 @@ void print_performance_metrics() {
    * 
   */
     int n_devices;
-    cudaGetDeviceCount(&n_devices);
+    CHECK_CUDA(cudaGetDeviceCount(&n_devices));
     double peak_memory_bandwidth = 0;
     for (int i = 0; i < n_devices; i++) {
         cudaDeviceProp prop;
-        cudaGetDeviceProperties(&prop, i);
-        peak_memory_bandwidth += 2.0 * prop.memoryClockRate * (prop.memoryBusWidth / 8) / 1.0e6;
+        CHECK_CUDA(cudaGetDeviceProperties(&prop, i));
+        int memory_clock = query_cuda_attribute(cudaDevAttrMemoryClockRate, i);
+        peak_memory_bandwidth += 2.0 * memory_clock * (prop.memoryBusWidth / 8) / 1.0e6;
     }
     lprintf("GPU_INIT", 10, "Peak Memory Bandwidth (GB/s): %1.6g\n", peak_memory_bandwidth);
 }
