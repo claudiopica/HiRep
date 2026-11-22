@@ -133,7 +133,7 @@ void *wait_for_signal(void *argv) {
     return 0;
 }
 
-void signal() {
+void hr_signal_comms() {
     pthread_mutex_lock(&mutex);
     ready = 1;
     pthread_cond_broadcast(&cond);
@@ -165,7 +165,7 @@ void finalize_hr_comms() {
     pthread_mutex_lock(&mutex);
     finalize = 1;
     pthread_mutex_unlock(&mutex);
-    signal();
+    hr_signal_comms();
     pthread_join(thread[0], NULL);
 }
 
@@ -185,7 +185,7 @@ void hr_sendrecv(void *sendbuffer, void *recvbuffer, geometry_descriptor *type, 
     if (!is_locked()) {
         lock_comms();
         pthread_mutex_unlock(&mutex);
-        signal();
+        hr_signal_comms();
     } else {
         error(1, 1, __func__, "Simultaneous reduced communications attempted\n\n");
     }

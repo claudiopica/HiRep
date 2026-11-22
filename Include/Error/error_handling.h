@@ -47,19 +47,20 @@ void register_sighandlers(void);
         *
         * @param call          Function call that should be checked.
         */
-#define CHECK_MPI(call)                                                     \
-    do {                                                                    \
-        const int mpireturn = call;                                         \
-        if (mpireturn != MPI_SUCCESS) {                                     \
-            char message[MPI_MAX_ERROR_STRING];                             \
-            int message_length;                                             \
-            MPI_Error_string(mpireturn, message, &message_length);          \
-            char errmsg[500];                                               \
-            sprintf(errmsg, "Error in: %s:%d, function: %s\n \
-                            Communications call exited with code %d: %s\n", \
-                    __FILE__, __LINE__, __func__, mpireturn, message);      \
-            error(1, 1, __func__, errmsg);                                  \
-        }                                                                   \
+#define CHECK_MPI(call)                                                                    \
+    do {                                                                                   \
+        const int mpireturn = call;                                                        \
+        if (mpireturn != MPI_SUCCESS) {                                                    \
+            char message[MPI_MAX_ERROR_STRING];                                            \
+            int message_length;                                                            \
+            MPI_Error_string(mpireturn, message, &message_length);                         \
+            char errmsg[sizeof(__FILE__) + sizeof(__func__) + MPI_MAX_ERROR_STRING + 128]; \
+            snprintf(errmsg, sizeof errmsg,                                                \
+                     "Error in: %s:%d, function: %s\n"                                     \
+                     "Communications call exited with code %d: %s\n",                      \
+                     __FILE__, __LINE__, __func__, mpireturn, message);                    \
+            error(1, 1, __func__, errmsg);                                                 \
+        }                                                                                  \
     } while (0)
 #endif
 
