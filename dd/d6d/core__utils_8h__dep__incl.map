@@ -1,0 +1,11 @@
+<map id="core_utils.h" name="core_utils.h">
+<area shape="rect" id="Node000001" title="Macros to declare global variables." alt="" coords="69,5,166,31"/>
+<area shape="rect" id="Node000002" href="$d2/d49/global_8h.html" title="Global parameters and arrays." alt="" coords="5,79,80,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="97,42,57,80,53,77,94,38"/>
+<area shape="rect" id="Node000003" href="$d8/d1f/libhr__core_8h_source.html" title=" " alt="" coords="68,152,167,177"/>
+<area shape="poly" id="edge5_Node000001_Node000003" title=" " alt="" coords="120,45,120,152,115,152,115,45"/>
+<area shape="rect" id="Node000029" href="$d4/d44/global__gpu_8h.html" title="Global variables need to be declared once in the main program and then again as extern variables in t..." alt="" coords="155,79,261,104"/>
+<area shape="poly" id="edge3_Node000001_Node000029" title=" " alt="" coords="144,37,195,76,192,81,141,41"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="66,111,107,150,103,154,63,115"/>
+<area shape="poly" id="edge4_Node000029_Node000003" title=" " alt="" coords="184,115,134,154,131,150,181,110"/>
+</map>

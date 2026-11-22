@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['icoord_0',['icoord',['../d8/d45/structbox__t.html#a6b4b9f802061310dc40d5103fa836447',1,'box_t']]],
+  ['implementation_20of_20the_20point_20to_20all_20propagator_1',['Implementation of the Point-To-All Propagator',['../d3/dd4/analysis.html#autotoc_md17',1,'']]],
+  ['implementation_20scheme_2',['Implementation Scheme',['../d3/dd4/analysis.html#autotoc_md22',1,'']]],
+  ['implementation_20using_20taylor_20series_3',['Implementation using Taylor Series',['../dc/d0a/supported_features.html#autotoc_md76',1,'']]],
+  ['implemented_20patterns_4',['Implemented patterns',['../da/d26/geometry.html#autotoc_md91',1,'']]],
+  ['init_5fgpu_5',['init_gpu',['../de/d2e/geometry__gpu__init_8h.html#af6585e859d90ac41a33cdccfb50e5b06',1,'init_gpu(input_gpu gpu_var):&#160;init_gpu.c'],['../d0/d39/init__gpu_8c.html#a7787666b183ca7a329d0328151c77e23',1,'init_gpu(input_gpu gpu_var_init):&#160;init_gpu.c']]],
+  ['init_5fgpu_2ec_6',['init_gpu.c',['../d0/d39/init__gpu_8c.html',1,'']]],
+  ['init_5fneighbors_5fgpu_7',['init_neighbors_gpu',['../de/d2e/geometry__gpu__init_8h.html#acfbcdbcd80e57d54065aefd2edcbf251',1,'geometry_init_gpu.c']]],
+  ['inner_5fmaster_5fpieces_8',['inner_master_pieces',['../df/da2/structgeometry__descriptor.html#a11b7781649b65790f56a27e319e63ee2',1,'geometry_descriptor']]],
+  ['input_20file_9',['Adjust input file',['../d3/d89/get_started.html#autotoc_md34',1,'']]],
+  ['input_20file_20configuration_10',['Input File Configuration',['../d5/d19/input_file.html',1,'']]],
+  ['input_5fglb_11',['input_glb',['../d2/dc4/structinput__glb.html',1,'']]],
+  ['input_5fgpu_12',['input_gpu',['../d6/d40/structinput__gpu.html',1,'']]],
+  ['input_5flogger_13',['input_logger',['../d2/d51/structinput__logger.html',1,'']]],
+  ['input_5frecord_5ft_14',['input_record_t',['../de/d4f/structinput__record__t.html',1,'']]],
+  ['input_5frlx_15',['input_rlx',['../d7/d12/structinput__rlx.html',1,'']]],
+  ['integration_20tests_16',['Integration Tests',['../d5/d64/testing_setup.html#autotoc_md101',1,'']]],
+  ['integrator_5fpar_17',['integrator_par',['../da/d93/structintegrator__par.html',1,'']]],
+  ['integrators_18',['Integrators',['../d5/d19/input_file.html#autotoc_md44',1,'']]],
+  ['introduction_19',['Introduction',['../index.html',1,'']]],
+  ['inverter_20',['Chronological Inverter',['../d5/d19/input_file.html#autotoc_md54',1,'']]],
+  ['isosinglet_21',['Mesonic Correlators of the Isosinglet',['../d3/dd4/analysis.html#autotoc_md18',1,'']]],
+  ['isotriplet_22',['Mesonic Correlators of the Isotriplet',['../d3/dd4/analysis.html#autotoc_md16',1,'']]]
+];

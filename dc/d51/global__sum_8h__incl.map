@@ -1,0 +1,7 @@
+<map id="global_sum.h" name="global_sum.h">
+<area shape="rect" id="Node000001" title="Functions for global reduction operations across nodes." alt="" coords="73,5,182,31"/>
+<area shape="rect" id="Node000002" href="$d1/d74/hr__complex_8h.html" title="Type definitions and macros for complex numbers." alt="" coords="5,79,116,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="118,33,83,70,79,67,114,29"/>
+<area shape="rect" id="Node000005" href="$d3/ded/spinor__field_8h.html" title="The elementary site structures defined in suN.h are used in this file to define field structures that..." alt="" coords="141,79,250,104"/>
+<area shape="poly" id="edge2_Node000001_Node000005" title=" " alt="" coords="140,29,177,67,173,70,137,33"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="force_scalar_par" name="force_scalar_par">
+<area shape="rect" id="Node000001" title=" " alt="" coords="83,93,213,119"/>
+<area shape="rect" id="Node000002" href="$d6/d10/structsuNg__scalar__field.html" title="SU(N_g) scalar field of SU(N_g) vectors." alt="" coords="5,5,141,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,39,140,91,136,95,90,43"/>
+<area shape="rect" id="Node000004" href="$db/dc8/structsuNg__av__field.html" title="Field of SU(N_g) algebra vectors." alt="" coords="166,5,279,31"/>
+<area shape="poly" id="edge2_Node000001_Node000004" title=" " alt="" coords="211,44,191,71,165,95,162,91,187,68,207,41"/>
+</map>

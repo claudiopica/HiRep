@@ -1,0 +1,11 @@
+<map id="spinor_field.h" name="spinor_field.h">
+<area shape="rect" id="Node000001" title="The elementary site structures defined in suN.h are used in this file to define field structures that..." alt="" coords="321,5,431,31"/>
+<area shape="rect" id="Node000002" href="$dc/d56/geometry__descriptor_8h.html" title="Geometry descriptor struct, that contains all necessary information for multi&#45;node/ multi&#45;GPU calcula..." alt="" coords="5,79,243,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="336,33,179,77,177,72,335,28"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="267,79,370,104"/>
+<area shape="poly" id="edge2_Node000001_Node000004" title=" " alt="" coords="369,33,339,70,335,66,364,29"/>
+<area shape="rect" id="Node000005" href="$d4/d1a/hr__mpi_8h.html" title="Setup for mpi." alt="" coords="394,79,473,104"/>
+<area shape="poly" id="edge3_Node000001_Node000005" title=" " alt="" coords="388,29,417,66,413,70,383,33"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="497,79,679,104"/>
+<area shape="poly" id="edge4_Node000001_Node000007" title=" " alt="" coords="411,28,542,72,540,77,409,33"/>
+</map>

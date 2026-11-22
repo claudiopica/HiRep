@@ -1,0 +1,22 @@
+<map id="linear_algebra.h" name="linear_algebra.h">
+<area shape="rect" id="Node000001" title="Linear algebra operations on spinors both for CPU and with GPU." alt="" coords="518,5,645,31"/>
+<area shape="rect" id="Node000002" href="$d8/d1f/libhr__core_8h_source.html" title=" " alt="" coords="5,86,104,111"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="518,27,340,47,231,62,123,81,106,85,105,80,122,76,230,57,339,42,518,22"/>
+<area shape="rect" id="Node000055" href="$d1/d74/hr__complex_8h.html" title="Type definitions and macros for complex numbers." alt="" coords="42,167,153,192"/>
+<area shape="poly" id="edge3_Node000001_Node000055" title=" " alt="" coords="518,25,429,31,326,42,232,58,195,69,168,81,149,97,132,116,109,156,105,153,128,113,145,93,165,76,193,64,231,53,325,37,428,26,518,20"/>
+<area shape="rect" id="Node000025" href="$dd/d70/generics_8h_source.html" title=" " alt="" coords="179,86,301,111"/>
+<area shape="poly" id="edge4_Node000001_Node000025" title=" " alt="" coords="528,33,314,81,297,85,296,80,313,76,527,28"/>
+<area shape="rect" id="Node000060" title=" " alt="" coords="325,79,480,119"/>
+<area shape="poly" id="edge5_Node000001_Node000060" title=" " alt="" coords="556,33,459,76,457,71,554,28"/>
+<area shape="rect" id="Node000061" title=" " alt="" coords="504,79,659,119"/>
+<area shape="poly" id="edge6_Node000001_Node000061" title=" " alt="" coords="584,31,584,65,579,65,579,31"/>
+<area shape="rect" id="Node000062" title=" " alt="" coords="683,79,866,119"/>
+<area shape="poly" id="edge7_Node000001_Node000062" title=" " alt="" coords="610,28,717,71,715,76,608,33"/>
+<area shape="rect" id="Node000063" title=" " alt="" coords="891,79,1045,119"/>
+<area shape="poly" id="edge8_Node000001_Node000063" title=" " alt="" coords="640,28,878,76,877,81,639,33"/>
+<area shape="rect" id="Node000064" title=" " alt="" coords="1069,79,1224,119"/>
+<area shape="poly" id="edge9_Node000001_Node000064" title=" " alt="" coords="645,23,826,43,1056,76,1055,81,825,49,644,28"/>
+<area shape="rect" id="Node000065" title=" " alt="" coords="1248,79,1403,119"/>
+<area shape="poly" id="edge10_Node000001_Node000065" title=" " alt="" coords="645,20,899,38,1064,54,1235,76,1234,81,1064,60,899,43,645,25"/>
+<area shape="poly" id="edge2_Node000002_Node000055" title=" " alt="" coords="63,110,87,153,82,156,59,113"/>
+</map>

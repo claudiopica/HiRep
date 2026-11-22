@@ -1,0 +1,8 @@
+<map id="mon_hasenbusch_par" name="mon_hasenbusch_par">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,181,168,207"/>
+<area shape="rect" id="Node000002" href="$df/d6a/structforce__hmc__par.html" title=" " alt="" coords="93,93,211,119"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,131,98,182,94,179,133,128"/>
+<area shape="rect" id="Node000003" href="$d0/da8/structspinor__field.html" title="Spinor field array containing SU(N_f) spinors in chosen fermion representation." alt="" coords="23,5,121,31"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="69,45,65,80,67,118,75,152,84,180,79,182,70,154,61,119,60,80,64,44"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="94,39,143,91,139,95,90,43"/>
+</map>
